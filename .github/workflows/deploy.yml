@@ -26,7 +26,7 @@ jobs:
         run: npm ci
         
       - name: Build application
-        run: npm run build
+        run: npm run build:production
         env:
           NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID }}
           NEXT_PUBLIC_SANITY_DATASET: ${{ secrets.NEXT_PUBLIC_SANITY_DATASET }}

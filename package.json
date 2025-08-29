@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:production": "cp next.config.production.js next.config.js && next build && git checkout next.config.js",
     "start": "next start",
     "sanity": "sanity dev",
     "sanity:build": "sanity build",
