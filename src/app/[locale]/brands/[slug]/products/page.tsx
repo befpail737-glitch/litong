@@ -265,7 +265,7 @@ const getBrandData = (slug: string) => {
     }
   };
   
-  return brands[slug] || null;
+  return (brands as any)[slug] || null;
 };
 
 export async function generateMetadata({
@@ -333,7 +333,7 @@ export default async function BrandProductsPage({
             "mainEntity": {
               "@type": "ItemList",
               "numberOfItems": brand.categories.length,
-              "itemListElement": brand.categories.map((category, index) => ({
+              "itemListElement": brand.categories.map((category: any, index: number) => ({
                 "@type": "ListItem",
                 "position": index + 1,
                 "item": {

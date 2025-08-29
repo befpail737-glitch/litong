@@ -217,7 +217,7 @@ STM32H5系列的发布标志着STMicroelectronics在安全微控制器领域的�
     }
   };
 
-  return news[brandSlug]?.[newsId] || null;
+  return (news as any)[brandSlug]?.[newsId] || null;
 };
 
 export async function generateMetadata({
@@ -311,7 +311,7 @@ export default async function NewsDetailPage({
           </p>
           
           <div className="flex flex-wrap gap-2 mb-8">
-            {news.tags.map((tag, index) => (
+            {news.tags.map((tag: string, index: number) => (
               <span key={index} className="inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
                 #{tag}
               </span>
@@ -360,7 +360,7 @@ export default async function NewsDetailPage({
                 <div className="mt-12 pt-8 border-t border-gray-200">
                   <h3 className="text-2xl font-bold text-gray-900 mb-6">相关图片</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {news.gallery.map((image, index) => (
+                    {news.gallery.map((image: any, index: number) => (
                       <div key={index} className="bg-gray-100 rounded-lg overflow-hidden">
                         <img 
                           src={image.url} 
@@ -381,7 +381,7 @@ export default async function NewsDetailPage({
                 <div className="mt-12 pt-8 border-t border-gray-200">
                   <h3 className="text-2xl font-bold text-gray-900 mb-6">相关资料下载</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {news.downloads.map((download, index) => (
+                    {news.downloads.map((download: any, index: number) => (
                       <a key={index} href={download.url}
                          className="block bg-gray-50 rounded-lg p-6 hover:bg-gray-100 transition-colors border">
                         <div className="flex items-center mb-3">
@@ -423,7 +423,7 @@ export default async function NewsDetailPage({
               <div className="bg-white rounded-lg shadow-sm border p-6 mt-6">
                 <h3 className="font-semibold text-gray-900 mb-4">相关新闻</h3>
                 <div className="space-y-4">
-                  {news.related_news.map((related, index) => (
+                  {news.related_news.map((related: any, index: number) => (
                     <a key={related.id} href={`/brands/${slug}/news/${related.id}`}
                        className="block p-3 rounded hover:bg-gray-50 transition-colors">
                       <h4 className="font-medium text-gray-900 mb-1 text-sm leading-tight">

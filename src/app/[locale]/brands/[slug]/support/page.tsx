@@ -225,7 +225,7 @@ const getBrandData = (slug: string) => {
     }
   };
   
-  return brands[slug] || null;
+  return (brands as any)[slug] || null;
 };
 
 export async function generateMetadata({

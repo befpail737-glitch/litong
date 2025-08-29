@@ -163,7 +163,7 @@ const getBrandData = (slug: string) => {
     }
   };
   
-  return brands[slug] || null;
+  return (brands as any)[slug] || null;
 };
 
 export async function generateMetadata({
@@ -233,7 +233,7 @@ export default async function BrandDetailPage({
               "@type": "PostalAddress",
               "addressLocality": brand.headquarters
             },
-            "makesOffer": brand.categories.map(category => ({
+            "makesOffer": brand.categories.map((category: any) => ({
               "@type": "Offer",
               "itemOffered": {
                 "@type": "Product",

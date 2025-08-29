@@ -1,4 +1,4 @@
-import { ShieldCheckIcon, DocumentCheckIcon, UserGroupIcon, TruckIcon } from '@heroicons/react/24/outline';
+import { ShieldCheckIcon, DocumentCheckIcon, UserGroupIcon, TruckIcon } from '../ui/icons';
 
 interface QualityFeature {
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;

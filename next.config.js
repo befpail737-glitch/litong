@@ -10,12 +10,12 @@ const nextConfig = {
   },
   
   // 配置静态导出用于Cloudflare Pages（仅在生产环境）
-  ...(process.env.NODE_ENV === 'production' && {
-    output: 'export',
-    distDir: 'out',
-    trailingSlash: true,
-    skipTrailingSlashRedirect: true,
-  }),
+  // ...(process.env.NODE_ENV === 'production' && {
+  //   output: 'export',
+  //   distDir: 'out',
+  //   trailingSlash: true,
+  //   skipTrailingSlashRedirect: true,
+  // }),
   
   // 图片优化配置
   images: {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { getBrands } from '@/lib/sanity';
+import { getBrands } from '../../../lib/sanity';
 
 interface Brand {
   id: string;

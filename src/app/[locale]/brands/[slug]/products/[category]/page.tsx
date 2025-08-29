@@ -234,7 +234,7 @@ const getProductData = (brandSlug: string, categorySlug: string) => {
     }
   };
 
-  return productData[brandSlug]?.[categorySlug] || null;
+  return (productData as any)[brandSlug]?.[categorySlug] || null;
 };
 
 export async function generateMetadata({
@@ -311,7 +311,7 @@ export default async function ProductCategoryPage({
             "mainEntity": {
               "@type": "ItemList",
               "numberOfItems": categoryData.products.length,
-              "itemListElement": categoryData.products.map((product, index) => ({
+              "itemListElement": categoryData.products.map((product: any, index: number) => ({
                 "@type": "ListItem",
                 "position": index + 1,
                 "item": {

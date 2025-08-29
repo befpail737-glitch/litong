@@ -82,7 +82,8 @@ export default function NewsManager() {
       createdAt: '2024-01-18',
       updatedAt: '2024-01-20',
       viewCount: 890,
-      source: 'LiTong Electronics'
+      source: 'LiTong Electronics',
+      images: ['/images/news/stm32h7-product.jpg']
     },
     {
       id: '3',
@@ -99,7 +100,8 @@ export default function NewsManager() {
       createdAt: '2024-01-28',
       updatedAt: '2024-01-29',
       viewCount: 0,
-      source: 'LiTong Electronics'
+      source: 'LiTong Electronics',
+      images: []
     }
   ];
 

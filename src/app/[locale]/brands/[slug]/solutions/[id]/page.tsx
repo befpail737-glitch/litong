@@ -170,7 +170,7 @@ const getSolutionData = (brandSlug: string, solutionId: string) => {
     }
   };
 
-  return solutions[brandSlug]?.[solutionId] || null;
+  return (solutions as any)[brandSlug]?.[solutionId] || null;
 };
 
 export async function generateMetadata({
@@ -251,7 +251,7 @@ export default async function SolutionDetailPage({
           <h2 className="text-3xl font-bold text-gray-900 mb-6">{solution.challenge.title}</h2>
           <p className="text-lg text-gray-600 mb-8">{solution.challenge.description}</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {solution.challenge.points.map((point, index) => (
+            {solution.challenge.points.map((point: string, index: number) => (
               <div key={index} className="flex items-start space-x-3">
                 <div className="flex-shrink-0 w-2 h-2 bg-red-500 rounded-full mt-2"></div>
                 <p className="text-gray-700">{point}</p>

@@ -123,7 +123,7 @@ const getBrandData = (slug: string) => {
     }
   };
   
-  return brands[slug] || null;
+  return (brands as any)[slug] || null;
 };
 
 export async function generateMetadata({
@@ -191,7 +191,7 @@ export default async function BrandNewsPage({
             "mainEntity": {
               "@type": "ItemList",
               "numberOfItems": brand.news.length,
-              "itemListElement": brand.news.map((article, index) => ({
+              "itemListElement": brand.news.map((article: any, index: number) => ({
                 "@type": "ListItem",
                 "position": index + 1,
                 "item": {
