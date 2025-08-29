@@ -5,6 +5,9 @@ import ProductsFilter from '@/components/products/ProductsFilter';
 import ProductsList from '@/components/products/ProductsList';
 import Breadcrumb from '@/components/ui/Breadcrumb';
 
+// 强制静态生成
+export const dynamic = 'force-static';
+
 export async function generateMetadata({
   params: { locale }
 }: {
@@ -24,11 +27,7 @@ const breadcrumbItems = [
   { label: '产品列表', href: '/products' }
 ];
 
-export default function ProductsPage({
-  searchParams
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
+export default function ProductsPage() {
   return (
     <>
       <div className="bg-gray-50 py-8">
@@ -49,14 +48,14 @@ export default function ProductsPage({
             {/* Filters Sidebar */}
             <div className="lg:col-span-1">
               <Suspense fallback={<div>Loading filters...</div>}>
-                <ProductsFilter searchParams={searchParams} />
+                <ProductsFilter />
               </Suspense>
             </div>
             
             {/* Products Grid */}
             <div className="lg:col-span-3">
               <Suspense fallback={<div>Loading products...</div>}>
-                <ProductsList searchParams={searchParams} />
+                <ProductsList />
               </Suspense>
             </div>
           </div>

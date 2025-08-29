@@ -66,11 +66,7 @@ const filterGroups: FilterGroup[] = [
   }
 ];
 
-export default function ProductsFilter({ 
-  searchParams 
-}: { 
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
+export default function ProductsFilter() {
   const router = useRouter();
   const pathname = usePathname();
   const locale = useLocale();
@@ -82,13 +78,13 @@ export default function ProductsFilter({
   useEffect(() => {
     const filters: Record<string, string[]> = {};
     filterGroups.forEach(group => {
-      const paramValue = searchParams[group.key];
+      const paramValue = urlSearchParams.get(group.key);
       if (paramValue) {
-        filters[group.key] = Array.isArray(paramValue) ? paramValue : [paramValue];
+        filters[group.key] = [paramValue];
       }
     });
     setSelectedFilters(filters);
-  }, [searchParams]);
+  }, [urlSearchParams]);
 
   const updateFilters = (groupKey: string, optionId: string, checked: boolean) => {
     const newFilters = { ...selectedFilters };

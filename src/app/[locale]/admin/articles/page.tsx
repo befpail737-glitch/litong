@@ -1,6 +1,9 @@
 import { Metadata } from 'next';
 import ArticleManager from '@/components/admin/ArticleManager';
 
+// 强制静态生成
+export const dynamic = 'force-static';
+
 export const metadata: Metadata = {
   title: '文章管理 - 后台管理系统 | LiTong',
   description: '管理技术文章、新闻资讯和产品案例，支持富文本编辑器',

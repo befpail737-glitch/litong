@@ -1,0 +1,43 @@
+{
+  "common": {
+    "home": "Home",
+    "brands": "Brands",
+    "products": "Products",
+    "about": "About",
+    "contact": "Contact",
+    "search": "Search",
+    "viewMore": "View More",
+    "readMore": "Read More"
+  },
+  "meta": {
+    "title": "Electronic Components Distributor | Original Authentic Stock | LiTong",
+    "description": "LiTong is a core distributor of electronic components, providing long-term stable supply of original authentic stock with technical support and competitive prices.",
+    "keywords": "LiTong,Electronic Components Distributor,Electronic Components Stock"
+  },
+  "hero": {
+    "title": "Professional Electronic Components Distributor",
+    "subtitle": "Original Authentic Stock · Technical Support · Competitive Prices",
+    "description": "LiTong Electronics has focused on electronic component distribution for 20 years, providing customers with original authentic stock, professional technical support and competitive prices.",
+    "cta": "Contact Now",
+    "cta2": "Product Catalog"
+  },
+  "features": {
+    "title": "Why Choose LiTong Electronics",
+    "inventory": {
+      "title": "Deep Inventory",
+      "description": "Over 100,000 types of stock inventory to meet various needs"
+    },
+    "authentic": {
+      "title": "Authentic Guarantee",
+      "description": "All products are original and authentic with digital certificate tracking"
+    },
+    "support": {
+      "title": "Technical Support",
+      "description": "Professional FAE team provides selection guidance and technical support"
+    },
+    "logistics": {
+      "title": "Fast Logistics",
+      "description": "Global warehouse layout for quick response to customer needs"
+    }
+  }
+}

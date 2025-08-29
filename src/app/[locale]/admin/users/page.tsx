@@ -1,3 +1,5 @@
+// 强制静态生成
+export const dynamic = 'force-static';
 import { Metadata } from 'next';
 import UserManager from '@/components/admin/UserManager';
 

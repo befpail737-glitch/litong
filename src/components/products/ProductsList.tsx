@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 // Sample product data - would come from API/CMS in real app
 const sampleProducts = [
@@ -65,26 +66,24 @@ const sampleProducts = [
   }
 ];
 
-export default function ProductsList({
-  searchParams
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
+export default function ProductsList() {
   const locale = useLocale();
+  const searchParams = useSearchParams();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState('name');
   
   // Filter products based on search params
   const filteredProducts = sampleProducts.filter(product => {
     // Category filter
-    if (searchParams.category) {
-      const categories = Array.isArray(searchParams.category) ? searchParams.category : [searchParams.category];
-      if (!categories.includes(product.category)) return false;
+    const category = searchParams.get('category');
+    if (category) {
+      if (!category.split(',').includes(product.category)) return false;
     }
     
     // Brand filter
-    if (searchParams.brand) {
-      const brands = Array.isArray(searchParams.brand) ? searchParams.brand : [searchParams.brand];
+    const brand = searchParams.get('brand');
+    if (brand) {
+      const brands = brand.split(',');
       const brandSlug = product.brand.toLowerCase().replace(/\s+/g, '-');
       if (!brands.includes(brandSlug)) return false;
     }

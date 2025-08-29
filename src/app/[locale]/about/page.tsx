@@ -6,6 +6,9 @@ import CompanyHistory from '@/components/about/CompanyHistory';
 import QualityAssurance from '@/components/about/QualityAssurance';
 import CustomerCases from '@/components/about/CustomerCases';
 
+// 强制静态生成
+export const dynamic = 'force-static';
+
 export async function generateMetadata({
   params: { locale }
 }: {
