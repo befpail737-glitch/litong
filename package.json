@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "cp next.config.production.js next.config.js && next build",
+    "build:dev": "next build",
     "build:production": "cp next.config.production.js next.config.js && next build && git checkout next.config.js",
     "start": "next start",
     "sanity": "sanity dev",
