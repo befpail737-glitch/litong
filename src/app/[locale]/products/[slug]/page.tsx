@@ -156,6 +156,15 @@ const getProductData = (slug: string) => {
   return products[slug] || null;
 };
 
+export async function generateStaticParams() {
+  // Generate static params for all available product slugs
+  const productSlugs = ['stm32f407vgt6', 'lm358', 'ads1115']; // Add more product slugs as needed
+  
+  return productSlugs.map((slug) => ({
+    slug: slug,
+  }));
+}
+
 export async function generateMetadata({
   params: { locale, slug }
 }: {

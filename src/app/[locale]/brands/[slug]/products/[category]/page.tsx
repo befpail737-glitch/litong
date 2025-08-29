@@ -237,6 +237,19 @@ const getProductData = (brandSlug: string, categorySlug: string) => {
   return (productData as any)[brandSlug]?.[categorySlug] || null;
 };
 
+export async function generateStaticParams() {
+  // Generate static params for all available brand slugs and category slugs
+  const brandCategories = [
+    { slug: 'stm', category: 'microcontrollers' },
+    { slug: 'stm', category: 'analog-ics' }
+  ];
+  
+  return brandCategories.map((item) => ({
+    slug: item.slug,
+    category: item.category,
+  }));
+}
+
 export async function generateMetadata({
   params: { locale, slug, category }
 }: {

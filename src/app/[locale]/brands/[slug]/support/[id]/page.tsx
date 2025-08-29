@@ -287,6 +287,18 @@ void sensor_node_main_loop(void) {
   return articles[brandSlug]?.[articleId] || null;
 };
 
+export async function generateStaticParams() {
+  // Generate static params for all available brand slugs and article IDs
+  const brandArticles = [
+    { slug: 'stm', id: 'stm32-low-power-design' }
+  ];
+  
+  return brandArticles.map((item) => ({
+    slug: item.slug,
+    id: item.id,
+  }));
+}
+
 export async function generateMetadata({
   params: { locale, slug, id }
 }: {

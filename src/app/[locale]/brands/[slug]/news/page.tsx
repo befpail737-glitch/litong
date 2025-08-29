@@ -126,6 +126,15 @@ const getBrandData = (slug: string) => {
   return (brands as any)[slug] || null;
 };
 
+export async function generateStaticParams() {
+  // Generate static params for all available brand slugs
+  const brandSlugs = ['stm', 'ti']; // Add more brand slugs as needed
+  
+  return brandSlugs.map((slug) => ({
+    slug: slug,
+  }));
+}
+
 export async function generateMetadata({
   params: { locale, slug }
 }: {

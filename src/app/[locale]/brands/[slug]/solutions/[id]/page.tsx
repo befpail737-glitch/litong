@@ -173,6 +173,18 @@ const getSolutionData = (brandSlug: string, solutionId: string) => {
   return (solutions as any)[brandSlug]?.[solutionId] || null;
 };
 
+export async function generateStaticParams() {
+  // Generate static params for all available brand slugs and solution IDs
+  const brandSolutions = [
+    { slug: 'stm', id: 'iot-smart-home' }
+  ];
+  
+  return brandSolutions.map((item) => ({
+    slug: item.slug,
+    id: item.id,
+  }));
+}
+
 export async function generateMetadata({
   params: { locale, slug, id }
 }: {
