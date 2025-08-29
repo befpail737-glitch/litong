@@ -18,7 +18,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const t = await getTranslations({ locale, namespace: 'meta' });
   
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elec-distributor.com';
+  
   return {
+    metadataBase: new URL(siteUrl),
     title: t('title'),
     description: t('description'),
     keywords: t('keywords'),

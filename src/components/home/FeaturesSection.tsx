@@ -38,7 +38,7 @@ const features = [
 ];
 
 export default function FeaturesSection() {
-  const t = useTranslations('features');
+  const t = useTranslations('home.features');
 
   return (
     <section className="py-24 bg-gray-50">
@@ -48,7 +48,7 @@ export default function FeaturesSection() {
             {t('title')}
           </h2>
           <p className="mt-6 text-lg leading-8 text-gray-600 max-w-2xl mx-auto">
-            作为专业的电子元件代理商，我们为客户提供全方位的服务支持
+            {t('subtitle')}
           </p>
         </div>
 
@@ -82,8 +82,8 @@ export default function FeaturesSection() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h4 className="mt-4 font-semibold text-gray-900">数字证书追踪</h4>
-              <p className="mt-2 text-sm text-gray-600">每个产品都有数字证书和报关单，确保产品来源可追溯</p>
+              <h4 className="mt-4 font-semibold text-gray-900">{t('trust.certificate.title')}</h4>
+              <p className="mt-2 text-sm text-gray-600">{t('trust.certificate.description')}</p>
             </div>
             
             <div className="text-center">
@@ -92,8 +92,8 @@ export default function FeaturesSection() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                 </svg>
               </div>
-              <h4 className="mt-4 font-semibold text-gray-900">优势价格</h4>
-              <p className="mt-2 text-sm text-gray-600">直接与原厂合作，提供具有竞争力的价格和灵活的付款方式</p>
+              <h4 className="mt-4 font-semibold text-gray-900">{t('trust.pricing.title')}</h4>
+              <p className="mt-2 text-sm text-gray-600">{t('trust.pricing.description')}</p>
             </div>
             
             <div className="text-center">
@@ -102,8 +102,8 @@ export default function FeaturesSection() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <h4 className="mt-4 font-semibold text-gray-900">快速交付</h4>
-              <p className="mt-2 text-sm text-gray-600">全球仓储布局，大部分产品可在24小时内发货</p>
+              <h4 className="mt-4 font-semibold text-gray-900">{t('trust.delivery.title')}</h4>
+              <p className="mt-2 text-sm text-gray-600">{t('trust.delivery.description')}</p>
             </div>
           </div>
         </div>
