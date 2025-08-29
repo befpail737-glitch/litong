@@ -7,7 +7,6 @@
  * https://www.sanity.io/docs/sanity-studio
  */
 
-import { NextStudioHead } from 'next-sanity/studio/head'
 import { NextStudio } from 'next-sanity/studio'
 import { metadata } from 'next-sanity/studio/metadata'
 import config from '../../../../sanity.config'
@@ -16,8 +15,4 @@ export { metadata }
 
 export default function StudioPage() {
   return <NextStudio config={config} />
-}
-
-export function Head() {
-  return <NextStudioHead />
 }
