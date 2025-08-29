@@ -1,0 +1,45 @@
+<svg viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Circuit board pattern background -->
+  <g opacity="0.1">
+    <path d="M20 10h160M20 30h160M20 50h160M30 0v60M60 0v60M90 0v60M120 0v60M150 0v60M170 0v60" stroke="#3B82F6" stroke-width="0.5"/>
+    <circle cx="30" cy="10" r="2" fill="#3B82F6"/>
+    <circle cx="60" cy="30" r="2" fill="#3B82F6"/>
+    <circle cx="90" cy="10" r="2" fill="#3B82F6"/>
+    <circle cx="120" cy="50" r="2" fill="#3B82F6"/>
+    <circle cx="150" cy="30" r="2" fill="#3B82F6"/>
+    <circle cx="170" cy="10" r="2" fill="#3B82F6"/>
+  </g>
+  
+  <!-- Main logo icon -->
+  <g transform="translate(10, 10)">
+    <!-- Microchip icon -->
+    <rect x="0" y="0" width="40" height="40" rx="4" fill="#3B82F6" stroke="#1D4ED8" stroke-width="2"/>
+    <rect x="6" y="6" width="28" height="28" rx="2" fill="#DBEAFE"/>
+    
+    <!-- Circuit lines -->
+    <path d="M12 12h16M12 20h16M12 28h16M12 16h8M20 16h8" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round"/>
+    
+    <!-- Connection dots -->
+    <circle cx="12" cy="12" r="1" fill="#1D4ED8"/>
+    <circle cx="28" cy="12" r="1" fill="#1D4ED8"/>
+    <circle cx="12" cy="20" r="1" fill="#1D4ED8"/>
+    <circle cx="28" cy="20" r="1" fill="#1D4ED8"/>
+    <circle cx="12" cy="28" r="1" fill="#1D4ED8"/>
+    <circle cx="28" cy="28" r="1" fill="#1D4ED8"/>
+    
+    <!-- External pins -->
+    <rect x="-2" y="8" width="4" height="2" fill="#6B7280"/>
+    <rect x="-2" y="18" width="4" height="2" fill="#6B7280"/>
+    <rect x="-2" y="28" width="4" height="2" fill="#6B7280"/>
+    <rect x="38" y="8" width="4" height="2" fill="#6B7280"/>
+    <rect x="38" y="18" width="4" height="2" fill="#6B7280"/>
+    <rect x="38" y="28" width="4" height="2" fill="#6B7280"/>
+  </g>
+  
+  <!-- Company name -->
+  <g transform="translate(60, 15)">
+    <!-- LiTong text -->
+    <text x="0" y="20" font-family="Inter, sans-serif" font-size="24" font-weight="700" fill="#1F2937">LiTong</text>
+    <text x="0" y="38" font-family="Inter, sans-serif" font-size="12" font-weight="500" fill="#6B7280">Electronics</text>
+  </g>
+</svg>

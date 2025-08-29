@@ -1,0 +1,20 @@
+# Redirect root to default language
+/ /zh 302
+
+# Legacy URLs
+/index.html /zh 301
+/home /zh 301
+/product /zh/products 301
+/brand /zh/brands 301
+/contact.html /zh/contact 301
+
+# Handle old product URLs
+/products.html /zh/products 301
+/brands.html /zh/brands 301
+/about.html /zh/about 301
+
+# API endpoints (if needed in future)
+/api/* /api/:splat 200
+
+# Fallback for any unmatched paths
+/* /zh/404 404

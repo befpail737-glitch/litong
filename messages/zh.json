@@ -1,0 +1,43 @@
+{
+  "common": {
+    "home": "首页",
+    "brands": "品牌列表",
+    "products": "产品列表",
+    "about": "关于我们",
+    "contact": "联系我们",
+    "search": "搜索",
+    "viewMore": "查看更多",
+    "readMore": "阅读更多"
+  },
+  "meta": {
+    "title": "电子元件核心代理 | 提供正品原装现货 | LiTong",
+    "description": "力通是电子元件核心代理，长期稳定供应提供正品原装现货。并提供技术支持和优势价格，欢迎咨询。",
+    "keywords": "LiTong,电子元件代理,电子元件现货"
+  },
+  "hero": {
+    "title": "专业电子元件代理商",
+    "subtitle": "正品原装现货 · 技术支持 · 优势价格",
+    "description": "力通电子专注电子元件代理20年，为客户提供正品原装现货，专业技术支持和有竞争力的价格。",
+    "cta": "立即咨询",
+    "cta2": "产品目录"
+  },
+  "features": {
+    "title": "为什么选择力通电子",
+    "inventory": {
+      "title": "库存深度",
+      "description": "超过10万种现货库存，满足各种需求"
+    },
+    "authentic": {
+      "title": "正品保证",
+      "description": "所有产品均为原装正品，提供数字证书追踪"
+    },
+    "support": {
+      "title": "技术支持",
+      "description": "专业FAE团队提供选型指导和技术支持"
+    },
+    "logistics": {
+      "title": "快速物流",
+      "description": "全球仓储布局，快速响应客户需求"
+    }
+  }
+}

@@ -1,0 +1,62 @@
+<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Power management IC outline -->
+  <rect x="25" y="30" width="50" height="40" rx="3" fill="#10B981" stroke="#047857" stroke-width="2"/>
+  
+  <!-- Input/Output indicators -->
+  <rect x="15" y="45" width="10" height="4" fill="#6B7280" rx="1"/>
+  <rect x="75" y="45" width="10" height="4" fill="#6B7280" rx="1"/>
+  
+  <!-- Power flow visualization -->
+  <g stroke="#047857" stroke-width="2" fill="none">
+    <!-- Input power line -->
+    <path d="M15 47L25 47" marker-end="url(#arrowgreen)"/>
+    <!-- Output power line -->
+    <path d="M75 47L85 47" marker-end="url(#arrowgreen)"/>
+  </g>
+  
+  <!-- Voltage regulation visualization -->
+  <g transform="translate(30, 35)">
+    <!-- Input waveform (higher amplitude) -->
+    <path d="M0 15 Q5 5 10 15 Q15 25 20 15" stroke="#DC2626" stroke-width="2" fill="none"/>
+    <text x="10" y="4" text-anchor="middle" font-size="8" fill="#DC2626" font-weight="600">VIN</text>
+    
+    <!-- Arrow indicating conversion -->
+    <path d="M22 15 L28 15" stroke="#6B7280" stroke-width="2" marker-end="url(#arrowgray)"/>
+    
+    <!-- Output waveform (stable, lower amplitude) -->
+    <path d="M30 15 L50 15" stroke="#059669" stroke-width="3"/>
+    <text x="40" y="12" text-anchor="middle" font-size="8" fill="#059669" font-weight="600">VOUT</text>
+  </g>
+  
+  <!-- Power regulation components -->
+  <g transform="translate(35, 50)">
+    <!-- Inductor -->
+    <path d="M0 0 Q5 -5 10 0 Q15 5 20 0 Q25 -5 30 0" stroke="#374151" stroke-width="2" fill="none"/>
+    <!-- Capacitor -->
+    <line x1="35" y1="-3" x2="35" y2="3" stroke="#374151" stroke-width="2"/>
+    <line x1="38" y1="-3" x2="38" y2="3" stroke="#374151" stroke-width="2"/>
+  </g>
+  
+  <!-- Efficiency indicator -->
+  <g transform="translate(45, 20)">
+    <circle cx="5" cy="5" r="8" fill="#ECFDF5" stroke="#10B981" stroke-width="2"/>
+    <text x="5" y="9" text-anchor="middle" font-size="10" fill="#047857" font-weight="700">95%</text>
+  </g>
+  
+  <!-- Arrow markers -->
+  <defs>
+    <marker id="arrowgreen" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0,0 0,6 9,3" fill="#047857"/>
+    </marker>
+    <marker id="arrowgray" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0,0 0,6 9,3" fill="#6B7280"/>
+    </marker>
+  </defs>
+  
+  <!-- Heat dissipation lines -->
+  <g stroke="#F59E0B" stroke-width="1" opacity="0.6">
+    <path d="M40 25 Q42 22 44 25 Q46 28 48 25"/>
+    <path d="M50 25 Q52 22 54 25 Q56 28 58 25"/>
+    <path d="M60 25 Q62 22 64 25 Q66 28 68 25"/>
+  </g>
+</svg>
