@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getTranslations } from 'next-intl/server';
 import BrandAbout from '@/components/brands/BrandAbout';
 import Breadcrumb from '@/components/ui/Breadcrumb';
 
@@ -171,12 +170,18 @@ const getBrandData = (slug: string) => {
 };
 
 export async function generateStaticParams() {
-  // Generate static params for all available brand slugs
+  // Generate static params for all available brand slugs and locales
   const brandSlugs = ['stm', 'ti']; // Add more brand slugs as needed
+  const locales = ['zh', 'en', 'ja', 'ko', 'ru', 'vi', 'fr', 'de', 'it', 'tr', 'ar'];
   
-  return brandSlugs.map((slug) => ({
-    slug: slug,
-  }));
+  const params = [];
+  for (const locale of locales) {
+    for (const slug of brandSlugs) {
+      params.push({ locale, slug });
+    }
+  }
+  
+  return params;
 }
 
 export async function generateMetadata({
