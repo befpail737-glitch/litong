@@ -1,0 +1,19 @@
+{
+  "name": "litong-electronics",
+  "production_branch": "master",
+  "build_config": {
+    "build_command": "npm run build",
+    "build_output_directory": "out",
+    "root_dir": ".",
+    "environment_variables": {
+      "NODE_VERSION": "18",
+      "NEXT_PUBLIC_SANITY_PROJECT_ID": "oquvb2bs",
+      "NEXT_PUBLIC_SANITY_DATASET": "production",
+      "NEXT_PUBLIC_SITE_URL": "https://www.elec-distributor.com"
+    }
+  },
+  "preview_branch_includes": ["*"],
+  "preview_branch_excludes": [],
+  "compatibility_date": "2024-08-29",
+  "compatibility_flags": []
+}
