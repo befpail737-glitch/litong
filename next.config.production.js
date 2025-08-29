@@ -15,6 +15,7 @@ const nextConfig = {
   trailingSlash: true,
   skipTrailingSlashRedirect: true,
   
+  
   // 图片优化配置
   images: {
     unoptimized: true
