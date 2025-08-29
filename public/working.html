@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Working Test - LiTong</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        .success { color: green; font-size: 24px; }
+        .info { color: #666; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1 class="success">✅ Static Files Are Working!</h1>
+    <p class="info">This confirms that Cloudflare Pages is serving static files correctly.</p>
+    <p><strong>Test successful at:</strong> <span id="time"></span></p>
+    <p><a href="/zh/">Go to Chinese Website →</a></p>
+    <script>
+        document.getElementById('time').textContent = new Date().toLocaleString();
+    </script>
+</body>
+</html>
