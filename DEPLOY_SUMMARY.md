@@ -17,7 +17,7 @@
 ### ✅ 3. Cloudflare Pages 部署配置
 - **构建命令**: `npm run build:production`
 - **输出目录**: `out`
-- **Node.js版本**: 18
+- **Node.js版本**: 20
 - **自定义域名**: www.elec-distributor.com
 
 ## 下一步操作
@@ -44,7 +44,7 @@
 
 4. **设置环境变量**
    ```
-   NODE_VERSION=18
+   NODE_VERSION=20
    NEXT_PUBLIC_SANITY_PROJECT_ID=oquvb2bs
    NEXT_PUBLIC_SANITY_DATASET=production
    SANITY_API_TOKEN=<从Sanity管理面板获取>
