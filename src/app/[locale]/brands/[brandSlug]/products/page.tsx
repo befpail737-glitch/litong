@@ -334,7 +334,34 @@ export default async function BrandProductsPage({
         </div>
       </div>
       
-      <BrandProducts brand={brand} categories={brand.categories} />
+      <BrandProducts 
+        brand={{
+          _id: brand.id,
+          name: brand.name,
+          nameEn: brand.name,
+          slug: { current: brandSlug },
+          description: brand.description,
+          website: brand.website,
+          country: brand.headquarters,
+          founded: parseInt(brand.founded)
+        }} 
+        categories={brand.categories.map((cat: any) => ({
+          _id: cat.id,
+          name: cat.name,
+          nameEn: cat.name,
+          slug: { current: cat.slug },
+          description: cat.description,
+          productCount: cat.productCount,
+          subcategories: cat.subcategories?.map((sub: any) => ({
+            _id: sub.name,
+            name: sub.name,
+            nameEn: sub.name,
+            slug: { current: sub.name.toLowerCase().replace(/\s+/g, '-') },
+            description: sub.description,
+            productCount: sub.productCount
+          })) || []
+        }))}
+      />
       
       {/* JSON-LD Schema for Brand Products Page */}
       <script

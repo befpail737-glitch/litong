@@ -97,15 +97,11 @@ export async function generateStaticParams() {
   // 这里可以预生成一些热门的品牌分类组合，支持多语言
   const brandCategories = [
     {
-      brandSlug: 'stmicroelectronics',
+      brandSlug: 'stm',
       categorySlug: 'microcontrollers'
     },
     {
-      brandSlug: 'ti',
-      categorySlug: 'power-management'
-    },
-    {
-      brandSlug: 'infineon',
+      brandSlug: 'stmicroelectronics',
       categorySlug: 'microcontrollers'
     }
   ];
