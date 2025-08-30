@@ -185,11 +185,11 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({
-  params: { locale, slug }
+  params: { locale, brandSlug }
 }: {
-  params: { locale: string; slug: string };
+  params: { locale: string; brandSlug: string };
 }): Promise<Metadata> {
-  const brand = getBrandData(slug);
+  const brand = getBrandData(brandSlug);
   
   if (!brand) {
     return {
@@ -210,11 +210,11 @@ export async function generateMetadata({
 }
 
 export default async function BrandAboutPage({
-  params: { locale, slug }
+  params: { locale, brandSlug }
 }: {
-  params: { locale: string; slug: string };
+  params: { locale: string; brandSlug: string };
 }) {
-  const brand = getBrandData(slug);
+  const brand = getBrandData(brandSlug);
   
   if (!brand) {
     notFound();
@@ -223,8 +223,8 @@ export default async function BrandAboutPage({
   const breadcrumbItems = [
     { label: '首页', href: '/' },
     { label: '品牌列表', href: '/brands' },
-    { label: brand.name, href: `/brands/${slug}` },
-    { label: '关于品牌', href: `/brands/${slug}/about` }
+    { label: brand.name, href: `/brands/${brandSlug}` },
+    { label: '关于品牌', href: `/brands/${brandSlug}/about` }
   ];
 
   return (

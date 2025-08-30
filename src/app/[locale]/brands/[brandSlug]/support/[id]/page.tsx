@@ -309,11 +309,11 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({
-  params: { locale, slug, id }
+  params: { locale, brandSlug, id }
 }: {
-  params: { locale: string; slug: string; id: string };
+  params: { locale: string; brandSlug: string; id: string };
 }): Promise<Metadata> {
-  const article = getArticleData(slug, id);
+  const article = getArticleData(brandSlug, id);
   
   if (!article) {
     return {
@@ -321,7 +321,7 @@ export async function generateMetadata({
     };
   }
   
-  const brandName = slug === 'stm' ? 'STMicroelectronics' : slug;
+  const brandName = brandSlug === 'stm' ? 'STMicroelectronics' : brandSlug;
   
   return {
     title: `${article.title} - ${brandName} | LiTong`,
@@ -337,24 +337,24 @@ export async function generateMetadata({
 }
 
 export default async function SupportArticlePage({
-  params: { locale, slug, id }
+  params: { locale, brandSlug, id }
 }: {
-  params: { locale: string; slug: string; id: string };
+  params: { locale: string; brandSlug: string; id: string };
 }) {
-  const article = getArticleData(slug, id);
+  const article = getArticleData(brandSlug, id);
   
   if (!article) {
     notFound();
   }
 
-  const brandName = slug === 'stm' ? 'STMicroelectronics' : slug;
+  const brandName = brandSlug === 'stm' ? 'STMicroelectronics' : brandSlug;
 
   const breadcrumbItems = [
     { label: '首页', href: '/' },
     { label: '品牌列表', href: '/brands' },
-    { label: brandName, href: `/brands/${slug}` },
-    { label: '技术支持', href: `/brands/${slug}/support` },
-    { label: article.title, href: `/brands/${slug}/support/${id}` }
+    { label: brandName, href: `/brands/${brandSlug}` },
+    { label: '技术支持', href: `/brands/${brandSlug}/support` },
+    { label: article.title, href: `/brands/${brandSlug}/support/${id}` }
   ];
 
   const getDifficultyColor = (difficulty: string) => {
@@ -523,7 +523,7 @@ export default async function SupportArticlePage({
                 <h3 className="font-semibold text-gray-900 mb-4">相关文章</h3>
                 <div className="space-y-4">
                   {article.related_articles.map((related, index) => (
-                    <a key={related.id} href={`/brands/${slug}/support/${related.id}`}
+                    <a key={related.id} href={`/brands/${brandSlug}/support/${related.id}`}
                        className="block p-3 rounded hover:bg-gray-50 transition-colors">
                       <h4 className="font-medium text-gray-900 mb-1">{related.title}</h4>
                       <p className="text-sm text-gray-600">{related.summary}</p>
@@ -555,7 +555,7 @@ export default async function SupportArticlePage({
             },
             "mainEntityOfPage": {
               "@type": "WebPage",
-              "@id": `/${locale}/brands/${slug}/support/${id}`
+              "@id": `/${locale}/brands/${brandSlug}/support/${id}`
             },
             "image": article.featured_image,
             "datePublished": article.publishDate,
