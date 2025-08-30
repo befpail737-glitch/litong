@@ -229,12 +229,18 @@ const getBrandData = (slug: string) => {
 };
 
 export async function generateStaticParams() {
-  // Generate static params for all available brand slugs
+  // Generate static params for all available brand slugs and locales
   const brandSlugs = ['stm']; // Add more brand slugs as needed
+  const locales = ['zh', 'en', 'ja', 'ko', 'ru', 'vi', 'fr', 'de', 'it', 'tr', 'ar'];
   
-  return brandSlugs.map((slug) => ({
-    slug: slug,
-  }));
+  const params = [];
+  for (const locale of locales) {
+    for (const brandSlug of brandSlugs) {
+      params.push({ locale, brandSlug });
+    }
+  }
+  
+  return params;
 }
 
 export async function generateMetadata({

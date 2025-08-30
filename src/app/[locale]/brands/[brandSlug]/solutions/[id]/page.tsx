@@ -174,15 +174,24 @@ const getSolutionData = (brandSlug: string, solutionId: string) => {
 };
 
 export async function generateStaticParams() {
-  // Generate static params for all available brand slugs and solution IDs
+  // Generate static params for all available brand slugs, locales and solution IDs
   const brandSolutions = [
-    { slug: 'stm', id: 'iot-smart-home' }
+    { brandSlug: 'stm', id: 'iot-smart-home' }
   ];
+  const locales = ['zh', 'en', 'ja', 'ko', 'ru', 'vi', 'fr', 'de', 'it', 'tr', 'ar'];
   
-  return brandSolutions.map((item) => ({
-    slug: item.slug,
-    id: item.id,
-  }));
+  const params = [];
+  for (const locale of locales) {
+    for (const item of brandSolutions) {
+      params.push({
+        locale,
+        brandSlug: item.brandSlug,
+        id: item.id,
+      });
+    }
+  }
+  
+  return params;
 }
 
 export async function generateMetadata({

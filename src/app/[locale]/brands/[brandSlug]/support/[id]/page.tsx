@@ -288,15 +288,24 @@ void sensor_node_main_loop(void) {
 };
 
 export async function generateStaticParams() {
-  // Generate static params for all available brand slugs and article IDs
+  // Generate static params for all available brand slugs, locales and article IDs
   const brandArticles = [
-    { slug: 'stm', id: 'stm32-low-power-design' }
+    { brandSlug: 'stm', id: 'stm32-low-power-design' }
   ];
+  const locales = ['zh', 'en', 'ja', 'ko', 'ru', 'vi', 'fr', 'de', 'it', 'tr', 'ar'];
   
-  return brandArticles.map((item) => ({
-    slug: item.slug,
-    id: item.id,
-  }));
+  const params = [];
+  for (const locale of locales) {
+    for (const item of brandArticles) {
+      params.push({
+        locale,
+        brandSlug: item.brandSlug,
+        id: item.id,
+      });
+    }
+  }
+  
+  return params;
 }
 
 export async function generateMetadata({

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-// Excel处理现在使用ExcelJS库通过useProductData hook
+import ExcelJS from 'exceljs';
 import { getProducts, getProductCategories } from '@/lib/sanity';
 
 interface Product {
@@ -282,13 +282,21 @@ export default function ProductManager() {
     try {
       const fileReader = new FileReader();
       
-      fileReader.onload = (e) => {
+      fileReader.onload = async (e) => {
         try {
           const data = new Uint8Array(e.target?.result as ArrayBuffer);
-          const workbook = XLSX.read(data, { type: 'array' });
-          const sheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
+          const workbook = new ExcelJS.Workbook();
+          await workbook.xlsx.load(data);
+          const worksheet = workbook.worksheets[0];
+          const jsonData: any[][] = [];
+          
+          worksheet.eachRow((row, rowNumber) => {
+            const rowData: any[] = [];
+            row.eachCell((cell, colNumber) => {
+              rowData[colNumber - 1] = cell.value;
+            });
+            jsonData.push(rowData);
+          });
 
           setUploadProgress(30);
 
@@ -418,67 +426,84 @@ export default function ProductManager() {
     }
   }, [uploadFile]);
 
-  const downloadTemplate = useCallback(() => {
-    // 创建模板数据
-    const templateData = [
-      [
-        '产品名称', '品牌', '产品分类', '产品小类', '封装', '描述', 
-        '价格', '库存', '规格书链接', '参数1', '参数2', '参数3', '参数4', '参数5'
-      ],
-      [
-        'STM32F407VGT6', 'STMicroelectronics', 'microcontrollers', 'ARM Cortex-M4', 
-        'LQFP100', '32位ARM Cortex-M4微控制器，168MHz，1MB Flash，192KB RAM',
-        '25.50', '1000', '/datasheets/STM32F407VGT6.pdf',
-        '内核:ARM Cortex-M4', '主频:168MHz', 'Flash:1MB', 'RAM:192KB', '工作电压:1.8-3.6V'
-      ],
-      [
-        'TPS54360DDA', 'Texas Instruments', 'power-management', 'DC-DC转换器',
-        'HSOP8', '3.5V至60V输入、3.5A同步降压转换器',
-        '8.20', '500', '/datasheets/TPS54360DDA.pdf',
-        '输入电压:3.5-60V', '输出电流:3.5A', '效率:95%', '开关频率:500kHz', '工作温度:-40 to +125°C'
-      ],
-      [
-        'DHT22', '', 'sensors', '温湿度传感器',
-        'DIP-4', '数字温湿度传感器，高精度，长期稳定性好',
-        '15.80', '200', '/datasheets/DHT22.pdf',
-        '温度范围:-40~80°C', '湿度范围:0~100%RH', '精度:±0.5°C', '供电电压:3.3-6V', '接口:单总线'
-      ],
-      [
-        'ESP32-WROOM-32', '', 'rf-wireless', 'WiFi模块',
-        'SMD-38', '集成WiFi和蓝牙的MCU模块',
-        '28.50', '300', '/datasheets/ESP32-WROOM-32.pdf',
-        '内核:双核32位', 'WiFi:802.11b/g/n', '蓝牙:BLE 4.2', 'Flash:4MB', 'RAM:520KB'
-      ]
-    ];
+  const downloadTemplate = useCallback(async () => {
+    try {
+      // 创建模板数据
+      const templateData = [
+        [
+          '产品名称', '品牌', '产品分类', '产品小类', '封装', '描述', 
+          '价格', '库存', '规格书链接', '参数1', '参数2', '参数3', '参数4', '参数5'
+        ],
+        [
+          'STM32F407VGT6', 'STMicroelectronics', 'microcontrollers', 'ARM Cortex-M4', 
+          'LQFP100', '32位ARM Cortex-M4微控制器，168MHz，1MB Flash，192KB RAM',
+          '25.50', '1000', '/datasheets/STM32F407VGT6.pdf',
+          '内核:ARM Cortex-M4', '主频:168MHz', 'Flash:1MB', 'RAM:192KB', '工作电压:1.8-3.6V'
+        ],
+        [
+          'TPS54360DDA', 'Texas Instruments', 'power-management', 'DC-DC转换器',
+          'HSOP8', '3.5V至60V输入、3.5A同步降压转换器',
+          '8.20', '500', '/datasheets/TPS54360DDA.pdf',
+          '输入电压:3.5-60V', '输出电流:3.5A', '效率:95%', '开关频率:500kHz', '工作温度:-40 to +125°C'
+        ],
+        [
+          'DHT22', '', 'sensors', '温湿度传感器',
+          'DIP-4', '数字温湿度传感器，高精度，长期稳定性好',
+          '15.80', '200', '/datasheets/DHT22.pdf',
+          '温度范围:-40~80°C', '湿度范围:0~100%RH', '精度:±0.5°C', '供电电压:3.3-6V', '接口:单总线'
+        ],
+        [
+          'ESP32-WROOM-32', '', 'rf-wireless', 'WiFi模块',
+          'SMD-38', '集成WiFi和蓝牙的MCU模块',
+          '28.50', '300', '/datasheets/ESP32-WROOM-32.pdf',
+          '内核:双核32位', 'WiFi:802.11b/g/n', '蓝牙:BLE 4.2', 'Flash:4MB', 'RAM:520KB'
+        ]
+      ];
 
-    // 创建工作簿和工作表
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet(templateData);
-    
-    // 设置列宽
-    const colWidths = [
-      { wch: 15 }, // 产品名称
-      { wch: 20 }, // 品牌
-      { wch: 15 }, // 产品分类
-      { wch: 12 }, // 产品小类
-      { wch: 10 }, // 封装
-      { wch: 30 }, // 描述
-      { wch: 8 },  // 价格
-      { wch: 8 },  // 库存
-      { wch: 25 }, // 规格书链接
-      { wch: 15 }, // 参数1
-      { wch: 15 }, // 参数2
-      { wch: 15 }, // 参数3
-      { wch: 15 }, // 参数4
-      { wch: 15 }  // 参数5
-    ];
-    ws['!cols'] = colWidths;
-    
-    // 添加工作表到工作簿
-    XLSX.utils.book_append_sheet(wb, ws, '产品导入模板');
-    
-    // 下载文件
-    XLSX.writeFile(wb, 'LiTong产品导入模板.xlsx');
+      // 创建工作簿和工作表
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('产品导入模板');
+      
+      // 添加数据到工作表
+      templateData.forEach((row, rowIndex) => {
+        row.forEach((cell, colIndex) => {
+          const cellRef = worksheet.getCell(rowIndex + 1, colIndex + 1);
+          cellRef.value = cell;
+          
+          // 设置标题行样式
+          if (rowIndex === 0) {
+            cellRef.font = { bold: true };
+            cellRef.fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: 'FFE6E6FA' }
+            };
+          }
+        });
+      });
+      
+      // 设置列宽
+      const colWidths = [15, 20, 15, 12, 10, 30, 8, 8, 25, 15, 15, 15, 15, 15];
+      colWidths.forEach((width, index) => {
+        worksheet.getColumn(index + 1).width = width;
+      });
+      
+      // 生成文件并下载
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { 
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'LiTong产品导入模板.xlsx';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('模板下载失败:', error);
+    }
   }, []);
 
   const filteredProducts = products.filter(product => {

@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      count: result.length,
+      count: Array.isArray(result) ? result.length : 1,
       data: result
     })
 

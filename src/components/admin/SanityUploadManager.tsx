@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-// Excel处理现在使用ExcelJS库通过useProductData hook
+import ExcelJS from 'exceljs';
 
 interface Product {
   partNumber: string;
@@ -178,10 +178,18 @@ export default function SanityUploadManager() {
       fileReader.onload = async (e) => {
         try {
           const data = new Uint8Array(e.target?.result as ArrayBuffer);
-          const workbook = XLSX.read(data, { type: 'array' });
-          const sheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
+          const workbook = new ExcelJS.Workbook();
+          await workbook.xlsx.load(data);
+          const worksheet = workbook.worksheets[0];
+          const jsonData: any[][] = [];
+          
+          worksheet.eachRow((row, rowNumber) => {
+            const rowData: any[] = [];
+            row.eachCell((cell, colNumber) => {
+              rowData[colNumber - 1] = cell.value;
+            });
+            jsonData.push(rowData);
+          });
 
           setUploadProgress(30);
 
@@ -231,7 +239,7 @@ export default function SanityUploadManager() {
     }
   }, [uploadFile, uploadType, processProductsExcel, processCategoriesExcel, uploadToSanity]);
 
-  const downloadTemplate = useCallback(() => {
+  const downloadTemplate = useCallback(async () => {
     let templateData: any[][] = [];
     
     if (uploadType === 'products') {
@@ -256,14 +264,49 @@ export default function SanityUploadManager() {
       ];
     }
 
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet(templateData);
-    
-    const colWidths = templateData[0].map((_, index) => ({ wch: 15 }));
-    ws['!cols'] = colWidths;
-    
-    XLSX.utils.book_append_sheet(wb, ws, uploadType === 'products' ? '产品模板' : '分类模板');
-    XLSX.writeFile(wb, `LiTong${uploadType === 'products' ? '产品' : '分类'}导入模板.xlsx`);
+    try {
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet(uploadType === 'products' ? '产品模板' : '分类模板');
+      
+      // 添加数据
+      templateData.forEach((row, rowIndex) => {
+        row.forEach((cell, colIndex) => {
+          const cellRef = worksheet.getCell(rowIndex + 1, colIndex + 1);
+          cellRef.value = cell;
+          
+          // 设置标题行样式
+          if (rowIndex === 0) {
+            cellRef.font = { bold: true };
+            cellRef.fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: 'FFE6E6FA' }
+            };
+          }
+        });
+      });
+      
+      // 设置列宽
+      templateData[0].forEach((_, index) => {
+        worksheet.getColumn(index + 1).width = 15;
+      });
+      
+      // 下载文件
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { 
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `LiTong${uploadType === 'products' ? '产品' : '分类'}导入模板.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('模板下载失败:', error);
+    }
   }, [uploadType]);
 
   const openSanityStudio = useCallback(() => {

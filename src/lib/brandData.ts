@@ -101,7 +101,7 @@ export async function getBrandCategories(brandSlug: string): Promise<BrandCatego
 
   try {
     const categories = await client.fetch(query, { brandSlug });
-    return categories;
+    return categories as unknown as BrandCategory[];
   } catch (error) {
     console.error('Error fetching brand categories:', error);
     return [];
@@ -158,7 +158,7 @@ export async function getBrandCategoryProducts(
       categorySlug,
       ...(subcategorySlug && { subcategorySlug })
     });
-    return products;
+    return products as unknown as BrandProduct[];
   } catch (error) {
     console.error('Error fetching brand category products:', error);
     return [];

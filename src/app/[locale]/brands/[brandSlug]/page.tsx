@@ -172,8 +172,8 @@ export async function generateStaticParams() {
   
   const params = [];
   for (const locale of locales) {
-    for (const slug of brandSlugs) {
-      params.push({ locale, slug });
+    for (const brandSlug of brandSlugs) {
+      params.push({ locale, brandSlug });
     }
   }
   
