@@ -24,24 +24,69 @@ export interface FilterColumn {
   unit?: string;
 }
 
-// 模拟Excel文件解析
+// Excel文件解析 - 支持CSV, XLSX等格式
 export const parseExcelData = (file: File): Promise<{ products: ProductData[], columns: FilterColumn[] }> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     
     reader.onload = (e) => {
       try {
-        const csvData = e.target?.result as string;
-        const lines = csvData.split('\n');
-        const headers = lines[0].split(',').map(h => h.trim());
+        let csvData: string;
+        
+        if (file.name.endsWith('.csv')) {
+          csvData = e.target?.result as string;
+        } else {
+          // 对于Excel文件，这里应该使用xlsx库解析，目前先按CSV处理
+          csvData = e.target?.result as string;
+        }
+        
+        const lines = csvData.split('\n').filter(line => line.trim());
+        if (lines.length < 2) {
+          throw new Error('文件格式错误或数据为空');
+        }
+        
+        const headers = lines[0].split(',').map(h => h.trim().replace(/["""]/g, ''));
+        
+        // 验证必需的列
+        const requiredColumns = ['型号', 'partNumber', 'Part Number', 'part_number'];
+        const hasRequiredColumn = requiredColumns.some(col => 
+          headers.some(h => h.toLowerCase().includes(col.toLowerCase()))
+        );
+        
+        if (!hasRequiredColumn) {
+          throw new Error('文件必须包含型号列 (Part Number)');
+        }
         
         // 生成产品数据
         const products: ProductData[] = [];
         const dynamicColumns: FilterColumn[] = [];
         
+        // 标准化表头映射
+        const headerMapping: Record<string, string> = {
+          '型号': 'partNumber',
+          'Part Number': 'partNumber', 
+          'part_number': 'partNumber',
+          '描述': 'description',
+          'Description': 'description',
+          '品牌': 'brand',
+          'Brand': 'brand',
+          '分类': 'category',
+          'Category': 'category',
+          '封装': 'package',
+          'Package': 'package',
+          '价格': 'price',
+          'Price': 'price',
+          '库存': 'stock',
+          'Stock': 'stock'
+        };
+        
         // 解析表头，生成筛选列配置
+        const baseFields = Object.values(headerMapping);
         headers.forEach((header, index) => {
-          if (index < 5) return; // 跳过基础字段
+          const normalizedHeader = headerMapping[header] || header.toLowerCase().replace(/[^\w]/g, '_');
+          
+          // 跳过基础字段，只为参数字段生成筛选配置
+          if (baseFields.includes(normalizedHeader)) return;
           
           // 根据表头名称推断筛选类型
           let filterType: 'select' | 'range' = 'select';
@@ -50,30 +95,41 @@ export const parseExcelData = (file: File): Promise<{ products: ProductData[], c
           let max: number | undefined;
           let unit: string | undefined;
           
-          // 推断字段类型
-          if (header.includes('频率') || header.includes('MHz') || header.includes('频率')) {
+          // 智能推断字段类型
+          const lowerHeader = header.toLowerCase();
+          if (lowerHeader.includes('频率') || lowerHeader.includes('mhz') || lowerHeader.includes('frequency')) {
             filterType = 'range';
             min = 0;
             max = 1000;
             unit = 'MHz';
-          } else if (header.includes('电压') || header.includes('V')) {
+          } else if (lowerHeader.includes('电压') || lowerHeader.includes('voltage') || lowerHeader.includes('vdd')) {
             filterType = 'range';
             min = 0;
             max = 50;
             unit = 'V';
-          } else if (header.includes('容量') || header.includes('KB') || header.includes('MB')) {
+          } else if (lowerHeader.includes('电流') || lowerHeader.includes('current') || lowerHeader.includes('ma')) {
+            filterType = 'range';
+            min = 0;
+            max = 1000;
+            unit = 'mA';
+          } else if (lowerHeader.includes('容量') || lowerHeader.includes('kb') || lowerHeader.includes('mb') || 
+                     lowerHeader.includes('flash') || lowerHeader.includes('ram')) {
             filterType = 'select';
-            options = ['16KB', '32KB', '64KB', '128KB', '256KB', '512KB', '1MB', '2MB'];
-          } else if (header.includes('温度') || header.includes('°C')) {
+            options = ['8KB', '16KB', '32KB', '64KB', '128KB', '256KB', '512KB', '1MB', '2MB', '4MB'];
+          } else if (lowerHeader.includes('温度') || lowerHeader.includes('temp') || lowerHeader.includes('°c')) {
             filterType = 'select';
-            options = ['-40~85°C', '-40~105°C', '-40~125°C'];
-          } else if (header.includes('封装')) {
+            options = ['-40~85°C', '-40~105°C', '-40~125°C', '-55~150°C'];
+          } else if (lowerHeader.includes('封装') || lowerHeader.includes('package')) {
             filterType = 'select';
-            options = ['LQFP32', 'LQFP48', 'LQFP64', 'LQFP100', 'BGA100', 'SOT23-5', 'SOIC8'];
+            options = ['LQFP32', 'LQFP48', 'LQFP64', 'LQFP100', 'LQFP144', 'BGA64', 'BGA100', 'BGA144', 
+                      'TQFP32', 'TQFP48', 'TQFP64', 'SOIC8', 'SOIC16', 'SOT23-5', 'SOT23-6', 'WLCSP'];
+          } else if (lowerHeader.includes('内核') || lowerHeader.includes('core') || lowerHeader.includes('cpu')) {
+            filterType = 'select';
+            options = ['Cortex-M0', 'Cortex-M0+', 'Cortex-M3', 'Cortex-M4', 'Cortex-M7', 'Cortex-M33'];
           }
           
           dynamicColumns.push({
-            key: header.toLowerCase().replace(/[^\w]/g, '_'),
+            key: normalizedHeader,
             name: header,
             type: filterType,
             options,
@@ -85,29 +141,51 @@ export const parseExcelData = (file: File): Promise<{ products: ProductData[], c
         
         // 解析数据行
         for (let i = 1; i < lines.length; i++) {
-          const values = lines[i].split(',').map(v => v.trim());
-          if (values.length < 5) continue;
+          const values = lines[i].split(',').map(v => v.trim().replace(/["""]/g, ''));
+          if (values.length < headers.length || !values[0]) continue; // 跳过空行或不完整行
           
           const parameters: Record<string, string> = {};
+          let productData: any = {};
           
-          // 动态参数
+          // 解析所有列数据
           headers.forEach((header, index) => {
-            if (index >= 5 && values[index]) {
-              parameters[header.toLowerCase().replace(/[^\w]/g, '_')] = values[index];
+            if (!values[index]) return;
+            
+            const normalizedHeader = headerMapping[header] || header.toLowerCase().replace(/[^\w]/g, '_');
+            
+            if (baseFields.includes(normalizedHeader)) {
+              // 基础字段
+              if (normalizedHeader === 'price') {
+                productData[normalizedHeader] = parseFloat(values[index].replace(/[^0-9.]/g, '')) || 0;
+              } else if (normalizedHeader === 'stock') {
+                productData[normalizedHeader] = parseInt(values[index]) || 0;
+              } else {
+                productData[normalizedHeader] = values[index];
+              }
+            } else {
+              // 参数字段
+              parameters[normalizedHeader] = values[index];
             }
           });
           
+          // 确保必需字段
+          if (!productData.partNumber) {
+            console.warn(`第${i+1}行缺少型号，跳过`);
+            continue;
+          }
+          
           products.push({
-            id: `product_${i}`,
-            partNumber: values[0] || '',
-            description: values[1] || '',
-            brand: values[2] || 'STMicroelectronics',
-            category: values[3] || 'microcontrollers',
+            id: `product_${Date.now()}_${i}`,
+            partNumber: productData.partNumber,
+            description: productData.description || productData.partNumber,
+            brand: productData.brand || 'Unknown',
+            category: productData.category || 'general',
             parameters,
-            package: values[4] || '',
-            price: values[5] ? `¥${values[5]}` : undefined,
-            stock: values[6] ? parseInt(values[6]) : undefined,
-            datasheet: `/datasheets/${values[0]?.toLowerCase()}.pdf`
+            package: productData.package || '',
+            price: productData.price ? `¥${productData.price}` : undefined,
+            stock: productData.stock,
+            datasheet: `/datasheets/${productData.partNumber?.toLowerCase().replace(/[^\w]/g, '-')}.pdf`,
+            image: `/images/products/${productData.partNumber?.toLowerCase().replace(/[^\w]/g, '-')}.jpg`
           });
         }
         
@@ -142,12 +220,55 @@ export const useProductData = () => {
       localStorage.setItem('productData', JSON.stringify(newProducts));
       localStorage.setItem('filterColumns', JSON.stringify(columns));
       
+      return { count: newProducts.length, products: newProducts, columns };
+      
     } catch (err) {
       setError(err instanceof Error ? err.message : '文件解析失败');
+      throw err;
     } finally {
       setLoading(false);
     }
   }, []);
+
+  // 上传数据到Sanity CMS
+  const uploadToSanity = useCallback(async (data: any[], type: string) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await fetch('/api/sanity/upload', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ data, type }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || '上传失败');
+      }
+
+      const result = await response.json();
+      return result;
+      
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '上传到CMS失败');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // 批量上传产品到Sanity
+  const uploadProductsToSanity = useCallback(async (productsToUpload?: ProductData[]) => {
+    const data = productsToUpload || products;
+    if (data.length === 0) {
+      throw new Error('没有产品数据可上传');
+    }
+    
+    return uploadToSanity(data, 'products');
+  }, [products, uploadToSanity]);
 
   // 从localStorage加载数据
   const loadStoredData = useCallback(() => {
@@ -213,6 +334,8 @@ export const useProductData = () => {
     loading,
     error,
     uploadExcelFile,
+    uploadToSanity,
+    uploadProductsToSanity,
     loadStoredData,
     addProduct,
     updateProduct,

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
 interface NavItem {
@@ -13,69 +13,71 @@ interface NavItem {
 
 export default function AdminNavigation() {
   const pathname = usePathname();
+  const params = useParams();
+  const locale = params.locale as string || 'zh';
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isHydrated, setIsHydrated] = useState(false);
 
   const navigation: NavItem[] = [
     { 
       name: '仪表板', 
-      href: '/admin/dashboard', 
+      href: `/${locale}/admin/dashboard`, 
       icon: '📊', 
       description: '系统概览和统计数据' 
     },
     { 
       name: '产品管理', 
-      href: '/admin/products', 
+      href: `/${locale}/admin/products`, 
       icon: '📦', 
       description: '产品信息管理和批量导入' 
     },
     { 
       name: '品牌管理', 
-      href: '/admin/brands', 
+      href: `/${locale}/admin/brands`, 
       icon: '🏷️', 
       description: '品牌信息配置和管理' 
     },
     { 
       name: '文章管理', 
-      href: '/admin/articles', 
+      href: `/${locale}/admin/articles`, 
       icon: '📝', 
       description: '技术文章和内容管理' 
     },
     { 
       name: '解决方案', 
-      href: '/admin/solutions', 
+      href: `/${locale}/admin/solutions`, 
       icon: '💡', 
       description: '解决方案案例管理' 
     },
     { 
       name: '新闻管理', 
-      href: '/admin/news', 
+      href: `/${locale}/admin/news`, 
       icon: '📰', 
       description: '新闻资讯发布管理' 
     },
     { 
       name: '用户管理', 
-      href: '/admin/users', 
+      href: `/${locale}/admin/users`, 
       icon: '👥', 
       description: '系统用户和权限管理' 
     },
     { 
       name: '系统设置', 
-      href: '/admin/settings', 
+      href: `/${locale}/admin/settings`, 
       icon: '⚙️', 
       description: '系统配置和参数设置' 
     },
     { 
       name: 'Sanity管理', 
-      href: '/admin/sanity', 
+      href: `/${locale}/admin/sanity`, 
       icon: '☁️', 
       description: 'Sanity CMS内容管理' 
     }
   ];
 
   const isActive = (href: string) => {
-    if (href === '/admin/dashboard') {
-      return pathname === '/admin' || pathname === '/admin/dashboard';
+    if (href === `/${locale}/admin/dashboard`) {
+      return pathname === `/${locale}/admin` || pathname === `/${locale}/admin/dashboard`;
     }
     return pathname?.startsWith(href);
   };

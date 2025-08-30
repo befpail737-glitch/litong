@@ -1,0 +1,7 @@
+型号,描述,品牌,分类,封装,价格,库存,产品系列,CPU内核,主频MHz,Flash容量,RAM容量,工作温度
+STM32F407VGT6,32位ARM Cortex-M4微控制器,STMicroelectronics,microcontrollers,LQFP100,45.80,1200,STM32F4,Cortex-M4,168,1MB,192KB,-40~85°C
+STM32F103C8T6,32位ARM Cortex-M3微控制器,STMicroelectronics,microcontrollers,LQFP48,12.50,8500,STM32F1,Cortex-M3,72,64KB,20KB,-40~85°C
+STM32H743VIT6,32位ARM Cortex-M7微控制器,STMicroelectronics,microcontrollers,LQFP100,89.50,650,STM32H7,Cortex-M7,480,2MB,1MB,-40~85°C
+LM358N,双运算放大器,Texas Instruments,analog-ics,DIP8,2.30,25000,LM358,N/A,N/A,N/A,N/A,-40~85°C
+TLV274IDR,四路CMOS运算放大器,Texas Instruments,analog-ics,SOIC14,3.45,12000,TLV274,N/A,N/A,N/A,N/A,-40~125°C
+ADS1115IDGS,16位ADC,Texas Instruments,data-converters,MSOP10,8.90,3200,ADS111x,N/A,N/A,N/A,N/A,-40~125°C

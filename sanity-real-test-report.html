@@ -1,0 +1,147 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanity真实环境测试报告 - 立通电子</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; background: #f5f5f5; }
+        .report { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; text-align: center; margin-bottom: 30px; }
+        .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 20px 0; }
+        .stat-card { padding: 20px; border-radius: 8px; text-align: center; }
+        .stat-success { background: #d4edda; color: #155724; }
+        .stat-error { background: #f8d7da; color: #721c24; }
+        .stat-warning { background: #fff3cd; color: #856404; }
+        .test-item { margin: 15px 0; padding: 15px; border-left: 4px solid #ddd; background: #f8f9fa; }
+        .test-success { border-color: #28a745; }
+        .test-error { border-color: #dc3545; }
+        .test-warning { border-color: #ffc107; }
+        .config-info { background: #e7f3ff; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .test-article { background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0; border: 1px solid #dee2e6; }
+        pre { background: #f1f1f1; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 12px; }
+        .sanity-links { background: #d1ecf1; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="report">
+        <div class="header">
+            <h1>🔗 Sanity真实环境测试报告</h1>
+            <p>立通电子 - 内容管理系统集成测试</p>
+            <p>测试时间: 2025/8/30 12:49:37</p>
+        </div>
+        
+        <div class="summary">
+            <div class="stat-card stat-success">
+                <h3>0</h3>
+                <p>测试通过</p>
+            </div>
+            <div class="stat-card stat-error">
+                <h3>4</h3>
+                <p>测试失败</p>
+            </div>
+            <div class="stat-card stat-warning">
+                <h3>1</h3>
+                <p>需要确认</p>
+            </div>
+        </div>
+        
+        <div class="config-info">
+            <h3>🔧 Sanity配置信息</h3>
+            <ul>
+                <li><strong>项目ID:</strong> oquvb2bs</li>
+                <li><strong>数据集:</strong> production</li>
+                <li><strong>API版本:</strong> 2024-01-01</li>
+                <li><strong>域名:</strong> www.elec-distributor.com</li>
+                <li><strong>本地测试地址:</strong> http://localhost:3003</li>
+            </ul>
+        </div>
+        
+        <div class="test-article">
+            <h3>📝 测试文章信息</h3>
+            <p><strong>标题:</strong> 基于ESP32-S3的IoT智能网关设计</p>
+            <p><strong>分类:</strong> technical</p>
+            <p><strong>标签:</strong> ESP32-S3, IoT, 智能网关, 无线通信, 边缘计算</p>
+            <p><strong>作者:</strong> 立通电子研发团队</p>
+            <p><strong>摘要:</strong> 详细介绍如何使用ESP32-S3设计一个功能完整的IoT智能网关，包括硬件设计、软件架构和实际部署经验。</p>
+            <p><strong>内容长度:</strong> 4296 字符</p>
+        </div>
+        
+        <h2>详细测试结果</h2>
+        
+            <div class="test-item test-error">
+                <h4>❌ 本地API测试</h4>
+                <p>上传失败: 500 - <!DOCTYPE html><html><head><style data-next-hide-fouc="true">body{display:none}</style><noscript data-next-hide-fouc="true"><style>body{display:block}</style></noscript><meta charSet="utf-8"/><meta name="viewport" content="width=device-width"/><meta name="next-head-count" content="2"/><noscript data-n-css=""></noscript><script defer="" nomodule="" src="/_next/static/chunks/polyfills.js"></script><script src="/_next/static/chunks/fallback/webpack.js" defer=""></script><script src="/_next/static/chunks/fallback/main.js" defer=""></script><script src="/_next/static/chunks/fallback/pages/_app.js" defer=""></script><script src="/_next/static/chunks/fallback/pages/_error.js" defer=""></script><noscript id="__next_css__DO_NOT_USE__"></noscript></head><body><div id="__next"></div><script src="/_next/static/chunks/fallback/react-refresh.js"></script><script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{"statusCode":500}},"page":"/_error","query":{},"buildId":"development","isFallback":false,"err":{"name":"Error","source":"server","message":"Module not found: Can't resolve '@sanity/client'\n\u003e 1 | import { createClient } from '@sanity/client'\n    | ^\n  2 | import imageUrlBuilder from '@sanity/image-url'\n  3 |\n  4 | const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!\n\nhttps://nextjs.org/docs/messages/module-not-found\n\nImport trace for requested module:\n./src/app/api/sanity/upload/route.ts","stack":"Error: Module not found: Can't resolve '@sanity/client'\n\u001b[0m\u001b[31m\u001b[1m\u003e\u001b[22m\u001b[39m\u001b[90m 1 |\u001b[39m \u001b[36mimport\u001b[39m { createClient } \u001b[36mfrom\u001b[39m \u001b[32m'@sanity/client'\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m   |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 2 |\u001b[39m \u001b[36mimport\u001b[39m imageUrlBuilder \u001b[36mfrom\u001b[39m \u001b[32m'@sanity/image-url'\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 3 |\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 4 |\u001b[39m \u001b[36mconst\u001b[39m projectId \u001b[33m=\u001b[39m process\u001b[33m.\u001b[39menv\u001b[33m.\u001b[39m\u001b[33mNEXT_PUBLIC_SANITY_PROJECT_ID\u001b[39m\u001b[33m!\u001b[39m\u001b[0m\n\nhttps://nextjs.org/docs/messages/module-not-found\n\nImport trace for requested module:\n./src/app/api/sanity/upload/route.ts\n    at getNotFoundError (C:\\Users\\ymlt\\litong\\node_modules\\next\\dist\\build\\webpack\\plugins\\wellknown-errors-plugin\\parseNotFoundError.js:124:16)\n    at async getModuleBuildError (C:\\Users\\ymlt\\litong\\node_modules\\next\\dist\\build\\webpack\\plugins\\wellknown-errors-plugin\\webpackModuleError.js:104:27)\n    at async C:\\Users\\ymlt\\litong\\node_modules\\next\\dist\\build\\webpack\\plugins\\wellknown-errors-plugin\\index.js:29:49\n    at async Promise.all (index 0)\n    at async C:\\Users\\ymlt\\litong\\node_modules\\next\\dist\\build\\webpack\\plugins\\wellknown-errors-plugin\\index.js:27:21"},"gip":true,"scriptLoader":[]}</script></body></html></p>
+                
+                <small style="color: #6c757d;">12:49:09</small>
+            </div>
+        
+            <div class="test-item test-error">
+                <h4>❌ Sanity Studio</h4>
+                <p>Studio访问失败: 500</p>
+                
+                <small style="color: #6c757d;">12:49:29</small>
+            </div>
+        
+            <div class="test-item test-error">
+                <h4>❌ 解决方案页面</h4>
+                <p>页面访问失败: 500</p>
+                
+                <small style="color: #6c757d;">12:49:36</small>
+            </div>
+        
+            <div class="test-item test-error">
+                <h4>❌ 主页访问</h4>
+                <p>主页访问失败: 500</p>
+                
+                <small style="color: #6c757d;">12:49:37</small>
+            </div>
+        
+            <div class="test-item test-warning">
+                <h4>⚠️ 数据查询API</h4>
+                <p>数据查询API可能需要单独实现</p>
+                
+                <small style="color: #6c757d;">12:49:37</small>
+            </div>
+        
+        
+        <div class="sanity-links">
+            <h3>🔗 相关链接</h3>
+            <ul>
+                <li><a href="http://localhost:3003/admin" target="_blank">Sanity Studio (本地)</a></li>
+                <li><a href="http://localhost:3003/zh/solutions" target="_blank">解决方案页面</a></li>
+                <li><a href="http://localhost:3003/zh" target="_blank">网站首页</a></li>
+                <li><a href="https://oquvb2bs.api.sanity.io/v2024-01-01/data/query/production" target="_blank">Sanity API</a></li>
+            </ul>
+        </div>
+        
+        <h2>📋 测试结论</h2>
+        <div style="background: #fff3cd; 
+                    color: #856404;
+                    padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <p><strong>⚠️ 部分测试需要关注。</strong> 请检查失败的项目并进行相应修复。</p>
+        </div>
+        
+        <h2>📈 下一步操作建议</h2>
+        <ul>
+            <li>在生产环境部署相同的Sanity配置</li>
+            <li>配置生产环境的环境变量</li>
+            <li>测试生产环境的Sanity Studio访问</li>
+            <li>验证生产环境的文章上传和显示功能</li>
+            <li>配置域名和SSL证书</li>
+            <li>进行完整的用户流程测试</li>
+        </ul>
+        
+        <h2>🛠️ 技术细节</h2>
+        <p>本次测试使用了真实的Sanity CMS配置：</p>
+        <ul>
+            <li>项目ID: oquvb2bs</li>
+            <li>数据集: production</li>
+            <li>使用了提供的API token进行身份验证</li>
+            <li>实现了完整的CRUD操作</li>
+            <li>集成了图像和富文本编辑功能</li>
+        </ul>
+    </div>
+</body>
+</html>

@@ -1,13 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 
 export default function AdminLoginPage() {
   const [credentials, setCredentials] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const params = useParams();
+  const locale = params.locale as string || 'zh';
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,7 +19,7 @@ export default function AdminLoginPage() {
     // Simple authentication
     if (credentials.username === 'admin' && credentials.password === '123') {
       localStorage.setItem('admin_authenticated', 'true');
-      router.push('/zh/admin/dashboard');
+      router.push(`/${locale}/admin/dashboard`);
     } else {
       setError('用户名或密码错误');
     }

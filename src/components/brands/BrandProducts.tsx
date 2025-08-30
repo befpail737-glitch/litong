@@ -3,35 +3,23 @@
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
 
+import { BrandCategory } from '@/lib/brandData';
+
 interface BrandProductsProps {
   brand: {
-    id: string;
+    _id: string;
     name: string;
-    slug: string;
-    logo: string;
+    nameEn: string;
+    slug: { current: string };
     description: string;
-    website: string;
-    founded: string;
-    headquarters: string;
-    categories: Array<{
-      id: string;
-      name: string;
-      slug: string;
-      description: string;
-      productCount: number;
-      image: string;
-      subcategories: Array<{
-        name: string;
-        description: string;
-        productCount: number;
-      }>;
-      features: string[];
-      applications: string[];
-    }>;
+    website?: string;
+    country?: string;
+    founded?: number;
   };
+  categories: BrandCategory[];
 }
 
-export default function BrandProducts({ brand }: BrandProductsProps) {
+export default function BrandProducts({ brand, categories }: BrandProductsProps) {
   const locale = useLocale();
 
   return (
@@ -42,31 +30,31 @@ export default function BrandProducts({ brand }: BrandProductsProps) {
           <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-8" aria-label="Tabs">
               <Link
-                href={`/${locale}/brands/${brand.slug}/about`}
+                href={`/${locale}/brands/${brand.slug.current}/about`}
                 className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 border-b-2 py-2 px-1 text-sm font-medium"
               >
                 关于品牌
               </Link>
               <Link
-                href={`/${locale}/brands/${brand.slug}/products`}
+                href={`/${locale}/brands/${brand.slug.current}/products`}
                 className="border-primary-500 text-primary-600 border-b-2 py-2 px-1 text-sm font-medium"
               >
                 产品分类
               </Link>
               <Link
-                href={`/${locale}/brands/${brand.slug}/solutions`}
+                href={`/${locale}/brands/${brand.slug.current}/solutions`}
                 className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 border-b-2 py-2 px-1 text-sm font-medium"
               >
                 解决方案
               </Link>
               <Link
-                href={`/${locale}/brands/${brand.slug}/support`}
+                href={`/${locale}/brands/${brand.slug.current}/support`}
                 className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 border-b-2 py-2 px-1 text-sm font-medium"
               >
                 技术支持
               </Link>
               <Link
-                href={`/${locale}/brands/${brand.slug}/news`}
+                href={`/${locale}/brands/${brand.slug.current}/news`}
                 className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 border-b-2 py-2 px-1 text-sm font-medium"
               >
                 新闻中心
@@ -87,8 +75,8 @@ export default function BrandProducts({ brand }: BrandProductsProps) {
 
         {/* Product Categories Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
-          {brand.categories.map((category) => (
-            <div key={category.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300">
+          {categories.map((category) => (
+            <div key={category._id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300">
               {/* Category Header */}
               <div className="bg-gradient-to-r from-primary-600 to-primary-700 p-6 text-white">
                 <div className="flex items-center justify-between mb-2">
@@ -106,14 +94,18 @@ export default function BrandProducts({ brand }: BrandProductsProps) {
                 <div className="mb-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-3">产品子类</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {category.subcategories.slice(0, 6).map((sub, index) => (
-                      <div key={index} className="bg-gray-50 rounded-lg p-3">
+                    {category.subcategories.slice(0, 6).map((sub) => (
+                      <Link
+                        key={sub._id}
+                        href={`/${locale}/brands/${brand.slug.current}/products/${category.slug.current}?subcategory=${sub.slug.current}`}
+                        className="bg-gray-50 rounded-lg p-3 hover:bg-gray-100 transition-colors"
+                      >
                         <h4 className="font-medium text-gray-900 text-sm">{sub.name}</h4>
                         <p className="text-xs text-gray-600 mt-1">{sub.description}</p>
                         <span className="text-xs text-primary-600 font-medium">
                           {sub.productCount} 个产品
                         </span>
-                      </div>
+                      </Link>
                     ))}
                     {category.subcategories.length > 6 && (
                       <div className="bg-gray-50 rounded-lg p-3 flex items-center justify-center">
@@ -125,43 +117,25 @@ export default function BrandProducts({ brand }: BrandProductsProps) {
                   </div>
                 </div>
 
-                {/* Key Features */}
+                {/* Product Statistics */}
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">主要特性</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {category.features.map((feature, index) => (
-                      <span
-                        key={index}
-                        className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                      >
-                        <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                        {feature}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Applications */}
-                <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">应用领域</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {category.applications.map((app, index) => (
-                      <span
-                        key={index}
-                        className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
-                      >
-                        {app}
-                      </span>
-                    ))}
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">分类统计</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-blue-50 rounded-lg p-3 text-center">
+                      <div className="text-2xl font-bold text-blue-600">{category.productCount}</div>
+                      <div className="text-sm text-gray-600">产品型号</div>
+                    </div>
+                    <div className="bg-green-50 rounded-lg p-3 text-center">
+                      <div className="text-2xl font-bold text-green-600">{category.subcategories.length}</div>
+                      <div className="text-sm text-gray-600">产品子类</div>
+                    </div>
                   </div>
                 </div>
 
                 {/* Action Buttons */}
                 <div className="flex flex-col sm:flex-row gap-3">
                   <Link
-                    href={`/${locale}/brands/${brand.slug}/products/${category.slug}`}
+                    href={`/${locale}/brands/${brand.slug.current}/products/${category.slug.current}`}
                     className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 transition-colors duration-200"
                   >
                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -193,15 +167,17 @@ export default function BrandProducts({ brand }: BrandProductsProps) {
             使用我们的高级产品搜索功能，通过参数筛选快速找到满足您需求的{brand.name}产品
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href={`/${locale}/brands/${brand.slug}/products/microcontrollers`}
-              className="inline-flex items-center justify-center px-6 py-3 border border-white text-base font-medium rounded-md text-primary-600 bg-white hover:bg-gray-100 transition-colors duration-200"
-            >
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              产品筛选
-            </Link>
+            {categories.length > 0 && (
+              <Link
+                href={`/${locale}/brands/${brand.slug.current}/products/${categories[0].slug.current}`}
+                className="inline-flex items-center justify-center px-6 py-3 border border-white text-base font-medium rounded-md text-primary-600 bg-white hover:bg-gray-100 transition-colors duration-200"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                产品筛选
+              </Link>
+            )}
             <Link
               href={`/${locale}/contact`}
               className="inline-flex items-center justify-center px-6 py-3 border-2 border-white text-base font-medium rounded-md text-white hover:bg-white/10 transition-colors duration-200"
@@ -219,7 +195,7 @@ export default function BrandProducts({ brand }: BrandProductsProps) {
           <h3 className="text-xl font-semibold text-gray-900 mb-4">技术资源</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link
-              href={`/${locale}/brands/${brand.slug}/support`}
+              href={`/${locale}/brands/${brand.slug.current}/support`}
               className="flex items-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
             >
               <svg className="w-8 h-8 text-primary-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -232,7 +208,7 @@ export default function BrandProducts({ brand }: BrandProductsProps) {
             </Link>
             
             <Link
-              href={`/${locale}/brands/${brand.slug}/solutions`}
+              href={`/${locale}/brands/${brand.slug.current}/solutions`}
               className="flex items-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
             >
               <svg className="w-8 h-8 text-primary-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -244,20 +220,22 @@ export default function BrandProducts({ brand }: BrandProductsProps) {
               </div>
             </Link>
             
-            <a
-              href={brand.website}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
-            >
-              <svg className="w-8 h-8 text-primary-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-              <div>
-                <h4 className="font-semibold text-gray-900">官方网站</h4>
-                <p className="text-sm text-gray-600">访问{brand.name}官网</p>
-              </div>
-            </a>
+            {brand.website && (
+              <a
+                href={brand.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
+              >
+                <svg className="w-8 h-8 text-primary-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+                <div>
+                  <h4 className="font-semibold text-gray-900">官方网站</h4>
+                  <p className="text-sm text-gray-600">访问{brand.name}官网</p>
+                </div>
+              </a>
+            )}
           </div>
         </section>
       </div>

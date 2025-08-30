@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { client } from '@/lib/sanity'
+import { client } from '@/lib/sanity-client'
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,34 +19,45 @@ export async function POST(request: NextRequest) {
         create: {
           _type: 'product',
           partNumber: product.partNumber,
-          name: product.name,
-          brand: product.brand,
-          description: product.description,
-          package: product.package || '',
-          specifications: Object.entries(product.specifications || {}).map(([parameter, value]) => ({
+          slug: {
+            _type: 'slug',
+            current: product.partNumber.toLowerCase().replace(/[^\w]/g, '-')
+          },
+          name: product.name || product.description || product.partNumber,
+          description: product.description || '',
+          specifications: Object.entries(product.parameters || {}).map(([parameter, value]) => ({
             parameter,
             value: String(value),
             unit: ''
           })),
-          features: product.features || [],
-          applications: product.applications || [],
-          pricing: {
-            price: product.price || null,
-            currency: 'CNY',
-            moq: 1,
-            priceBreaks: product.price ? [
-              { quantity: 1, price: product.price },
-              { quantity: 10, price: product.price * 0.95 },
-              { quantity: 100, price: product.price * 0.9 },
-              { quantity: 1000, price: product.price * 0.85 }
-            ] : []
-          },
           stock: product.stock || 0,
-          leadTime: product.leadTime || 'inquiry',
+          price: product.price ? {
+            currency: 'CNY',
+            amount: parseFloat(product.price.toString().replace(/[^0-9.]/g, '')),
+            minQuantity: 1
+          } : undefined,
+          status: product.stock && product.stock > 0 ? 'active' : 'out_of_stock',
           isActive: true,
-          tags: product.tags || [],
-          seoTitle: `${product.partNumber} - ${product.name}`,
+          seoTitle: `${product.partNumber} - ${product.name || product.description}`,
           seoDescription: product.description
+        }
+      }))
+    } else if (type === 'brands') {
+      mutations = data.map(brand => ({
+        create: {
+          _type: 'brand',
+          name: brand.name,
+          nameEn: brand.nameEn || brand.name,
+          slug: {
+            _type: 'slug',
+            current: (brand.nameEn || brand.name).toLowerCase().replace(/[^\w]/g, '-')
+          },
+          description: brand.description || '',
+          website: brand.website,
+          country: brand.country,
+          founded: brand.founded ? parseInt(brand.founded) : undefined,
+          isActive: true,
+          sortOrder: brand.sortOrder || 0
         }
       }))
     } else if (type === 'categories') {
@@ -54,56 +65,58 @@ export async function POST(request: NextRequest) {
         create: {
           _type: 'productCategory',
           name: category.name,
-          nameEn: category.nameEn,
+          nameEn: category.nameEn || category.name,
           slug: {
             _type: 'slug',
-            current: category.slug
+            current: (category.nameEn || category.name).toLowerCase().replace(/[^\w]/g, '-')
           },
           description: category.description || '',
-          sort: 0,
+          sortOrder: category.sortOrder || 0,
           isActive: true
         }
       }))
-    } else if (type === 'articles') {
-      mutations = data.map(article => ({
+    } else if (type === 'subcategories') {
+      mutations = data.map(subcategory => ({
         create: {
-          _type: 'article',
-          title: article.title,
+          _type: 'productSubcategory',
+          name: subcategory.name,
+          nameEn: subcategory.nameEn || subcategory.name,
           slug: {
             _type: 'slug',
-            current: article.slug
+            current: (subcategory.nameEn || subcategory.name).toLowerCase().replace(/[^\w]/g, '-')
           },
-          type: article.type || 'technical',
-          category: article.category || 'general',
-          summary: article.summary,
-          content: [
-            {
-              _type: 'block',
-              _key: 'content',
-              style: 'normal',
-              markDefs: [],
-              children: [
-                {
-                  _type: 'span',
-                  _key: 'span',
-                  text: article.content || article.summary,
-                  marks: []
-                }
-              ]
-            }
-          ],
-          author: {
-            name: article.author || 'LiTong Electronics',
-            title: 'Technical Team'
+          description: subcategory.description || '',
+          specifications: subcategory.specifications || [],
+          sortOrder: subcategory.sortOrder || 0,
+          isActive: true
+        }
+      }))
+    } else if (type === 'solutions') {
+      mutations = data.map(solution => ({
+        create: {
+          _type: 'solution',
+          title: solution.title,
+          titleEn: solution.titleEn,
+          slug: {
+            _type: 'slug',
+            current: solution.title.toLowerCase().replace(/[^\w\u4e00-\u9fa5]/g, '-')
           },
-          tags: article.tags || [],
+          summary: solution.summary,
+          content: solution.content ? [{
+            _type: 'block',
+            _key: 'content',
+            style: 'normal',
+            markDefs: [],
+            children: [{
+              _type: 'span',
+              _key: 'span',
+              text: solution.content,
+              marks: []
+            }]
+          }] : [],
+          category: solution.category,
           publishedAt: new Date().toISOString(),
-          isPublished: true,
-          isFeatured: false,
-          readTime: Math.ceil((article.content || article.summary).length / 200) || 5,
-          difficulty: article.difficulty || 'intermediate',
-          seoTitle: article.title,
-          seoDescription: article.summary
+          isActive: true
         }
       }))
     }

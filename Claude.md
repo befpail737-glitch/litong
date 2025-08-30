@@ -103,7 +103,6 @@ Keywords (关键词): LiTong,电子元件代理,电子元件现货 (3-5个最核
 项目名：litong 项目ID：oquvb2bs 数据集：production 
 token:skcH3gNsfBNrrk7DlrAqF7ocB0o4QagJoWWQGRhXvZYyh1ULE0ef96EBqZ2kRWCnH6YnRDTo7bUBJn0dpjjLuZIz8S4wkpo0Sb9AXLxfO1Y6gG4agwbw60hskt6aIW1arCcAeM44oS6iZdUQ9jNcWEnOaEIhSYQRynnwKoI5oSixuHwYy9gk
 域名：www.elec-distributor.com
-做好数据对接。
 
 拥有数据库，后台管理，可以上传产品表格和文章。产品分类分大类，小类。上传产品，可以选择或新增大类，小类。
 文章详情页编辑可以插入图片，pdf,表格，加粗，超链接，字体大小。
@@ -115,5 +114,3 @@ token:skcH3gNsfBNrrk7DlrAqF7ocB0o4QagJoWWQGRhXvZYyh1ULE0ef96EBqZ2kRWCnH6YnRDTo7b
 Next.js 国际化 多语言包括英语，日语，韩语，俄语，越南语，法语，德语，意大利语，土耳其语，阿拉伯语
 github仓库：https://github.com/befpail737-glitch/litong.git
 部署: Cloudflare Pages / Workers。
-
-所有逻辑请检查，测试，修复。

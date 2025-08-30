@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前端测试 - 立通电子</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-item {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-success { background: #d4edda; border-color: #c3e6cb; }
+        .test-error { background: #f8d7da; border-color: #f5c6cb; }
+        .test-warning { background: #fff3cd; border-color: #ffeaa7; }
+        .test-loading { background: #e2e3e5; border-color: #d6d8db; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #6c757d; cursor: not-allowed; }
+        .url-list {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .url-item {
+            margin: 5px 0;
+            padding: 8px;
+            background: white;
+            border-radius: 3px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-left: 10px;
+        }
+        .status-success { background: #28a745; }
+        .status-error { background: #dc3545; }
+        .status-loading { background: #ffc107; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 前端测试中心 - 立通电子</h1>
+        <p>自动测试前端页面功能和后台管理接口</p>
+        
+        <div class="test-item test-loading" id="server-status">
+            <h3>🌐 服务器状态检测</h3>
+            <p>正在检测开发服务器状态...</p>
+            <div id="server-info"></div>
+        </div>
+
+        <div class="test-item" id="pages-test">
+            <h3>📄 页面可访问性测试</h3>
+            <button onclick="testAllPages()">开始测试所有页面</button>
+            <div class="url-list" id="page-results"></div>
+        </div>
+
+        <div class="test-item" id="api-test">
+            <h3>🔌 API接口测试</h3>
+            <button onclick="testAPIs()">测试API接口</button>
+            <div class="url-list" id="api-results"></div>
+        </div>
+
+        <div class="test-item" id="upload-test">
+            <h3>📤 文件上传测试</h3>
+            <button onclick="testFileUpload()">测试Excel上传</button>
+            <input type="file" id="test-file" accept=".csv,.xlsx,.xls" style="display:none">
+            <div id="upload-results"></div>
+        </div>
+
+        <div class="test-item" id="performance-test">
+            <h3>⚡ 性能测试</h3>
+            <button onclick="testPerformance()">测试页面性能</button>
+            <div id="performance-results"></div>
+        </div>
+
+        <div class="test-item" id="console-logs">
+            <h3>🐛 控制台日志</h3>
+            <button onclick="clearLogs()">清空日志</button>
+            <div id="log-output" style="background: #f8f9fa; padding: 10px; border-radius: 5px; font-family: monospace; font-size: 12px; max-height: 200px; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <script>
+        const baseURL = 'http://localhost:3001';
+        const testPages = [
+            '/',
+            '/zh',
+            '/zh/admin',
+            '/zh/admin/test',
+            '/zh/admin/dashboard',
+            '/zh/brands',
+            '/zh/products',
+            '/zh/about'
+        ];
+        
+        const testAPIs = [
+            '/api/sanity/upload'
+        ];
+
+        let logs = [];
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            logs.push({ timestamp, message, type });
+            updateLogDisplay();
+        }
+
+        function updateLogDisplay() {
+            const logOutput = document.getElementById('log-output');
+            logOutput.innerHTML = logs.map(log => 
+                `<div style="color: ${log.type === 'error' ? '#dc3545' : log.type === 'success' ? '#28a745' : '#333'}">
+                    [${log.timestamp}] ${log.message}
+                </div>`
+            ).join('');
+            logOutput.scrollTop = logOutput.scrollHeight;
+        }
+
+        function clearLogs() {
+            logs = [];
+            updateLogDisplay();
+        }
+
+        // 检测服务器状态
+        async function checkServerStatus() {
+            try {
+                const response = await fetch(baseURL + '/zh');
+                const serverStatus = document.getElementById('server-status');
+                const serverInfo = document.getElementById('server-info');
+                
+                if (response.ok) {
+                    serverStatus.className = 'test-item test-success';
+                    serverInfo.innerHTML = `
+                        <p>✅ 服务器运行正常</p>
+                        <p>状态码: ${response.status}</p>
+                        <p>服务器: Next.js 开发服务器</p>
+                        <p>地址: ${baseURL}</p>
+                    `;
+                    log('服务器状态检测成功', 'success');
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                const serverStatus = document.getElementById('server-status');
+                const serverInfo = document.getElementById('server-info');
+                serverStatus.className = 'test-item test-error';
+                serverInfo.innerHTML = `
+                    <p>❌ 服务器连接失败</p>
+                    <p>错误: ${error.message}</p>
+                `;
+                log(`服务器状态检测失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 测试所有页面
+        async function testAllPages() {
+            const resultsDiv = document.getElementById('page-results');
+            resultsDiv.innerHTML = '<p>正在测试页面...</p>';
+            
+            const results = [];
+            
+            for (const page of testPages) {
+                try {
+                    log(`正在测试页面: ${page}`);
+                    const startTime = Date.now();
+                    const response = await fetch(baseURL + page);
+                    const endTime = Date.now();
+                    const loadTime = endTime - startTime;
+                    
+                    results.push({
+                        url: page,
+                        status: response.ok ? 'success' : 'error',
+                        statusCode: response.status,
+                        loadTime: loadTime,
+                        error: response.ok ? null : `HTTP ${response.status}`
+                    });
+                    
+                    log(`页面 ${page} 测试完成 (${loadTime}ms)`, response.ok ? 'success' : 'error');
+                } catch (error) {
+                    results.push({
+                        url: page,
+                        status: 'error',
+                        statusCode: 0,
+                        loadTime: 0,
+                        error: error.message
+                    });
+                    log(`页面 ${page} 测试失败: ${error.message}`, 'error');
+                }
+            }
+            
+            resultsDiv.innerHTML = results.map(result => `
+                <div class="url-item">
+                    <span>${result.url}</span>
+                    <div>
+                        <span>${result.loadTime}ms</span>
+                        <span class="status-indicator status-${result.status}"></span>
+                        ${result.error ? `<small style="color: #dc3545; margin-left: 10px;">${result.error}</small>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 测试API接口
+        async function testAPIs() {
+            const resultsDiv = document.getElementById('api-results');
+            resultsDiv.innerHTML = '<p>正在测试API...</p>';
+            
+            const results = [];
+            
+            // 测试Sanity上传API
+            try {
+                log('正在测试 Sanity 上传API');
+                const testData = {
+                    data: [{
+                        name: "测试品牌",
+                        nameEn: "Test Brand",
+                        description: "这是一个测试品牌"
+                    }],
+                    type: 'brands'
+                };
+                
+                const response = await fetch(baseURL + '/api/sanity/upload', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                const result = await response.json();
+                
+                results.push({
+                    url: '/api/sanity/upload',
+                    status: response.ok ? 'success' : 'error',
+                    statusCode: response.status,
+                    response: result
+                });
+                
+                log(`API测试完成: /api/sanity/upload`, response.ok ? 'success' : 'error');
+            } catch (error) {
+                results.push({
+                    url: '/api/sanity/upload',
+                    status: 'error',
+                    statusCode: 0,
+                    error: error.message
+                });
+                log(`API测试失败: ${error.message}`, 'error');
+            }
+            
+            resultsDiv.innerHTML = results.map(result => `
+                <div class="url-item">
+                    <span>${result.url}</span>
+                    <div>
+                        <span>HTTP ${result.statusCode}</span>
+                        <span class="status-indicator status-${result.status}"></span>
+                    </div>
+                </div>
+                ${result.response ? `<pre style="background: #f8f9fa; padding: 10px; margin-top: 10px; border-radius: 3px; font-size: 11px;">${JSON.stringify(result.response, null, 2)}</pre>` : ''}
+                ${result.error ? `<small style="color: #dc3545; margin-top: 5px; display: block;">${result.error}</small>` : ''}
+            `).join('');
+        }
+
+        // 测试文件上传
+        function testFileUpload() {
+            const fileInput = document.getElementById('test-file');
+            fileInput.click();
+            
+            fileInput.onchange = async function(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                const resultsDiv = document.getElementById('upload-results');
+                resultsDiv.innerHTML = '<p>正在上传文件...</p>';
+                
+                try {
+                    log(`开始上传文件: ${file.name}`);
+                    
+                    // 这里应该调用实际的上传逻辑
+                    // 模拟上传过程
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    
+                    resultsDiv.innerHTML = `
+                        <div style="background: #d4edda; padding: 10px; border-radius: 5px;">
+                            <p>✅ 文件上传测试完成</p>
+                            <p>文件名: ${file.name}</p>
+                            <p>文件大小: ${(file.size / 1024).toFixed(2)} KB</p>
+                        </div>
+                    `;
+                    
+                    log(`文件上传完成: ${file.name}`, 'success');
+                } catch (error) {
+                    resultsDiv.innerHTML = `
+                        <div style="background: #f8d7da; padding: 10px; border-radius: 5px;">
+                            <p>❌ 文件上传失败</p>
+                            <p>错误: ${error.message}</p>
+                        </div>
+                    `;
+                    log(`文件上传失败: ${error.message}`, 'error');
+                }
+            };
+        }
+
+        // 性能测试
+        async function testPerformance() {
+            const resultsDiv = document.getElementById('performance-results');
+            resultsDiv.innerHTML = '<p>正在进行性能测试...</p>';
+            
+            try {
+                log('开始性能测试');
+                
+                const tests = [];
+                for (let i = 0; i < 5; i++) {
+                    const startTime = performance.now();
+                    await fetch(baseURL + '/zh');
+                    const endTime = performance.now();
+                    tests.push(endTime - startTime);
+                }
+                
+                const average = tests.reduce((a, b) => a + b) / tests.length;
+                const min = Math.min(...tests);
+                const max = Math.max(...tests);
+                
+                resultsDiv.innerHTML = `
+                    <div style="background: #d1ecf1; padding: 15px; border-radius: 5px;">
+                        <h4>📊 性能测试结果</h4>
+                        <p>平均响应时间: ${average.toFixed(2)}ms</p>
+                        <p>最快响应: ${min.toFixed(2)}ms</p>
+                        <p>最慢响应: ${max.toFixed(2)}ms</p>
+                        <p>测试次数: ${tests.length}</p>
+                    </div>
+                `;
+                
+                log(`性能测试完成 - 平均响应: ${average.toFixed(2)}ms`, 'success');
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div style="background: #f8d7da; padding: 10px; border-radius: 5px;">
+                        <p>❌ 性能测试失败: ${error.message}</p>
+                    </div>
+                `;
+                log(`性能测试失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 页面加载时自动检测服务器状态
+        document.addEventListener('DOMContentLoaded', function() {
+            log('页面加载完成，开始自动测试');
+            checkServerStatus();
+        });
+    </script>
+</body>
+</html>

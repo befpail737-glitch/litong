@@ -4,14 +4,23 @@ import { useRef, useState, useCallback } from 'react';
 import { useProductData } from '@/hooks/useProductData';
 
 interface ExcelUploaderProps {
-  onUploadComplete?: (count: number) => void;
+  onUploadComplete?: (result: { count: number; products: any[]; columns: any[] }) => void;
+  onSanityUpload?: (result: any) => void;
   className?: string;
+  showSanityUpload?: boolean;
 }
 
-export default function ExcelUploader({ onUploadComplete, className = '' }: ExcelUploaderProps) {
+export default function ExcelUploader({ 
+  onUploadComplete, 
+  onSanityUpload,
+  className = '', 
+  showSanityUpload = true 
+}: ExcelUploaderProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { uploadExcelFile, loading, error } = useProductData();
+  const { uploadExcelFile, uploadProductsToSanity, products, loading, error } = useProductData();
   const [dragOver, setDragOver] = useState(false);
+  const [uploadResult, setUploadResult] = useState<{ count: number; products: any[]; columns: any[] } | null>(null);
+  const [sanityUploading, setSanityUploading] = useState(false);
 
   const handleFileSelect = useCallback(async (file: File) => {
     if (!file.name.match(/\.(csv|xlsx?|txt)$/i)) {
@@ -20,8 +29,9 @@ export default function ExcelUploader({ onUploadComplete, className = '' }: Exce
     }
 
     try {
-      await uploadExcelFile(file);
-      onUploadComplete?.(1); // 临时返回1，实际应该返回解析的产品数量
+      const result = await uploadExcelFile(file);
+      setUploadResult(result);
+      onUploadComplete?.(result);
       
       // 重置文件输入
       if (fileInputRef.current) {
@@ -29,8 +39,28 @@ export default function ExcelUploader({ onUploadComplete, className = '' }: Exce
       }
     } catch (err) {
       console.error('文件上传失败:', err);
+      setUploadResult(null);
     }
   }, [uploadExcelFile, onUploadComplete]);
+
+  const handleSanityUpload = useCallback(async () => {
+    if (!uploadResult?.products || uploadResult.products.length === 0) {
+      alert('请先上传Excel文件');
+      return;
+    }
+
+    setSanityUploading(true);
+    try {
+      const result = await uploadProductsToSanity(uploadResult.products);
+      onSanityUpload?.(result);
+      alert(`成功上传 ${result.count} 个产品到CMS`);
+    } catch (err) {
+      console.error('CMS上传失败:', err);
+      alert(`CMS上传失败: ${err instanceof Error ? err.message : '未知错误'}`);
+    } finally {
+      setSanityUploading(false);
+    }
+  }, [uploadResult, uploadProductsToSanity, onSanityUpload]);
 
   const handleFileInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -187,12 +217,68 @@ export default function ExcelUploader({ onUploadComplete, className = '' }: Exce
         </div>
       )}
 
-      {/* 上传成功提示 */}
-      {!error && !loading && (
+      {/* 解析成功提示和Sanity上传 */}
+      {uploadResult && !error && (
+        <div className="mt-4 space-y-4">
+          <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+            <div className="flex items-center">
+              <svg className="h-5 w-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div className="text-sm text-green-800">
+                <p className="font-medium">✅ 文件解析成功</p>
+                <p>成功解析 {uploadResult.count} 个产品，生成了 {uploadResult.columns.length} 个筛选条件</p>
+                <div className="mt-2">
+                  <p className="font-medium">生成的筛选条件：</p>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {uploadResult.columns.map((col, idx) => (
+                      <span key={idx} className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                        {col.name} ({col.type})
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {showSanityUpload && (
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <h4 className="font-medium text-blue-800 mb-2">🚀 上传到CMS</h4>
+              <p className="text-sm text-blue-700 mb-3">
+                将解析的产品数据上传到Sanity CMS，供网站前台展示使用。
+              </p>
+              <button
+                onClick={handleSanityUpload}
+                disabled={sanityUploading}
+                className={`
+                  px-4 py-2 rounded text-sm font-medium transition-colors
+                  ${sanityUploading 
+                    ? 'bg-gray-400 text-white cursor-not-allowed' 
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                  }
+                `}
+              >
+                {sanityUploading ? (
+                  <div className="flex items-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    上传中...
+                  </div>
+                ) : (
+                  `上传 ${uploadResult.count} 个产品到CMS`
+                )}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 上传提示 */}
+      {!uploadResult && !error && !loading && (
         <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
           <div className="flex items-center">
             <svg className="h-5 w-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div className="text-sm text-green-800">
               <p className="font-medium">上传提示</p>

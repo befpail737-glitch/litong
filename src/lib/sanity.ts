@@ -106,6 +106,63 @@ const mockArticles = [
   }
 ];
 
+const mockSolutions = [
+  {
+    _id: 'stm32f4-analysis',
+    title: 'STM32F4系列微控制器深度解析',
+    titleEn: 'STM32F4 Series Microcontroller Deep Analysis',
+    summary: '本文深入分析STM32F4系列微控制器的特性、应用场景和开发技巧，为工程师提供全面的技术指导。',
+    content: `# STM32F4系列微控制器深度解析
+
+STM32F4系列微控制器是STMicroelectronics推出的基于ARM Cortex-M4内核的高性能32位微控制器，具有出色的处理能力和丰富的外设资源。
+
+## 主要特性
+
+### 1. 高性能内核
+- ARM Cortex-M4 内核，主频高达180MHz
+- 浮点运算单元(FPU)，支持单精度浮点运算
+- DSP指令集，适合数字信号处理应用
+
+### 2. 存储资源
+- Flash存储器：512KB到2MB不等
+- SRAM：192KB到256KB
+- 支持外部存储器接口
+
+### 3. 丰富的外设
+- 多达17个定时器
+- 最多3个SPI接口
+- 最多4个USART/UART接口
+- 2个CAN接口
+- USB OTG接口
+
+## 应用场景
+
+STM32F4系列广泛应用于：
+
+1. **工业自动化**
+   - PLC控制系统
+   - 电机控制
+   - 传感器数据采集
+
+2. **消费电子**
+   - 音频处理设备
+   - 人机界面(HMI)
+   - 智能家居设备
+
+3. **通信设备**
+   - 网关设备
+   - 协议转换器
+   - 数据采集器`,
+    category: 'technical',
+    tags: ['STM32', '微控制器', '嵌入式', 'ARM'],
+    author: '立通电子技术团队',
+    publishDate: new Date().toISOString(),
+    _createdAt: new Date().toISOString(),
+    _updatedAt: new Date().toISOString(),
+    slug: { current: 'stm32f4-analysis' }
+  }
+];
+
 // 模拟Sanity客户端
 export const client = {
   fetch: async (query: string, params?: any) => {
@@ -118,6 +175,9 @@ export const client = {
     }
     if (query.includes('_type == "article"')) {
       return mockArticles;
+    }
+    if (query.includes('_type == "solution"')) {
+      return mockSolutions;
     }
     return [];
   },
@@ -179,4 +239,16 @@ export async function searchProducts(searchTerm: string, filters?: any) {
 export async function importProductsFromExcel(products: any[]) {
   // 模拟导入成功
   return products.map((_, index) => ({ _id: `imported_${Date.now()}_${index}` }));
+}
+
+export async function getSolutions(category?: string, limit?: number) {
+  let solutions = mockSolutions;
+  if (category && category !== 'all') {
+    solutions = solutions.filter(s => s.category === category);
+  }
+  return limit ? solutions.slice(0, limit) : solutions;
+}
+
+export async function getSolution(slug: string) {
+  return mockSolutions.find(s => s.slug.current === slug) || null;
 }
