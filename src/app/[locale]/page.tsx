@@ -54,6 +54,14 @@ export async function generateMetadata({
   };
 }
 
+export async function generateStaticParams() {
+  const locales = ['zh', 'en', 'ja', 'ko', 'ru', 'vi', 'fr', 'de', 'it', 'tr', 'ar'];
+  
+  return locales.map((locale) => ({
+    locale
+  }));
+}
+
 // 结构化数据（Schema.org）
 const organizationSchema = {
   "@context": "https://schema.org",

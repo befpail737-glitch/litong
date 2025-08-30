@@ -17,6 +17,14 @@ export async function generateMetadata({
   };
 }
 
+export async function generateStaticParams() {
+  const locales = ['zh', 'en', 'ja', 'ko', 'ru', 'vi', 'fr', 'de', 'it', 'tr', 'ar'];
+  
+  return locales.map((locale) => ({
+    locale
+  }));
+}
+
 const breadcrumbItems = [
   { label: '首页', href: '/' },
   { label: '品牌列表', href: '/brands' }

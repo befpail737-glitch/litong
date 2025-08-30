@@ -9,20 +9,16 @@ interface PageProps {
     brandSlug: string;
     categorySlug: string;
   };
-  searchParams: {
-    subcategory?: string;
-  };
 }
 
 // 生成页面元数据
-export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { brandSlug, categorySlug } = params;
-  const { subcategory } = searchParams;
 
   try {
     const [brandInfo, categoryData] = await Promise.all([
       getBrandInfo(brandSlug),
-      getBrandCategoryFilterData(brandSlug, categorySlug, subcategory)
+      getBrandCategoryFilterData(brandSlug, categorySlug) // 移除 subcategory 参数
     ]);
 
     if (!brandInfo || !categoryData) {
@@ -43,7 +39,7 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
         title: pageTitle,
         description: pageDescription,
         type: 'website',
-        url: `/brands/${brandSlug}/products/${categorySlug}${subcategory ? `?subcategory=${subcategory}` : ''}`,
+        url: `/brands/${brandSlug}/products/${categorySlug}`,
       },
       twitter: {
         card: 'summary_large_image',
@@ -59,15 +55,14 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
   }
 }
 
-export default async function BrandCategoryPage({ params, searchParams }: PageProps) {
+export default async function BrandCategoryPage({ params }: PageProps) {
   const { brandSlug, categorySlug } = params;
-  const { subcategory } = searchParams;
 
   try {
     // 并行获取品牌信息和分类数据
     const [brandInfo, categoryData] = await Promise.all([
       getBrandInfo(brandSlug),
-      getBrandCategoryFilterData(brandSlug, categorySlug, subcategory)
+      getBrandCategoryFilterData(brandSlug, categorySlug) // 移除 subcategory 参数
     ]);
 
     // 检查数据是否存在
@@ -77,7 +72,7 @@ export default async function BrandCategoryPage({ params, searchParams }: PagePr
     }
 
     if (!categoryData || (categoryData as any).products.length === 0) {
-      console.error(`No products found for brand: ${brandSlug}, category: ${categorySlug}, subcategory: ${subcategory}`);
+      console.error(`No products found for brand: ${brandSlug}, category: ${categorySlug}`);
       notFound();
     }
 
@@ -99,9 +94,8 @@ export default async function BrandCategoryPage({ params, searchParams }: PagePr
 
 // 生成静态路径（可选，用于预渲染热门品牌分类）
 export async function generateStaticParams() {
-  // 这里可以预生成一些热门的品牌分类组合
-  // 由于数据量可能很大，建议只预生成最热门的几个
-  return [
+  // 这里可以预生成一些热门的品牌分类组合，支持多语言
+  const brandCategories = [
     {
       brandSlug: 'stmicroelectronics',
       categorySlug: 'microcontrollers'
@@ -115,4 +109,19 @@ export async function generateStaticParams() {
       categorySlug: 'microcontrollers'
     }
   ];
+  
+  const locales = ['zh', 'en', 'ja', 'ko', 'ru', 'vi', 'fr', 'de', 'it', 'tr', 'ar'];
+  
+  const params = [];
+  for (const locale of locales) {
+    for (const brandCategory of brandCategories) {
+      params.push({
+        locale,
+        brandSlug: brandCategory.brandSlug,
+        categorySlug: brandCategory.categorySlug
+      });
+    }
+  }
+  
+  return params;
 }

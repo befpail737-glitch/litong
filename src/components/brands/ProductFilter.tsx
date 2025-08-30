@@ -2,8 +2,7 @@
 
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
-import { useState, useMemo, useCallback, useEffect } from 'react';
-import { useProductData } from '@/hooks/useProductData';
+import { useState, useMemo, useCallback } from 'react';
 
 interface FilterColumn {
   key: string;
@@ -47,7 +46,6 @@ interface ProductFilterProps {
 
 export default function ProductFilter({ brandSlug, brandName, categoryData }: ProductFilterProps) {
   const locale = useLocale();
-  const { products: dynamicProducts, filterColumns: dynamicColumns, loadStoredData } = useProductData();
   
   // 筛选状态
   const [filters, setFilters] = useState<Record<string, string | [number, number]>>({});
@@ -57,23 +55,15 @@ export default function ProductFilter({ brandSlug, brandName, categoryData }: Pr
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
 
-  // 加载存储的产品数据
-  useEffect(() => {
-    loadStoredData();
-  }, [loadStoredData]);
-
-  // 合并静态数据和动态数据
+  // 使用来自props的静态数据
   const allProducts = useMemo(() => {
-    const categoryProducts = dynamicProducts.length > 0 
-      ? dynamicProducts.filter(p => p.category === categoryData.id)
-      : categoryData.products;
-    return categoryProducts;
-  }, [dynamicProducts, categoryData.products, categoryData.id]);
+    return categoryData.products || [];
+  }, [categoryData.products]);
 
-  // 合并筛选列配置
+  // 使用来自props的筛选列配置
   const allFilterColumns = useMemo(() => {
-    return dynamicColumns.length > 0 ? dynamicColumns : categoryData.filterColumns;
-  }, [dynamicColumns, categoryData.filterColumns]);
+    return categoryData.filterColumns || [];
+  }, [categoryData.filterColumns]);
 
   // 筛选逻辑
   const filteredProducts = useMemo(() => {
