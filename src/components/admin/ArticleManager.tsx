@@ -12,6 +12,7 @@ interface Article {
   author: string;
   publishedAt: string;
   status: 'draft' | 'published';
+  brand?: string; // 添加品牌字段
   featured?: boolean;
   readTime?: number;
 }
@@ -26,7 +27,8 @@ const sampleArticles: Article[] = [
     tags: ['STM32', '选型', '微控制器'],
     author: 'FAE团队',
     publishedAt: '2024-11-15',
-    status: 'published'
+    status: 'published',
+    brand: 'stmicroelectronics'
   },
   {
     id: '2',
@@ -37,7 +39,8 @@ const sampleArticles: Article[] = [
     tags: ['TPS54360', '电源管理', '降压转换器'],
     author: '李工程师',
     publishedAt: '2024-11-12',
-    status: 'published'
+    status: 'published',
+    brand: 'ti'
   }
 ];
 
@@ -56,6 +59,19 @@ export default function ArticleManager() {
     { value: 'application-note', label: '应用笔记' },
     { value: 'troubleshooting', label: '问题排查' },
     { value: 'product-review', label: '新品评测' }
+  ];
+
+  // 品牌列表
+  const brands = [
+    { value: '', label: '通用文章' },
+    { value: 'stmicroelectronics', label: 'STMicroelectronics' },
+    { value: 'ti', label: 'Texas Instruments' },
+    { value: 'infineon', label: 'Infineon' },
+    { value: 'microchip', label: 'Microchip' },
+    { value: 'analog-devices', label: 'Analog Devices' },
+    { value: 'maxim', label: 'Maxim Integrated' },
+    { value: 'nxp', label: 'NXP' },
+    { value: 'renesas', label: 'Renesas' }
   ];
 
   const filteredArticles = articles.filter(article => {
@@ -90,6 +106,7 @@ export default function ArticleManager() {
           author: articleData.author || 'FAE团队',
           publishedAt: new Date().toISOString().split('T')[0],
           status: articleData.status || 'draft',
+          brand: articleData.brand || '',
           featured: articleData.featured || false,
           readTime: calculateReadTime(articleData.content || '')
         };
@@ -310,6 +327,7 @@ export default function ArticleManager() {
         <ArticleModal
           article={editingArticle}
           categories={categories.filter(cat => cat.value !== 'all')}
+          brands={brands}
           onSave={handleSaveArticle}
           onClose={() => {
             setIsModalOpen(false);
@@ -325,11 +343,12 @@ export default function ArticleManager() {
 interface ArticleModalProps {
   article: Article | null;
   categories: { value: string; label: string }[];
+  brands: { value: string; label: string }[];
   onSave: (article: Partial<Article>) => void;
   onClose: () => void;
 }
 
-function ArticleModal({ article, categories, onSave, onClose }: ArticleModalProps) {
+function ArticleModal({ article, categories, brands, onSave, onClose }: ArticleModalProps) {
   const contentRef = useRef<HTMLTextAreaElement>(null);
   const [formData, setFormData] = useState({
     title: article?.title || '',
@@ -339,6 +358,7 @@ function ArticleModal({ article, categories, onSave, onClose }: ArticleModalProp
     tags: article?.tags.join(', ') || '',
     author: article?.author || 'FAE团队',
     status: article?.status || 'draft',
+    brand: article?.brand || '',
     featured: article?.featured || false
   });
 
@@ -388,7 +408,7 @@ function ArticleModal({ article, categories, onSave, onClose }: ArticleModalProp
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">分类</label>
               <select
@@ -399,6 +419,21 @@ function ArticleModal({ article, categories, onSave, onClose }: ArticleModalProp
                 {categories.map(category => (
                   <option key={category.value} value={category.value}>
                     {category.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700">关联品牌</label>
+              <select
+                value={formData.brand}
+                onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              >
+                {brands.map(brand => (
+                  <option key={brand.value} value={brand.value}>
+                    {brand.label}
                   </option>
                 ))}
               </select>

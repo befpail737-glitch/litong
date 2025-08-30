@@ -307,46 +307,87 @@ export default function ProductManager() {
           const headers = jsonData[0] as string[];
           const rows = jsonData.slice(1);
 
-          // 验证必要的列
-          const requiredColumns = ['产品名称', '品牌', '产品分类', '产品小类', '封装', '描述', '价格', '库存'];
-          const missingColumns = requiredColumns.filter(col => !headers.includes(col));
+          // 查找必要的列，允许灵活的列名
+          const findColumn = (possibleNames: string[]) => {
+            return possibleNames.find(name => 
+              headers.some(header => header.toLowerCase().includes(name.toLowerCase()))
+            );
+          };
           
-          if (missingColumns.length > 0) {
-            throw new Error(`缺少必要的列: ${missingColumns.join(', ')}`);
+          const nameColumn = headers.find(h => 
+            h.includes('型号') || h.includes('名称') || h.toLowerCase().includes('part') || h.toLowerCase().includes('name')
+          );
+          const brandColumn = headers.find(h => 
+            h.includes('品牌') || h.toLowerCase().includes('brand') || h.toLowerCase().includes('manufacturer')
+          );
+          
+          if (!nameColumn) {
+            throw new Error('未找到产品名称/型号列。请确保表格包含"产品名称"、"型号"或"Part Number"列。');
           }
 
           setUploadProgress(50);
 
-          // 解析产品数据
+          // 解析产品数据 - 自动处理所有列
           const newProducts: Product[] = [];
           const timestamp = Date.now();
+          
+          // 预定义的标准字段映射
+          const standardFields = {
+            name: [nameColumn],
+            brand: [brandColumn, '品牌', 'brand', 'manufacturer'],
+            category: ['分类', '产品分类', 'category', 'product category'],
+            subcategory: ['子分类', '产品小类', 'subcategory', 'sub category'],
+            package: ['封装', 'package', 'packaging'],
+            description: ['描述', '说明', 'description', 'desc'],
+            price: ['价格', 'price', 'cost'],
+            stock: ['库存', 'stock', 'quantity', 'qty'],
+            datasheet: ['规格书', '数据手册', 'datasheet', 'spec sheet']
+          };
+          
+          // 找到每个标准字段对应的列索引
+          const fieldMappings: Record<string, number> = {};
+          Object.entries(standardFields).forEach(([field, possibleNames]) => {
+            const columnName = possibleNames.find(name => 
+              name && headers.some(h => h && h.toLowerCase().includes(name.toLowerCase()))
+            );
+            if (columnName) {
+              const index = headers.findIndex(h => h && h.toLowerCase().includes(columnName.toLowerCase()));
+              if (index >= 0) {
+                fieldMappings[field] = index;
+              }
+            }
+          });
 
           rows.forEach((row, index) => {
-            if (!row || row.length === 0) return;
+            if (!row || row.length === 0 || !row[fieldMappings.name]) return;
 
             const product: Product = {
               id: `${timestamp}_${index}`,
-              name: String(row[headers.indexOf('产品名称')] || ''),
-              brand: String(row[headers.indexOf('品牌')] || selectedBrand || ''),
-              category: String(row[headers.indexOf('产品分类')] || selectedMainCategory || ''),
-              subcategory: String(row[headers.indexOf('产品小类')] || selectedSubCategory || ''),
-              package: String(row[headers.indexOf('封装')] || ''),
-              description: String(row[headers.indexOf('描述')] || ''),
-              price: parseFloat(String(row[headers.indexOf('价格')] || '0')) || undefined,
-              stock: parseInt(String(row[headers.indexOf('库存')] || '0')) || 0,
-              datasheet: String(row[headers.indexOf('规格书链接')] || ''),
+              name: String(row[fieldMappings.name] || ''),
+              brand: String(row[fieldMappings.brand] || selectedBrand || ''),
+              category: String(row[fieldMappings.category] || selectedMainCategory || ''),
+              subcategory: String(row[fieldMappings.subcategory] || selectedSubCategory || ''),
+              package: String(row[fieldMappings.package] || ''),
+              description: String(row[fieldMappings.description] || ''),
+              price: fieldMappings.price ? parseFloat(String(row[fieldMappings.price]) || '0') : undefined,
+              stock: fieldMappings.stock ? parseInt(String(row[fieldMappings.stock]) || '0') : 0,
+              datasheet: fieldMappings.datasheet ? String(row[fieldMappings.datasheet] || '') : '',
               specifications: {},
               createdAt: new Date().toISOString().split('T')[0]
             };
 
-            // 解析参数列
+            // 将所有非标准字段作为规格参数处理
             headers.forEach((header, headerIndex) => {
-              if (header.startsWith('参数') && row[headerIndex]) {
-                const paramValue = String(row[headerIndex]);
-                if (paramValue.includes(':')) {
-                  const [key, value] = paramValue.split(':');
-                  product.specifications[key.trim()] = value.trim();
-                }
+              if (!header || row[headerIndex] === null || row[headerIndex] === undefined) return;
+              
+              // 跳过已经处理的标准字段
+              const isStandardField = Object.values(fieldMappings).includes(headerIndex);
+              if (isStandardField) return;
+              
+              // 将所有其他列作为产品规格参数
+              const value = String(row[headerIndex]).trim();
+              if (value) {
+                product.specifications[header] = value;
               }
             });
 
