@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import * as XLSX from 'xlsx';
+// Excel处理现在使用ExcelJS库通过useProductData hook
 
 interface Product {
   partNumber: string;

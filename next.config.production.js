@@ -6,7 +6,7 @@ const withNextIntl = require('next-intl/plugin')(
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    serverComponentsExternalPackages: ['xlsx']
+    serverComponentsExternalPackages: ['exceljs']
   },
   
   // 配置静态导出用于Cloudflare Pages

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import * as XLSX from 'xlsx';
+// Excel处理现在使用ExcelJS库通过useProductData hook
 import { getProducts, getProductCategories } from '@/lib/sanity';
 
 interface Product {

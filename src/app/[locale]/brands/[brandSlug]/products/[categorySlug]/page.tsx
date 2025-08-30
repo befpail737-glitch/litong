@@ -32,13 +32,13 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
       };
     }
 
-    const pageTitle = `${brandInfo.name} ${categoryData.categoryInfo.name} - 产品筛选`;
-    const pageDescription = `浏览和筛选${brandInfo.name}的${categoryData.categoryInfo.name}产品，包含${categoryData.products.length}个产品型号。支持参数筛选、价格对比和技术规格查询。`;
+    const pageTitle = `${(brandInfo as any).name} ${(categoryData as any).categoryInfo.name} - 产品筛选`;
+    const pageDescription = `浏览和筛选${(brandInfo as any).name}的${(categoryData as any).categoryInfo.name}产品，包含${(categoryData as any).products.length}个产品型号。支持参数筛选、价格对比和技术规格查询。`;
 
     return {
       title: pageTitle,
       description: pageDescription,
-      keywords: `${brandInfo.name}, ${categoryData.categoryInfo.name}, 产品筛选, 参数对比, 电子元器件`,
+      keywords: `${(brandInfo as any).name}, ${(categoryData as any).categoryInfo.name}, 产品筛选, 参数对比, 电子元器件`,
       openGraph: {
         title: pageTitle,
         description: pageDescription,
@@ -76,7 +76,7 @@ export default async function BrandCategoryPage({ params, searchParams }: PagePr
       notFound();
     }
 
-    if (!categoryData || categoryData.products.length === 0) {
+    if (!categoryData || (categoryData as any).products.length === 0) {
       console.error(`No products found for brand: ${brandSlug}, category: ${categorySlug}, subcategory: ${subcategory}`);
       notFound();
     }
@@ -85,8 +85,8 @@ export default async function BrandCategoryPage({ params, searchParams }: PagePr
       <main className="min-h-screen bg-gray-50">
         <ProductFilter
           brandSlug={brandSlug}
-          brandName={brandInfo.name}
-          categoryData={categoryData.categoryInfo}
+          brandName={(brandInfo as any).name}
+          categoryData={(categoryData as any).categoryInfo}
         />
       </main>
     );
