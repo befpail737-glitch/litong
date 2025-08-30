@@ -1,0 +1,266 @@
+2025-08-29T22:47:43.551633Z	Cloning repository...
+2025-08-29T22:47:44.22898Z	From https://github.com/befpail737-glitch/litong
+2025-08-29T22:47:44.229425Z	 * branch            f08502a05ab0656aa9d0a8382070d24a03d2bc50 -> FETCH_HEAD
+2025-08-29T22:47:44.229517Z	
+2025-08-29T22:47:44.264208Z	HEAD is now at f08502a Fix root path 404 - Add Next.js root page and layout
+2025-08-29T22:47:44.264971Z	
+2025-08-29T22:47:44.342822Z	
+2025-08-29T22:47:44.343282Z	Using v2 root directory strategy
+2025-08-29T22:47:44.363362Z	Success: Finished cloning repository files
+2025-08-29T22:47:46.338027Z	Checking for configuration in a Wrangler configuration file (BETA)
+2025-08-29T22:47:46.338867Z	
+2025-08-29T22:47:46.340097Z	Found wrangler.toml file. Reading build configuration...
+2025-08-29T22:47:46.345955Z	pages_build_output_dir: out
+2025-08-29T22:47:46.346093Z	Build environment variables: (none found)
+2025-08-29T22:47:47.443023Z	Successfully read wrangler.toml file.
+2025-08-29T22:47:47.508288Z	Detected the following tools from environment: npm@10.9.2, nodejs@22.16.0
+2025-08-29T22:47:47.508894Z	Installing project dependencies: npm install --progress=false
+2025-08-29T22:48:01.855626Z	
+2025-08-29T22:48:01.855957Z	added 172 packages, and audited 173 packages in 14s
+2025-08-29T22:48:01.856054Z	
+2025-08-29T22:48:01.85624Z	36 packages are looking for funding
+2025-08-29T22:48:01.856473Z	  run `npm fund` for details
+2025-08-29T22:48:01.903856Z	
+2025-08-29T22:48:01.904175Z	2 vulnerabilities (1 high, 1 critical)
+2025-08-29T22:48:01.904305Z	
+2025-08-29T22:48:01.904405Z	To address all issues possible, run:
+2025-08-29T22:48:01.904513Z	  npm audit fix --force
+2025-08-29T22:48:01.904635Z	
+2025-08-29T22:48:01.904705Z	Some issues need review, and may require choosing
+2025-08-29T22:48:01.904784Z	a different dependency.
+2025-08-29T22:48:01.904997Z	
+2025-08-29T22:48:01.905105Z	Run `npm audit` for details.
+2025-08-29T22:48:01.933973Z	Executing user command: npm run build:production
+2025-08-29T22:48:02.31957Z	
+2025-08-29T22:48:02.319899Z	> litong-electronics@1.0.0 build:production
+2025-08-29T22:48:02.320037Z	> cp next.config.production.js next.config.js && next build
+2025-08-29T22:48:02.320411Z	
+2025-08-29T22:48:02.99674Z	⚠ No build cache found. Please configure build caching for faster rebuilds. Read more: https://nextjs.org/docs/messages/no-cache
+2025-08-29T22:48:03.001256Z	Attention: Next.js now collects completely anonymous telemetry regarding usage.
+2025-08-29T22:48:03.00153Z	This information is used to shape Next.js' roadmap and prioritize features.
+2025-08-29T22:48:03.001686Z	You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+2025-08-29T22:48:03.001866Z	https://nextjs.org/telemetry
+2025-08-29T22:48:03.001995Z	
+2025-08-29T22:48:03.058103Z	  ▲ Next.js 14.2.5
+2025-08-29T22:48:03.075451Z	  - Environments: .env.production
+2025-08-29T22:48:03.07693Z	
+2025-08-29T22:48:03.13282Z	   Creating an optimized production build ...
+2025-08-29T22:48:15.084463Z	 ✓ Compiled successfully
+2025-08-29T22:48:15.085678Z	   Linting and checking validity of types ...
+2025-08-29T22:48:19.816255Z	   Collecting page data ...
+2025-08-29T22:48:21.45597Z	   Generating static pages (0/369) ...
+2025-08-29T22:48:23.828165Z	   Generating static pages (92/369) 
+2025-08-29T22:48:25.185812Z	   Generating static pages (184/369) 
+2025-08-29T22:48:26.802616Z	   Generating static pages (276/369) 
+2025-08-29T22:48:27.695763Z	 ✓ Generating static pages (369/369)
+2025-08-29T22:48:27.867303Z	   Finalizing page optimization ...
+2025-08-29T22:48:27.867924Z	   Collecting build traces ...
+2025-08-29T22:48:30.135441Z	 ⚠ Statically exporting a Next.js application via `next export` disables API routes and middleware.
+2025-08-29T22:48:30.135784Z	This command is meant for static-only hosts, and is not necessary to make your application static.
+2025-08-29T22:48:30.136016Z	Pages in your application without server-side data dependencies will be automatically statically exported by `next build`, including pages powered by `getStaticProps`.
+2025-08-29T22:48:30.136158Z	Learn more: https://nextjs.org/docs/messages/api-routes-static-export
+2025-08-29T22:48:30.553259Z	
+2025-08-29T22:48:30.563852Z	Route (app)                                          Size     First Load JS
+2025-08-29T22:48:30.564131Z	┌ ○ /                                                5 kB           92.2 kB
+2025-08-29T22:48:30.564284Z	├ ○ /_not-found                                      871 B          88.1 kB
+2025-08-29T22:48:30.564444Z	├ ● /[locale]                                        144 B          87.3 kB
+2025-08-29T22:48:30.564524Z	├   ├ /zh
+2025-08-29T22:48:30.565014Z	├   ├ /en
+2025-08-29T22:48:30.565124Z	├   ├ /ja
+2025-08-29T22:48:30.565286Z	├   └ [+8 more paths]
+2025-08-29T22:48:30.565392Z	├ ● /[locale]/about                                  2.62 kB         113 kB
+2025-08-29T22:48:30.565498Z	├   ├ /zh/about
+2025-08-29T22:48:30.565604Z	├   ├ /en/about
+2025-08-29T22:48:30.56573Z	├   ├ /ja/about
+2025-08-29T22:48:30.565839Z	├   └ [+8 more paths]
+2025-08-29T22:48:30.565932Z	├ ● /[locale]/admin                                  1.09 kB        88.3 kB
+2025-08-29T22:48:30.566028Z	├   ├ /zh/admin
+2025-08-29T22:48:30.566128Z	├   ├ /en/admin
+2025-08-29T22:48:30.566225Z	├   ├ /ja/admin
+2025-08-29T22:48:30.566339Z	├   └ [+8 more paths]
+2025-08-29T22:48:30.566435Z	├ ● /[locale]/admin/articles                         4.48 kB        91.7 kB
+2025-08-29T22:48:30.566541Z	├   ├ /zh/admin/articles
+2025-08-29T22:48:30.566644Z	├   ├ /en/admin/articles
+2025-08-29T22:48:30.566707Z	├   ├ /ja/admin/articles
+2025-08-29T22:48:30.566879Z	├   └ [+8 more paths]
+2025-08-29T22:48:30.566998Z	├ ● /[locale]/admin/brands                           3 kB           90.2 kB
+2025-08-29T22:48:30.567097Z	├   ├ /zh/admin/brands
+2025-08-29T22:48:30.567189Z	├   ├ /en/admin/brands
+2025-08-29T22:48:30.567336Z	├   ├ /ja/admin/brands
+2025-08-29T22:48:30.567506Z	├   └ [+8 more paths]
+2025-08-29T22:48:30.567617Z	├ ● /[locale]/admin/dashboard                        3.16 kB        90.3 kB
+2025-08-29T22:48:30.567734Z	├   ├ /zh/admin/dashboard
+2025-08-29T22:48:30.567843Z	├   ├ /en/admin/dashboard
+2025-08-29T22:48:30.567928Z	├   ├ /ja/admin/dashboard
+2025-08-29T22:48:30.568024Z	├   └ [+8 more paths]
+2025-08-29T22:48:30.568114Z	├ ● /[locale]/admin/news                             4.76 kB        91.9 kB
+2025-08-29T22:48:30.56821Z	├   ├ /zh/admin/news
+2025-08-29T22:48:30.568307Z	├   ├ /en/admin/news
+2025-08-29T22:48:30.568404Z	├   ├ /ja/admin/news
+2025-08-29T22:48:30.568497Z	├   └ [+8 more paths]
+2025-08-29T22:48:30.568586Z	├ ● /[locale]/admin/products                         7.81 kB         234 kB
+2025-08-29T22:48:30.568685Z	├   ├ /zh/admin/products
+2025-08-29T22:48:30.569035Z	├   ├ /en/admin/products
+2025-08-29T22:48:30.569155Z	├   ├ /ja/admin/products
+2025-08-29T22:48:30.569253Z	├   └ [+8 more paths]
+2025-08-29T22:48:30.569344Z	├ ● /[locale]/admin/sanity                           4.23 kB         230 kB
+2025-08-29T22:48:30.569408Z	├   ├ /zh/admin/sanity
+2025-08-29T22:48:30.569504Z	├   ├ /en/admin/sanity
+2025-08-29T22:48:30.569591Z	├   ├ /ja/admin/sanity
+2025-08-29T22:48:30.569697Z	├   └ [+8 more paths]
+2025-08-29T22:48:30.569822Z	├ ● /[locale]/admin/settings                         3.08 kB        90.3 kB
+2025-08-29T22:48:30.569919Z	├   ├ /zh/admin/settings
+2025-08-29T22:48:30.570014Z	├   ├ /en/admin/settings
+2025-08-29T22:48:30.570097Z	├   ├ /ja/admin/settings
+2025-08-29T22:48:30.570171Z	├   └ [+8 more paths]
+2025-08-29T22:48:30.570263Z	├ ● /[locale]/admin/solutions                        4.36 kB        91.5 kB
+2025-08-29T22:48:30.570356Z	├   ├ /zh/admin/solutions
+2025-08-29T22:48:30.570443Z	├   ├ /en/admin/solutions
+2025-08-29T22:48:30.570527Z	├   ├ /ja/admin/solutions
+2025-08-29T22:48:30.570616Z	├   └ [+8 more paths]
+2025-08-29T22:48:30.570725Z	├ ● /[locale]/admin/users                            3.52 kB        90.7 kB
+2025-08-29T22:48:30.570845Z	├   ├ /zh/admin/users
+2025-08-29T22:48:30.570943Z	├   ├ /en/admin/users
+2025-08-29T22:48:30.571079Z	├   ├ /ja/admin/users
+2025-08-29T22:48:30.571299Z	├   └ [+8 more paths]
+2025-08-29T22:48:30.571447Z	├ ● /[locale]/brands                                 2.5 kB          112 kB
+2025-08-29T22:48:30.57155Z	├   ├ /zh/brands
+2025-08-29T22:48:30.571665Z	├   ├ /en/brands
+2025-08-29T22:48:30.571816Z	├   ├ /ja/brands
+2025-08-29T22:48:30.57194Z	├   └ [+8 more paths]
+2025-08-29T22:48:30.572058Z	├ ● /[locale]/brands/[slug]                          2.32 kB         112 kB
+2025-08-29T22:48:30.572178Z	├   ├ /zh/brands/stm
+2025-08-29T22:48:30.572299Z	├   ├ /zh/brands/stmicroelectronics
+2025-08-29T22:48:30.572422Z	├   ├ /zh/brands/ti
+2025-08-29T22:48:30.572542Z	├   └ [+30 more paths]
+2025-08-29T22:48:30.572637Z	├ ● /[locale]/brands/[slug]/about                    2.33 kB         112 kB
+2025-08-29T22:48:30.572758Z	├   ├ /zh/brands/stm/about
+2025-08-29T22:48:30.572886Z	├   ├ /zh/brands/ti/about
+2025-08-29T22:48:30.572988Z	├   ├ /en/brands/stm/about
+2025-08-29T22:48:30.573091Z	├   └ [+19 more paths]
+2025-08-29T22:48:30.57318Z	├ ● /[locale]/brands/[slug]/news                     3.84 kB         114 kB
+2025-08-29T22:48:30.573281Z	├   ├ /zh/brands/stm/news
+2025-08-29T22:48:30.573354Z	├   ├ /zh/brands/ti/news
+2025-08-29T22:48:30.573495Z	├   ├ /en/brands/stm/news
+2025-08-29T22:48:30.573574Z	├   └ [+19 more paths]
+2025-08-29T22:48:30.573684Z	├ ● /[locale]/brands/[slug]/news/[id]                575 B           111 kB
+2025-08-29T22:48:30.573899Z	├   ├ /zh/brands/stm/news/stm32h5-launch
+2025-08-29T22:48:30.573972Z	├   ├ /en/brands/stm/news/stm32h5-launch
+2025-08-29T22:48:30.574133Z	├   ├ /ja/brands/stm/news/stm32h5-launch
+2025-08-29T22:48:30.574269Z	├   └ [+8 more paths]
+2025-08-29T22:48:30.574561Z	├ ● /[locale]/brands/[slug]/products                 2.7 kB          113 kB
+2025-08-29T22:48:30.574656Z	├   ├ /zh/brands/stm/products
+2025-08-29T22:48:30.575026Z	├   ├ /en/brands/stm/products
+2025-08-29T22:48:30.57511Z	├   ├ /ja/brands/stm/products
+2025-08-29T22:48:30.575172Z	├   └ [+8 more paths]
+2025-08-29T22:48:30.575247Z	├ ● /[locale]/brands/[slug]/products/[category]      5.54 kB         115 kB
+2025-08-29T22:48:30.575347Z	├   ├ /zh/brands/stm/products/microcontrollers
+2025-08-29T22:48:30.575451Z	├   ├ /zh/brands/stm/products/analog-ics
+2025-08-29T22:48:30.575547Z	├   ├ /en/brands/stm/products/microcontrollers
+2025-08-29T22:48:30.57565Z	├   └ [+19 more paths]
+2025-08-29T22:48:30.575758Z	├ ● /[locale]/brands/[slug]/solutions                3.54 kB         113 kB
+2025-08-29T22:48:30.575863Z	├   ├ /zh/brands/stm/solutions
+2025-08-29T22:48:30.576175Z	├   ├ /en/brands/stm/solutions
+2025-08-29T22:48:30.576286Z	├   ├ /ja/brands/stm/solutions
+2025-08-29T22:48:30.57639Z	├   └ [+8 more paths]
+2025-08-29T22:48:30.576469Z	├ ● /[locale]/brands/[slug]/solutions/[id]           575 B           111 kB
+2025-08-29T22:48:30.576559Z	├   ├ /zh/brands/stm/solutions/iot-smart-home
+2025-08-29T22:48:30.576685Z	├   ├ /en/brands/stm/solutions/iot-smart-home
+2025-08-29T22:48:30.576848Z	├   ├ /ja/brands/stm/solutions/iot-smart-home
+2025-08-29T22:48:30.576965Z	├   └ [+8 more paths]
+2025-08-29T22:48:30.577066Z	├ ● /[locale]/brands/[slug]/support                  1.47 kB         111 kB
+2025-08-29T22:48:30.577176Z	├   ├ /zh/brands/stm/support
+2025-08-29T22:48:30.577274Z	├   ├ /en/brands/stm/support
+2025-08-29T22:48:30.577378Z	├   ├ /ja/brands/stm/support
+2025-08-29T22:48:30.57751Z	├   └ [+8 more paths]
+2025-08-29T22:48:30.577641Z	├ ● /[locale]/brands/[slug]/support/[id]             575 B           111 kB
+2025-08-29T22:48:30.577791Z	├   ├ /zh/brands/stm/support/stm32-low-power-design
+2025-08-29T22:48:30.577927Z	├   ├ /en/brands/stm/support/stm32-low-power-design
+2025-08-29T22:48:30.578025Z	├   ├ /ja/brands/stm/support/stm32-low-power-design
+2025-08-29T22:48:30.578264Z	├   └ [+8 more paths]
+2025-08-29T22:48:30.578384Z	├ ● /[locale]/products                               4.95 kB         115 kB
+2025-08-29T22:48:30.578737Z	├   ├ /zh/products
+2025-08-29T22:48:30.578992Z	├   ├ /en/products
+2025-08-29T22:48:30.57908Z	├   ├ /ja/products
+2025-08-29T22:48:30.579143Z	├   └ [+8 more paths]
+2025-08-29T22:48:30.579332Z	├ ● /[locale]/products/[slug]                        4.02 kB         114 kB
+2025-08-29T22:48:30.579566Z	├   ├ /zh/products/stm32f407vgt6
+2025-08-29T22:48:30.579661Z	├   ├ /zh/products/lm358
+2025-08-29T22:48:30.579729Z	├   ├ /zh/products/ads1115
+2025-08-29T22:48:30.579817Z	├   └ [+30 more paths]
+2025-08-29T22:48:30.579884Z	├ ● /[locale]/test                                   144 B          87.3 kB
+2025-08-29T22:48:30.579949Z	├   ├ /zh/test
+2025-08-29T22:48:30.58001Z	├   ├ /en/test
+2025-08-29T22:48:30.580067Z	├   ├ /ja/test
+2025-08-29T22:48:30.580123Z	├   └ [+8 more paths]
+2025-08-29T22:48:30.580178Z	├ ƒ /api/sanity/upload                               0 B                0 B
+2025-08-29T22:48:30.580241Z	└ ○ /robots.txt                                      0 B                0 B
+2025-08-29T22:48:30.580303Z	+ First Load JS shared by all                        87.2 kB
+2025-08-29T22:48:30.580367Z	  ├ chunks/23-21446771554bb579.js                    31.6 kB
+2025-08-29T22:48:30.580424Z	  ├ chunks/fd9d1056-4b87d5bb1aa946b3.js              53.6 kB
+2025-08-29T22:48:30.58048Z	  └ other shared chunks (total)                      1.95 kB
+2025-08-29T22:48:30.580536Z	
+2025-08-29T22:48:30.580591Z	
+2025-08-29T22:48:30.580648Z	ƒ Middleware                                         46 kB
+2025-08-29T22:48:30.580709Z	
+2025-08-29T22:48:30.580792Z	○  (Static)   prerendered as static content
+2025-08-29T22:48:30.580862Z	●  (SSG)      prerendered as static HTML (uses getStaticProps)
+2025-08-29T22:48:30.580932Z	ƒ  (Dynamic)  server-rendered on demand
+2025-08-29T22:48:30.580994Z	
+2025-08-29T22:48:30.629735Z	Finished
+2025-08-29T22:48:31.516342Z	Checking for configuration in a Wrangler configuration file (BETA)
+2025-08-29T22:48:31.517077Z	
+2025-08-29T22:48:31.517688Z	Found wrangler.toml file. Reading build configuration...
+2025-08-29T22:48:31.523798Z	pages_build_output_dir: out
+2025-08-29T22:48:31.524039Z	Build environment variables: (none found)
+2025-08-29T22:48:32.631603Z	Successfully read wrangler.toml file.
+2025-08-29T22:48:32.632547Z	Found Functions directory at /functions. Uploading.
+2025-08-29T22:48:32.639492Z	 ⛅️ wrangler 3.101.0
+2025-08-29T22:48:32.639964Z	-------------------
+2025-08-29T22:48:33.506276Z	✘ [ERROR] Transforming async functions to the configured target environment ("es5") is not supported yet
+2025-08-29T22:48:33.506947Z	
+2025-08-29T22:48:33.507062Z	    ../../../buildhome/repo/functions/_middleware.js:2:7:
+2025-08-29T22:48:33.507164Z	      2 │ export async function onRequest(context) {
+2025-08-29T22:48:33.507272Z	        ╵        ~~~~~
+2025-08-29T22:48:33.507362Z	
+2025-08-29T22:48:33.507461Z	  The target environment was set to "es5" here:
+2025-08-29T22:48:33.507557Z	
+2025-08-29T22:48:33.507653Z	    ../../../buildhome/repo/tsconfig.json:3:14:
+2025-08-29T22:48:33.507718Z	      3 │     "target": "es5",
+2025-08-29T22:48:33.507844Z	        ╵               ~~~~~
+2025-08-29T22:48:33.507956Z	
+2025-08-29T22:48:33.508066Z	✘ [ERROR] Transforming const to the configured target environment ("es5") is not supported yet
+2025-08-29T22:48:33.508167Z	
+2025-08-29T22:48:33.508273Z	    ../../../buildhome/repo/functions/_middleware.js:3:2:
+2025-08-29T22:48:33.508435Z	      3 │   const url = new URL(context.request.url);
+2025-08-29T22:48:33.508541Z	        ╵   ~~~~~
+2025-08-29T22:48:33.508637Z	
+2025-08-29T22:48:33.508735Z	  The target environment was set to "es5" here:
+2025-08-29T22:48:33.508844Z	
+2025-08-29T22:48:33.508949Z	    ../../../buildhome/repo/tsconfig.json:3:14:
+2025-08-29T22:48:33.509046Z	      3 │     "target": "es5",
+2025-08-29T22:48:33.509155Z	        ╵               ~~~~~
+2025-08-29T22:48:33.509262Z	
+2025-08-29T22:48:33.509359Z	✘ [ERROR] Transforming const to the configured target environment ("es5") is not supported yet
+2025-08-29T22:48:33.509466Z	
+2025-08-29T22:48:33.509575Z	    ../../../buildhome/repo/functions/_middleware.js:7:4:
+2025-08-29T22:48:33.50968Z	      7 │     const html = `<!DOCTYPE html>
+2025-08-29T22:48:33.509881Z	        ╵     ~~~~~
+2025-08-29T22:48:33.51009Z	
+2025-08-29T22:48:33.510207Z	  The target environment was set to "es5" here:
+2025-08-29T22:48:33.510306Z	
+2025-08-29T22:48:33.510406Z	    ../../../buildhome/repo/tsconfig.json:3:14:
+2025-08-29T22:48:33.510503Z	      3 │     "target": "es5",
+2025-08-29T22:48:33.510604Z	        ╵               ~~~~~
+2025-08-29T22:48:33.510699Z	
+2025-08-29T22:48:33.519294Z	
+2025-08-29T22:48:33.610444Z	[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mBuild failed with 3 errors:[0m
+2025-08-29T22:48:33.611028Z	
+2025-08-29T22:48:33.611156Z	  ../../../buildhome/repo/functions/_middleware.js:2:7: ERROR: Transforming async functions to the configured target environment ("es5") is not supported yet
+2025-08-29T22:48:33.61126Z	  ../../../buildhome/repo/functions/_middleware.js:3:2: ERROR: Transforming const to the configured target environment ("es5") is not supported yet
+2025-08-29T22:48:33.611403Z	  ../../../buildhome/repo/functions/_middleware.js:7:4: ERROR: Transforming const to the configured target environment ("es5") is not supported yet
+2025-08-29T22:48:33.611509Z	
+2025-08-29T22:48:33.61161Z	
+2025-08-29T22:48:33.677805Z	🪵  Logs were written to "/root/.config/.wrangler/logs/wrangler-2025-08-29_22-48-33_253.log"
+2025-08-29T22:48:33.688907Z	Failed building Pages Functions.
+2025-08-29T22:48:34.856571Z	Failed: generating Pages Functions failed. Check the logs above for more information. If this continues for an unknown reason, contact support: https://cfl.re/3WgEyrH

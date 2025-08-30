@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useTranslations, useLocale } from 'next-intl';
 
 const productCategories = [
@@ -9,78 +10,40 @@ const productCategories = [
     nameEn: 'Microcontrollers',
     slug: 'microcontrollers',
     description: 'ARM Cortex、RISC-V、8位/16位/32位MCU',
-    icon: (
-      <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M4 4h4v4H4zM10 4h4v4h-4zM16 4h4v4h-4zM4 10h4v4H4zM10 10h4v4h-4zM16 10h4v4h-4zM4 16h4v4H4zM10 16h4v4h-4zM16 16h4v4h-4z"/>
-      </svg>
-    ),
-    productCount: '2000+',
-    brands: ['STM32', 'ESP32', 'Arduino', 'PIC']
+    icon: '/icons/microcontroller-icon.svg',
+    productCount: '25,000+',
+    brands: ['STM32', 'ESP32', 'Arduino', 'PIC'],
+    color: 'bg-blue-500'
   },
   {
     name: '电源管理',
     nameEn: 'Power Management',
     slug: 'power-management',
     description: 'DC-DC转换器、LDO、充电管理IC',
-    icon: (
-      <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M11.5 2L6 6.5L7.5 8L12 4.5L16.5 8L18 6.5L12.5 2H11.5M7 10V12H9V14H7V22H10V14H12V16H14V14H12V12H14V10H12V8H10V10H7M17 12V22H20V12H17Z"/>
-      </svg>
-    ),
-    productCount: '1500+',
-    brands: ['TI', 'Maxim', 'Linear', 'ON Semi']
+    icon: '/icons/power-management-icon.svg',
+    productCount: '18,000+',
+    brands: ['TI', 'Maxim', 'Linear', 'ON Semi'],
+    color: 'bg-green-500'
   },
   {
     name: '模拟与混合信号',
     nameEn: 'Analog & Mixed Signal',
     slug: 'analog-mixed-signal',
     description: 'ADC、DAC、放大器、比较器',
-    icon: (
-      <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M16 7.97L15.45 8.95L14.5 9.41L15.45 9.87L16 10.85L16.55 9.87L17.5 9.41L16.55 8.95L16 7.97M12.5 2L11 6.5L6.5 8L11 9.5L12.5 14L14 9.5L18.5 8L14 6.5L12.5 2M12.5 4.28L13.26 6.5L15.22 7.22L13.26 7.94L12.5 10.16L11.74 7.94L9.78 7.22L11.74 6.5L12.5 4.28M7 16L5.5 20.5L1 22L5.5 23.5L7 28L8.5 23.5L13 22L8.5 20.5L7 16Z"/>
-      </svg>
-    ),
-    productCount: '3000+',
-    brands: ['ADI', 'TI', 'Maxim', 'Infineon']
+    icon: '/icons/analog-mixed-signal-icon.svg',
+    productCount: '30,000+',
+    brands: ['ADI', 'TI', 'Maxim', 'Infineon'],
+    color: 'bg-orange-500'
   },
   {
     name: 'RF与无线',
     nameEn: 'RF & Wireless',
     slug: 'rf-wireless',
     description: 'WiFi、蓝牙、LoRa、5G模块',
-    icon: (
-      <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8M12,10A2,2 0 0,0 10,12A2,2 0 0,0 12,14A2,2 0 0,0 14,12A2,2 0 0,0 12,10Z"/>
-      </svg>
-    ),
-    productCount: '800+',
-    brands: ['Espressif', 'Nordic', 'Qualcomm', 'Broadcom']
-  },
-  {
-    name: '传感器',
-    nameEn: 'Sensors',
-    slug: 'sensors',
-    description: '温湿度、压力、加速度、光电传感器',
-    icon: (
-      <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8Z"/>
-      </svg>
-    ),
-    productCount: '1200+',
-    brands: ['Bosch', 'STM', 'Honeywell', 'Sensirion']
-  },
-  {
-    name: '接口IC',
-    nameEn: 'Interface ICs',
-    slug: 'interface-ics',
-    description: 'UART、SPI、I2C、CAN、USB接口芯片',
-    icon: (
-      <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M8,3A2,2 0 0,0 6,5V9A2,2 0 0,1 4,11H3V13H4A2,2 0 0,1 6,15V19A2,2 0 0,0 8,21H10V19H8V15A2,2 0 0,0 6,13V11A2,2 0 0,0 8,9V5H10V3H8M16,3A2,2 0 0,1 18,5V9A2,2 0 0,0 20,11H21V13H20A2,2 0 0,0 18,15V19A2,2 0 0,1 16,21H14V19H16V15A2,2 0 0,1 18,13V11A2,2 0 0,1 16,9V5H14V3H16Z"/>
-      </svg>
-    ),
-    productCount: '600+',
-    brands: ['FTDI', 'Silicon Labs', 'TI', 'Maxim']
+    icon: '/icons/rf-wireless-icon.svg',
+    productCount: '12,000+',
+    brands: ['Espressif', 'Nordic', 'Qualcomm', 'Broadcom'],
+    color: 'bg-purple-500'
   }
 ];
 
@@ -89,76 +52,125 @@ export default function ProductCategoriesSection() {
   const locale = useLocale();
 
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24 bg-gradient-to-b from-gray-50 to-white">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            核心产品领域
+          <h2 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+            <span className="text-blue-600">核心产品</span>领域
           </h2>
-          <p className="mt-6 text-lg leading-8 text-gray-600 max-w-2xl mx-auto">
-            覆盖完整的电子元件产品线，为各行业提供专业的解决方案
+          <p className="mt-6 text-xl leading-8 text-gray-600 max-w-3xl mx-auto">
+            覆盖<span className="font-semibold text-blue-600">电子元件代理</span>全领域，提供从微控制器到RF无线的完整<span className="font-semibold text-blue-600">芯片现货</span>解决方案
           </p>
         </div>
 
-        <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {productCategories.map((category) => (
+        <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          {productCategories.map((category, index) => (
             <Link
               key={category.slug}
               href={`/${locale}/products/${category.slug}`}
-              className="group relative bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 border border-gray-200 hover:border-primary-200"
+              className="group relative block bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 overflow-hidden"
             >
-              <div className="flex items-start">
-                <div className="flex-shrink-0">
-                  <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-primary-100 text-primary-600 group-hover:bg-primary-600 group-hover:text-white transition-colors duration-200">
-                    {category.icon}
+              {/* 顶部装饰条 */}
+              <div className={`h-2 ${category.color} transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300`}></div>
+              
+              <div className="p-8">
+                <div className="text-center">
+                  {/* 专业图标 */}
+                  <div className="mx-auto flex items-center justify-center h-20 w-20 rounded-2xl bg-gray-50 group-hover:bg-blue-50 transition-colors duration-300">
+                    <Image
+                      src={category.icon}
+                      alt={`${category.name} 电子元件代理`}
+                      width={48}
+                      height={48}
+                      className="group-hover:scale-110 transition-transform duration-300"
+                    />
                   </div>
-                </div>
-                <div className="ml-4 flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-primary-600 transition-colors duration-200">
+                  
+                  {/* 分类标题 */}
+                  <h3 className="mt-6 text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors duration-200">
                     {category.name}
                   </h3>
+                  
                   <p className="text-sm text-gray-500 mt-1">{category.nameEn}</p>
                   <p className="mt-2 text-sm text-gray-600">
                     {category.description}
                   </p>
                   
-                  <div className="mt-4 flex items-center justify-between">
-                    <span className="text-sm font-medium text-primary-600">
-                      {category.productCount} 型号
-                    </span>
-                    <svg className="w-5 h-5 text-gray-400 group-hover:text-primary-600 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                  {/* 产品数量 */}
+                  <div className="mt-4 flex items-center justify-center">
+                    <span className="text-2xl font-bold text-blue-600">{category.productCount}</span>
+                    <span className="ml-2 text-sm text-gray-500">现货型号</span>
                   </div>
                   
-                  <div className="mt-3 flex flex-wrap gap-1">
-                    {category.brands.slice(0, 3).map((brand) => (
-                      <span key={brand} className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-800">
-                        {brand}
-                      </span>
-                    ))}
-                    {category.brands.length > 3 && (
-                      <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-800">
-                        +{category.brands.length - 3}
-                      </span>
-                    )}
+                  {/* 主要品牌 */}
+                  <div className="mt-4">
+                    <p className="text-sm text-gray-500 mb-2">主要品牌：</p>
+                    <div className="flex flex-wrap justify-center gap-2">
+                      {category.brands.map((brand) => (
+                        <span
+                          key={brand}
+                          className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-50 rounded-full group-hover:bg-blue-100 transition-colors duration-200"
+                        >
+                          {brand}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* 查看详情按钮 */}
+                  <div className="mt-6 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <span className="inline-flex items-center text-sm font-medium text-blue-600">
+                      查看产品
+                      <svg className="ml-1 w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-200" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    </span>
                   </div>
                 </div>
               </div>
+              
+              {/* 悬停背景效果 */}
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-50 to-indigo-50 opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
             </Link>
           ))}
         </div>
 
-        <div className="mt-12 text-center">
+        {/* 查看所有产品按钮 */}
+        <div className="mt-16 text-center">
           <Link
             href={`/${locale}/products`}
-            className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 transition-colors duration-200"
+            className="group inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
           >
-            查看所有产品分类
-            <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+            浏览全部产品分类
+            <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
             </svg>
           </Link>
+        </div>
+
+        {/* 底部统计数据 */}
+        <div className="mt-20 bg-white rounded-2xl shadow-lg p-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
+            <div className="border-r border-gray-200 last:border-r-0">
+              <div className="text-3xl font-bold text-blue-600">85,000+</div>
+              <div className="text-sm text-gray-600 mt-1">现货型号总数</div>
+            </div>
+            <div className="border-r border-gray-200 last:border-r-0">
+              <div className="text-3xl font-bold text-green-600">50+</div>
+              <div className="text-sm text-gray-600 mt-1">合作品牌</div>
+            </div>
+            <div className="border-r border-gray-200 last:border-r-0">
+              <div className="text-3xl font-bold text-orange-600">24小时</div>
+              <div className="text-sm text-gray-600 mt-1">快速发货</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-purple-600">99.9%</div>
+              <div className="text-sm text-gray-600 mt-1">正品保证率</div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
