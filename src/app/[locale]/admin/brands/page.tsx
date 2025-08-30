@@ -1,7 +1,4 @@
 import { Metadata } from 'next';
-
-// 强制静态生成
-export const dynamic = 'force-static';
 import BrandManager from '@/components/admin/BrandManager';
 
 export const metadata: Metadata = {

@@ -2,9 +2,6 @@ import type { Metadata } from 'next';
 import AdminNavigation from '@/components/admin/AdminNavigation';
 import '../../globals.css';
 
-// 强制静态生成
-export const dynamic = 'force-static';
-
 export const metadata: Metadata = {
   title: '后台管理系统 | LiTong Electronics',
   description: 'LiTong Electronics 后台管理系统',

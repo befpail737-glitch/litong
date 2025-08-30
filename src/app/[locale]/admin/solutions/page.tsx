@@ -1,5 +1,3 @@
-// 强制静态生成
-export const dynamic = 'force-static';
 import { Metadata } from 'next';
 import SolutionManager from '@/components/admin/SolutionManager';
 
