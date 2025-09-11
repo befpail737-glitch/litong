@@ -1,0 +1,64 @@
+{
+  "recommendations": [
+    // 基础开发工具
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "ms-vscode.vscode-typescript-next",
+    
+    // React/Next.js 开发
+    "formulahendry.auto-rename-tag",
+    "bradlc.vscode-tailwindcss",
+    "styled-components.vscode-styled-components",
+    
+    // 路径和导入辅助
+    "christian-kohler.path-intellisense",
+    "steoates.autoimport-es6-ts",
+    
+    // JSON 和配置文件
+    "ms-vscode.vscode-json",
+    
+    // Sanity CMS
+    "sanity-io.vscode-sanity",
+    
+    // GraphQL
+    "GraphQL.vscode-graphql",
+    "GraphQL.vscode-graphql-syntax",
+    
+    // 测试工具
+    "ms-playwright.playwright",
+    "orta.vscode-jest",
+    
+    // 代码质量
+    "yoavbls.pretty-ts-errors",
+    "usernamehw.errorlens",
+    "streetsidesoftware.code-spell-checker",
+    
+    // Git 工具
+    "eamodio.gitlens",
+    "github.vscode-pull-request-github",
+    
+    // 开发效率工具
+    "ms-vscode.vscode-thunder-client",
+    "humao.rest-client",
+    "ms-vscode.live-server",
+    
+    // 文档和Markdown
+    "yzhang.markdown-all-in-one",
+    "davidanson.vscode-markdownlint",
+    
+    // 主题和图标
+    "pkief.material-icon-theme",
+    "github.github-vscode-theme",
+    
+    // 其他有用工具
+    "ms-vscode.vscode-colorize",
+    "aaron-bond.better-comments",
+    "oderwat.indent-rainbow",
+    "wix.vscode-import-cost",
+    "ms-vscode.vscode-yaml"
+  ],
+  "unwantedRecommendations": [
+    "ms-vscode.vscode-css",
+    "hookyqr.beautify"
+  ]
+}

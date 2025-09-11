@@ -1,0 +1,138 @@
+{
+  "common": {
+    "home": "Home",
+    "about": "About Us",
+    "contact": "Contact",
+    "brands": "Brands",
+    "search": "Search",
+    "inquiry": "Get Quote",
+    "language": "Language",
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "view": "View",
+    "close": "Close"
+  },
+  "navigation": {
+    "home": "Home",
+    "brands": "Brands",
+    "products": "Products",
+    "solutions": "Solutions",
+    "about": "About Us",
+    "contact": "Contact",
+    "inquiry": "Quote Center",
+    "search": "Search Products"
+  },
+  "home": {
+    "title": "Welcome to Litong Electronics",
+    "subtitle": "Professional electronic components supply chain service provider, providing high-quality products and professional technical support for global customers to help your project succeed",
+    "cta": {
+      "inquiry": "Get Quote Now",
+      "browse": "Browse Brands"
+    },
+    "stats": {
+      "experience": "Years of Experience",
+      "brands": "Partner Brands",
+      "products": "Product Models",
+      "customers": "Trusted by Customers"
+    },
+    "features": {
+      "title": "Why Choose Litong Electronics",
+      "subtitle": "With 15 years of industry experience, we provide customers with one-stop electronic component procurement solutions",
+      "quality": {
+        "title": "Quality Assurance",
+        "description": "Strict quality control system to ensure that every product meets the highest standards, all products are original and authentic"
+      },
+      "service": {
+        "title": "Professional Service",
+        "description": "Professional technical support team provides comprehensive technical consulting services from selection to application"
+      },
+      "supply": {
+        "title": "Stable Supply",
+        "description": "Global supplier network ensures stability and timeliness of product supply"
+      },
+      "competitive": {
+        "title": "Competitive Prices",
+        "description": "With strong purchasing power, we provide customers with competitive product prices"
+      }
+    },
+    "brands": {
+      "title": "Partner Brands",
+      "subtitle": "We have established long-term stable cooperative relationships with world-renowned electronic component manufacturers"
+    }
+  },
+  "brands": {
+    "title": "Partner Brands",
+    "subtitle": "Cooperation with world-leading electronic component manufacturers",
+    "search_placeholder": "Search brands...",
+    "filter": {
+      "all": "All Brands",
+      "featured": "Featured Brands",
+      "popular": "Popular Brands"
+    }
+  },
+  "products": {
+    "title": "Product Catalog",
+    "subtitle": "Browse our extensive electronic components product series",
+    "search_placeholder": "Search product model...",
+    "filter": {
+      "category": "Category",
+      "brand": "Brand",
+      "price": "Price",
+      "availability": "Stock Status"
+    },
+    "sort": {
+      "name": "Name",
+      "price_asc": "Price: Low to High",
+      "price_desc": "Price: High to Low",
+      "popular": "Popularity"
+    }
+  },
+  "solutions": {
+    "title": "Solutions",
+    "subtitle": "Professional solutions for different industries and application scenarios",
+    "categories": {
+      "automotive": "Automotive Electronics",
+      "industrial": "Industrial Control",
+      "consumer": "Consumer Electronics",
+      "medical": "Medical Equipment",
+      "telecommunications": "Telecommunications Equipment"
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Our professional team is at your service anytime",
+    "form": {
+      "name": "Name",
+      "email": "Email",
+      "company": "Company Name",
+      "phone": "Phone",
+      "message": "Message",
+      "submit": "Send Message"
+    },
+    "info": {
+      "address": "Address",
+      "phone": "Phone",
+      "email": "Email",
+      "hours": "Business Hours"
+    }
+  },
+  "inquiry": {
+    "title": "Quote Center",
+    "subtitle": "Get product quotes and technical support",
+    "form": {
+      "product": "Product Model",
+      "quantity": "Quantity",
+      "target_price": "Target Price",
+      "delivery_date": "Desired Delivery Date",
+      "application": "Application Description",
+      "submit": "Submit Quote"
+    }
+  }
+}

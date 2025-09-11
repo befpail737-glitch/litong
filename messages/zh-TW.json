@@ -1,0 +1,138 @@
+{
+  "common": {
+    "home": "首頁",
+    "about": "關於我們",
+    "contact": "聯繫我們",
+    "brands": "合作品牌",
+    "search": "搜尋",
+    "inquiry": "立即詢價",
+    "language": "語言",
+    "loading": "載入中...",
+    "error": "錯誤",
+    "retry": "重試",
+    "submit": "提交",
+    "cancel": "取消",
+    "confirm": "確認",
+    "save": "儲存",
+    "edit": "編輯",
+    "delete": "刪除",
+    "view": "檢視",
+    "close": "關閉"
+  },
+  "navigation": {
+    "home": "首頁",
+    "brands": "品牌中心",
+    "products": "產品目錄",
+    "solutions": "解決方案",
+    "about": "關於我們",
+    "contact": "聯繫我們",
+    "inquiry": "詢價中心",
+    "search": "搜尋產品"
+  },
+  "home": {
+    "title": "歡迎來到力通電子",
+    "subtitle": "專業的電子元器件供應鏈服務商，為全球客戶提供高品質產品和專業技術支援，助力您的項目成功",
+    "cta": {
+      "inquiry": "立即詢價",
+      "browse": "瀏覽品牌"
+    },
+    "stats": {
+      "experience": "年行業經驗",
+      "brands": "合作品牌",
+      "products": "產品型號",
+      "customers": "客戶信賴"
+    },
+    "features": {
+      "title": "為什麼選擇力通電子",
+      "subtitle": "憑藉15年的行業經驗，我們為客戶提供一站式電子元器件採購解決方案",
+      "quality": {
+        "title": "品質保證",
+        "description": "嚴格的質量控制體系，確保每一個產品都符合最高標準，所有產品均為原裝正品"
+      },
+      "service": {
+        "title": "專業服務",
+        "description": "專業的技術支援團隊，提供從選型到應用的全方位技術諮詢服務"
+      },
+      "supply": {
+        "title": "穩定供應",
+        "description": "遍佈全球的供應商網路，確保產品供應的穩定性和及時性"
+      },
+      "competitive": {
+        "title": "競爭價格",
+        "description": "憑藉強大的採購實力，為客戶提供具有競爭力的產品價格"
+      }
+    },
+    "brands": {
+      "title": "合作品牌",
+      "subtitle": "我們與全球知名電子元器件製造商建立了長期穩定的合作關係"
+    }
+  },
+  "brands": {
+    "title": "合作品牌",
+    "subtitle": "與全球領先的電子元器件製造商合作",
+    "search_placeholder": "搜尋品牌...",
+    "filter": {
+      "all": "全部品牌",
+      "featured": "精選品牌",
+      "popular": "熱門品牌"
+    }
+  },
+  "products": {
+    "title": "產品目錄",
+    "subtitle": "瀏覽我們廣泛的電子元器件產品系列",
+    "search_placeholder": "搜尋產品型號...",
+    "filter": {
+      "category": "分類",
+      "brand": "品牌",
+      "price": "價格",
+      "availability": "庫存狀態"
+    },
+    "sort": {
+      "name": "名稱",
+      "price_asc": "價格從低到高",
+      "price_desc": "價格從高到低",
+      "popular": "熱門程度"
+    }
+  },
+  "solutions": {
+    "title": "解決方案",
+    "subtitle": "為不同行業和應用場景提供專業的解決方案",
+    "categories": {
+      "automotive": "汽車電子",
+      "industrial": "工業控制",
+      "consumer": "消費電子",
+      "medical": "醫療設備",
+      "telecommunications": "通訊設備"
+    }
+  },
+  "contact": {
+    "title": "聯繫我們",
+    "subtitle": "我們的專業團隊隨時為您提供服務",
+    "form": {
+      "name": "姓名",
+      "email": "電子郵箱",
+      "company": "公司名稱",
+      "phone": "聯繫電話",
+      "message": "留言內容",
+      "submit": "發送訊息"
+    },
+    "info": {
+      "address": "地址",
+      "phone": "電話",
+      "email": "郵箱",
+      "hours": "營業時間"
+    }
+  },
+  "inquiry": {
+    "title": "詢價中心",
+    "subtitle": "獲取產品報價和技術支援",
+    "form": {
+      "product": "產品型號",
+      "quantity": "數量",
+      "target_price": "目標價格",
+      "delivery_date": "期望交期",
+      "application": "應用說明",
+      "submit": "提交詢價"
+    }
+  }
+}

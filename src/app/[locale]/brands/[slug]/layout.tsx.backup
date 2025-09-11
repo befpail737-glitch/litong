@@ -1,0 +1,301 @@
+import { notFound } from 'next/navigation'
+import Link from 'next/link'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { 
+  Building2, 
+  Globe, 
+  MapPin, 
+  Users, 
+  Award,
+  ChevronRight,
+  Home
+} from 'lucide-react'
+
+// 品牌数据（应该从数据库获取）
+const getBrandData = (slug: string) => {
+  const brands = {
+    'stmicroelectronics': {
+      id: 'stmicroelectronics',
+      name: 'STMicroelectronics',
+      slug: 'stmicroelectronics',
+      logo: '/images/brands/st.svg',
+      description: '世界领先的半导体公司，专业提供各种电子应用所需的半导体解决方案',
+      website: 'https://www.st.com',
+      country: '法国/意大利',
+      founded: '1987',
+      employees: '50,000+',
+      isAuthorized: true,
+      isPreferred: true,
+      heroImage: '/images/brands/st-hero.jpg'
+    },
+    'texas-instruments': {
+      id: 'texas-instruments',
+      name: 'Texas Instruments',
+      slug: 'texas-instruments',
+      logo: '/images/brands/ti.svg',
+      description: '德州仪器致力于开发模拟IC技术和嵌入式处理器，推动电子设备的发展',
+      website: 'https://www.ti.com',
+      country: '美国',
+      founded: '1930',
+      employees: '30,000+',
+      isAuthorized: true,
+      isPreferred: true,
+      heroImage: '/images/brands/ti-hero.jpg'
+    },
+    'espressif': {
+      id: 'espressif',
+      name: 'Espressif Systems',
+      slug: 'espressif',
+      logo: '/images/brands/espressif.svg',
+      description: '乐鑫科技专注于WiFi和蓝牙芯片及模组的设计，是物联网领域的领先企业',
+      website: 'https://www.espressif.com',
+      country: '中国',
+      founded: '2008',
+      employees: '1,000+',
+      isAuthorized: true,
+      isPreferred: true,
+      heroImage: '/images/brands/espressif-hero.jpg'
+    },
+    'analog-devices': {
+      id: 'analog-devices',
+      name: 'Analog Devices',
+      slug: 'analog-devices',
+      logo: '/images/brands/adi.svg',
+      description: 'ADI亚德诺半导体是高性能模拟、混合信号和数字信号处理集成电路设计、制造和营销的世界领先企业',
+      website: 'https://www.analog.com',
+      country: '美国',
+      founded: '1965',
+      employees: '25,000+',
+      isAuthorized: true,
+      isPreferred: true,
+      heroImage: '/images/brands/adi-hero.jpg'
+    },
+    'infineon': {
+      id: 'infineon',
+      name: 'Infineon Technologies',
+      slug: 'infineon',
+      logo: '/images/brands/infineon.svg',
+      description: '英飞凌科技专注于半导体解决方案，致力于让生活更轻松、安全和环保',
+      website: 'https://www.infineon.com',
+      country: '德国',
+      founded: '1999',
+      employees: '50,000+',
+      isAuthorized: true,
+      isPreferred: false,
+      heroImage: '/images/brands/infineon-hero.jpg'
+    },
+    'nxp': {
+      id: 'nxp',
+      name: 'NXP Semiconductors',
+      slug: 'nxp',
+      logo: '/images/brands/nxp.svg',
+      description: 'NXP恩智浦半导体致力于通过安全连接及基础设施解决方案创造更智慧的世界',
+      website: 'https://www.nxp.com',
+      country: '荷兰',
+      founded: '2006',
+      employees: '31,000+',
+      isAuthorized: true,
+      isPreferred: false,
+      heroImage: '/images/brands/nxp-hero.jpg'
+    },
+    'microchip': {
+      id: 'microchip',
+      name: 'Microchip Technology',
+      slug: 'microchip',
+      logo: '/images/brands/microchip.svg',
+      description: '微芯科技提供智能、互联和安全的嵌入式控制解决方案',
+      website: 'https://www.microchip.com',
+      country: '美国',
+      founded: '1989',
+      employees: '22,000+',
+      isAuthorized: true,
+      isPreferred: false,
+      heroImage: '/images/brands/microchip-hero.jpg'
+    },
+    'qualcomm': {
+      id: 'qualcomm',
+      name: 'Qualcomm',
+      slug: 'qualcomm',
+      logo: '/images/brands/qualcomm.svg',
+      description: 'Qualcomm高通是无线技术研发、商用与实现规模化的推动力量',
+      website: 'https://www.qualcomm.com',
+      country: '美国',
+      founded: '1985',
+      employees: '50,000+',
+      isAuthorized: true,
+      isPreferred: true,
+      heroImage: '/images/brands/qualcomm-hero.jpg'
+    },
+    'semikron': {
+      id: 'semikron',
+      name: 'Semikron',
+      slug: 'semikron',
+      logo: '/images/brands/semikron.svg',
+      description: 'Semikron是全球领先的功率电子系统解决方案供应商，专业提供功率半导体、电力电子组件和系统',
+      website: 'https://www.semikron.com',
+      country: '德国',
+      founded: '1951',
+      employees: '4,000+',
+      isAuthorized: true,
+      isPreferred: true,
+      heroImage: '/images/brands/semikron-hero.jpg'
+    }
+  }
+  
+  return brands[slug as keyof typeof brands] || null
+}
+
+interface BrandLayoutProps {
+  children: React.ReactNode
+  params: {
+    slug: string
+  }
+}
+
+export default function BrandLayout({ children, params }: BrandLayoutProps) {
+  const brand = getBrandData(params.slug)
+  
+  if (!brand) {
+    notFound()
+  }
+
+  const navigation = [
+    { name: '关于品牌', href: `/brands/${brand.slug}`, exact: true },
+    { name: '产品分类', href: `/brands/${brand.slug}/products` },
+    { name: '解决方案', href: `/brands/${brand.slug}/solutions` },
+    { name: '技术支持', href: `/brands/${brand.slug}/support` },
+    { name: '新闻中心', href: `/brands/${brand.slug}/news` }
+  ]
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* 品牌头部区域 */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="container mx-auto px-4">
+          {/* 面包屑导航 */}
+          <nav className="flex items-center space-x-2 text-sm text-gray-500 py-3">
+            <Link href="/" className="hover:text-blue-600 flex items-center">
+              <Home className="h-4 w-4" />
+            </Link>
+            <ChevronRight className="h-4 w-4" />
+            <Link href="/brands" className="hover:text-blue-600">
+              品牌中心
+            </Link>
+            <ChevronRight className="h-4 w-4" />
+            <span className="text-gray-900">{brand.name}</span>
+          </nav>
+
+          {/* 品牌基本信息 */}
+          <div className="py-6">
+            <div className="flex items-center gap-6">
+              {/* 品牌Logo */}
+              <div className="w-20 h-20 bg-gray-100 rounded-xl flex items-center justify-center">
+                <Building2 className="h-10 w-10 text-gray-600" />
+              </div>
+              
+              {/* 品牌信息 */}
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-2">
+                  <h1 className="text-3xl font-bold text-gray-900">{brand.name}</h1>
+                  {brand.isAuthorized && (
+                    <Badge className="bg-green-100 text-green-800">授权代理</Badge>
+                  )}
+                  {brand.isPreferred && (
+                    <Badge className="bg-yellow-100 text-yellow-800">
+                      <Award className="h-3 w-3 mr-1" />
+                      优选品牌
+                    </Badge>
+                  )}
+                </div>
+                
+                <p className="text-gray-600 mb-4 max-w-2xl">
+                  {brand.description}
+                </p>
+                
+                <div className="flex items-center gap-6 text-sm text-gray-600">
+                  <div className="flex items-center gap-1">
+                    <MapPin className="h-4 w-4" />
+                    <span>{brand.country}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Users className="h-4 w-4" />
+                    <span>{brand.employees} 员工</span>
+                  </div>
+                  <div>成立于 {brand.founded}</div>
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href={brand.website} target="_blank" rel="noopener noreferrer">
+                      <Globe className="h-4 w-4 mr-1" />
+                      官方网站
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 品牌导航菜单 */}
+          <nav className="border-t border-gray-200">
+            <div className="flex space-x-8">
+              {navigation.map((item) => {
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className="py-4 px-1 border-b-2 border-transparent hover:border-blue-500 text-gray-700 hover:text-blue-600 transition-colors font-medium"
+                  >
+                    {item.name}
+                  </Link>
+                )
+              })}
+            </div>
+          </nav>
+        </div>
+      </div>
+
+      {/* 页面内容 */}
+      <main className="container mx-auto px-4 py-8">
+        {children}
+      </main>
+
+      {/* 底部行动号召 */}
+      <div className="bg-white border-t border-gray-200 mt-12">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              需要 {brand.name} 产品技术支持？
+            </h3>
+            <p className="text-gray-600 mb-4">
+              我们是 {brand.name} 的授权代理商，提供原装正品和专业技术支持
+            </p>
+            <div className="flex gap-4 justify-center">
+              <Button asChild>
+                <Link href="/inquiry">
+                  获取报价
+                </Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link href="/contact">
+                  联系工程师
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// 生成静态参数
+export async function generateStaticParams() {
+  return [
+    { slug: 'stmicroelectronics' },
+    { slug: 'texas-instruments' },
+    { slug: 'espressif' },
+    { slug: 'infineon' },
+    { slug: 'nxp' },
+    { slug: 'microchip' },
+    { slug: 'semikron' }
+  ]
+}

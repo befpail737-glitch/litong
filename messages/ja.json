@@ -1,0 +1,138 @@
+{
+  "common": {
+    "home": "ホーム",
+    "about": "会社概要",
+    "contact": "お問い合わせ",
+    "brands": "パートナーブランド",
+    "search": "検索",
+    "inquiry": "今すぐ見積り",
+    "language": "言語",
+    "loading": "読み込み中...",
+    "error": "エラー",
+    "retry": "再試行",
+    "submit": "送信",
+    "cancel": "キャンセル",
+    "confirm": "確認",
+    "save": "保存",
+    "edit": "編集",
+    "delete": "削除",
+    "view": "表示",
+    "close": "閉じる"
+  },
+  "navigation": {
+    "home": "ホーム",
+    "brands": "ブランドセンター",
+    "products": "製品カタログ",
+    "solutions": "ソリューション",
+    "about": "会社概要",
+    "contact": "お問い合わせ",
+    "inquiry": "見積りセンター",
+    "search": "製品検索"
+  },
+  "home": {
+    "title": "力通電子へようこそ",
+    "subtitle": "プロの電子部品サプライチェーンサービスプロバイダーとして、世界中のお客様に高品質な製品と専門技術サポートを提供し、あなたのプロジェクトの成功をお手伝いします",
+    "cta": {
+      "inquiry": "今すぐ見積り",
+      "browse": "ブランドを見る"
+    },
+    "stats": {
+      "experience": "年の業界経験",
+      "brands": "パートナーブランド",
+      "products": "製品モデル",
+      "customers": "お客様の信頼"
+    },
+    "features": {
+      "title": "力通電子を選ぶ理由",
+      "subtitle": "15年の業界経験により、お客様にワンストップの電子部品調達ソリューションを提供します",
+      "quality": {
+        "title": "品質保証",
+        "description": "厳格な品質管理システムにより、すべての製品が最高基準を満たすことを保証し、すべての製品は正規品です"
+      },
+      "service": {
+        "title": "プロフェッショナルサービス",
+        "description": "専門的な技術サポートチームが、選定から応用まで包括的な技術コンサルティングサービスを提供します"
+      },
+      "supply": {
+        "title": "安定供給",
+        "description": "世界的なサプライヤーネットワークにより、製品供給の安定性と迅速性を確保します"
+      },
+      "competitive": {
+        "title": "競争力のある価格",
+        "description": "強力な調達力により、お客様に競争力のある製品価格を提供します"
+      }
+    },
+    "brands": {
+      "title": "パートナーブランド",
+      "subtitle": "世界有数の電子部品メーカーと長期安定的な協力関係を築いています"
+    }
+  },
+  "brands": {
+    "title": "パートナーブランド",
+    "subtitle": "世界をリードする電子部品メーカーとの協力",
+    "search_placeholder": "ブランドを検索...",
+    "filter": {
+      "all": "すべてのブランド",
+      "featured": "注目ブランド",
+      "popular": "人気ブランド"
+    }
+  },
+  "products": {
+    "title": "製品カタログ",
+    "subtitle": "幅広い電子部品製品シリーズをご覧ください",
+    "search_placeholder": "製品モデルを検索...",
+    "filter": {
+      "category": "カテゴリ",
+      "brand": "ブランド",
+      "price": "価格",
+      "availability": "在庫状況"
+    },
+    "sort": {
+      "name": "名前",
+      "price_asc": "価格: 安い順",
+      "price_desc": "価格: 高い順",
+      "popular": "人気順"
+    }
+  },
+  "solutions": {
+    "title": "ソリューション",
+    "subtitle": "さまざまな業界とアプリケーションシナリオに専門的なソリューションを提供",
+    "categories": {
+      "automotive": "自動車エレクトロニクス",
+      "industrial": "産業制御",
+      "consumer": "コンシューマエレクトロニクス",
+      "medical": "医療機器",
+      "telecommunications": "通信機器"
+    }
+  },
+  "contact": {
+    "title": "お問い合わせ",
+    "subtitle": "専門チームがいつでもサービスを提供します",
+    "form": {
+      "name": "お名前",
+      "email": "メールアドレス",
+      "company": "会社名",
+      "phone": "電話番号",
+      "message": "メッセージ",
+      "submit": "メッセージを送信"
+    },
+    "info": {
+      "address": "住所",
+      "phone": "電話",
+      "email": "メール",
+      "hours": "営業時間"
+    }
+  },
+  "inquiry": {
+    "title": "見積りセンター",
+    "subtitle": "製品見積りと技術サポートを取得",
+    "form": {
+      "product": "製品モデル",
+      "quantity": "数量",
+      "target_price": "目標価格",
+      "delivery_date": "希望納期",
+      "application": "アプリケーション説明",
+      "submit": "見積り提出"
+    }
+  }
+}

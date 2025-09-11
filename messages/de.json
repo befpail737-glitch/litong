@@ -1,0 +1,138 @@
+{
+  "common": {
+    "home": "Startseite",
+    "about": "Über uns",
+    "contact": "Kontakt",
+    "brands": "Partner-Marken",
+    "search": "Suchen",
+    "inquiry": "Sofortanfrage",
+    "language": "Sprache",
+    "loading": "Laden...",
+    "error": "Fehler",
+    "retry": "Wiederholen",
+    "submit": "Senden",
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "save": "Speichern",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "view": "Anzeigen",
+    "close": "Schließen"
+  },
+  "navigation": {
+    "home": "Startseite",
+    "brands": "Marken-Center",
+    "products": "Produktkatalog",
+    "solutions": "Lösungen",
+    "about": "Über uns",
+    "contact": "Kontakt",
+    "inquiry": "Anfrage-Center",
+    "search": "Produktsuche"
+  },
+  "home": {
+    "title": "Willkommen bei Litong Electronics",
+    "subtitle": "Als professioneller Lieferkettendienstleister für elektronische Komponenten bieten wir Kunden weltweit hochwertige Produkte und professionelle technische Unterstützung, um Ihren Projekterfolg zu gewährleisten",
+    "cta": {
+      "inquiry": "Sofortanfrage",
+      "browse": "Marken durchsuchen"
+    },
+    "stats": {
+      "experience": "Jahre Branchenerfahrung",
+      "brands": "Partner-Marken",
+      "products": "Produktmodelle",
+      "customers": "Kundenvertrauen"
+    },
+    "features": {
+      "title": "Warum Litong Electronics wählen",
+      "subtitle": "Mit 15 Jahren Branchenerfahrung bieten wir Kunden One-Stop-Beschaffungslösungen für elektronische Komponenten",
+      "quality": {
+        "title": "Qualitätsgarantie",
+        "description": "Strenges Qualitätsmanagementsystem gewährleistet, dass jedes Produkt den höchsten Standards entspricht, alle Produkte sind Originalware"
+      },
+      "service": {
+        "title": "Professioneller Service",
+        "description": "Professionelles technisches Support-Team bietet umfassende technische Beratung von der Auswahl bis zur Anwendung"
+      },
+      "supply": {
+        "title": "Stabile Versorgung",
+        "description": "Globales Lieferantennetzwerk gewährleistet Stabilität und Pünktlichkeit der Produktversorgung"
+      },
+      "competitive": {
+        "title": "Wettbewerbsfähige Preise",
+        "description": "Mit starker Einkaufsmacht bieten wir Kunden wettbewerbsfähige Produktpreise"
+      }
+    },
+    "brands": {
+      "title": "Partner-Marken",
+      "subtitle": "Wir haben langfristige und stabile Kooperationsbeziehungen mit weltweit renommierten Herstellern elektronischer Komponenten aufgebaut"
+    }
+  },
+  "brands": {
+    "title": "Partner-Marken",
+    "subtitle": "Kooperation mit weltweit führenden Herstellern elektronischer Komponenten",
+    "search_placeholder": "Marken suchen...",
+    "filter": {
+      "all": "Alle Marken",
+      "featured": "Ausgewählte Marken",
+      "popular": "Beliebte Marken"
+    }
+  },
+  "products": {
+    "title": "Produktkatalog",
+    "subtitle": "Durchsuchen Sie unser umfangreiches Sortiment elektronischer Komponenten",
+    "search_placeholder": "Produktmodell suchen...",
+    "filter": {
+      "category": "Kategorie",
+      "brand": "Marke",
+      "price": "Preis",
+      "availability": "Lagerstatus"
+    },
+    "sort": {
+      "name": "Name",
+      "price_asc": "Preis: Niedrig bis Hoch",
+      "price_desc": "Preis: Hoch bis Niedrig",
+      "popular": "Beliebtheit"
+    }
+  },
+  "solutions": {
+    "title": "Lösungen",
+    "subtitle": "Professionelle Lösungen für verschiedene Branchen und Anwendungsszenarien",
+    "categories": {
+      "automotive": "Automobilelektronik",
+      "industrial": "Industriesteuerung",
+      "consumer": "Unterhaltungselektronik",
+      "medical": "Medizingeräte",
+      "telecommunications": "Telekommunikationsgeräte"
+    }
+  },
+  "contact": {
+    "title": "Kontakt",
+    "subtitle": "Unser professionelles Team steht Ihnen jederzeit zur Verfügung",
+    "form": {
+      "name": "Name",
+      "email": "E-Mail",
+      "company": "Firmenname",
+      "phone": "Telefon",
+      "message": "Nachricht",
+      "submit": "Nachricht senden"
+    },
+    "info": {
+      "address": "Adresse",
+      "phone": "Telefon",
+      "email": "E-Mail",
+      "hours": "Öffnungszeiten"
+    }
+  },
+  "inquiry": {
+    "title": "Anfrage-Center",
+    "subtitle": "Produktanfrage und technische Unterstützung erhalten",
+    "form": {
+      "product": "Produktmodell",
+      "quantity": "Menge",
+      "target_price": "Zielpreis",
+      "delivery_date": "Gewünschtes Lieferdatum",
+      "application": "Anwendungsbeschreibung",
+      "submit": "Anfrage senden"
+    }
+  }
+}

@@ -1,0 +1,138 @@
+{
+  "common": {
+    "home": "Accueil",
+    "about": "À propos",
+    "contact": "Contact",
+    "brands": "Marques partenaires",
+    "search": "Rechercher",
+    "inquiry": "Demande immédiate",
+    "language": "Langue",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "retry": "Réessayer",
+    "submit": "Envoyer",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "save": "Enregistrer",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "view": "Voir",
+    "close": "Fermer"
+  },
+  "navigation": {
+    "home": "Accueil",
+    "brands": "Centre des marques",
+    "products": "Catalogue produits",
+    "solutions": "Solutions",
+    "about": "À propos",
+    "contact": "Contact",
+    "inquiry": "Centre de devis",
+    "search": "Recherche produits"
+  },
+  "home": {
+    "title": "Bienvenue chez Litong Electronics",
+    "subtitle": "Fournisseur professionnel de services de chaîne d'approvisionnement de composants électroniques, offrant des produits de haute qualité et un support technique professionnel aux clients du monde entier pour assurer le succès de vos projets",
+    "cta": {
+      "inquiry": "Demande immédiate",
+      "browse": "Parcourir les marques"
+    },
+    "stats": {
+      "experience": "ans d'expérience",
+      "brands": "marques partenaires",
+      "products": "modèles de produits",
+      "customers": "confiance client"
+    },
+    "features": {
+      "title": "Pourquoi choisir Litong Electronics",
+      "subtitle": "Avec 15 ans d'expérience dans l'industrie, nous offrons aux clients des solutions d'approvisionnement complètes en composants électroniques",
+      "quality": {
+        "title": "Garantie de qualité",
+        "description": "Système de contrôle qualité strict garantissant que chaque produit répond aux normes les plus élevées, tous les produits sont d'origine authentique"
+      },
+      "service": {
+        "title": "Service professionnel",
+        "description": "Équipe de support technique professionnel offrant des services de conseil technique complets, de la sélection à l'application"
+      },
+      "supply": {
+        "title": "Approvisionnement stable",
+        "description": "Réseau de fournisseurs mondial garantissant la stabilité et la rapidité de l'approvisionnement en produits"
+      },
+      "competitive": {
+        "title": "Prix compétitifs",
+        "description": "Avec un fort pouvoir d'achat, nous offrons aux clients des prix de produits compétitifs"
+      }
+    },
+    "brands": {
+      "title": "Marques partenaires",
+      "subtitle": "Nous avons établi des relations de coopération stables à long terme avec des fabricants de composants électroniques de renommée mondiale"
+    }
+  },
+  "brands": {
+    "title": "Marques partenaires",
+    "subtitle": "Coopération avec les fabricants de composants électroniques leaders mondiaux",
+    "search_placeholder": "Rechercher des marques...",
+    "filter": {
+      "all": "Toutes les marques",
+      "featured": "Marques vedettes",
+      "popular": "Marques populaires"
+    }
+  },
+  "products": {
+    "title": "Catalogue produits",
+    "subtitle": "Parcourez notre vaste gamme de composants électroniques",
+    "search_placeholder": "Rechercher modèle de produit...",
+    "filter": {
+      "category": "Catégorie",
+      "brand": "Marque",
+      "price": "Prix",
+      "availability": "État du stock"
+    },
+    "sort": {
+      "name": "Nom",
+      "price_asc": "Prix : Bas à Élevé",
+      "price_desc": "Prix : Élevé à Bas",
+      "popular": "Popularité"
+    }
+  },
+  "solutions": {
+    "title": "Solutions",
+    "subtitle": "Solutions professionnelles pour différentes industries et scénarios d'application",
+    "categories": {
+      "automotive": "Électronique automobile",
+      "industrial": "Contrôle industriel",
+      "consumer": "Électronique grand public",
+      "medical": "Équipement médical",
+      "telecommunications": "Équipement de télécommunications"
+    }
+  },
+  "contact": {
+    "title": "Contact",
+    "subtitle": "Notre équipe professionnelle est à votre service à tout moment",
+    "form": {
+      "name": "Nom",
+      "email": "E-mail",
+      "company": "Nom de l'entreprise",
+      "phone": "Téléphone",
+      "message": "Message",
+      "submit": "Envoyer le message"
+    },
+    "info": {
+      "address": "Adresse",
+      "phone": "Téléphone",
+      "email": "E-mail",
+      "hours": "Heures d'ouverture"
+    }
+  },
+  "inquiry": {
+    "title": "Centre de devis",
+    "subtitle": "Obtenir un devis produit et un support technique",
+    "form": {
+      "product": "Modèle de produit",
+      "quantity": "Quantité",
+      "target_price": "Prix cible",
+      "delivery_date": "Date de livraison souhaitée",
+      "application": "Description de l'application",
+      "submit": "Soumettre le devis"
+    }
+  }
+}

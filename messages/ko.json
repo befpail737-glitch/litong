@@ -1,0 +1,138 @@
+{
+  "common": {
+    "home": "홈",
+    "about": "회사소개",
+    "contact": "문의하기",
+    "brands": "파트너 브랜드",
+    "search": "검색",
+    "inquiry": "즉시 견적",
+    "language": "언어",
+    "loading": "로딩 중...",
+    "error": "오류",
+    "retry": "다시 시도",
+    "submit": "제출",
+    "cancel": "취소",
+    "confirm": "확인",
+    "save": "저장",
+    "edit": "편집",
+    "delete": "삭제",
+    "view": "보기",
+    "close": "닫기"
+  },
+  "navigation": {
+    "home": "홈",
+    "brands": "브랜드 센터",
+    "products": "제품 카탈로그",
+    "solutions": "솔루션",
+    "about": "회사소개",
+    "contact": "문의하기",
+    "inquiry": "견적 센터",
+    "search": "제품 검색"
+  },
+  "home": {
+    "title": "력통전자에 오신 것을 환영합니다",
+    "subtitle": "전문 전자부품 공급체인 서비스 제공업체로서, 전 세계 고객에게 고품질 제품과 전문 기술 지원을 제공하여 귀하의 프로젝트 성공을 돕습니다",
+    "cta": {
+      "inquiry": "즉시 견적",
+      "browse": "브랜드 보기"
+    },
+    "stats": {
+      "experience": "년 업계 경험",
+      "brands": "파트너 브랜드",
+      "products": "제품 모델",
+      "customers": "고객 신뢰"
+    },
+    "features": {
+      "title": "력통전자를 선택하는 이유",
+      "subtitle": "15년의 업계 경험으로 고객에게 원스톱 전자부품 조달 솔루션을 제공합니다",
+      "quality": {
+        "title": "품질 보증",
+        "description": "엄격한 품질 관리 시스템으로 모든 제품이 최고 기준을 충족하도록 보장하며, 모든 제품은 정품입니다"
+      },
+      "service": {
+        "title": "전문 서비스",
+        "description": "전문 기술 지원팀이 선택에서 응용까지 종합적인 기술 컨설팅 서비스를 제공합니다"
+      },
+      "supply": {
+        "title": "안정적 공급",
+        "description": "전 세계 공급업체 네트워크로 제품 공급의 안정성과 신속성을 보장합니다"
+      },
+      "competitive": {
+        "title": "경쟁력 있는 가격",
+        "description": "강력한 구매력으로 고객에게 경쟁력 있는 제품 가격을 제공합니다"
+      }
+    },
+    "brands": {
+      "title": "파트너 브랜드",
+      "subtitle": "세계적으로 유명한 전자부품 제조업체와 장기 안정적 협력 관계를 구축했습니다"
+    }
+  },
+  "brands": {
+    "title": "파트너 브랜드",
+    "subtitle": "세계를 선도하는 전자부품 제조업체와의 협력",
+    "search_placeholder": "브랜드 검색...",
+    "filter": {
+      "all": "모든 브랜드",
+      "featured": "주요 브랜드",
+      "popular": "인기 브랜드"
+    }
+  },
+  "products": {
+    "title": "제품 카탈로그",
+    "subtitle": "광범위한 전자부품 제품 시리즈를 탐색하세요",
+    "search_placeholder": "제품 모델 검색...",
+    "filter": {
+      "category": "카테고리",
+      "brand": "브랜드",
+      "price": "가격",
+      "availability": "재고 상태"
+    },
+    "sort": {
+      "name": "이름",
+      "price_asc": "가격: 낮은순",
+      "price_desc": "가격: 높은순",
+      "popular": "인기순"
+    }
+  },
+  "solutions": {
+    "title": "솔루션",
+    "subtitle": "다양한 산업과 응용 시나리오에 전문 솔루션 제공",
+    "categories": {
+      "automotive": "자동차 전자",
+      "industrial": "산업 제어",
+      "consumer": "소비자 전자",
+      "medical": "의료 장비",
+      "telecommunications": "통신 장비"
+    }
+  },
+  "contact": {
+    "title": "문의하기",
+    "subtitle": "전문팀이 언제든지 서비스를 제공합니다",
+    "form": {
+      "name": "이름",
+      "email": "이메일",
+      "company": "회사명",
+      "phone": "연락처",
+      "message": "메시지",
+      "submit": "메시지 보내기"
+    },
+    "info": {
+      "address": "주소",
+      "phone": "전화",
+      "email": "이메일",
+      "hours": "운영시간"
+    }
+  },
+  "inquiry": {
+    "title": "견적 센터",
+    "subtitle": "제품 견적 및 기술 지원 받기",
+    "form": {
+      "product": "제품 모델",
+      "quantity": "수량",
+      "target_price": "목표 가격",
+      "delivery_date": "희망 납기",
+      "application": "응용 설명",
+      "submit": "견적 제출"
+    }
+  }
+}

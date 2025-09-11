@@ -1,0 +1,138 @@
+{
+  "common": {
+    "home": "Inicio",
+    "about": "Acerca de",
+    "contact": "Contacto",
+    "brands": "Marcas asociadas",
+    "search": "Buscar",
+    "inquiry": "Cotización inmediata",
+    "language": "Idioma",
+    "loading": "Cargando...",
+    "error": "Error",
+    "retry": "Reintentar",
+    "submit": "Enviar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "save": "Guardar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "view": "Ver",
+    "close": "Cerrar"
+  },
+  "navigation": {
+    "home": "Inicio",
+    "brands": "Centro de marcas",
+    "products": "Catálogo de productos",
+    "solutions": "Soluciones",
+    "about": "Acerca de",
+    "contact": "Contacto",
+    "inquiry": "Centro de cotizaciones",
+    "search": "Búsqueda de productos"
+  },
+  "home": {
+    "title": "Bienvenido a Litong Electronics",
+    "subtitle": "Proveedor profesional de servicios de cadena de suministro de componentes electrónicos, ofreciendo productos de alta calidad y soporte técnico profesional a clientes de todo el mundo para garantizar el éxito de sus proyectos",
+    "cta": {
+      "inquiry": "Cotización inmediata",
+      "browse": "Explorar marcas"
+    },
+    "stats": {
+      "experience": "años de experiencia",
+      "brands": "marcas asociadas",
+      "products": "modelos de productos",
+      "customers": "confianza del cliente"
+    },
+    "features": {
+      "title": "Por qué elegir Litong Electronics",
+      "subtitle": "Con 15 años de experiencia en la industria, ofrecemos a los clientes soluciones integrales de adquisición de componentes electrónicos",
+      "quality": {
+        "title": "Garantía de calidad",
+        "description": "Sistema de control de calidad estricto que garantiza que cada producto cumple con los más altos estándares, todos los productos son originales auténticos"
+      },
+      "service": {
+        "title": "Servicio profesional",
+        "description": "Equipo de soporte técnico profesional que ofrece servicios de consultoría técnica integral, desde la selección hasta la aplicación"
+      },
+      "supply": {
+        "title": "Suministro estable",
+        "description": "Red global de proveedores que garantiza la estabilidad y puntualidad del suministro de productos"
+      },
+      "competitive": {
+        "title": "Precios competitivos",
+        "description": "Con fuerte poder adquisitivo, ofrecemos a los clientes precios de productos competitivos"
+      }
+    },
+    "brands": {
+      "title": "Marcas asociadas",
+      "subtitle": "Hemos establecido relaciones de cooperación estables a largo plazo con fabricantes de componentes electrónicos de renombre mundial"
+    }
+  },
+  "brands": {
+    "title": "Marcas asociadas",
+    "subtitle": "Cooperación con fabricantes líderes mundiales de componentes electrónicos",
+    "search_placeholder": "Buscar marcas...",
+    "filter": {
+      "all": "Todas las marcas",
+      "featured": "Marcas destacadas",
+      "popular": "Marcas populares"
+    }
+  },
+  "products": {
+    "title": "Catálogo de productos",
+    "subtitle": "Explore nuestra amplia gama de componentes electrónicos",
+    "search_placeholder": "Buscar modelo de producto...",
+    "filter": {
+      "category": "Categoría",
+      "brand": "Marca",
+      "price": "Precio",
+      "availability": "Estado del inventario"
+    },
+    "sort": {
+      "name": "Nombre",
+      "price_asc": "Precio: Bajo a Alto",
+      "price_desc": "Precio: Alto a Bajo",
+      "popular": "Popularidad"
+    }
+  },
+  "solutions": {
+    "title": "Soluciones",
+    "subtitle": "Soluciones profesionales para diferentes industrias y escenarios de aplicación",
+    "categories": {
+      "automotive": "Electrónica automotriz",
+      "industrial": "Control industrial",
+      "consumer": "Electrónica de consumo",
+      "medical": "Equipo médico",
+      "telecommunications": "Equipo de telecomunicaciones"
+    }
+  },
+  "contact": {
+    "title": "Contacto",
+    "subtitle": "Nuestro equipo profesional está a su servicio en todo momento",
+    "form": {
+      "name": "Nombre",
+      "email": "Correo electrónico",
+      "company": "Nombre de la empresa",
+      "phone": "Teléfono",
+      "message": "Mensaje",
+      "submit": "Enviar mensaje"
+    },
+    "info": {
+      "address": "Dirección",
+      "phone": "Teléfono",
+      "email": "Correo electrónico",
+      "hours": "Horario de atención"
+    }
+  },
+  "inquiry": {
+    "title": "Centro de cotizaciones",
+    "subtitle": "Obtener cotización de productos y soporte técnico",
+    "form": {
+      "product": "Modelo de producto",
+      "quantity": "Cantidad",
+      "target_price": "Precio objetivo",
+      "delivery_date": "Fecha de entrega deseada",
+      "application": "Descripción de la aplicación",
+      "submit": "Enviar cotización"
+    }
+  }
+}

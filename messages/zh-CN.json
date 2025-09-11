@@ -1,0 +1,138 @@
+{
+  "common": {
+    "home": "首页",
+    "about": "关于我们",
+    "contact": "联系我们",
+    "brands": "合作品牌",
+    "search": "搜索",
+    "inquiry": "立即询价",
+    "language": "语言",
+    "loading": "加载中...",
+    "error": "错误",
+    "retry": "重试",
+    "submit": "提交",
+    "cancel": "取消",
+    "confirm": "确认",
+    "save": "保存",
+    "edit": "编辑",
+    "delete": "删除",
+    "view": "查看",
+    "close": "关闭"
+  },
+  "navigation": {
+    "home": "首页",
+    "brands": "品牌中心",
+    "products": "产品目录",
+    "solutions": "解决方案",
+    "about": "关于我们",
+    "contact": "联系我们",
+    "inquiry": "询价中心",
+    "search": "搜索产品"
+  },
+  "home": {
+    "title": "欢迎来到力通电子",
+    "subtitle": "专业的电子元器件供应链服务商，为全球客户提供高品质产品和专业技术支持，助力您的项目成功",
+    "cta": {
+      "inquiry": "立即询价",
+      "browse": "浏览品牌"
+    },
+    "stats": {
+      "experience": "年行业经验",
+      "brands": "合作品牌",
+      "products": "产品型号",
+      "customers": "客户信赖"
+    },
+    "features": {
+      "title": "为什么选择力通电子",
+      "subtitle": "凭借15年的行业经验，我们为客户提供一站式电子元器件采购解决方案",
+      "quality": {
+        "title": "品质保证",
+        "description": "严格的质量控制体系，确保每一个产品都符合最高标准，所有产品均为原装正品"
+      },
+      "service": {
+        "title": "专业服务",
+        "description": "专业的技术支持团队，提供从选型到应用的全方位技术咨询服务"
+      },
+      "supply": {
+        "title": "稳定供应",
+        "description": "遍布全球的供应商网络，确保产品供应的稳定性和及时性"
+      },
+      "competitive": {
+        "title": "竞争价格",
+        "description": "凭借强大的采购实力，为客户提供具有竞争力的产品价格"
+      }
+    },
+    "brands": {
+      "title": "合作品牌",
+      "subtitle": "我们与全球知名电子元器件制造商建立了长期稳定的合作关系"
+    }
+  },
+  "brands": {
+    "title": "合作品牌",
+    "subtitle": "与全球领先的电子元器件制造商合作",
+    "search_placeholder": "搜索品牌...",
+    "filter": {
+      "all": "全部品牌",
+      "featured": "精选品牌",
+      "popular": "热门品牌"
+    }
+  },
+  "products": {
+    "title": "产品目录",
+    "subtitle": "浏览我们广泛的电子元器件产品系列",
+    "search_placeholder": "搜索产品型号...",
+    "filter": {
+      "category": "分类",
+      "brand": "品牌",
+      "price": "价格",
+      "availability": "库存状态"
+    },
+    "sort": {
+      "name": "名称",
+      "price_asc": "价格从低到高",
+      "price_desc": "价格从高到低",
+      "popular": "热门程度"
+    }
+  },
+  "solutions": {
+    "title": "解决方案",
+    "subtitle": "为不同行业和应用场景提供专业的解决方案",
+    "categories": {
+      "automotive": "汽车电子",
+      "industrial": "工业控制",
+      "consumer": "消费电子",
+      "medical": "医疗设备",
+      "telecommunications": "通讯设备"
+    }
+  },
+  "contact": {
+    "title": "联系我们",
+    "subtitle": "我们的专业团队随时为您提供服务",
+    "form": {
+      "name": "姓名",
+      "email": "电子邮箱",
+      "company": "公司名称",
+      "phone": "联系电话",
+      "message": "留言内容",
+      "submit": "发送消息"
+    },
+    "info": {
+      "address": "地址",
+      "phone": "电话",
+      "email": "邮箱",
+      "hours": "营业时间"
+    }
+  },
+  "inquiry": {
+    "title": "询价中心",
+    "subtitle": "获取产品报价和技术支持",
+    "form": {
+      "product": "产品型号",
+      "quantity": "数量",
+      "target_price": "目标价格",
+      "delivery_date": "期望交期",
+      "application": "应用说明",
+      "submit": "提交询价"
+    }
+  }
+}

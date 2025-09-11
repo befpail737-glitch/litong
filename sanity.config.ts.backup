@@ -1,0 +1,177 @@
+import { defineConfig } from 'sanity'
+import { structureTool } from 'sanity/structure'
+import { visionTool } from '@sanity/vision'
+import { schemaTypes } from './sanity/schemas'
+
+export default defineConfig({
+  name: 'litong-electronics',
+  title: '力通电子管理系统',
+  
+  projectId: 'oquvb2bs',
+  dataset: 'production',
+  
+  basePath: '/admin',
+  
+  plugins: [
+    structureTool({
+      structure: (S) =>
+        S.list()
+          .id('root')
+          .title('内容管理')
+          .items([
+            // 产品管理
+            S.listItem()
+              .id('product-management')
+              .title('产品管理')
+              .child(
+                S.list()
+                  .id('product-list')
+                  .title('产品管理')
+                  .items([
+                    S.listItem()
+                      .id('all-products')
+                      .title('所有产品')
+                      .schemaType('product')
+                      .child(S.documentTypeList('product').title('所有产品')),
+                    S.listItem()
+                      .id('product-categories')
+                      .title('产品分类')
+                      .schemaType('productCategory')
+                      .child(S.documentTypeList('productCategory').title('产品分类')),
+                    S.listItem()
+                      .id('product-subcategories')
+                      .title('产品子分类')
+                      .schemaType('productSubcategory')
+                      .child(S.documentTypeList('productSubcategory').title('产品子分类')),
+                    S.listItem()
+                      .id('brands')
+                      .title('品牌管理')
+                      .schemaType('brandBasic')
+                      .child(S.documentTypeList('brandBasic').title('品牌管理')),
+                  ])
+              ),
+            
+            // 内容管理
+            S.listItem()
+              .id('content-management')
+              .title('内容管理')
+              .child(
+                S.list()
+                  .id('content-list')
+                  .title('内容管理')
+                  .items([
+                    S.listItem()
+                      .id('articles')
+                      .title('技术文章')
+                      .schemaType('article')
+                      .child(S.documentTypeList('article').title('技术文章')),
+                    S.listItem()
+                      .id('article-categories')
+                      .title('文章分类')
+                      .schemaType('articleCategory')
+                      .child(S.documentTypeList('articleCategory').title('文章分类')),
+                    S.listItem()
+                      .id('authors')
+                      .title('作者管理')
+                      .schemaType('author')
+                      .child(S.documentTypeList('author').title('作者管理')),
+                  ])
+              ),
+            
+            // 解决方案
+            S.listItem()
+              .id('solutions')
+              .title('解决方案')
+              .child(
+                S.list()
+                  .id('solution-list')
+                  .title('解决方案')
+                  .items([
+                    S.listItem()
+                      .id('all-solutions')
+                      .title('所有方案')
+                      .schemaType('solution')
+                      .child(S.documentTypeList('solution').title('所有方案')),
+                    S.listItem()
+                      .id('industries')
+                      .title('行业分类')
+                      .schemaType('industry')
+                      .child(S.documentTypeList('industry').title('行业分类')),
+                    S.listItem()
+                      .id('applications')
+                      .title('应用场景')
+                      .schemaType('application')
+                      .child(S.documentTypeList('application').title('应用场景')),
+                  ])
+              ),
+            
+            // 询价管理
+            S.listItem()
+              .id('inquiry-management')
+              .title('询价管理')
+              .child(
+                S.list()
+                  .id('inquiry-list')
+                  .title('询价管理')
+                  .items([
+                    S.listItem()
+                      .id('all-inquiries')
+                      .title('所有询价')
+                      .schemaType('inquiry')
+                      .child(S.documentTypeList('inquiry').title('所有询价')),
+                    S.listItem()
+                      .id('quotes')
+                      .title('报价单')
+                      .schemaType('quote')
+                      .child(S.documentTypeList('quote').title('报价单')),
+                  ])
+              ),
+            
+            // 其他内容类型
+            ...S.documentTypeListItems().filter(
+              (listItem) => !['product', 'productCategory', 'productSubcategory', 'brandBasic', 'article', 'articleCategory', 'author', 'solution', 'industry', 'application', 'inquiry', 'quote'].includes(listItem.getId()!)
+            ),
+          ])
+    }),
+    visionTool({
+      defaultApiVersion: '2023-05-03',
+    }),
+  ],
+  
+  schema: {
+    types: schemaTypes,
+  },
+  
+  // 工具配置
+  tools: (prev) => {
+    // 只在开发环境显示Vision工具
+    if (process.env.NODE_ENV === 'development') {
+      return prev
+    }
+    return prev.filter((tool) => tool.name !== 'vision')
+  },
+  
+  // 文档操作配置
+  document: {
+    // 防止意外删除重要文档
+    actions: (prev, context) => {
+      const { schemaType } = context
+      
+      if (schemaType === 'product' || schemaType === 'brandBasic') {
+        return prev.map(action => 
+          action.action === 'delete' 
+            ? { ...action, disabled: true, title: '禁止删除' }
+            : action
+        )
+      }
+      
+      return prev
+    },
+  },
+  
+  // 开发服务器配置
+  api: {
+    projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
+    dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
+  },
+})
