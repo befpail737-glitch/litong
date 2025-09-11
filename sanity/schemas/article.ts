@@ -396,7 +396,7 @@ export const article = defineType({
       difficulty: 'difficulty'
     },
     prepare({ title, author, image, isPublished, isFeatured, difficulty }) {
-      const difficultyMap = {
+      const difficultyMap: Record<string, string> = {
         beginner: '初级',
         intermediate: '中级', 
         advanced: '高级',
