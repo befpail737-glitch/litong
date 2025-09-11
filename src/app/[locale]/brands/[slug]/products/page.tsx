@@ -97,7 +97,7 @@ export default async function BrandProductsPage({ params, searchParams }: Props)
       total: productsData.total,
       fetchedCount: productsData.products?.length || 0,
       expectedCount: association.productCount,
-      products: productsData.products?.map(p => ({ id: p._id, partNumber: p.partNumber, slug: p.slug })) || []
+      products: productsData.products?.map((p: any) => ({ id: p._id, partNumber: p.partNumber, slug: p.slug })) || []
     })
     
     const { products, total } = productsData
