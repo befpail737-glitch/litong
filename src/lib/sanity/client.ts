@@ -14,8 +14,8 @@ export const client = createClient({
 
 // 带认证的客户端（用于需要权限的操作）
 export const authenticatedClient = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
+  projectId: 'oquvb2bs', // 直接硬编码
+  dataset: 'production', // 直接硬编码
   apiVersion: '2023-05-03',
   useCdn: false,
   token: process.env.SANITY_API_TOKEN,
@@ -25,8 +25,8 @@ export const authenticatedClient = createClient({
 
 // 预览模式客户端（包含草稿）
 export const previewClient = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
+  projectId: 'oquvb2bs', // 直接硬编码
+  dataset: 'production', // 直接硬编码
   apiVersion: '2023-05-03',
   useCdn: false,
   token: process.env.SANITY_API_TOKEN,
