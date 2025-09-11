@@ -28,7 +28,7 @@ const ProductCreateSchema = z.object({
   description: z.string().optional(),
   manufacturer: z.string().min(1).max(100),
   category: z.string().min(1).max(100),
-  model: z.string().optional().max(100),
+  model: z.string().max(100).optional(),
   price: z.number().positive().optional(),
   currency: z.string().length(3).optional().default('USD'),
   specifications: z.record(z.any()).optional(),
