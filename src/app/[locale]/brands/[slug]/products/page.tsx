@@ -25,6 +25,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     const brand = await getBrandData(brandSlug)
     
+    if (!brand) {
+      return {
+        title: '品牌未找到 - 力通电子',
+        description: '未找到指定的品牌信息',
+      }
+    }
+    
     return {
       title: `${brand.name}产品列表 - 力通电子`,
       description: `查看${brand.name}品牌的所有产品，包括详细规格参数和价格信息`,
