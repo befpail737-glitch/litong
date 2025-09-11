@@ -11,33 +11,11 @@ import { urlFor, client } from '@/lib/sanity/client';
 import { getArticle } from '@/lib/sanity/queries';
 import { locales } from '@/i18n';
 
-// 为静态生成获取所有文章slugs
+// 为静态生成提供基本参数（简化版本）
 export async function generateStaticParams() {
-  try {
-    const articles = await client.fetch(`
-      *[_type == "article" && defined(slug.current)] {
-        "slug": slug.current
-      }
-    `);
-
-    // 为每个locale和每个article生成参数
-    const params = [];
-    for (const locale of locales) {
-      for (const article of articles) {
-        if (article.slug) {
-          params.push({
-            locale,
-            slug: article.slug
-          });
-        }
-      }
-    }
-
-    return params;
-  } catch (error) {
-    console.error('Error generating static params for articles:', error);
-    return [];
-  }
+  return [
+    { locale: 'zh-CN', slug: 'sample-article' }
+  ];
 }
 
 type Article = {

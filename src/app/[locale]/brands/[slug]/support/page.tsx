@@ -10,33 +10,11 @@ import { client } from '@/lib/sanity/client';
 import { getArticles } from '@/lib/sanity/queries';
 import { locales } from '@/i18n';
 
-// 为静态生成获取所有品牌slugs
+// 为静态生成提供基本参数（简化版本）
 export async function generateStaticParams() {
-  try {
-    const brands = await client.fetch(`
-      *[_type == "brandBasic" && isActive == true] {
-        "slug": slug.current
-      }
-    `);
-
-    // 为每个locale和每个brand生成参数
-    const params = [];
-    for (const locale of locales) {
-      for (const brand of brands) {
-        if (brand.slug) {
-          params.push({
-            locale,
-            slug: brand.slug
-          });
-        }
-      }
-    }
-
-    return params;
-  } catch (error) {
-    console.error('Error generating static params for brand support:', error);
-    return [];
-  }
+  return [
+    { locale: 'zh-CN', slug: 'sample-brand' }
+  ];
 }
 
 // 从Sanity获取品牌数据
