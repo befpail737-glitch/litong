@@ -106,7 +106,7 @@ export default async function BrandsPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {brands.filter(brand => brand.isFeatured).map((brand) => (
+            {brands.filter((brand: any) => brand.isFeatured).map((brand: any) => (
               <Card key={brand._id} className="hover:shadow-lg transition-all duration-300 group">
                 <CardHeader className="pb-4">
                   <div className="flex items-center justify-between mb-3">
@@ -197,7 +197,7 @@ export default async function BrandsPage() {
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {brands.map((brand) => (
+            {brands.map((brand: any) => (
               <Link key={brand._id} href={`/brands/${brand.slug}`}>
                 <Card className="hover:shadow-md transition-shadow cursor-pointer group h-full">
                   <CardContent className="p-6">

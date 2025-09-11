@@ -1,7 +1,6 @@
 module.exports = {
   extends: [
     'next/core-web-vitals',
-    '@typescript-eslint/recommended',
     'plugin:react-hooks/recommended',
     'plugin:jsx-a11y/recommended',
     'prettier'
