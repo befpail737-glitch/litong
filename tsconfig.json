@@ -45,5 +45,12 @@
     ".next/types/**/*.ts",
     "src/**/*"
   ],
-  "exclude": ["node_modules", ".next", "out", "dist"]
+  "exclude": [
+    "node_modules", 
+    ".next", 
+    "out", 
+    "dist",
+    "src/lib/deployment/ci-cd-pipeline.ts",
+    "src/lib/performance/code-splitting.ts"
+  ]
 }

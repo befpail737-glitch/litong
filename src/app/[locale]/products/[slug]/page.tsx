@@ -197,7 +197,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
                     </Link>
                     {product.subcategory && (
                       <>
-                        <span className="text-gray-400">></span>
+                        <span className="text-gray-400">&gt;</span>
                         <span className="text-gray-600">{product.subcategory.name}</span>
                       </>
                     )}
