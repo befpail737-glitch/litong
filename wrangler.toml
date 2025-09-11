@@ -1,16 +1,15 @@
 # Cloudflare Pages configuration
 # This file is used to configure Cloudflare Pages deployment
 
-# Build configuration
+# Project name (required for Pages)
+name = "litong-electronics-website"
+
+# Build output directory
 pages_build_output_dir = ".next"
 
 # Compatibility settings
 compatibility_date = "2024-09-11"
 compatibility_flags = ["nodejs_compat"]
-
-# Node.js compatibility for Next.js
-[build]
-command = "npm run build"
 
 # Environment variables
 [env.production.vars]
