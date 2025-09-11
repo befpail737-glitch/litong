@@ -6,8 +6,38 @@ import { Metadata } from 'next';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { urlFor } from '@/lib/sanity/client';
+import { urlFor, client } from '@/lib/sanity/client';
 import { getProduct } from '@/lib/sanity/queries';
+import { locales } from '@/i18n';
+
+// 为静态生成获取所有产品slugs
+export async function generateStaticParams() {
+  try {
+    const products = await client.fetch(`
+      *[_type == "product" && defined(slug.current)] {
+        "slug": slug.current
+      }
+    `);
+
+    // 为每个locale和每个product生成参数
+    const params = [];
+    for (const locale of locales) {
+      for (const product of products) {
+        if (product.slug) {
+          params.push({
+            locale,
+            slug: product.slug
+          });
+        }
+      }
+    }
+
+    return params;
+  } catch (error) {
+    console.error('Error generating static params for products:', error);
+    return [];
+  }
+}
 
 interface PageProps {
   params: {

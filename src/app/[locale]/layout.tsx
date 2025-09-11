@@ -1,5 +1,6 @@
 import { Inter, Poppins } from 'next/font/google';
 import '../globals.css';
+import { locales } from '../../i18n';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -13,6 +14,12 @@ const poppins = Poppins({
   variable: '--font-poppins',
   display: 'swap',
 });
+
+export function generateStaticParams() {
+  return locales.map((locale) => ({
+    locale,
+  }));
+}
 
 export default function LocaleLayout({
   children,

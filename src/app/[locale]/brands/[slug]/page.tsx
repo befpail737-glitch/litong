@@ -12,6 +12,36 @@ import {
 } from 'lucide-react';
 
 import { client } from '@/lib/sanity/client';
+import { locales } from '@/i18n';
+
+// 为静态生成获取所有品牌slugs
+export async function generateStaticParams() {
+  try {
+    const brands = await client.fetch(`
+      *[_type == "brandBasic" && isActive == true] {
+        "slug": slug.current
+      }
+    `);
+
+    // 为每个locale和每个brand生成参数
+    const params = [];
+    for (const locale of locales) {
+      for (const brand of brands) {
+        if (brand.slug) {
+          params.push({
+            locale,
+            slug: brand.slug
+          });
+        }
+      }
+    }
+
+    return params;
+  } catch (error) {
+    console.error('Error generating static params for brands:', error);
+    return [];
+  }
+}
 
 // 从Sanity获取品牌数据
 const getBrandData = async (slug: string) => {

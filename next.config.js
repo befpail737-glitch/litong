@@ -3,9 +3,12 @@
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Cloudflare Pages SSR configuration
-  // output: 'export', // Removed to enable API routes and SSR
+  // Static export for Cloudflare Pages compatibility
+  output: 'export',
   trailingSlash: true,
+  images: {
+    unoptimized: true, // Required for static export
+  },
   // Worker pool configuration to prevent Jest worker errors
   experimental: {
     workerThreads: false,
@@ -42,35 +45,8 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true, // 暂时忽略构建时的ESLint错误以支持部署
   },
-  images: {
-    formats: ['image/webp', 'image/avif'],
-    domains: ['localhost', 'cdn.sanity.io'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-  },
   env: {
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
-  },
-  async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY',
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin',
-          },
-        ],
-      },
-    ];
   },
   poweredByHeader: false,
   compress: true,

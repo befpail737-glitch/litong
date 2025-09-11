@@ -7,8 +7,38 @@ import { Calendar, Clock, User, Building2, ArrowLeft, Tag } from 'lucide-react';
 import PortableText from '@/components/PortableText';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { urlFor } from '@/lib/sanity/client';
+import { urlFor, client } from '@/lib/sanity/client';
 import { getArticle } from '@/lib/sanity/queries';
+import { locales } from '@/i18n';
+
+// 为静态生成获取所有文章slugs
+export async function generateStaticParams() {
+  try {
+    const articles = await client.fetch(`
+      *[_type == "article" && defined(slug.current)] {
+        "slug": slug.current
+      }
+    `);
+
+    // 为每个locale和每个article生成参数
+    const params = [];
+    for (const locale of locales) {
+      for (const article of articles) {
+        if (article.slug) {
+          params.push({
+            locale,
+            slug: article.slug
+          });
+        }
+      }
+    }
+
+    return params;
+  } catch (error) {
+    console.error('Error generating static params for articles:', error);
+    return [];
+  }
+}
 
 type Article = {
   _id: string

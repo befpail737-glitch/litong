@@ -4,9 +4,39 @@ import { notFound } from 'next/navigation';
 import PortableText from '@/components/PortableText';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { urlFor } from '@/lib/sanity/client';
+import { urlFor, client } from '@/lib/sanity/client';
 import { getSolution } from '@/lib/sanity/queries';
 import { getLocalizedValue } from '@/lib/sanity-i18n';
+import { locales } from '@/i18n';
+
+// 为静态生成获取所有解决方案slugs
+export async function generateStaticParams() {
+  try {
+    const solutions = await client.fetch(`
+      *[_type == "solution" && defined(slug.current)] {
+        "slug": slug.current
+      }
+    `);
+
+    // 为每个locale和每个solution生成参数
+    const params = [];
+    for (const locale of locales) {
+      for (const solution of solutions) {
+        if (solution.slug) {
+          params.push({
+            locale,
+            slug: solution.slug
+          });
+        }
+      }
+    }
+
+    return params;
+  } catch (error) {
+    console.error('Error generating static params for solutions:', error);
+    return [];
+  }
+}
 
 type Solution = {
   _id: string

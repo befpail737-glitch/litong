@@ -1,22 +1,19 @@
-import createMiddleware from 'next-intl/middleware';
+// 临时禁用中间件以支持静态导出
+// import createMiddleware from 'next-intl/middleware';
+// import { locales } from './i18n';
 
-import { locales } from './i18n';
-
-export default createMiddleware({
-  // 支持的语言列表
-  locales,
-
-  // 默认语言
-  defaultLocale: 'zh-CN',
-
-  // 语言检测策略
-  localeDetection: true,
-
-  // 路径前缀策略 - 默认语言不需要前缀，其他语言需要
-  localePrefix: 'as-needed' // 默认语言可在根路径，其他语言需要前缀
-});
+// export default createMiddleware({
+//   // 支持的语言列表
+//   locales,
+//   // 默认语言
+//   defaultLocale: 'zh-CN',
+//   // 禁用语言检测以支持静态导出
+//   localeDetection: false,
+//   // 路径前缀策略 - 总是使用前缀以确保静态导出兼容性
+//   localePrefix: 'always'
+// });
 
 export const config = {
-  // 匹配除了API、静态文件、admin、studio等之外的所有路径
-  matcher: ['/((?!api|_next|_vercel|admin|studio|.*\\..*).*)']
+  // 空匹配器以禁用中间件
+  matcher: []
 };
