@@ -3,15 +3,15 @@ import { defineField, defineType } from 'sanity'
 // 支持的语言列表
 export const supportedLanguages = [
   { id: 'zhCN', title: '简体中文', isDefault: true },
-  { id: 'zhTW', title: '繁體中文' },
-  { id: 'en', title: 'English' },
-  { id: 'ja', title: '日本語' },
-  { id: 'ko', title: '한국어' },
-  { id: 'de', title: 'Deutsch' },
-  { id: 'fr', title: 'Français' },
-  { id: 'es', title: 'Español' },
-  { id: 'ru', title: 'Русский' },
-  { id: 'ar', title: 'العربية' },
+  { id: 'zhTW', title: '繁體中文', isDefault: false },
+  { id: 'en', title: 'English', isDefault: false },
+  { id: 'ja', title: '日本語', isDefault: false },
+  { id: 'ko', title: '한국어', isDefault: false },
+  { id: 'de', title: 'Deutsch', isDefault: false },
+  { id: 'fr', title: 'Français', isDefault: false },
+  { id: 'es', title: 'Español', isDefault: false },
+  { id: 'ru', title: 'Русский', isDefault: false },
+  { id: 'ar', title: 'العربية', isDefault: false },
 ] as const
 
 export type SupportedLanguage = typeof supportedLanguages[number]['id']
