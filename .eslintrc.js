@@ -131,11 +131,8 @@ module.exports = {
       env: {
         jest: true,
       },
-      extends: ['plugin:testing-library/react'],
       rules: {
         '@typescript-eslint/no-explicit-any': 'off',
-        'testing-library/prefer-screen-queries': 'error',
-        'testing-library/prefer-presence-queries': 'error',
       },
     },
     {
