@@ -12,8 +12,8 @@ export default createMiddleware({
   // 语言检测策略
   localeDetection: true,
 
-  // 路径前缀策略
-  localePrefix: 'always' // 所有语言都需要前缀
+  // 路径前缀策略 - 默认语言不需要前缀，其他语言需要
+  localePrefix: 'as-needed' // 默认语言可在根路径，其他语言需要前缀
 });
 
 export const config = {
