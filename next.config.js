@@ -10,8 +10,9 @@ const nextConfig = {
   experimental: {
     workerThreads: false,
     cpus: 1,
+    webpackBuildWorker: true, // Enable webpack build worker for better cache management
   },
-  // Webpack configuration for better worker handling
+  // Webpack configuration for better worker handling and cache exclusion
   webpack: (config, { dev, isServer }) => {
     if (dev && !isServer) {
       // Limit worker pools in development
@@ -20,6 +21,19 @@ const nextConfig = {
         level: 'error',
       };
     }
+    
+    // Configure cache to be stored outside .next directory for production
+    if (!dev) {
+      const path = require('path');
+      config.cache = {
+        type: 'filesystem',
+        cacheDirectory: path.resolve(__dirname, '.webpack-cache'), // Absolute path for webpack cache
+        buildDependencies: {
+          config: [__filename],
+        },
+      };
+    }
+    
     return config;
   },
   typescript: {
