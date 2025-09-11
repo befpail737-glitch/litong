@@ -107,7 +107,7 @@ module.exports = {
     'no-multiple-empty-lines': ['error', { max: 1, maxEOF: 0 }],
     'no-trailing-spaces': 'error',
     'eol-last': 'error',
-    'comma-dangle': ['error', 'es5'],
+    'comma-dangle': ['error', 'only-multiline'],
     'quotes': ['error', 'single', { avoidEscape: true }],
     'semi': ['error', 'always'],
     

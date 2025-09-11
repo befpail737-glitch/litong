@@ -63,7 +63,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
               </div>
               <div className="grid grid-cols-3 gap-2">
                 {product.gallery?.length ? (
-                  product.gallery.map((image: any, index) => (
+                  product.gallery.map((image: any, index: number) => (
                     <div key={index} className="aspect-square bg-gray-50 rounded-md overflow-hidden">
                       <img
                         src={urlFor(image).width(200).height(200).url()}
