@@ -353,7 +353,7 @@ export async function generateMetadata({ params }: ArticleDetailPageProps) {
       }
     }
 
-    const brandNames = article.relatedBrands?.map(b => b.name).join(', ') || ''
+    const brandNames = article.relatedBrands?.map((b: any) => b.name).join(', ') || ''
     
     return {
       title: `${article.title} | 力通电子技术文章`,
