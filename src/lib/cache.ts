@@ -98,4 +98,26 @@ export const deleteCached = (key: string): boolean => {
   return cache.delete(key)
 }
 
+export async function cacheResponse<T>(
+  key: string, 
+  data?: T, 
+  ttlSeconds?: number
+): Promise<T | null> {
+  if (data === undefined) {
+    // Getter mode - retrieve cached data
+    return getCached<T>(key) || null
+  }
+  
+  if (data === null) {
+    // Delete mode - clear cache entry
+    deleteCached(key)
+    return null
+  }
+  
+  // Setter mode - store data in cache
+  const ttlMs = ttlSeconds ? ttlSeconds * 1000 : undefined
+  setCached(key, data, ttlMs)
+  return data
+}
+
 export default cache

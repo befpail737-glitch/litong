@@ -39,7 +39,7 @@ export default defineConfig({
     newDocumentOptions: (prev, { creationContext }) => {
       return prev.map(template => {
         // 为常用文档类型添加更清晰的描述
-        const descriptions = {
+        const descriptions: Record<string, string> = {
           'brandBasic': '创建新的品牌信息',
           'product': '添加新的产品信息',
           'solution': '创建新的解决方案',
