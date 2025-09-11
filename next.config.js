@@ -46,7 +46,7 @@ const nextConfig = {
     ignoreDuringBuilds: true, // 暂时忽略构建时的ESLint错误以支持部署
   },
   env: {
-    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || 'https://litong.pages.dev',
   },
   poweredByHeader: false,
   compress: true,
