@@ -1,6 +1,8 @@
-import { PortableText as BasePortableText } from '@portabletext/react'
-import { urlFor } from '@/lib/sanity/client'
-import Image from 'next/image'
+import Image from 'next/image';
+
+import { PortableText as BasePortableText } from '@portabletext/react';
+
+import { urlFor } from '@/lib/sanity/client';
 
 // 富文本内容类型定义
 type PortableTextProps = {
@@ -44,10 +46,10 @@ const components = {
     code: ({ children }: any) => (
       <code className="bg-gray-100 px-2 py-1 rounded text-sm font-mono">{children}</code>
     ),
-    
+
     // 链接处理
     link: ({ value, children }: any) => {
-      const { href, target = '_blank' } = value
+      const { href, target = '_blank' } = value;
       return (
         <a
           href={href}
@@ -57,27 +59,27 @@ const components = {
         >
           {children}
         </a>
-      )
+      );
     },
 
     // 字体颜色处理
     color: ({ value, children }: any) => {
-      const { hex } = value
+      const { hex } = value;
       return (
         <span style={{ color: hex }}>
           {children}
         </span>
-      )
+      );
     },
 
     // 字体大小处理
     fontSize: ({ value, children }: any) => {
-      const { size } = value
+      const { size } = value;
       return (
         <span className={size}>
           {children}
         </span>
-      )
+      );
     },
   },
 
@@ -85,9 +87,9 @@ const components = {
   types: {
     // 图片处理
     image: ({ value }: any) => {
-      const { alt, caption } = value
-      const imageUrl = urlFor(value).width(800).height(600).url()
-      
+      const { alt, caption } = value;
+      const imageUrl = urlFor(value).width(800).height(600).url();
+
       return (
         <figure className="my-6">
           <div className="relative w-full h-96">
@@ -105,16 +107,16 @@ const components = {
             </figcaption>
           )}
         </figure>
-      )
+      );
     },
 
     // PDF文件处理
     pdf: ({ value }: any) => {
-      const { title, description, asset } = value
-      const fileUrl = asset?.url
-      
-      if (!fileUrl) return null
-      
+      const { title, description, asset } = value;
+      const fileUrl = asset?.url;
+
+      if (!fileUrl) return null;
+
       return (
         <div className="border rounded-lg p-4 my-6 bg-red-50">
           <div className="flex items-center gap-3">
@@ -135,15 +137,15 @@ const components = {
             </a>
           </div>
         </div>
-      )
+      );
     },
 
     // 表格处理
     table: ({ value }: any) => {
-      const { title, rows } = value
-      
-      if (!rows?.length) return null
-      
+      const { title, rows } = value;
+
+      if (!rows?.length) return null;
+
       return (
         <div className="my-6">
           {title && <h4 className="text-lg font-semibold mb-3">{title}</h4>}
@@ -166,10 +168,10 @@ const components = {
             </table>
           </div>
         </div>
-      )
+      );
     },
   },
-}
+};
 
 export default function PortableText({ content, className = '' }: PortableTextProps) {
   if (!content || !Array.isArray(content) || content.length === 0) {
@@ -177,12 +179,12 @@ export default function PortableText({ content, className = '' }: PortableTextPr
       <div className={`text-gray-500 ${className}`}>
         暂无内容
       </div>
-    )
+    );
   }
 
   return (
     <div className={`prose max-w-none ${className}`}>
       <BasePortableText value={content} components={components} />
     </div>
-  )
+  );
 }

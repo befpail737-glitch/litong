@@ -1,21 +1,23 @@
-import Link from 'next/link'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { 
-  Cpu, 
-  Zap, 
-  Radio, 
-  Gauge, 
-  Settings, 
-  Shield, 
-  Battery, 
+import Link from 'next/link';
+
+import {
+  Cpu,
+  Zap,
+  Radio,
+  Gauge,
+  Settings,
+  Shield,
+  Battery,
   Wifi,
   ChevronRight,
   TrendingUp,
   Star,
   Package
-} from 'lucide-react'
+} from 'lucide-react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 // 产品大分类数据
 const productCategories = [
@@ -42,7 +44,7 @@ const productCategories = [
   {
     id: 'power-management',
     name: '电源管理',
-    slug: 'power-management', 
+    slug: 'power-management',
     icon: Battery,
     description: 'LDO、DC-DC转换器、电池管理、电源监控等电源管理芯片',
     productCount: 8920,
@@ -179,11 +181,11 @@ const productCategories = [
     isHot: false,
     growth: '+3%'
   }
-]
+];
 
 export default function CategoriesPage() {
-  const hotCategories = productCategories.filter(cat => cat.isHot)
-  const otherCategories = productCategories.filter(cat => !cat.isHot)
+  const hotCategories = productCategories.filter(cat => cat.isHot);
+  const otherCategories = productCategories.filter(cat => !cat.isHot);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -234,7 +236,7 @@ export default function CategoriesPage() {
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6">
             {hotCategories.map((category) => {
-              const IconComponent = category.icon
+              const IconComponent = category.icon;
               return (
                 <Card key={category.id} className="hover:shadow-lg transition-shadow border-l-4 border-l-yellow-500">
                   <CardHeader>
@@ -261,7 +263,7 @@ export default function CategoriesPage() {
                     <p className="text-sm text-gray-600">
                       {category.description}
                     </p>
-                    
+
                     <div>
                       <h4 className="text-sm font-medium text-gray-900 mb-2">产品特性</h4>
                       <div className="flex flex-wrap gap-1">
@@ -309,7 +311,7 @@ export default function CategoriesPage() {
                     </Button>
                   </CardContent>
                 </Card>
-              )
+              );
             })}
           </div>
         </div>
@@ -323,7 +325,7 @@ export default function CategoriesPage() {
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {otherCategories.map((category) => {
-            const IconComponent = category.icon
+            const IconComponent = category.icon;
             return (
               <Card key={category.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
@@ -346,7 +348,7 @@ export default function CategoriesPage() {
                   <p className="text-sm text-gray-600 line-clamp-2">
                     {category.description}
                   </p>
-                  
+
                   <div className="flex flex-wrap gap-1">
                     {category.features.slice(0, 3).map((feature) => (
                       <Badge key={feature} variant="secondary" className="text-xs">
@@ -363,7 +365,7 @@ export default function CategoriesPage() {
                   </Button>
                 </CardContent>
               </Card>
-            )
+            );
           })}
         </div>
       </div>
@@ -391,7 +393,7 @@ export default function CategoriesPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // SEO元数据
@@ -399,4 +401,4 @@ export const metadata = {
   title: '产品分类 - 电子元器件产品大全 | 力通电子',
   description: '力通电子产品分类涵盖微控制器、电源管理IC、模拟IC、传感器、无线连接等八大类别，超过80,000种电子元器件型号，原装正品现货供应。',
   keywords: '电子元器件分类,微控制器,电源管理IC,模拟IC,传感器,无线连接,接口IC,保护IC,无源器件,芯片现货',
-}
+};

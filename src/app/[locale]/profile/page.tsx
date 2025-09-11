@@ -1,45 +1,48 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { useAuth } from '@/contexts/AuthContext'
-import { useOrder } from '@/contexts/OrderContext'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
-import { Alert } from '@/components/ui/alert'
-import { InquiryHistory } from '@/components/inquiry/InquiryHistory'
-import { 
-  User, 
-  Settings, 
-  ShoppingCart, 
-  FileText, 
+import { useState } from 'react';
+
+import Link from 'next/link';
+
+import {
+  User,
+  Settings,
+  ShoppingCart,
+  FileText,
   Heart,
   Bell,
   Shield,
   Edit,
   Save,
   X
-} from 'lucide-react'
+} from 'lucide-react';
+
+import { InquiryHistory } from '@/components/inquiry/InquiryHistory';
+import { Alert } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useAuth } from '@/contexts/AuthContext';
+import { useOrder } from '@/contexts/OrderContext';
 
 export default function ProfilePage() {
-  const { user, updateUser, logout } = useAuth()
-  const { orders, getOrderStatusText } = useOrder()
-  
+  const { user, updateUser, logout } = useAuth();
+  const { orders, getOrderStatusText } = useOrder();
+
   // 为了向后兼容，保留updateProfile别名
-  const updateProfile = updateUser
-  const [isEditing, setIsEditing] = useState(false)
+  const updateProfile = updateUser;
+  const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
     name: user?.name || '',
     email: user?.email || '',
     company: user?.company || '',
     phone: user?.phone || ''
-  })
-  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
+  });
+  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!user) {
     return (
@@ -55,27 +58,27 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
   const handleSaveProfile = async () => {
-    setIsLoading(true)
-    setMessage(null)
-    
+    setIsLoading(true);
+    setMessage(null);
+
     try {
-      const result = await updateProfile(editData)
+      const result = await updateProfile(editData);
       if (result.success) {
-        setMessage({ type: 'success', text: '个人信息更新成功' })
-        setIsEditing(false)
+        setMessage({ type: 'success', text: '个人信息更新成功' });
+        setIsEditing(false);
       } else {
-        setMessage({ type: 'error', text: result.error || '更新失败' })
+        setMessage({ type: 'error', text: result.error || '更新失败' });
       }
     } catch (error) {
-      setMessage({ type: 'error', text: '更新失败，请重试' })
+      setMessage({ type: 'error', text: '更新失败，请重试' });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleCancelEdit = () => {
     setEditData({
@@ -83,10 +86,10 @@ export default function ProfilePage() {
       email: user.email,
       company: user.company || '',
       phone: user.phone || ''
-    })
-    setIsEditing(false)
-    setMessage(null)
-  }
+    });
+    setIsEditing(false);
+    setMessage(null);
+  };
 
   // 使用真实订单数据而不是mockOrders
 
@@ -98,12 +101,12 @@ export default function ProfilePage() {
       stock: '有现货'
     },
     {
-      id: '2', 
+      id: '2',
       name: 'Raspberry Pi 4B',
       price: '¥399.00',
       stock: '预订中'
     }
-  ]
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -133,8 +136,8 @@ export default function ProfilePage() {
                   {user.company && <p><span className="font-medium">公司：</span>{user.company}</p>}
                   {user.phone && <p><span className="font-medium">电话：</span>{user.phone}</p>}
                 </div>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full mt-4"
                   onClick={logout}
                 >
@@ -148,8 +151,8 @@ export default function ProfilePage() {
           <div className="lg:col-span-3">
             {message && (
               <Alert className={`mb-6 ${
-                message.type === 'success' 
-                  ? 'border-green-200 bg-green-50 text-green-800' 
+                message.type === 'success'
+                  ? 'border-green-200 bg-green-50 text-green-800'
                   : 'border-red-200 bg-red-50 text-red-800'
               }`}>
                 {message.text}
@@ -186,8 +189,8 @@ export default function ProfilePage() {
                   <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle>基本信息</CardTitle>
                     {!isEditing ? (
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => setIsEditing(true)}
                       >
@@ -196,16 +199,16 @@ export default function ProfilePage() {
                       </Button>
                     ) : (
                       <div className="flex gap-2">
-                        <Button 
-                          size="sm" 
+                        <Button
+                          size="sm"
                           onClick={handleSaveProfile}
                           disabled={isLoading}
                         >
                           <Save className="h-4 w-4 mr-2" />
                           {isLoading ? '保存中...' : '保存'}
                         </Button>
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           size="sm"
                           onClick={handleCancelEdit}
                           disabled={isLoading}
@@ -353,19 +356,19 @@ export default function ProfilePage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // 设置标签组件
 function SettingsTab({ user }: { user: User }) {
-  const { updateUser } = useAuth()
+  const { updateUser } = useAuth();
   const [settings, setSettings] = useState({
     notifications: { ...user.preferences.notifications },
     language: user.preferences.language,
     currency: user.preferences.currency
-  })
-  const [isLoading, setIsLoading] = useState(false)
-  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
   const handleNotificationChange = (key: keyof typeof settings.notifications) => {
     setSettings(prev => ({
@@ -374,20 +377,20 @@ function SettingsTab({ user }: { user: User }) {
         ...prev.notifications,
         [key]: !prev.notifications[key]
       }
-    }))
-  }
+    }));
+  };
 
   const handlePreferenceChange = (key: 'language' | 'currency', value: string) => {
     setSettings(prev => ({
       ...prev,
       [key]: value
-    }))
-  }
+    }));
+  };
 
   const handleSaveSettings = async () => {
-    setIsLoading(true)
-    setMessage(null)
-    
+    setIsLoading(true);
+    setMessage(null);
+
     try {
       const result = await updateUser({
         preferences: {
@@ -396,26 +399,26 @@ function SettingsTab({ user }: { user: User }) {
           currency: settings.currency,
           notifications: settings.notifications
         }
-      })
-      
+      });
+
       if (result.success) {
-        setMessage({ type: 'success', text: '设置已保存' })
+        setMessage({ type: 'success', text: '设置已保存' });
       } else {
-        setMessage({ type: 'error', text: result.error || '保存失败' })
+        setMessage({ type: 'error', text: result.error || '保存失败' });
       }
     } catch (error) {
-      setMessage({ type: 'error', text: '保存失败，请重试' })
+      setMessage({ type: 'error', text: '保存失败，请重试' });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
       {message && (
         <Alert className={`${
-          message.type === 'success' 
-            ? 'border-green-200 bg-green-50 text-green-800' 
+          message.type === 'success'
+            ? 'border-green-200 bg-green-50 text-green-800'
             : 'border-red-200 bg-red-50 text-red-800'
         }`}>
           {message.text}
@@ -434,17 +437,17 @@ function SettingsTab({ user }: { user: User }) {
             </h4>
             <div className="space-y-3">
               <label className="flex items-center">
-                <input 
-                  type="checkbox" 
-                  className="rounded border-gray-300" 
+                <input
+                  type="checkbox"
+                  className="rounded border-gray-300"
                   checked={settings.notifications.email}
                   onChange={() => handleNotificationChange('email')}
                 />
                 <span className="ml-2 text-sm">邮件通知</span>
               </label>
               <label className="flex items-center">
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   className="rounded border-gray-300"
                   checked={settings.notifications.sms}
                   onChange={() => handleNotificationChange('sms')}
@@ -452,8 +455,8 @@ function SettingsTab({ user }: { user: User }) {
                 <span className="ml-2 text-sm">短信通知</span>
               </label>
               <label className="flex items-center">
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   className="rounded border-gray-300"
                   checked={settings.notifications.marketing}
                   onChange={() => handleNotificationChange('marketing')}
@@ -468,8 +471,8 @@ function SettingsTab({ user }: { user: User }) {
             <div className="space-y-3">
               <div>
                 <Label htmlFor="language">语言</Label>
-                <select 
-                  id="language" 
+                <select
+                  id="language"
                   className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md"
                   value={settings.language}
                   onChange={(e) => handlePreferenceChange('language', e.target.value as 'zh' | 'en')}
@@ -480,8 +483,8 @@ function SettingsTab({ user }: { user: User }) {
               </div>
               <div>
                 <Label htmlFor="currency">货币</Label>
-                <select 
-                  id="currency" 
+                <select
+                  id="currency"
                   className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md"
                   value={settings.currency}
                   onChange={(e) => handlePreferenceChange('currency', e.target.value as 'CNY' | 'USD')}
@@ -494,14 +497,14 @@ function SettingsTab({ user }: { user: User }) {
           </div>
 
           <div className="flex gap-3 pt-4 border-t">
-            <Button 
+            <Button
               onClick={handleSaveSettings}
               disabled={isLoading}
             >
               {isLoading ? '保存中...' : '保存设置'}
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="text-red-600 hover:text-red-800"
             >
               修改密码
@@ -510,5 +513,5 @@ function SettingsTab({ user }: { user: User }) {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

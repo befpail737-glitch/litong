@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events'
+import { EventEmitter } from 'events';
 
 export interface IntegrationConfig {
   apiKey?: string
@@ -49,24 +49,24 @@ export interface WebhookPayload {
 }
 
 export abstract class BaseIntegration extends EventEmitter {
-  protected config: IntegrationConfig
-  protected name: string
-  protected version: string
-  protected isConnected: boolean = false
-  protected lastError: Error | null = null
-  protected requestCount: number = 0
-  protected rateLimitWindow: Map<string, number[]> = new Map()
+  protected config: IntegrationConfig;
+  protected name: string;
+  protected version: string;
+  protected isConnected: boolean = false;
+  protected lastError: Error | null = null;
+  protected requestCount: number = 0;
+  protected rateLimitWindow: Map<string, number[]> = new Map();
 
   constructor(name: string, version: string, config: IntegrationConfig) {
-    super()
-    this.name = name
-    this.version = version
+    super();
+    this.name = name;
+    this.version = version;
     this.config = {
       timeout: 30000,
       retryAttempts: 3,
       retryDelay: 1000,
       ...config
-    }
+    };
   }
 
   // Abstract methods that must be implemented by subclasses
@@ -86,9 +86,9 @@ export abstract class BaseIntegration extends EventEmitter {
       retries?: number
     }
   ): Promise<IntegrationResponse<T>> {
-    const startTime = Date.now()
-    const requestId = this.generateRequestId()
-    
+    const startTime = Date.now();
+    const requestId = this.generateRequestId();
+
     try {
       // Check rate limiting
       if (!this.checkRateLimit()) {
@@ -98,7 +98,7 @@ export abstract class BaseIntegration extends EventEmitter {
             code: 'RATE_LIMIT_EXCEEDED',
             message: 'Rate limit exceeded. Please try again later.'
           }
-        }
+        };
       }
 
       const headers = {
@@ -106,11 +106,11 @@ export abstract class BaseIntegration extends EventEmitter {
         'User-Agent': `${this.name}-integration/${this.version}`,
         ...this.config.customHeaders,
         ...options?.headers
-      }
+      };
 
       // Add authentication headers if available
       if (this.config.apiKey) {
-        headers['Authorization'] = `Bearer ${this.config.apiKey}`
+        headers['Authorization'] = `Bearer ${this.config.apiKey}`;
       }
 
       const requestConfig = {
@@ -118,10 +118,10 @@ export abstract class BaseIntegration extends EventEmitter {
         headers,
         timeout: options?.timeout || this.config.timeout,
         ...(data && { body: JSON.stringify(data) })
-      }
+      };
 
-      let lastError: Error | null = null
-      const maxRetries = options?.retries ?? this.config.retryAttempts ?? 3
+      let lastError: Error | null = null;
+      const maxRetries = options?.retries ?? this.config.retryAttempts ?? 3;
 
       for (let attempt = 0; attempt <= maxRetries; attempt++) {
         try {
@@ -131,19 +131,19 @@ export abstract class BaseIntegration extends EventEmitter {
             url,
             attempt: attempt + 1,
             maxRetries: maxRetries + 1
-          })
+          });
 
-          const response = await fetch(url, requestConfig)
-          const responseData = await this.parseResponse<T>(response)
+          const response = await fetch(url, requestConfig);
+          const responseData = await this.parseResponse<T>(response);
 
-          this.requestCount++
+          this.requestCount++;
           this.emit('request:success', {
             requestId,
             method,
             url,
             statusCode: response.status,
             processingTime: Date.now() - startTime
-          })
+          });
 
           return {
             success: true,
@@ -154,11 +154,11 @@ export abstract class BaseIntegration extends EventEmitter {
               rateLimitRemaining: this.getRateLimitRemaining(),
               rateLimitReset: this.getRateLimitReset()
             }
-          }
+          };
 
         } catch (error) {
-          lastError = error instanceof Error ? error : new Error(String(error))
-          
+          lastError = error instanceof Error ? error : new Error(String(error));
+
           this.emit('request:error', {
             requestId,
             method,
@@ -166,10 +166,10 @@ export abstract class BaseIntegration extends EventEmitter {
             attempt: attempt + 1,
             error: lastError.message,
             willRetry: attempt < maxRetries
-          })
+          });
 
           if (attempt < maxRetries) {
-            await this.delay((this.config.retryDelay || 1000) * Math.pow(2, attempt))
+            await this.delay((this.config.retryDelay || 1000) * Math.pow(2, attempt));
           }
         }
       }
@@ -186,18 +186,18 @@ export abstract class BaseIntegration extends EventEmitter {
           requestId,
           processingTime: Date.now() - startTime
         }
-      }
+      };
 
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-      
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
       this.emit('request:error', {
         requestId,
         method,
         url,
         error: errorMessage,
         fatal: true
-      })
+      });
 
       return {
         success: false,
@@ -209,111 +209,111 @@ export abstract class BaseIntegration extends EventEmitter {
           requestId,
           processingTime: Date.now() - startTime
         }
-      }
+      };
     }
   }
 
   protected async parseResponse<T>(response: Response): Promise<T> {
-    const contentType = response.headers.get('content-type')
-    
+    const contentType = response.headers.get('content-type');
+
     if (!response.ok) {
-      let errorBody: any
+      let errorBody: any;
       try {
-        errorBody = contentType?.includes('application/json') 
+        errorBody = contentType?.includes('application/json')
           ? await response.json()
-          : await response.text()
+          : await response.text();
       } catch {
-        errorBody = null
+        errorBody = null;
       }
 
-      throw new Error(`HTTP ${response.status}: ${response.statusText}${errorBody ? ` - ${JSON.stringify(errorBody)}` : ''}`)
+      throw new Error(`HTTP ${response.status}: ${response.statusText}${errorBody ? ` - ${JSON.stringify(errorBody)}` : ''}`);
     }
 
     if (contentType?.includes('application/json')) {
-      return await response.json()
+      return await response.json();
     } else {
-      return await response.text() as unknown as T
+      return await response.text() as unknown as T;
     }
   }
 
   protected checkRateLimit(): boolean {
-    if (!this.config.rateLimiting) return true
+    if (!this.config.rateLimiting) return true;
 
-    const now = Date.now()
-    const windowKey = `${Math.floor(now / 60000)}` // 1-minute window
-    const requests = this.rateLimitWindow.get(windowKey) || []
-    
+    const now = Date.now();
+    const windowKey = `${Math.floor(now / 60000)}`; // 1-minute window
+    const requests = this.rateLimitWindow.get(windowKey) || [];
+
     // Clean old windows
-    const tenMinutesAgo = now - 10 * 60 * 1000
+    const tenMinutesAgo = now - 10 * 60 * 1000;
     for (const [key, timestamps] of this.rateLimitWindow.entries()) {
       if (parseInt(key) * 60000 < tenMinutesAgo) {
-        this.rateLimitWindow.delete(key)
+        this.rateLimitWindow.delete(key);
       }
     }
 
     // Check requests per minute
     if (requests.length >= this.config.rateLimiting.requestsPerMinute) {
-      return false
+      return false;
     }
 
     // Check requests per hour
     const hourRequests = Array.from(this.rateLimitWindow.values())
       .flat()
-      .filter(timestamp => timestamp > now - 60 * 60 * 1000)
-    
+      .filter(timestamp => timestamp > now - 60 * 60 * 1000);
+
     if (hourRequests.length >= this.config.rateLimiting.requestsPerHour) {
-      return false
+      return false;
     }
 
     // Add current request
-    requests.push(now)
-    this.rateLimitWindow.set(windowKey, requests)
-    
-    return true
+    requests.push(now);
+    this.rateLimitWindow.set(windowKey, requests);
+
+    return true;
   }
 
   protected getRateLimitRemaining(): number {
-    if (!this.config.rateLimiting) return -1
+    if (!this.config.rateLimiting) return -1;
 
-    const now = Date.now()
-    const windowKey = `${Math.floor(now / 60000)}`
-    const requests = this.rateLimitWindow.get(windowKey) || []
-    
-    return Math.max(0, this.config.rateLimiting.requestsPerMinute - requests.length)
+    const now = Date.now();
+    const windowKey = `${Math.floor(now / 60000)}`;
+    const requests = this.rateLimitWindow.get(windowKey) || [];
+
+    return Math.max(0, this.config.rateLimiting.requestsPerMinute - requests.length);
   }
 
   protected getRateLimitReset(): number {
-    const now = Date.now()
-    const currentMinute = Math.floor(now / 60000)
-    return (currentMinute + 1) * 60000 // Next minute
+    const now = Date.now();
+    const currentMinute = Math.floor(now / 60000);
+    return (currentMinute + 1) * 60000; // Next minute
   }
 
   protected generateRequestId(): string {
-    return `${this.name}_${Date.now()}_${Math.random().toString(36).substring(7)}`
+    return `${this.name}_${Date.now()}_${Math.random().toString(36).substring(7)}`;
   }
 
   protected delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms))
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   // Webhook handling
   protected verifyWebhookSignature(payload: string, signature: string): boolean {
     if (!this.config.webhookSecret) {
-      throw new Error('Webhook secret not configured')
+      throw new Error('Webhook secret not configured');
     }
 
     // Implementation depends on the specific signature algorithm used by the service
     // This is a placeholder implementation
-    const crypto = require('crypto')
+    const crypto = require('crypto');
     const expectedSignature = crypto
       .createHmac('sha256', this.config.webhookSecret)
       .update(payload, 'utf8')
-      .digest('hex')
+      .digest('hex');
 
     return crypto.timingSafeEqual(
       Buffer.from(signature, 'hex'),
       Buffer.from(expectedSignature, 'hex')
-    )
+    );
   }
 
   protected async processWebhook(payload: WebhookPayload): Promise<IntegrationResponse<void>> {
@@ -323,29 +323,29 @@ export abstract class BaseIntegration extends EventEmitter {
         timestamp: payload.timestamp,
         id: payload.id,
         source: this.name
-      })
+      });
 
       // Process webhook based on event type
-      await this.handleWebhookEvent(payload)
+      await this.handleWebhookEvent(payload);
 
       this.emit('webhook:processed', {
         event: payload.event,
         timestamp: payload.timestamp,
         id: payload.id,
         source: this.name
-      })
+      });
 
-      return { success: true }
+      return { success: true };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-      
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
       this.emit('webhook:error', {
         event: payload.event,
         timestamp: payload.timestamp,
         id: payload.id,
         error: errorMessage,
         source: this.name
-      })
+      });
 
       return {
         success: false,
@@ -353,7 +353,7 @@ export abstract class BaseIntegration extends EventEmitter {
           code: 'WEBHOOK_PROCESSING_ERROR',
           message: errorMessage
         }
-      }
+      };
     }
   }
 
@@ -361,61 +361,61 @@ export abstract class BaseIntegration extends EventEmitter {
 
   // Public methods
   public getName(): string {
-    return this.name
+    return this.name;
   }
 
   public getVersion(): string {
-    return this.version
+    return this.version;
   }
 
   public getConfig(): Partial<IntegrationConfig> {
     // Return config without sensitive information
-    const { apiKey, apiSecret, webhookSecret, ...safeConfig } = this.config
+    const { apiKey, apiSecret, webhookSecret, ...safeConfig } = this.config;
     return {
       ...safeConfig,
       apiKey: apiKey ? '***masked***' : undefined,
       apiSecret: apiSecret ? '***masked***' : undefined,
       webhookSecret: webhookSecret ? '***masked***' : undefined
-    }
+    };
   }
 
   public isHealthy(): boolean {
-    return this.isConnected && !this.lastError
+    return this.isConnected && !this.lastError;
   }
 
   public getLastError(): Error | null {
-    return this.lastError
+    return this.lastError;
   }
 
   public getRequestCount(): number {
-    return this.requestCount
+    return this.requestCount;
   }
 
   public async updateConfig(newConfig: Partial<IntegrationConfig>): Promise<IntegrationResponse<void>> {
     try {
-      this.config = { ...this.config, ...newConfig }
-      
+      this.config = { ...this.config, ...newConfig };
+
       // Validate new configuration
-      const validationResult = await this.validateConfig()
+      const validationResult = await this.validateConfig();
       if (!validationResult.success) {
-        return validationResult
+        return validationResult;
       }
 
       this.emit('config:updated', {
         timestamp: new Date().toISOString(),
         changes: Object.keys(newConfig)
-      })
+      });
 
-      return { success: true }
+      return { success: true };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       return {
         success: false,
         error: {
           code: 'CONFIG_UPDATE_ERROR',
           message: errorMessage
         }
-      }
+      };
     }
   }
 
@@ -436,15 +436,15 @@ export abstract class BaseIntegration extends EventEmitter {
       requestCount: this.requestCount,
       rateLimitRemaining: this.getRateLimitRemaining(),
       lastError: this.lastError?.message || null
-    }
+    };
   }
 
   // Event handling
   public onEvent(event: string, callback: (...args: any[]) => void): void {
-    this.on(event, callback)
+    this.on(event, callback);
   }
 
   public removeEventListener(event: string, callback: (...args: any[]) => void): void {
-    this.off(event, callback)
+    this.off(event, callback);
   }
 }

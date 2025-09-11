@@ -1,13 +1,16 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useInquiry } from '@/contexts/InquiryContext'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { MessageCircle, Send, X, ArrowRight } from 'lucide-react'
+import { useState } from 'react';
+
+import { useRouter } from 'next/navigation';
+
+import { MessageCircle, Send, X, ArrowRight } from 'lucide-react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { useInquiry } from '@/contexts/InquiryContext';
 
 interface QuickInquiryProps {
   productId?: string
@@ -16,9 +19,9 @@ interface QuickInquiryProps {
 }
 
 export function QuickInquiry({ productId, productName, className }: QuickInquiryProps) {
-  const router = useRouter()
-  const { addProduct, updateCompanyInfo, setCurrentStep } = useInquiry()
-  const [isOpen, setIsOpen] = useState(false)
+  const router = useRouter();
+  const { addProduct, updateCompanyInfo, setCurrentStep } = useInquiry();
+  const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
     partNumber: productName || '',
     quantity: 1,
@@ -26,13 +29,13 @@ export function QuickInquiry({ productId, productName, className }: QuickInquiry
     phone: '',
     email: '',
     company: ''
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    
+    e.preventDefault();
+    setIsSubmitting(true);
+
     try {
       // 添加产品到询价系统
       if (formData.partNumber) {
@@ -47,8 +50,8 @@ export function QuickInquiry({ productId, productName, className }: QuickInquiry
           quantity: formData.quantity,
           urgency: 'standard' as const,
           specifications: {}
-        }
-        addProduct(product)
+        };
+        addProduct(product);
       }
 
       // 更新公司信息（如果提供）
@@ -58,28 +61,28 @@ export function QuickInquiry({ productId, productName, className }: QuickInquiry
           contactPerson: formData.contactName || '',
           email: formData.email || '',
           phone: formData.phone || ''
-        })
+        });
       }
 
       // 设置当前步骤并跳转到询价页面
       if (formData.contactName && formData.phone) {
         // 如果基本联系信息已填写，跳到项目信息步骤
-        setCurrentStep('project')
+        setCurrentStep('project');
       } else {
         // 否则跳到公司信息步骤
-        setCurrentStep('company')
+        setCurrentStep('company');
       }
 
       // 跳转到询价页面
-      router.push('/inquiry')
+      router.push('/inquiry');
     } catch (error) {
-      console.error('快速询价处理错误:', error)
-      alert('处理失败，请重试')
+      console.error('快速询价处理错误:', error);
+      alert('处理失败，请重试');
     } finally {
-      setIsSubmitting(false)
-      setIsOpen(false)
+      setIsSubmitting(false);
+      setIsOpen(false);
     }
-  }
+  };
 
   const handleDetailedInquiry = () => {
     // 如果有产品信息，添加到询价系统
@@ -95,19 +98,19 @@ export function QuickInquiry({ productId, productName, className }: QuickInquiry
         quantity: formData.quantity,
         urgency: 'standard' as const,
         specifications: {}
-      }
-      addProduct(product)
+      };
+      addProduct(product);
     }
 
     // 跳转到询价页面
-    setCurrentStep('products')
-    router.push('/inquiry')
-    setIsOpen(false)
-  }
+    setCurrentStep('products');
+    router.push('/inquiry');
+    setIsOpen(false);
+  };
 
   if (!isOpen) {
     return (
-      <Button 
+      <Button
         onClick={() => setIsOpen(true)}
         className={className}
         size="sm"
@@ -115,7 +118,7 @@ export function QuickInquiry({ productId, productName, className }: QuickInquiry
         <MessageCircle className="h-4 w-4 mr-2" />
         快速询价
       </Button>
-    )
+    );
   }
 
   return (
@@ -153,7 +156,7 @@ export function QuickInquiry({ productId, productName, className }: QuickInquiry
                 placeholder="请输入产品型号"
               />
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 需求数量 <span className="text-red-500">*</span>
@@ -216,8 +219,8 @@ export function QuickInquiry({ productId, productName, className }: QuickInquiry
             </div>
 
             <div className="space-y-3 pt-4">
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="w-full"
                 disabled={isSubmitting}
               >
@@ -233,20 +236,20 @@ export function QuickInquiry({ productId, productName, className }: QuickInquiry
                   </>
                 )}
               </Button>
-              
+
               <div className="flex gap-3">
-                <Button 
-                  type="button" 
-                  variant="outline" 
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={() => setIsOpen(false)}
                   className="flex-1"
                   disabled={isSubmitting}
                 >
                   取消
                 </Button>
-                <Button 
-                  type="button" 
-                  variant="outline" 
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={handleDetailedInquiry}
                   className="flex-1"
                   disabled={isSubmitting}
@@ -255,7 +258,7 @@ export function QuickInquiry({ productId, productName, className }: QuickInquiry
                   详细询价
                 </Button>
               </div>
-              
+
               <p className="text-xs text-gray-500 text-center">
                 快速提交直接发送询价，详细询价进入完整表单
               </p>
@@ -264,5 +267,5 @@ export function QuickInquiry({ productId, productName, className }: QuickInquiry
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

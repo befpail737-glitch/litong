@@ -1,7 +1,8 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
-import { Home, Search, ArrowLeft } from 'lucide-react'
+import Link from 'next/link';
+
+import { Home, Search, ArrowLeft } from 'lucide-react';
 
 export default function LocaleNotFound() {
   return (
@@ -37,5 +38,5 @@ export default function LocaleNotFound() {
         </div>
       </div>
     </div>
-  )
+  );
 }

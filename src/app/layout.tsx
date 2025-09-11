@@ -1,5 +1,5 @@
-import type { Metadata } from 'next'
-import './globals.css'
+import type { Metadata } from 'next';
+import './globals.css';
 
 export const metadata: Metadata = {
   title: {
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     google: process.env.GOOGLE_SITE_VERIFICATION,
     yandex: process.env.YANDEX_VERIFICATION,
   },
-}
+};
 
 export default function RootLayout({
   children,
@@ -76,5 +76,5 @@ export default function RootLayout({
         {children}
       </body>
     </html>
-  )
+  );
 }

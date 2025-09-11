@@ -1,8 +1,10 @@
-'use client'
+'use client';
 
-import { Search } from 'lucide-react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { useState, useCallback } from 'react'
+import { useState, useCallback } from 'react';
+
+import { useRouter, useSearchParams } from 'next/navigation';
+
+import { Search } from 'lucide-react';
 
 interface SearchInputProps {
   placeholder: string
@@ -12,26 +14,26 @@ interface SearchInputProps {
 }
 
 export default function SearchInput({ placeholder, defaultValue = '', locale, basePath }: SearchInputProps) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const [searchValue, setSearchValue] = useState(defaultValue)
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [searchValue, setSearchValue] = useState(defaultValue);
 
   const handleSearchChange = useCallback((value: string) => {
-    setSearchValue(value)
-    
-    const current = new URLSearchParams(Array.from(searchParams.entries()))
-    
+    setSearchValue(value);
+
+    const current = new URLSearchParams(Array.from(searchParams.entries()));
+
     if (value.trim()) {
-      current.set('search', value.trim())
+      current.set('search', value.trim());
     } else {
-      current.delete('search')
+      current.delete('search');
     }
-    
-    const search = current.toString()
-    const query = search ? `?${search}` : ''
-    
-    router.replace(`${basePath}${query}`)
-  }, [router, searchParams, basePath])
+
+    const search = current.toString();
+    const query = search ? `?${search}` : '';
+
+    router.replace(`${basePath}${query}`);
+  }, [router, searchParams, basePath]);
 
   return (
     <div className="relative">
@@ -44,5 +46,5 @@ export default function SearchInput({ placeholder, defaultValue = '', locale, ba
         className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
       />
     </div>
-  )
+  );
 }

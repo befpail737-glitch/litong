@@ -1,20 +1,22 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { 
-  MessageCircle, 
-  FileSpreadsheet, 
-  Send, 
+import Link from 'next/link';
+
+import {
+  MessageCircle,
+  FileSpreadsheet,
+  Send,
   Clock,
   CheckCircle2,
   ArrowRight,
   Zap,
   Shield,
   HeadphonesIcon
-} from 'lucide-react'
+} from 'lucide-react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export function InquiryGuide() {
   return (
@@ -198,5 +200,5 @@ export function InquiryGuide() {
         </div>
       </div>
     </section>
-  )
+  );
 }

@@ -1,14 +1,11 @@
-'use client'
+'use client';
 
-import { useState, useMemo } from 'react'
-import { useTranslations } from 'next-intl'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Separator } from '@/components/ui/separator'
-import { 
+import { useState, useMemo } from 'react';
+
+import Image from 'next/image';
+import Link from 'next/link';
+
+import {
   Lightbulb,
   Search,
   Filter,
@@ -23,13 +20,19 @@ import {
   Heart,
   Share2,
   Bookmark
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { useFormatters } from '@/hooks/use-formatters'
-import { getLocalizedValue } from '@/lib/sanity-i18n'
-import type { Locale } from '@/i18n'
-import Link from 'next/link'
-import Image from 'next/image'
+} from 'lucide-react';
+import { useTranslations } from 'next-intl';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import { useFormatters } from '@/hooks/use-formatters';
+import type { Locale } from '@/i18n';
+import { getLocalizedValue } from '@/lib/sanity-i18n';
+import { cn } from '@/lib/utils';
 
 // 解决方案类型定义
 interface Solution {
@@ -94,16 +97,16 @@ export function SolutionList({
   onPageChange,
   className
 }: SolutionListProps) {
-  const t = useTranslations('solutions')
-  const { dateShort, currency } = useFormatters()
-  
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedIndustry, setSelectedIndustry] = useState<string>('all')
-  const [selectedMarket, setSelectedMarket] = useState<string>('all')
-  const [selectedComplexity, setSelectedComplexity] = useState<string>('all')
-  const [selectedStatus, setSelectedStatus] = useState<string>('all')
-  const [sortBy, setSortBy] = useState<'latest' | 'popular' | 'featured' | 'complexity'>('latest')
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const t = useTranslations('solutions');
+  const { dateShort, currency } = useFormatters();
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedIndustry, setSelectedIndustry] = useState<string>('all');
+  const [selectedMarket, setSelectedMarket] = useState<string>('all');
+  const [selectedComplexity, setSelectedComplexity] = useState<string>('all');
+  const [selectedStatus, setSelectedStatus] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<'latest' | 'popular' | 'featured' | 'complexity'>('latest');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   // 目标市场映射
   const targetMarketMap = {
@@ -115,7 +118,7 @@ export function SolutionList({
     'power-energy': { label: t('markets.powerEnergy'), color: 'bg-orange-100 text-orange-800' },
     'aerospace': { label: t('markets.aerospace'), color: 'bg-indigo-100 text-indigo-800' },
     'others': { label: t('markets.others'), color: 'bg-gray-100 text-gray-800' }
-  }
+  };
 
   // 复杂度映射
   const complexityMap = {
@@ -123,7 +126,7 @@ export function SolutionList({
     medium: { label: t('complexity.medium'), color: 'bg-blue-100 text-blue-800' },
     complex: { label: t('complexity.complex'), color: 'bg-orange-100 text-orange-800' },
     'high-complex': { label: t('complexity.highComplex'), color: 'bg-red-100 text-red-800' }
-  }
+  };
 
   // 状态映射
   const statusMap = {
@@ -131,71 +134,71 @@ export function SolutionList({
     testing: { label: t('status.testing'), color: 'bg-blue-100 text-blue-800' },
     released: { label: t('status.released'), color: 'bg-green-100 text-green-800' },
     deprecated: { label: t('status.deprecated'), color: 'bg-gray-100 text-gray-800' }
-  }
+  };
 
   // 过滤解决方案
   const filteredSolutions = useMemo(() => {
     return solutions.filter(solution => {
-      const title = getLocalizedValue(solution.title, locale).toLowerCase()
-      const summary = getLocalizedValue(solution.summary, locale).toLowerCase()
-      const search = searchTerm.toLowerCase()
-      
-      const matchesSearch = !searchTerm || 
-        title.includes(search) || 
+      const title = getLocalizedValue(solution.title, locale).toLowerCase();
+      const summary = getLocalizedValue(solution.summary, locale).toLowerCase();
+      const search = searchTerm.toLowerCase();
+
+      const matchesSearch = !searchTerm ||
+        title.includes(search) ||
         summary.includes(search) ||
-        solution.applications?.some(app => app.toLowerCase().includes(search))
-      
-      const matchesIndustry = selectedIndustry === 'all' || 
-        solution.industries?.some(industry => industry._id === selectedIndustry)
-      
-      const matchesMarket = selectedMarket === 'all' || solution.targetMarket === selectedMarket
-      const matchesComplexity = selectedComplexity === 'all' || solution.complexity === selectedComplexity
-      const matchesStatus = selectedStatus === 'all' || solution.status === selectedStatus
-      
-      return matchesSearch && matchesIndustry && matchesMarket && matchesComplexity && matchesStatus
-    })
-  }, [solutions, searchTerm, selectedIndustry, selectedMarket, selectedComplexity, selectedStatus, locale])
+        solution.applications?.some(app => app.toLowerCase().includes(search));
+
+      const matchesIndustry = selectedIndustry === 'all' ||
+        solution.industries?.some(industry => industry._id === selectedIndustry);
+
+      const matchesMarket = selectedMarket === 'all' || solution.targetMarket === selectedMarket;
+      const matchesComplexity = selectedComplexity === 'all' || solution.complexity === selectedComplexity;
+      const matchesStatus = selectedStatus === 'all' || solution.status === selectedStatus;
+
+      return matchesSearch && matchesIndustry && matchesMarket && matchesComplexity && matchesStatus;
+    });
+  }, [solutions, searchTerm, selectedIndustry, selectedMarket, selectedComplexity, selectedStatus, locale]);
 
   // 排序解决方案
   const sortedSolutions = useMemo(() => {
     return [...filteredSolutions].sort((a, b) => {
       switch (sortBy) {
         case 'popular':
-          return (b.viewCount + b.inquiryCount) - (a.viewCount + a.inquiryCount)
+          return (b.viewCount + b.inquiryCount) - (a.viewCount + a.inquiryCount);
         case 'featured':
-          if (a.isFeatured && !b.isFeatured) return -1
-          if (!a.isFeatured && b.isFeatured) return 1
-          return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+          if (a.isFeatured && !b.isFeatured) return -1;
+          if (!a.isFeatured && b.isFeatured) return 1;
+          return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
         case 'complexity':
-          const complexityOrder = { simple: 1, medium: 2, complex: 3, 'high-complex': 4 }
-          return complexityOrder[a.complexity] - complexityOrder[b.complexity]
+          const complexityOrder = { simple: 1, medium: 2, complex: 3, 'high-complex': 4 };
+          return complexityOrder[a.complexity] - complexityOrder[b.complexity];
         case 'latest':
         default:
-          return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+          return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
       }
-    })
-  }, [filteredSolutions, sortBy])
+    });
+  }, [filteredSolutions, sortBy]);
 
   // 分页计算
-  const totalPages = Math.ceil(sortedSolutions.length / pageSize)
-  const startIndex = (currentPage - 1) * pageSize
-  const paginatedSolutions = sortedSolutions.slice(startIndex, startIndex + pageSize)
+  const totalPages = Math.ceil(sortedSolutions.length / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const paginatedSolutions = sortedSolutions.slice(startIndex, startIndex + pageSize);
 
   const SolutionCard = ({ solution }: { solution: Solution }) => {
-    const title = getLocalizedValue(solution.title, locale)
-    const summary = getLocalizedValue(solution.summary, locale)
-    const marketInfo = targetMarketMap[solution.targetMarket]
-    const complexityInfo = complexityMap[solution.complexity]
-    const statusInfo = statusMap[solution.status]
+    const title = getLocalizedValue(solution.title, locale);
+    const summary = getLocalizedValue(solution.summary, locale);
+    const marketInfo = targetMarketMap[solution.targetMarket];
+    const complexityInfo = complexityMap[solution.complexity];
+    const statusInfo = statusMap[solution.status];
 
     return (
       <Card className={cn(
-        "group hover:shadow-lg transition-all duration-300",
-        viewMode === 'list' && "flex flex-row"
+        'group hover:shadow-lg transition-all duration-300',
+        viewMode === 'list' && 'flex flex-row'
       )}>
         <div className={cn(
-          "relative",
-          viewMode === 'grid' ? "aspect-video" : "w-64 flex-shrink-0"
+          'relative',
+          viewMode === 'grid' ? 'aspect-video' : 'w-64 flex-shrink-0'
         )}>
           {solution.coverImage?.asset && (
             <Image
@@ -215,25 +218,25 @@ export function SolutionList({
           )}
 
           {/* 状态标识 */}
-          <Badge className={cn("absolute top-3 right-3", statusInfo.color)}>
+          <Badge className={cn('absolute top-3 right-3', statusInfo.color)}>
             {statusInfo.label}
           </Badge>
 
           {/* 复杂度指示 */}
           <div className="absolute bottom-3 left-3">
-            <Badge className={cn("text-xs", complexityInfo.color)}>
+            <Badge className={cn('text-xs', complexityInfo.color)}>
               {complexityInfo.label}
             </Badge>
           </div>
         </div>
-        
+
         <div className="flex-1">
-          <CardHeader className={cn(viewMode === 'list' && "py-4")}>
+          <CardHeader className={cn(viewMode === 'list' && 'py-4')}>
             <div className="flex items-center gap-2 mb-2">
               <Badge className={marketInfo.color}>
                 {marketInfo.label}
               </Badge>
-              
+
               {solution.industries && solution.industries.length > 0 && (
                 <Badge variant="outline">
                   {getLocalizedValue(solution.industries[0].name, locale)}
@@ -241,21 +244,21 @@ export function SolutionList({
                 </Badge>
               )}
             </div>
-            
+
             <CardTitle className="line-clamp-2 group-hover:text-primary transition-colors">
               <Link href={`/solutions/${solution.slug.current}`}>
                 {title}
               </Link>
             </CardTitle>
-            
+
             {summary && (
               <CardDescription className="line-clamp-3">
                 {summary}
               </CardDescription>
             )}
           </CardHeader>
-          
-          <CardContent className={cn(viewMode === 'list' && "py-0 pb-4")}>
+
+          <CardContent className={cn(viewMode === 'list' && 'py-0 pb-4')}>
             {/* 技术特性 */}
             {solution.features && solution.features.length > 0 && (
               <div className="flex flex-wrap gap-1 mb-4">
@@ -280,7 +283,7 @@ export function SolutionList({
                   <span>{solution.developmentCycle} {t('days')}</span>
                 </div>
               )}
-              
+
               {solution.costRange && (
                 <div className="flex items-center gap-2">
                   <DollarSign className="w-4 h-4" />
@@ -307,7 +310,7 @@ export function SolutionList({
                   {solution.favoriteCount || 0}
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <Button variant="ghost" size="sm">
                   <Bookmark className="w-4 h-4" />
@@ -325,8 +328,8 @@ export function SolutionList({
           </CardContent>
         </div>
       </Card>
-    )
-  }
+    );
+  };
 
   return (
     <div className={className}>
@@ -343,7 +346,7 @@ export function SolutionList({
               className="pl-10"
             />
           </div>
-          
+
           {/* 过滤器 */}
           <div className="flex flex-wrap gap-2">
             <Select value={selectedIndustry} onValueChange={setSelectedIndustry}>
@@ -359,7 +362,7 @@ export function SolutionList({
                 ))}
               </SelectContent>
             </Select>
-            
+
             <Select value={selectedMarket} onValueChange={setSelectedMarket}>
               <SelectTrigger className="w-48">
                 <SelectValue placeholder={t('selectMarket')} />
@@ -373,7 +376,7 @@ export function SolutionList({
                 ))}
               </SelectContent>
             </Select>
-            
+
             <Select value={selectedComplexity} onValueChange={setSelectedComplexity}>
               <SelectTrigger className="w-40">
                 <SelectValue placeholder={t('selectComplexity')} />
@@ -387,7 +390,7 @@ export function SolutionList({
                 ))}
               </SelectContent>
             </Select>
-            
+
             <Select value={selectedStatus} onValueChange={setSelectedStatus}>
               <SelectTrigger className="w-32">
                 <SelectValue placeholder={t('selectStatus')} />
@@ -403,16 +406,16 @@ export function SolutionList({
             </Select>
           </div>
         </div>
-        
+
         {/* 排序和视图切换 */}
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            {t('showingResults', { 
-              count: sortedSolutions.length, 
-              total: totalCount 
+            {t('showingResults', {
+              count: sortedSolutions.length,
+              total: totalCount
             })}
           </p>
-          
+
           <div className="flex items-center gap-4">
             {/* 排序 */}
             <Select value={sortBy} onValueChange={(value) => setSortBy(value as typeof sortBy)}>
@@ -432,14 +435,14 @@ export function SolutionList({
             {/* 视图切换 */}
             <div className="flex items-center">
               <Button
-                variant={viewMode === 'grid' ? "default" : "outline"}
+                variant={viewMode === 'grid' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setViewMode('grid')}
               >
                 <Grid3X3 className="w-4 h-4" />
               </Button>
               <Button
-                variant={viewMode === 'list' ? "default" : "outline"}
+                variant={viewMode === 'list' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setViewMode('list')}
               >
@@ -460,11 +463,11 @@ export function SolutionList({
             <p className="text-lg font-medium mb-2">{t('noSolutionsFound')}</p>
             <p className="text-muted-foreground mb-4">{t('tryAdjustingFilters')}</p>
             <Button onClick={() => {
-              setSearchTerm('')
-              setSelectedIndustry('all')
-              setSelectedMarket('all')
-              setSelectedComplexity('all')
-              setSelectedStatus('all')
+              setSearchTerm('');
+              setSelectedIndustry('all');
+              setSelectedMarket('all');
+              setSelectedComplexity('all');
+              setSelectedStatus('all');
             }}>
               {t('clearFilters')}
             </Button>
@@ -472,10 +475,10 @@ export function SolutionList({
         </Card>
       ) : (
         <div className={cn(
-          "gap-6",
-          viewMode === 'grid' 
-            ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3" 
-            : "flex flex-col"
+          'gap-6',
+          viewMode === 'grid'
+            ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3'
+            : 'flex flex-col'
         )}>
           {paginatedSolutions.map((solution) => (
             <SolutionCard key={solution._id} solution={solution} />
@@ -493,10 +496,10 @@ export function SolutionList({
           >
             {t('previous')}
           </Button>
-          
+
           <div className="flex items-center gap-1">
             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-              const pageNumber = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i
+              const pageNumber = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
               return (
                 <Button
                   key={pageNumber}
@@ -506,10 +509,10 @@ export function SolutionList({
                 >
                   {pageNumber}
                 </Button>
-              )
+              );
             })}
           </div>
-          
+
           <Button
             variant="outline"
             onClick={() => onPageChange?.(currentPage + 1)}
@@ -585,5 +588,5 @@ export function SolutionList({
         </Card>
       </div>
     </div>
-  )
+  );
 }

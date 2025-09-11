@@ -1,7 +1,7 @@
 /**
  * Cloudflare Pages Deployment System
  * Comprehensive deployment automation for Cloudflare Pages
- * 
+ *
  * Features:
  * - Project deployment configuration and management
  * - Build optimization and environment variable management
@@ -121,41 +121,41 @@ export interface DeploymentResult {
 }
 
 export class CloudflareDeployment {
-  private config: CloudflareDeploymentConfig
-  private apiBaseUrl = 'https://api.cloudflare.com/client/v4'
+  private config: CloudflareDeploymentConfig;
+  private apiBaseUrl = 'https://api.cloudflare.com/client/v4';
 
   constructor(config: CloudflareDeploymentConfig) {
-    this.config = config
+    this.config = config;
   }
 
   // Project Configuration and Setup
   public async setupProject(): Promise<boolean> {
     try {
-      console.log(`Setting up Cloudflare Pages project: ${this.config.project.name}`)
-      
+      console.log(`Setting up Cloudflare Pages project: ${this.config.project.name}`);
+
       // Create or update project
-      await this.createOrUpdateProject()
-      
+      await this.createOrUpdateProject();
+
       // Configure build settings
-      await this.configureBuildSettings()
-      
+      await this.configureBuildSettings();
+
       // Setup environment variables
-      await this.configureEnvironmentVariables()
-      
+      await this.configureEnvironmentVariables();
+
       // Configure custom domains
-      await this.configureDomains()
-      
-      console.log('Project setup completed successfully')
-      return true
+      await this.configureDomains();
+
+      console.log('Project setup completed successfully');
+      return true;
     } catch (error) {
-      console.error('Project setup failed:', error)
-      return false
+      console.error('Project setup failed:', error);
+      return false;
     }
   }
 
   private async createOrUpdateProject(): Promise<void> {
-    console.log('Creating/updating Cloudflare Pages project...')
-    
+    console.log('Creating/updating Cloudflare Pages project...');
+
     const projectConfig = {
       name: this.config.project.name,
       production_branch: this.config.project.productionBranch,
@@ -164,16 +164,16 @@ export class CloudflareDeployment {
         destination_dir: this.config.project.buildOutputDirectory,
         root_dir: this.config.project.rootDirectory || ''
       }
-    }
+    };
 
     // Mock API call - in real implementation, this would call Cloudflare API
-    await this.makeCloudflareAPICall('POST', '/pages/projects', projectConfig)
-    console.log('Project configuration updated')
+    await this.makeCloudflareAPICall('POST', '/pages/projects', projectConfig);
+    console.log('Project configuration updated');
   }
 
   private async configureBuildSettings(): Promise<void> {
-    console.log('Configuring build optimization settings...')
-    
+    console.log('Configuring build optimization settings...');
+
     const buildConfig = {
       build_command: this.config.project.buildCommand,
       build_output_directory: this.config.project.buildOutputDirectory,
@@ -183,82 +183,82 @@ export class CloudflareDeployment {
       npm_version: '9',
       build_caching: true,
       skip_build: false
-    }
+    };
 
     await this.makeCloudflareAPICall('PATCH', `/pages/projects/${this.config.project.name}`, {
       build_config: buildConfig
-    })
-    
-    console.log('Build settings configured')
+    });
+
+    console.log('Build settings configured');
   }
 
   private async configureEnvironmentVariables(): Promise<void> {
-    console.log('Setting up environment variables...')
-    
+    console.log('Setting up environment variables...');
+
     for (const [key, value] of Object.entries(this.config.project.environmentVariables)) {
       await this.makeCloudflareAPICall('POST', `/pages/projects/${this.config.project.name}/env-vars`, {
         name: key,
         value: value,
         type: 'secret_text'
-      })
-      console.log(`Environment variable set: ${key}`)
+      });
+      console.log(`Environment variable set: ${key}`);
     }
   }
 
   // Domain and SSL Configuration
   private async configureDomains(): Promise<void> {
-    console.log('Configuring custom domains and SSL...')
-    
+    console.log('Configuring custom domains and SSL...');
+
     // Setup custom domain
-    await this.setupCustomDomain(this.config.domains.customDomain)
-    
+    await this.setupCustomDomain(this.config.domains.customDomain);
+
     // Setup subdomains
     for (const subdomain of this.config.domains.subdomains) {
-      await this.setupCustomDomain(subdomain)
+      await this.setupCustomDomain(subdomain);
     }
-    
+
     // Configure SSL certificates
-    await this.configureSSLCertificates()
-    
-    console.log('Domain configuration completed')
+    await this.configureSSLCertificates();
+
+    console.log('Domain configuration completed');
   }
 
   private async setupCustomDomain(domain: string): Promise<void> {
-    console.log(`Setting up custom domain: ${domain}`)
-    
+    console.log(`Setting up custom domain: ${domain}`);
+
     const domainConfig = {
       name: domain,
       type: 'custom'
-    }
+    };
 
-    await this.makeCloudflareAPICall('POST', `/pages/projects/${this.config.project.name}/domains`, domainConfig)
-    
+    await this.makeCloudflareAPICall('POST', `/pages/projects/${this.config.project.name}/domains`, domainConfig);
+
     // Verify domain DNS settings
-    await this.verifyDomainDNS(domain)
+    await this.verifyDomainDNS(domain);
   }
 
   private async verifyDomainDNS(domain: string): Promise<boolean> {
-    console.log(`Verifying DNS configuration for: ${domain}`)
-    
+    console.log(`Verifying DNS configuration for: ${domain}`);
+
     // Mock DNS verification - in real implementation, this would check actual DNS records
     const dnsRecords = [
       { type: 'CNAME', name: domain, value: `${this.config.project.name}.pages.dev` },
       { type: 'TXT', name: `_cf-pages-verify.${domain}`, value: 'verification-token' }
-    ]
+    ];
 
     for (const record of dnsRecords) {
-      console.log(`Verifying ${record.type} record for ${record.name}`)
+      console.log(`Verifying ${record.type} record for ${record.name}`);
       // Mock verification
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise(resolve => setTimeout(resolve, 100));
     }
 
-    console.log(`DNS verification completed for: ${domain}`)
-    return true
+    console.log(`DNS verification completed for: ${domain}`);
+    return true;
   }
 
   private async configureSSLCertificates(): Promise<void> {
-    console.log('Configuring SSL certificates...')
-    
+    console.log('Configuring SSL certificates...');
+
     const sslConfig = {
       certificate_type: this.config.domains.certificateSettings.type,
       minimum_tls_version: this.config.domains.certificateSettings.minimumTLSVersion,
@@ -271,52 +271,52 @@ export class CloudflareDeployment {
         include_subdomains: this.config.domains.certificateSettings.includeSubdomains,
         preload: this.config.domains.certificateSettings.preload
       }
-    }
+    };
 
-    await this.makeCloudflareAPICall('PATCH', `/zones/${this.getZoneId()}/settings/ssl`, sslConfig)
-    console.log('SSL certificates configured')
+    await this.makeCloudflareAPICall('PATCH', `/zones/${this.getZoneId()}/settings/ssl`, sslConfig);
+    console.log('SSL certificates configured');
   }
 
   // Security Configuration
   public async configureSecuritySettings(): Promise<boolean> {
     try {
-      console.log('Configuring security settings...')
-      
+      console.log('Configuring security settings...');
+
       // Setup DDoS protection
-      await this.configureDDoSProtection()
-      
+      await this.configureDDoSProtection();
+
       // Configure security headers
-      await this.configureSecurityHeaders()
-      
+      await this.configureSecurityHeaders();
+
       // Setup WAF rules
-      await this.configureWAFRules()
-      
-      console.log('Security configuration completed')
-      return true
+      await this.configureWAFRules();
+
+      console.log('Security configuration completed');
+      return true;
     } catch (error) {
-      console.error('Security configuration failed:', error)
-      return false
+      console.error('Security configuration failed:', error);
+      return false;
     }
   }
 
   private async configureDDoSProtection(): Promise<void> {
-    console.log('Setting up DDoS protection...')
-    
+    console.log('Setting up DDoS protection...');
+
     const ddosConfig = {
       security_level: this.config.security.ddosProtection.mode,
       challenge_ttl: this.config.security.ddosProtection.challengePassage,
       browser_check: this.config.security.ddosProtection.jsChallenge,
       managed_challenge: this.config.security.ddosProtection.managedChallenge
-    }
+    };
 
-    await this.makeCloudflareAPICall('PATCH', `/zones/${this.getZoneId()}/settings/security_level`, ddosConfig)
-    console.log('DDoS protection configured')
+    await this.makeCloudflareAPICall('PATCH', `/zones/${this.getZoneId()}/settings/security_level`, ddosConfig);
+    console.log('DDoS protection configured');
   }
 
   private async configureSecurityHeaders(): Promise<void> {
-    console.log('Configuring security headers...')
-    
-    const headers = this.config.security.securityHeaders
+    console.log('Configuring security headers...');
+
+    const headers = this.config.security.securityHeaders;
     const headerRules = [
       {
         name: 'Content-Security-Policy',
@@ -342,7 +342,7 @@ export class CloudflareDeployment {
         name: 'Permissions-Policy',
         value: headers.permissionsPolicy
       }
-    ]
+    ];
 
     for (const header of headerRules) {
       await this.makeCloudflareAPICall('POST', `/zones/${this.getZoneId()}/page_rules`, {
@@ -359,14 +359,14 @@ export class CloudflareDeployment {
             [header.name]: header.value
           }
         }]
-      })
-      console.log(`Security header configured: ${header.name}`)
+      });
+      console.log(`Security header configured: ${header.name}`);
     }
   }
 
   private async configureWAFRules(): Promise<void> {
-    console.log('Setting up WAF rules...')
-    
+    console.log('Setting up WAF rules...');
+
     for (const rule of this.config.security.wafRules) {
       const wafRuleConfig = {
         expression: rule.expression,
@@ -374,38 +374,38 @@ export class CloudflareDeployment {
         description: rule.description,
         enabled: rule.enabled,
         priority: rule.priority
-      }
+      };
 
-      await this.makeCloudflareAPICall('POST', `/zones/${this.getZoneId()}/firewall/rules`, wafRuleConfig)
-      console.log(`WAF rule configured: ${rule.description}`)
+      await this.makeCloudflareAPICall('POST', `/zones/${this.getZoneId()}/firewall/rules`, wafRuleConfig);
+      console.log(`WAF rule configured: ${rule.description}`);
     }
   }
 
   // CDN and Caching Configuration
   public async configureCDNAndCaching(): Promise<boolean> {
     try {
-      console.log('Configuring CDN and caching...')
-      
+      console.log('Configuring CDN and caching...');
+
       // Setup global CDN
-      await this.configureGlobalCDN()
-      
+      await this.configureGlobalCDN();
+
       // Configure caching strategy
-      await this.configureCachingStrategy()
-      
+      await this.configureCachingStrategy();
+
       // Setup cache rules
-      await this.configureCacheRules()
-      
-      console.log('CDN and caching configuration completed')
-      return true
+      await this.configureCacheRules();
+
+      console.log('CDN and caching configuration completed');
+      return true;
     } catch (error) {
-      console.error('CDN and caching configuration failed:', error)
-      return false
+      console.error('CDN and caching configuration failed:', error);
+      return false;
     }
   }
 
   private async configureGlobalCDN(): Promise<void> {
-    console.log('Setting up global CDN...')
-    
+    console.log('Setting up global CDN...');
+
     const cdnConfig = {
       development_mode: this.config.caching.strategy.developmentMode,
       cache_level: this.config.caching.strategy.cacheLevel,
@@ -416,16 +416,16 @@ export class CloudflareDeployment {
         tiered_caching: true,
         smart_routing: true
       }
-    }
+    };
 
-    await this.makeCloudflareAPICall('PATCH', `/zones/${this.getZoneId()}/settings/cache_level`, cdnConfig)
-    console.log('Global CDN configured')
+    await this.makeCloudflareAPICall('PATCH', `/zones/${this.getZoneId()}/settings/cache_level`, cdnConfig);
+    console.log('Global CDN configured');
   }
 
   private async configureCachingStrategy(): Promise<void> {
-    console.log('Setting up caching strategy...')
-    
-    const strategy = this.config.caching.strategy
+    console.log('Setting up caching strategy...');
+
+    const strategy = this.config.caching.strategy;
     const cachingRules = [
       {
         url: '*.css',
@@ -452,7 +452,7 @@ export class CloudflareDeployment {
         cacheTTL: 86400, // 1 day
         browserTTL: 86400
       }
-    ]
+    ];
 
     for (const rule of cachingRules) {
       await this.makeCloudflareAPICall('POST', `/zones/${this.getZoneId()}/page_rules`, {
@@ -470,14 +470,14 @@ export class CloudflareDeployment {
           id: 'browser_cache_ttl',
           value: rule.browserTTL
         }]
-      })
-      console.log(`Caching rule configured for: ${rule.url}`)
+      });
+      console.log(`Caching rule configured for: ${rule.url}`);
     }
   }
 
   private async configureCacheRules(): Promise<void> {
-    console.log('Setting up custom cache rules...')
-    
+    console.log('Setting up custom cache rules...');
+
     for (const rule of this.config.caching.rules) {
       const cacheRuleConfig = {
         expression: `http.request.uri.path matches "${rule.url}"`,
@@ -498,18 +498,18 @@ export class CloudflareDeployment {
             default: rule.browserTTL
           }
         }
-      }
+      };
 
-      await this.makeCloudflareAPICall('POST', `/zones/${this.getZoneId()}/rulesets/phases/http_request_cache_settings/entrypoint`, cacheRuleConfig)
-      console.log(`Custom cache rule configured: ${rule.id}`)
+      await this.makeCloudflareAPICall('POST', `/zones/${this.getZoneId()}/rulesets/phases/http_request_cache_settings/entrypoint`, cacheRuleConfig);
+      console.log(`Custom cache rule configured: ${rule.id}`);
     }
   }
 
   // Deployment Execution
   public async deployToProduction(gitCommitSHA?: string): Promise<DeploymentResult> {
-    const startTime = Date.now()
-    console.log('Starting production deployment...')
-    
+    const startTime = Date.now();
+    console.log('Starting production deployment...');
+
     const result: DeploymentResult = {
       success: false,
       deploymentId: `deploy-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
@@ -525,94 +525,94 @@ export class CloudflareDeployment {
         securityScore: 0,
         vulnerabilities: []
       }
-    }
+    };
 
     try {
       // Trigger build and deployment
-      result.buildLog.push('Starting build process...')
-      const buildSuccess = await this.triggerBuild(gitCommitSHA)
-      
+      result.buildLog.push('Starting build process...');
+      const buildSuccess = await this.triggerBuild(gitCommitSHA);
+
       if (!buildSuccess) {
-        result.errors.push('Build process failed')
-        return result
+        result.errors.push('Build process failed');
+        return result;
       }
 
-      result.buildLog.push('Build completed successfully')
-      result.performance.buildTime = Date.now() - startTime
+      result.buildLog.push('Build completed successfully');
+      result.performance.buildTime = Date.now() - startTime;
 
       // Deploy to production
-      result.buildLog.push('Deploying to production...')
-      const deploySuccess = await this.deployBuild(result.deploymentId)
-      
+      result.buildLog.push('Deploying to production...');
+      const deploySuccess = await this.deployBuild(result.deploymentId);
+
       if (!deploySuccess) {
-        result.errors.push('Deployment failed')
-        return result
+        result.errors.push('Deployment failed');
+        return result;
       }
 
-      result.buildLog.push('Deployment completed successfully')
-      result.performance.deployTime = Date.now() - startTime - result.performance.buildTime
+      result.buildLog.push('Deployment completed successfully');
+      result.performance.deployTime = Date.now() - startTime - result.performance.buildTime;
 
       // Run post-deployment checks
-      await this.runPostDeploymentChecks(result)
+      await this.runPostDeploymentChecks(result);
 
-      result.success = true
-      console.log(`Deployment completed successfully: ${result.deploymentId}`)
-      
+      result.success = true;
+      console.log(`Deployment completed successfully: ${result.deploymentId}`);
+
     } catch (error) {
-      result.errors.push(error.message)
-      console.error('Deployment failed:', error)
+      result.errors.push(error.message);
+      console.error('Deployment failed:', error);
     }
 
-    return result
+    return result;
   }
 
   private async triggerBuild(commitSHA?: string): Promise<boolean> {
-    console.log('Triggering build process...')
-    
+    console.log('Triggering build process...');
+
     const buildConfig = {
       branch: this.config.project.productionBranch,
       commit_sha: commitSHA,
       force_build: true
-    }
+    };
 
-    const buildResult = await this.makeCloudflareAPICall('POST', `/pages/projects/${this.config.project.name}/deployments`, buildConfig)
-    
+    const buildResult = await this.makeCloudflareAPICall('POST', `/pages/projects/${this.config.project.name}/deployments`, buildConfig);
+
     // Mock build process
-    console.log('Running build commands...')
-    await new Promise(resolve => setTimeout(resolve, 2000)) // Simulate build time
-    
-    return buildResult.success
+    console.log('Running build commands...');
+    await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate build time
+
+    return buildResult.success;
   }
 
   private async deployBuild(deploymentId: string): Promise<boolean> {
-    console.log(`Deploying build: ${deploymentId}`)
-    
+    console.log(`Deploying build: ${deploymentId}`);
+
     // Mock deployment process
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    console.log('Deployment completed')
-    return true
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    console.log('Deployment completed');
+    return true;
   }
 
   private async runPostDeploymentChecks(result: DeploymentResult): Promise<void> {
-    console.log('Running post-deployment checks...')
-    
+    console.log('Running post-deployment checks...');
+
     // SSL verification
-    result.security.sslStatus = await this.verifySSLStatus()
-    
+    result.security.sslStatus = await this.verifySSLStatus();
+
     // Performance checks
-    result.performance.firstContentfulPaint = await this.measurePerformanceMetric('fcp')
-    result.performance.largestContentfulPaint = await this.measurePerformanceMetric('lcp')
-    
+    result.performance.firstContentfulPaint = await this.measurePerformanceMetric('fcp');
+    result.performance.largestContentfulPaint = await this.measurePerformanceMetric('lcp');
+
     // Security scan
-    result.security.securityScore = await this.runSecurityScan()
-    
-    console.log('Post-deployment checks completed')
+    result.security.securityScore = await this.runSecurityScan();
+
+    console.log('Post-deployment checks completed');
   }
 
   private async verifySSLStatus(): Promise<string> {
     // Mock SSL verification
-    return 'active'
+    return 'active';
   }
 
   private async measurePerformanceMetric(metric: string): Promise<number> {
@@ -620,84 +620,84 @@ export class CloudflareDeployment {
     const metrics = {
       fcp: Math.random() * 2000 + 500, // 500-2500ms
       lcp: Math.random() * 3000 + 1000  // 1000-4000ms
-    }
-    return metrics[metric] || 0
+    };
+    return metrics[metric] || 0;
   }
 
   private async runSecurityScan(): Promise<number> {
     // Mock security scanning
-    return Math.floor(Math.random() * 20) + 80 // 80-100 security score
+    return Math.floor(Math.random() * 20) + 80; // 80-100 security score
   }
 
   // Cache Management
   public async purgeCache(config?: Partial<CachePurgeConfig>): Promise<boolean> {
     try {
-      console.log('Purging cache...')
-      
+      console.log('Purging cache...');
+
       const purgeConfig = {
         ...this.config.caching.purgeSettings,
         ...config
-      }
+      };
 
       if (purgeConfig.purgeEverything) {
         await this.makeCloudflareAPICall('POST', `/zones/${this.getZoneId()}/purge_cache`, {
           purge_everything: true
-        })
-        console.log('All cache purged')
+        });
+        console.log('All cache purged');
       } else {
-        const purgeParams: any = {}
-        
+        const purgeParams: any = {};
+
         if (purgeConfig.purgeByURL.length > 0) {
-          purgeParams.files = purgeConfig.purgeByURL
-        }
-        
-        if (purgeConfig.purgeByTag.length > 0) {
-          purgeParams.tags = purgeConfig.purgeByTag
-        }
-        
-        if (purgeConfig.purgeByHost.length > 0) {
-          purgeParams.hosts = purgeConfig.purgeByHost
+          purgeParams.files = purgeConfig.purgeByURL;
         }
 
-        await this.makeCloudflareAPICall('POST', `/zones/${this.getZoneId()}/purge_cache`, purgeParams)
-        console.log('Selective cache purge completed')
+        if (purgeConfig.purgeByTag.length > 0) {
+          purgeParams.tags = purgeConfig.purgeByTag;
+        }
+
+        if (purgeConfig.purgeByHost.length > 0) {
+          purgeParams.hosts = purgeConfig.purgeByHost;
+        }
+
+        await this.makeCloudflareAPICall('POST', `/zones/${this.getZoneId()}/purge_cache`, purgeParams);
+        console.log('Selective cache purge completed');
       }
 
-      return true
+      return true;
     } catch (error) {
-      console.error('Cache purge failed:', error)
-      return false
+      console.error('Cache purge failed:', error);
+      return false;
     }
   }
 
   // Utility Methods
   private async makeCloudflareAPICall(method: string, endpoint: string, data?: any): Promise<any> {
     // Mock Cloudflare API call
-    console.log(`${method} ${this.apiBaseUrl}${endpoint}`)
+    console.log(`${method} ${this.apiBaseUrl}${endpoint}`);
     if (data) {
-      console.log('Request data:', JSON.stringify(data, null, 2))
+      console.log('Request data:', JSON.stringify(data, null, 2));
     }
-    
+
     // Simulate API response delay
-    await new Promise(resolve => setTimeout(resolve, 100))
-    
-    return { success: true, result: data }
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    return { success: true, result: data };
   }
 
   private getZoneId(): string {
     // Mock zone ID - in real implementation, this would be retrieved from Cloudflare
-    return 'zone-id-mock'
+    return 'zone-id-mock';
   }
 
   public getDeploymentStatus(deploymentId: string): Promise<any> {
-    return this.makeCloudflareAPICall('GET', `/pages/projects/${this.config.project.name}/deployments/${deploymentId}`)
+    return this.makeCloudflareAPICall('GET', `/pages/projects/${this.config.project.name}/deployments/${deploymentId}`);
   }
 
   public rollbackDeployment(deploymentId: string): Promise<boolean> {
-    console.log(`Rolling back deployment: ${deploymentId}`)
+    console.log(`Rolling back deployment: ${deploymentId}`);
     return this.makeCloudflareAPICall('POST', `/pages/projects/${this.config.project.name}/deployments/${deploymentId}/rollback`)
       .then(() => true)
-      .catch(() => false)
+      .catch(() => false);
   }
 }
 
@@ -805,5 +805,5 @@ export function createProductionDeploymentConfig(): CloudflareDeploymentConfig {
         purgeByHost: []
       }
     }
-  }
+  };
 }

@@ -1,25 +1,27 @@
-'use client'
+'use client';
 
-import React from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { 
-  CheckCircle, 
-  XCircle, 
-  AlertTriangle, 
-  Info, 
+import React from 'react';
+
+import {
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+  Info,
   BarChart3,
   Languages,
   FileText,
   RefreshCw
-} from 'lucide-react'
-import { TranslationValidator, TranslationIssue, TranslationStats, validationRules } from '@/lib/translation-validator'
-import { LocalizedString } from '@/lib/sanity-i18n'
-import { locales } from '@/i18n'
+} from 'lucide-react';
+
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { locales } from '@/i18n';
+import { LocalizedString } from '@/lib/sanity-i18n';
+import { TranslationValidator, TranslationIssue, TranslationStats, validationRules } from '@/lib/translation-validator';
 
 interface TranslationQualityCheckProps {
   data: Record<string, LocalizedString>
@@ -28,72 +30,72 @@ interface TranslationQualityCheckProps {
   className?: string
 }
 
-export function TranslationQualityCheck({ 
-  data, 
+export function TranslationQualityCheck({
+  data,
   entityName = '内容',
   onRefresh,
-  className 
+  className
 }: TranslationQualityCheckProps) {
-  const validator = new TranslationValidator()
-  
+  const validator = new TranslationValidator();
+
   // 使用预设规则验证数据
   const rules = {
     title: validationRules.productName,
     description: validationRules.productDescription,
     seoTitle: validationRules.seoTitle,
     seoDescription: validationRules.seoDescription,
-  }
-  
-  const stats = validator.validateMultipleFields(data, rules)
+  };
+
+  const stats = validator.validateMultipleFields(data, rules);
 
   // 按严重程度分组问题
   const groupedIssues = {
     error: stats.issues.filter(issue => issue.severity === 'error'),
     warning: stats.issues.filter(issue => issue.severity === 'warning'),
     info: stats.issues.filter(issue => issue.severity === 'info'),
-  }
+  };
 
   // 按语言分组问题
   const issuesByLocale = locales.reduce((acc, locale) => {
-    acc[locale] = stats.issues.filter(issue => issue.locale === locale)
-    return acc
-  }, {} as Record<string, TranslationIssue[]>)
+    acc[locale] = stats.issues.filter(issue => issue.locale === locale);
+    return acc;
+  }, {} as Record<string, TranslationIssue[]>);
 
   // 获取完成度最低的语言
   const localeCompleteness = locales.map(locale => {
-    const totalFields = Object.keys(data).length
-    const translatedFields = Object.values(data).filter(field => field?.[locale]?.trim()).length
-    const completionRate = totalFields > 0 ? (translatedFields / totalFields) * 100 : 0
-    
+    const totalFields = Object.keys(data).length;
+    const translatedFields = Object.values(data).filter(field => field?.[locale]?.trim()).length;
+    const completionRate = totalFields > 0 ? (translatedFields / totalFields) * 100 : 0;
+
     return {
       locale,
       completionRate,
       translatedFields,
       totalFields,
-    }
-  }).sort((a, b) => a.completionRate - b.completionRate)
+    };
+  }).sort((a, b) => a.completionRate - b.completionRate);
 
   const getSeverityIcon = (severity: TranslationIssue['severity']) => {
     switch (severity) {
       case 'error':
-        return <XCircle className="h-4 w-4 text-red-500" />
+        return <XCircle className="h-4 w-4 text-red-500" />;
       case 'warning':
-        return <AlertTriangle className="h-4 w-4 text-yellow-500" />
+        return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
       case 'info':
-        return <Info className="h-4 w-4 text-blue-500" />
+        return <Info className="h-4 w-4 text-blue-500" />;
     }
-  }
+  };
 
   const getSeverityColor = (severity: TranslationIssue['severity']) => {
     switch (severity) {
       case 'error':
-        return 'destructive'
+        return 'destructive';
       case 'warning':
-        return 'default'
+        return 'default';
       case 'info':
-        return 'secondary'
+        return 'secondary';
     }
-  }
+  };
 
   const getLocaleDisplayName = (locale: string) => {
     const localeNames: Record<string, string> = {
@@ -107,9 +109,9 @@ export function TranslationQualityCheck({
       'es': 'Español',
       'ru': 'Русский',
       'ar': 'العربية'
-    }
-    return localeNames[locale] || locale
-  }
+    };
+    return localeNames[locale] || locale;
+  };
 
   return (
     <div className={className}>
@@ -311,5 +313,5 @@ export function TranslationQualityCheck({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

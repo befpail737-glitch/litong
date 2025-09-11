@@ -1,15 +1,18 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Checkbox } from '@/components/ui/checkbox'
-import { X, Plus, Send, ShoppingCart, User, Mail, Phone, Building } from 'lucide-react'
+import { useState, useEffect } from 'react';
+
+import { useRouter, useSearchParams } from 'next/navigation';
+
+import { X, Plus, Send, ShoppingCart, User, Mail, Phone, Building } from 'lucide-react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 
 interface BulkInquiryProduct {
   id: string
@@ -38,7 +41,7 @@ const mockProductsData = {
     pricing: { tiers: [{ price: 25.50 }] }
   },
   '2': {
-    id: '2', 
+    id: '2',
     partNumber: 'STM32F103C8T6',
     title: 'STM32F103C8T6 ARM Cortex-M3 微控制器',
     brand: { name: 'STMicroelectronics' },
@@ -46,16 +49,16 @@ const mockProductsData = {
   },
   '3': {
     id: '3',
-    partNumber: 'ESP32-WROOM-32', 
+    partNumber: 'ESP32-WROOM-32',
     title: 'ESP32-WROOM-32 WiFi+蓝牙模块',
     brand: { name: 'Espressif' },
     pricing: { tiers: [{ price: 32.00 }] }
   }
-}
+};
 
 export function BulkInquiry({ initialProducts = [], onSubmit, onCancel }: BulkInquiryProps) {
-  const searchParams = useSearchParams()
-  const router = useRouter()
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
   const [formData, setFormData] = useState({
     // 联系信息
@@ -65,29 +68,29 @@ export function BulkInquiry({ initialProducts = [], onSubmit, onCancel }: BulkIn
     phone: '',
     position: '',
     address: '',
-    
+
     // 询价信息
     inquiryType: 'bulk', // bulk, quote, sample
     projectName: '',
     estimatedVolume: '',
     targetDate: '',
     budgetRange: '',
-    
+
     // 其他要求
     requiresCertification: false,
     requiresCustomPackaging: false,
     requiresTechnicalSupport: false,
     additionalRequirements: '',
-  })
+  });
 
-  const [products, setProducts] = useState<BulkInquiryProduct[]>([])
+  const [products, setProducts] = useState<BulkInquiryProduct[]>([]);
 
   useEffect(() => {
     // 从URL参数或props获取产品
-    const productParams = searchParams.get('products')?.split(',') || []
+    const productParams = searchParams.get('products')?.split(',') || [];
     const urlProducts = productParams
       .map(id => {
-        const product = mockProductsData[id as keyof typeof mockProductsData]
+        const product = mockProductsData[id as keyof typeof mockProductsData];
         if (product) {
           return {
             id: product.id,
@@ -97,16 +100,16 @@ export function BulkInquiry({ initialProducts = [], onSubmit, onCancel }: BulkIn
             quantity: 1,
             urgency: 'normal' as const,
             notes: ''
-          }
+          };
         }
-        return null
+        return null;
       })
-      .filter(Boolean) as BulkInquiryProduct[]
+      .filter(Boolean) as BulkInquiryProduct[];
 
     if (urlProducts.length > 0) {
-      setProducts(urlProducts)
+      setProducts(urlProducts);
     } else if (initialProducts.length > 0) {
-      setProducts(initialProducts)
+      setProducts(initialProducts);
     } else {
       // 默认添加一个空产品行
       setProducts([{
@@ -117,9 +120,9 @@ export function BulkInquiry({ initialProducts = [], onSubmit, onCancel }: BulkIn
         quantity: 1,
         urgency: 'normal',
         notes: ''
-      }])
+      }]);
     }
-  }, [searchParams, initialProducts])
+  }, [searchParams, initialProducts]);
 
   const addProduct = () => {
     const newProduct: BulkInquiryProduct = {
@@ -130,44 +133,44 @@ export function BulkInquiry({ initialProducts = [], onSubmit, onCancel }: BulkIn
       quantity: 1,
       urgency: 'normal',
       notes: ''
-    }
-    setProducts(prev => [...prev, newProduct])
-  }
+    };
+    setProducts(prev => [...prev, newProduct]);
+  };
 
   const removeProduct = (id: string) => {
-    setProducts(prev => prev.filter(p => p.id !== id))
-  }
+    setProducts(prev => prev.filter(p => p.id !== id));
+  };
 
   const updateProduct = (id: string, field: keyof BulkInquiryProduct, value: any) => {
-    setProducts(prev => prev.map(p => 
+    setProducts(prev => prev.map(p =>
       p.id === id ? { ...p, [field]: value } : p
-    ))
-  }
+    ));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     const submissionData = {
       ...formData,
       products,
       totalItems: products.reduce((sum, p) => sum + p.quantity, 0),
       submittedAt: new Date().toISOString()
-    }
-    
-    onSubmit?.(submissionData)
-    
-    // 模拟提交成功
-    alert('批量询价单提交成功！我们将在24小时内回复您。')
-    
-    // 可以跳转到提交成功页面
-    router.push('/inquiry/success')
-  }
+    };
 
-  const totalQuantity = products.reduce((sum, product) => sum + product.quantity, 0)
+    onSubmit?.(submissionData);
+
+    // 模拟提交成功
+    alert('批量询价单提交成功！我们将在24小时内回复您。');
+
+    // 可以跳转到提交成功页面
+    router.push('/inquiry/success');
+  };
+
+  const totalQuantity = products.reduce((sum, product) => sum + product.quantity, 0);
   const estimatedTotal = products.reduce((sum, product) => {
-    const productData = mockProductsData[product.id as keyof typeof mockProductsData]
-    const price = productData?.pricing?.tiers[0]?.price || 0
-    return sum + (price * product.quantity)
-  }, 0)
+    const productData = mockProductsData[product.id as keyof typeof mockProductsData];
+    const price = productData?.pricing?.tiers[0]?.price || 0;
+    return sum + (price * product.quantity);
+  }, 0);
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
@@ -215,7 +218,7 @@ export function BulkInquiry({ initialProducts = [], onSubmit, onCancel }: BulkIn
                             <X className="h-4 w-4" />
                           </Button>
                         )}
-                        
+
                         <div className="space-y-4">
                           <div className="flex items-center gap-2 text-sm text-gray-600">
                             <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-semibold">
@@ -223,7 +226,7 @@ export function BulkInquiry({ initialProducts = [], onSubmit, onCancel }: BulkIn
                             </span>
                             产品信息
                           </div>
-                          
+
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -247,7 +250,7 @@ export function BulkInquiry({ initialProducts = [], onSubmit, onCancel }: BulkIn
                               />
                             </div>
                           </div>
-                          
+
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                               产品描述
@@ -258,7 +261,7 @@ export function BulkInquiry({ initialProducts = [], onSubmit, onCancel }: BulkIn
                               placeholder="产品详细描述"
                             />
                           </div>
-                          
+
                           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -288,8 +291,8 @@ export function BulkInquiry({ initialProducts = [], onSubmit, onCancel }: BulkIn
                               <label className="block text-sm font-medium text-gray-700 mb-1">
                                 紧急程度
                               </label>
-                              <Select 
-                                value={product.urgency} 
+                              <Select
+                                value={product.urgency}
                                 onValueChange={(value) => updateProduct(product.id, 'urgency', value)}
                               >
                                 <SelectTrigger>
@@ -303,7 +306,7 @@ export function BulkInquiry({ initialProducts = [], onSubmit, onCancel }: BulkIn
                               </Select>
                             </div>
                           </div>
-                          
+
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                               备注
@@ -371,7 +374,7 @@ export function BulkInquiry({ initialProducts = [], onSubmit, onCancel }: BulkIn
                     />
                   </div>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     补充说明
@@ -476,16 +479,16 @@ export function BulkInquiry({ initialProducts = [], onSubmit, onCancel }: BulkIn
                     <span className="font-semibold text-blue-600">¥{estimatedTotal.toFixed(2)}</span>
                   </div>
                 </div>
-                
+
                 <div className="pt-3 border-t">
                   <div className="space-y-3">
                     <div className="flex items-center space-x-2">
-                      <Checkbox 
+                      <Checkbox
                         id="certification"
                         checked={formData.requiresCertification}
-                        onCheckedChange={(checked) => setFormData(prev => ({ 
-                          ...prev, 
-                          requiresCertification: checked as boolean 
+                        onCheckedChange={(checked) => setFormData(prev => ({
+                          ...prev,
+                          requiresCertification: checked as boolean
                         }))}
                       />
                       <label htmlFor="certification" className="text-sm">
@@ -493,12 +496,12 @@ export function BulkInquiry({ initialProducts = [], onSubmit, onCancel }: BulkIn
                       </label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Checkbox 
+                      <Checkbox
                         id="packaging"
                         checked={formData.requiresCustomPackaging}
-                        onCheckedChange={(checked) => setFormData(prev => ({ 
-                          ...prev, 
-                          requiresCustomPackaging: checked as boolean 
+                        onCheckedChange={(checked) => setFormData(prev => ({
+                          ...prev,
+                          requiresCustomPackaging: checked as boolean
                         }))}
                       />
                       <label htmlFor="packaging" className="text-sm">
@@ -506,12 +509,12 @@ export function BulkInquiry({ initialProducts = [], onSubmit, onCancel }: BulkIn
                       </label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Checkbox 
+                      <Checkbox
                         id="support"
                         checked={formData.requiresTechnicalSupport}
-                        onCheckedChange={(checked) => setFormData(prev => ({ 
-                          ...prev, 
-                          requiresTechnicalSupport: checked as boolean 
+                        onCheckedChange={(checked) => setFormData(prev => ({
+                          ...prev,
+                          requiresTechnicalSupport: checked as boolean
                         }))}
                       />
                       <label htmlFor="support" className="text-sm">
@@ -539,5 +542,5 @@ export function BulkInquiry({ initialProducts = [], onSubmit, onCancel }: BulkIn
         </div>
       </form>
     </div>
-  )
+  );
 }

@@ -1,15 +1,17 @@
-import { notFound } from 'next/navigation'
-import Link from 'next/link'
-import { 
-  Calendar, 
-  MapPin, 
-  Users, 
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+
+import {
+  Calendar,
+  MapPin,
+  Users,
   Award,
   Globe,
   Building2,
   ExternalLink
-} from 'lucide-react'
-import { client } from '@/lib/sanity/client'
+} from 'lucide-react';
+
+import { client } from '@/lib/sanity/client';
 
 // 从Sanity获取品牌数据
 const getBrandData = async (slug: string) => {
@@ -28,14 +30,14 @@ const getBrandData = async (slug: string) => {
         isActive,
         isFeatured
       }
-    `, { slug })
-    
-    return brand
+    `, { slug });
+
+    return brand;
   } catch (error) {
-    console.error('Error fetching brand from Sanity:', error)
-    return null
+    console.error('Error fetching brand from Sanity:', error);
+    return null;
   }
-}
+};
 
 // 为不完整的品牌数据提供默认值
 const enhanceBrandData = (brand: any, slug: string) => {
@@ -49,8 +51,8 @@ const enhanceBrandData = (brand: any, slug: string) => {
     employees: '未知',
     isAuthorized: true,
     isPreferred: brand.isFeatured || false
-  }
-}
+  };
+};
 
 interface BrandPageProps {
   params: {
@@ -61,21 +63,21 @@ interface BrandPageProps {
 
 export default async function BrandPage({ params }: BrandPageProps) {
   // 解码URL编码的slug（处理中文slug）
-  const decodedSlug = decodeURIComponent(params.slug)
-  console.log('BrandPage called with slug:', params.slug, 'decoded:', decodedSlug)
-  
+  const decodedSlug = decodeURIComponent(params.slug);
+  console.log('BrandPage called with slug:', params.slug, 'decoded:', decodedSlug);
+
   // 从Sanity获取品牌数据
-  let brand = await getBrandData(decodedSlug)
-  console.log('Brand from Sanity:', brand)
-  
+  const brand = await getBrandData(decodedSlug);
+  console.log('Brand from Sanity:', brand);
+
   if (!brand) {
-    console.log('Brand not found, calling notFound()')
-    notFound()
+    console.log('Brand not found, calling notFound()');
+    notFound();
   }
 
   // 增强品牌数据，为缺失字段提供默认值
-  const enhancedBrand = enhanceBrandData(brand, decodedSlug)
-  console.log('Enhanced brand data:', enhancedBrand)
+  const enhancedBrand = enhanceBrandData(brand, decodedSlug);
+  console.log('Enhanced brand data:', enhancedBrand);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -157,8 +159,8 @@ export default async function BrandPage({ params }: BrandPageProps) {
                   <div className="flex items-center gap-3">
                     <Globe className="h-4 w-4 text-gray-400" />
                     <span className="text-sm text-gray-600">官方网站</span>
-                    <a 
-                      href={enhancedBrand.website} 
+                    <a
+                      href={enhancedBrand.website}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="font-medium text-blue-600 hover:underline flex items-center gap-1"
@@ -181,23 +183,23 @@ export default async function BrandPage({ params }: BrandPageProps) {
 
           {/* 快捷导航 */}
           <div className="grid md:grid-cols-3 gap-4">
-            <Link 
+            <Link
               href={`/brands/${enhancedBrand.slug}/products`}
               className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-lg transition-colors duration-200 text-center"
             >
               <div className="text-lg font-semibold mb-1">浏览产品</div>
               <div className="text-sm opacity-90">查看全系列产品</div>
             </Link>
-            
-            <Link 
+
+            <Link
               href={`/brands/${enhancedBrand.slug}/solutions`}
               className="bg-white hover:bg-gray-50 text-gray-900 border border-gray-300 p-4 rounded-lg transition-colors duration-200 text-center"
             >
               <div className="text-lg font-semibold mb-1">解决方案</div>
               <div className="text-sm opacity-70">行业应用方案</div>
             </Link>
-            
-            <Link 
+
+            <Link
               href={`/brands/${enhancedBrand.slug}/support`}
               className="bg-white hover:bg-gray-50 text-gray-900 border border-gray-300 p-4 rounded-lg transition-colors duration-200 text-center"
             >
@@ -208,25 +210,25 @@ export default async function BrandPage({ params }: BrandPageProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // SEO元数据
 export async function generateMetadata({ params }: BrandPageProps) {
-  const decodedSlug = decodeURIComponent(params.slug)
-  const brand = await getBrandData(decodedSlug)
-  
+  const decodedSlug = decodeURIComponent(params.slug);
+  const brand = await getBrandData(decodedSlug);
+
   if (!brand) {
     return {
       title: '品牌未找到'
-    }
+    };
   }
 
-  const enhancedBrand = enhanceBrandData(brand, decodedSlug)
+  const enhancedBrand = enhanceBrandData(brand, decodedSlug);
 
   return {
     title: `${enhancedBrand.name} - 授权代理商 | 力通电子`,
     description: `力通电子是${enhancedBrand.name}授权代理商，提供${enhancedBrand.name}全系列电子元器件产品，原装正品现货供应，专业技术支持服务。${enhancedBrand.description}`,
     keywords: `${enhancedBrand.name}代理,${enhancedBrand.name}现货,${enhancedBrand.name}芯片,电子元器件代理,半导体现货`,
-  }
+  };
 }

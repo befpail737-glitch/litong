@@ -1,9 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
-import { rateLimit } from '@/lib/rate-limit'
-import { authenticateRequest } from '@/lib/auth'
-import { logAPIRequest } from '@/lib/logging'
-import { cacheResponse } from '@/lib/cache'
+import { NextRequest, NextResponse } from 'next/server';
+
+import { z } from 'zod';
+
+import { authenticateRequest } from '@/lib/auth';
+import { cacheResponse } from '@/lib/cache';
+import { logAPIRequest } from '@/lib/logging';
+import { rateLimit } from '@/lib/rate-limit';
 
 // Validation Schemas
 const ProductUpdateSchema = z.object({
@@ -19,13 +21,13 @@ const ProductUpdateSchema = z.object({
   documents: z.array(z.string().url()).optional(),
   tags: z.array(z.string()).optional(),
   status: z.enum(['ACTIVE', 'INACTIVE', 'DISCONTINUED', 'COMING_SOON']).optional()
-})
+});
 
 // Mock Database Functions
 async function getProductById(id: string) {
   // Return null if product not found
   if (parseInt(id) > 150) {
-    return null
+    return null;
   }
 
   // Simulate database fetch with detailed product data
@@ -42,7 +44,7 @@ async function getProductById(id: string) {
     partNumber: `STM32H${743 + parseInt(id)}VIT6`,
     price: 15.50 + parseInt(id) * 2.5,
     currency: 'USD',
-    
+
     specifications: {
       core: {
         processor: 'ARM Cortex-M7',
@@ -167,8 +169,8 @@ async function getProductById(id: string) {
       },
       {
         id: `doc_${id}_2`,
-        name: `Reference Manual RM0433`,
-        filename: `rm0433_reference_manual.pdf`,
+        name: 'Reference Manual RM0433',
+        filename: 'rm0433_reference_manual.pdf',
         url: `https://cdn.example.com/docs/${id}/reference.pdf`,
         type: 'MANUAL',
         size: 15728640,
@@ -180,8 +182,8 @@ async function getProductById(id: string) {
       },
       {
         id: `doc_${id}_3`,
-        name: `Programming Manual`,
-        filename: `pm0253_programming_manual.pdf`,
+        name: 'Programming Manual',
+        filename: 'pm0253_programming_manual.pdf',
         url: `https://cdn.example.com/docs/${id}/programming.pdf`,
         type: 'MANUAL',
         size: 1234567,
@@ -193,8 +195,8 @@ async function getProductById(id: string) {
       },
       {
         id: `doc_${id}_4`,
-        name: `Application Note AN4013`,
-        filename: `an4013_application_note.pdf`,
+        name: 'Application Note AN4013',
+        filename: 'an4013_application_note.pdf',
         url: `https://cdn.example.com/docs/${id}/application_note.pdf`,
         type: 'APPLICATION_NOTE',
         size: 867532,
@@ -382,17 +384,17 @@ async function getProductById(id: string) {
         },
         {
           id: `debugger_${id}`,
-          name: `ST-LINK/V3SET Debugger`,
+          name: 'ST-LINK/V3SET Debugger',
           relationship: 'accessory',
           price: 75.00,
           description: 'Professional debugging and programming tool',
-          image: `https://cdn.example.com/products/debugger/thumb_main.jpg`
+          image: 'https://cdn.example.com/products/debugger/thumb_main.jpg'
         }
       ],
       alternatives: [
         {
           id: `ti_${id}`,
-          name: `TI TM4C129x Series`,
+          name: 'TI TM4C129x Series',
           manufacturer: 'Texas Instruments',
           relationship: 'alternative',
           price: 18.50,
@@ -482,15 +484,15 @@ async function getProductById(id: string) {
     createdAt: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
     updatedAt: new Date().toISOString(),
     lastViewedAt: new Date().toISOString()
-  }
+  };
 
-  return product
+  return product;
 }
 
 async function updateProduct(id: string, data: any, userId?: string) {
-  const existingProduct = await getProductById(id)
+  const existingProduct = await getProductById(id);
   if (!existingProduct) {
-    return null
+    return null;
   }
 
   // Simulate database update
@@ -499,15 +501,15 @@ async function updateProduct(id: string, data: any, userId?: string) {
     ...data,
     updatedAt: new Date().toISOString(),
     lastModifiedBy: userId
-  }
+  };
 
-  return updatedProduct
+  return updatedProduct;
 }
 
 async function deleteProduct(id: string, userId?: string) {
-  const existingProduct = await getProductById(id)
+  const existingProduct = await getProductById(id);
   if (!existingProduct) {
-    return null
+    return null;
   }
 
   // Simulate soft delete
@@ -516,7 +518,7 @@ async function deleteProduct(id: string, userId?: string) {
     message: 'Product deleted successfully',
     deletedAt: new Date().toISOString(),
     deletedBy: userId
-  }
+  };
 }
 
 // API Route Handlers
@@ -524,33 +526,33 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const startTime = Date.now()
-  const productId = params.id
+  const startTime = Date.now();
+  const productId = params.id;
 
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimit(request, { limit: 200, window: 60000 })
+    const rateLimitResult = await rateLimit(request, { limit: 200, window: 60000 });
     if (!rateLimitResult.success) {
       return NextResponse.json(
         { error: 'Rate limit exceeded', retryAfter: rateLimitResult.retryAfter },
         { status: 429 }
-      )
+      );
     }
 
     // Check cache first
-    const cacheKey = `product:${productId}`
-    const cachedProduct = await cacheResponse(cacheKey)
+    const cacheKey = `product:${productId}`;
+    const cachedProduct = await cacheResponse(cacheKey);
     if (cachedProduct) {
       return NextResponse.json({
         success: true,
         data: cachedProduct,
         cached: true,
         processingTime: Date.now() - startTime
-      })
+      });
     }
 
     // Fetch product
-    const product = await getProductById(productId)
+    const product = await getProductById(productId);
 
     if (!product) {
       await logAPIRequest({
@@ -560,16 +562,16 @@ export async function GET(
         status: 404,
         userAgent: request.headers.get('user-agent') || '',
         ip: request.ip || ''
-      })
+      });
 
       return NextResponse.json(
-        { 
+        {
           success: false,
           error: 'Product not found',
           message: `Product with ID ${productId} does not exist`
         },
         { status: 404 }
-      )
+      );
     }
 
     const response = {
@@ -577,7 +579,7 @@ export async function GET(
       data: product,
       cached: false,
       processingTime: Date.now() - startTime
-    }
+    };
 
     // Log successful request
     await logAPIRequest({
@@ -587,15 +589,15 @@ export async function GET(
       status: 200,
       userAgent: request.headers.get('user-agent') || '',
       ip: request.ip || ''
-    })
+    });
 
     // Cache for 10 minutes
-    await cacheResponse(cacheKey, product, 600)
+    await cacheResponse(cacheKey, product, 600);
 
-    return NextResponse.json(response)
+    return NextResponse.json(response);
 
   } catch (error) {
-    console.error('Product Detail API Error:', error)
+    console.error('Product Detail API Error:', error);
 
     await logAPIRequest({
       method: 'GET',
@@ -605,16 +607,16 @@ export async function GET(
       error: error instanceof Error ? error.message : 'Unknown error',
       userAgent: request.headers.get('user-agent') || '',
       ip: request.ip || ''
-    })
+    });
 
     return NextResponse.json(
-      { 
+      {
         success: false,
         error: 'Internal server error',
         message: 'An error occurred while fetching the product'
       },
       { status: 500 }
-    )
+    );
   }
 }
 
@@ -622,54 +624,54 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const startTime = Date.now()
-  const productId = params.id
+  const startTime = Date.now();
+  const productId = params.id;
 
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimit(request, { limit: 20, window: 60000 })
+    const rateLimitResult = await rateLimit(request, { limit: 20, window: 60000 });
     if (!rateLimitResult.success) {
       return NextResponse.json(
         { error: 'Rate limit exceeded', retryAfter: rateLimitResult.retryAfter },
         { status: 429 }
-      )
+      );
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request)
+    const authResult = await authenticateRequest(request);
     if (!authResult.success || !['ADMIN', 'MANAGER'].includes(authResult.user?.role)) {
       return NextResponse.json(
         { error: 'Unauthorized', message: 'Admin or Manager role required' },
         { status: 401 }
-      )
+      );
     }
 
     // Parse and validate request body
-    const body = await request.json()
-    const validation = ProductUpdateSchema.safeParse(body)
-    
+    const body = await request.json();
+    const validation = ProductUpdateSchema.safeParse(body);
+
     if (!validation.success) {
       return NextResponse.json(
-        { 
+        {
           error: 'Invalid request data',
           details: validation.error.errors
         },
         { status: 400 }
-      )
+      );
     }
 
     // Update product
-    const updatedProduct = await updateProduct(productId, validation.data, authResult.user.id)
+    const updatedProduct = await updateProduct(productId, validation.data, authResult.user.id);
 
     if (!updatedProduct) {
       return NextResponse.json(
-        { 
+        {
           success: false,
           error: 'Product not found',
           message: `Product with ID ${productId} does not exist`
         },
         { status: 404 }
-      )
+      );
     }
 
     const response = {
@@ -677,10 +679,10 @@ export async function PUT(
       data: updatedProduct,
       message: 'Product updated successfully',
       processingTime: Date.now() - startTime
-    }
+    };
 
     // Invalidate cache
-    await cacheResponse(`product:${productId}`, null, 0)
+    await cacheResponse(`product:${productId}`, null, 0);
 
     // Log API request
     await logAPIRequest({
@@ -691,12 +693,12 @@ export async function PUT(
       status: 200,
       userAgent: request.headers.get('user-agent') || '',
       ip: request.ip || ''
-    })
+    });
 
-    return NextResponse.json(response)
+    return NextResponse.json(response);
 
   } catch (error) {
-    console.error('Update Product API Error:', error)
+    console.error('Update Product API Error:', error);
 
     await logAPIRequest({
       method: 'PUT',
@@ -706,16 +708,16 @@ export async function PUT(
       error: error instanceof Error ? error.message : 'Unknown error',
       userAgent: request.headers.get('user-agent') || '',
       ip: request.ip || ''
-    })
+    });
 
     return NextResponse.json(
-      { 
+      {
         success: false,
         error: 'Internal server error',
         message: 'An error occurred while updating the product'
       },
       { status: 500 }
-    )
+    );
   }
 }
 
@@ -723,50 +725,50 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const startTime = Date.now()
-  const productId = params.id
+  const startTime = Date.now();
+  const productId = params.id;
 
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimit(request, { limit: 10, window: 60000 })
+    const rateLimitResult = await rateLimit(request, { limit: 10, window: 60000 });
     if (!rateLimitResult.success) {
       return NextResponse.json(
         { error: 'Rate limit exceeded', retryAfter: rateLimitResult.retryAfter },
         { status: 429 }
-      )
+      );
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request)
+    const authResult = await authenticateRequest(request);
     if (!authResult.success || authResult.user?.role !== 'ADMIN') {
       return NextResponse.json(
         { error: 'Unauthorized', message: 'Admin role required' },
         { status: 401 }
-      )
+      );
     }
 
     // Delete product
-    const result = await deleteProduct(productId, authResult.user.id)
+    const result = await deleteProduct(productId, authResult.user.id);
 
     if (!result) {
       return NextResponse.json(
-        { 
+        {
           success: false,
           error: 'Product not found',
           message: `Product with ID ${productId} does not exist`
         },
         { status: 404 }
-      )
+      );
     }
 
     const response = {
       success: true,
       message: 'Product deleted successfully',
       processingTime: Date.now() - startTime
-    }
+    };
 
     // Invalidate cache
-    await cacheResponse(`product:${productId}`, null, 0)
+    await cacheResponse(`product:${productId}`, null, 0);
 
     // Log API request
     await logAPIRequest({
@@ -777,12 +779,12 @@ export async function DELETE(
       status: 200,
       userAgent: request.headers.get('user-agent') || '',
       ip: request.ip || ''
-    })
+    });
 
-    return NextResponse.json(response)
+    return NextResponse.json(response);
 
   } catch (error) {
-    console.error('Delete Product API Error:', error)
+    console.error('Delete Product API Error:', error);
 
     await logAPIRequest({
       method: 'DELETE',
@@ -792,15 +794,15 @@ export async function DELETE(
       error: error instanceof Error ? error.message : 'Unknown error',
       userAgent: request.headers.get('user-agent') || '',
       ip: request.ip || ''
-    })
+    });
 
     return NextResponse.json(
-      { 
+      {
         success: false,
         error: 'Internal server error',
         message: 'An error occurred while deleting the product'
       },
       { status: 500 }
-    )
+    );
   }
 }

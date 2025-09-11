@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { InquiryProvider } from '@/contexts/InquiryContext'
+import { InquiryProvider } from '@/contexts/InquiryContext';
 
 interface ClientProvidersProps {
   children: React.ReactNode
@@ -11,5 +11,5 @@ export function ClientProviders({ children }: ClientProvidersProps) {
     <InquiryProvider>
       {children}
     </InquiryProvider>
-  )
+  );
 }

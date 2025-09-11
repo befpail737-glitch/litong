@@ -37,16 +37,16 @@ export interface CacheOptions {
 
 // Multi-level cache system
 export class CacheManager {
-  private config: Required<CacheConfig>
-  private memory = new Map<string, CacheEntry>()
+  private config: Required<CacheConfig>;
+  private memory = new Map<string, CacheEntry>();
   private stats = {
     hits: 0,
     misses: 0,
     sets: 0,
     evictions: 0
-  }
-  private tags = new Map<string, Set<string>>()
-  private compressionWorker: Worker | null = null
+  };
+  private tags = new Map<string, Set<string>>();
+  private compressionWorker: Worker | null = null;
 
   constructor(config: CacheConfig = {}) {
     this.config = {
@@ -59,40 +59,40 @@ export class CacheManager {
       persistenceKey: 'app_cache',
       debug: process.env.NODE_ENV === 'development',
       ...config
-    }
+    };
 
     if (this.config.enableCompression && typeof Worker !== 'undefined') {
-      this.setupCompressionWorker()
+      this.setupCompressionWorker();
     }
 
     if (this.config.enablePersistence && typeof localStorage !== 'undefined') {
-      this.loadFromPersistence()
+      this.loadFromPersistence();
     }
 
     // Setup periodic cleanup
-    setInterval(() => this.cleanup(), 60000) // Every minute
+    setInterval(() => this.cleanup(), 60000); // Every minute
   }
 
   // Core cache operations
   async set<T>(key: string, value: T, options: CacheOptions = {}): Promise<void> {
-    const ttl = options.ttl || this.config.defaultTTL
-    const timestamp = Date.now()
-    
-    let processedValue = value
-    let compressed = false
-    let size = this.estimateSize(value)
+    const ttl = options.ttl || this.config.defaultTTL;
+    const timestamp = Date.now();
+
+    let processedValue = value;
+    let compressed = false;
+    let size = this.estimateSize(value);
 
     // Compress large values if enabled
-    if (this.config.enableCompression && 
-        size > this.config.compressionThreshold && 
+    if (this.config.enableCompression &&
+        size > this.config.compressionThreshold &&
         options.compress !== false) {
       try {
-        processedValue = await this.compressValue(value)
-        compressed = true
-        size = this.estimateSize(processedValue)
+        processedValue = await this.compressValue(value);
+        compressed = true;
+        size = this.estimateSize(processedValue);
       } catch (error) {
         if (this.config.debug) {
-          console.warn('Compression failed for key:', key, error)
+          console.warn('Compression failed for key:', key, error);
         }
       }
     }
@@ -104,104 +104,104 @@ export class CacheManager {
       hits: 0,
       size,
       compressed
-    }
+    };
 
     // Check size limits and evict if necessary
-    await this.ensureCapacity(size)
+    await this.ensureCapacity(size);
 
-    this.memory.set(key, entry)
-    this.stats.sets++
+    this.memory.set(key, entry);
+    this.stats.sets++;
 
     // Handle tags
     if (options.tags) {
-      this.addTags(key, options.tags)
+      this.addTags(key, options.tags);
     }
 
     // Persist if enabled
     if (this.config.enablePersistence) {
-      this.persistToStorage()
+      this.persistToStorage();
     }
 
     if (this.config.debug) {
-      console.log(`Cache SET: ${key} (${compressed ? 'compressed' : 'uncompressed'}, ${size} bytes)`)
+      console.log(`Cache SET: ${key} (${compressed ? 'compressed' : 'uncompressed'}, ${size} bytes)`);
     }
   }
 
   async get<T>(key: string): Promise<T | null> {
-    const entry = this.memory.get(key) as CacheEntry<T> | undefined
+    const entry = this.memory.get(key) as CacheEntry<T> | undefined;
 
     if (!entry) {
-      this.stats.misses++
-      return null
+      this.stats.misses++;
+      return null;
     }
 
     // Check expiration
     if (Date.now() - entry.timestamp > entry.ttl) {
-      this.delete(key)
-      this.stats.misses++
-      return null
+      this.delete(key);
+      this.stats.misses++;
+      return null;
     }
 
     // Update hit count
-    entry.hits++
-    this.stats.hits++
+    entry.hits++;
+    this.stats.hits++;
 
-    let value = entry.value
+    let value = entry.value;
 
     // Decompress if necessary
     if (entry.compressed) {
       try {
-        value = await this.decompressValue(entry.value)
+        value = await this.decompressValue(entry.value);
       } catch (error) {
         if (this.config.debug) {
-          console.warn('Decompression failed for key:', key, error)
+          console.warn('Decompression failed for key:', key, error);
         }
-        this.delete(key)
-        return null
+        this.delete(key);
+        return null;
       }
     }
 
     if (this.config.debug) {
-      console.log(`Cache HIT: ${key} (hits: ${entry.hits})`)
+      console.log(`Cache HIT: ${key} (hits: ${entry.hits})`);
     }
 
-    return value
+    return value;
   }
 
   has(key: string): boolean {
-    const entry = this.memory.get(key)
-    if (!entry) return false
+    const entry = this.memory.get(key);
+    if (!entry) return false;
 
     // Check expiration
     if (Date.now() - entry.timestamp > entry.ttl) {
-      this.delete(key)
-      return false
+      this.delete(key);
+      return false;
     }
 
-    return true
+    return true;
   }
 
   delete(key: string): boolean {
-    const deleted = this.memory.delete(key)
-    
+    const deleted = this.memory.delete(key);
+
     if (deleted) {
-      this.removeFromTags(key)
-      
+      this.removeFromTags(key);
+
       if (this.config.enablePersistence) {
-        this.persistToStorage()
+        this.persistToStorage();
       }
     }
 
-    return deleted
+    return deleted;
   }
 
   clear(): void {
-    this.memory.clear()
-    this.tags.clear()
-    this.resetStats()
+    this.memory.clear();
+    this.tags.clear();
+    this.resetStats();
 
     if (this.config.enablePersistence) {
-      this.clearPersistence()
+      this.clearPersistence();
     }
   }
 
@@ -211,100 +211,100 @@ export class CacheManager {
     factory: () => Promise<T> | T,
     options: CacheOptions = {}
   ): Promise<T> {
-    const cached = await this.get<T>(key)
-    
+    const cached = await this.get<T>(key);
+
     if (cached !== null) {
-      return cached
+      return cached;
     }
 
-    const value = await factory()
-    await this.set(key, value, options)
-    return value
+    const value = await factory();
+    await this.set(key, value, options);
+    return value;
   }
 
   async mget<T>(keys: string[]): Promise<Map<string, T>> {
-    const results = new Map<string, T>()
+    const results = new Map<string, T>();
 
     await Promise.all(
       keys.map(async (key) => {
-        const value = await this.get<T>(key)
+        const value = await this.get<T>(key);
         if (value !== null) {
-          results.set(key, value)
+          results.set(key, value);
         }
       })
-    )
+    );
 
-    return results
+    return results;
   }
 
   async mset<T>(entries: Array<{ key: string; value: T; options?: CacheOptions }>): Promise<void> {
     await Promise.all(
-      entries.map(({ key, value, options = {} }) => 
+      entries.map(({ key, value, options = {} }) =>
         this.set(key, value, options)
       )
-    )
+    );
   }
 
   // Tag-based operations
   private addTags(key: string, tagList: string[]): void {
     tagList.forEach(tag => {
       if (!this.tags.has(tag)) {
-        this.tags.set(tag, new Set())
+        this.tags.set(tag, new Set());
       }
-      this.tags.get(tag)!.add(key)
-    })
+      this.tags.get(tag)!.add(key);
+    });
   }
 
   private removeFromTags(key: string): void {
     for (const [tag, keys] of this.tags.entries()) {
-      keys.delete(key)
+      keys.delete(key);
       if (keys.size === 0) {
-        this.tags.delete(tag)
+        this.tags.delete(tag);
       }
     }
   }
 
   deleteByTag(tag: string): number {
-    const keys = this.tags.get(tag)
-    if (!keys) return 0
+    const keys = this.tags.get(tag);
+    if (!keys) return 0;
 
-    let deleted = 0
+    let deleted = 0;
     keys.forEach(key => {
       if (this.delete(key)) {
-        deleted++
+        deleted++;
       }
-    })
+    });
 
-    this.tags.delete(tag)
-    return deleted
+    this.tags.delete(tag);
+    return deleted;
   }
 
   getKeysByTag(tag: string): string[] {
-    const keys = this.tags.get(tag)
-    return keys ? Array.from(keys) : []
+    const keys = this.tags.get(tag);
+    return keys ? Array.from(keys) : [];
   }
 
   // TTL operations
   expire(key: string, ttl: number): boolean {
-    const entry = this.memory.get(key)
-    if (!entry) return false
+    const entry = this.memory.get(key);
+    if (!entry) return false;
 
-    entry.ttl = ttl
-    entry.timestamp = Date.now()
-    return true
+    entry.ttl = ttl;
+    entry.timestamp = Date.now();
+    return true;
   }
 
   ttl(key: string): number {
-    const entry = this.memory.get(key)
-    if (!entry) return -2 // Key doesn't exist
+    const entry = this.memory.get(key);
+    if (!entry) return -2; // Key doesn't exist
 
-    const remaining = entry.ttl - (Date.now() - entry.timestamp)
-    return remaining > 0 ? remaining : -1 // Expired
+    const remaining = entry.ttl - (Date.now() - entry.timestamp);
+    return remaining > 0 ? remaining : -1; // Expired
   }
 
   // Compression
   private setupCompressionWorker(): void {
-    if (typeof Worker === 'undefined') return
+    if (typeof Worker === 'undefined') return;
 
     const workerScript = `
       self.onmessage = function(e) {
@@ -324,159 +324,159 @@ export class CacheManager {
           self.postMessage({ id, result: null, error: error.message });
         }
       };
-    `
+    `;
 
-    const blob = new Blob([workerScript], { type: 'application/javascript' })
-    this.compressionWorker = new Worker(URL.createObjectURL(blob))
+    const blob = new Blob([workerScript], { type: 'application/javascript' });
+    this.compressionWorker = new Worker(URL.createObjectURL(blob));
   }
 
   private async compressValue<T>(value: T): Promise<T> {
     if (!this.compressionWorker) {
       // Fallback to JSON stringify as simple compression
-      return JSON.parse(JSON.stringify(value))
+      return JSON.parse(JSON.stringify(value));
     }
 
     return new Promise((resolve, reject) => {
-      const id = Math.random().toString(36).substr(2, 9)
-      
+      const id = Math.random().toString(36).substr(2, 9);
+
       const timeout = setTimeout(() => {
-        reject(new Error('Compression timeout'))
-      }, 5000)
+        reject(new Error('Compression timeout'));
+      }, 5000);
 
       const handler = (e: MessageEvent) => {
         if (e.data.id === id) {
-          clearTimeout(timeout)
-          this.compressionWorker!.removeEventListener('message', handler)
-          
+          clearTimeout(timeout);
+          this.compressionWorker!.removeEventListener('message', handler);
+
           if (e.data.error) {
-            reject(new Error(e.data.error))
+            reject(new Error(e.data.error));
           } else {
-            resolve(e.data.result)
+            resolve(e.data.result);
           }
         }
-      }
+      };
 
-      this.compressionWorker.addEventListener('message', handler)
-      this.compressionWorker.postMessage({ action: 'compress', data: value, id })
-    })
+      this.compressionWorker.addEventListener('message', handler);
+      this.compressionWorker.postMessage({ action: 'compress', data: value, id });
+    });
   }
 
   private async decompressValue<T>(value: T): Promise<T> {
     if (!this.compressionWorker) {
-      return value // No compression was applied
+      return value; // No compression was applied
     }
 
     return new Promise((resolve, reject) => {
-      const id = Math.random().toString(36).substr(2, 9)
-      
+      const id = Math.random().toString(36).substr(2, 9);
+
       const timeout = setTimeout(() => {
-        reject(new Error('Decompression timeout'))
-      }, 5000)
+        reject(new Error('Decompression timeout'));
+      }, 5000);
 
       const handler = (e: MessageEvent) => {
         if (e.data.id === id) {
-          clearTimeout(timeout)
-          this.compressionWorker!.removeEventListener('message', handler)
-          
+          clearTimeout(timeout);
+          this.compressionWorker!.removeEventListener('message', handler);
+
           if (e.data.error) {
-            reject(new Error(e.data.error))
+            reject(new Error(e.data.error));
           } else {
-            resolve(e.data.result)
+            resolve(e.data.result);
           }
         }
-      }
+      };
 
-      this.compressionWorker.addEventListener('message', handler)
-      this.compressionWorker.postMessage({ action: 'decompress', data: value, id })
-    })
+      this.compressionWorker.addEventListener('message', handler);
+      this.compressionWorker.postMessage({ action: 'decompress', data: value, id });
+    });
   }
 
   // Memory management
   private async ensureCapacity(newEntrySize: number): Promise<void> {
     while (this.memory.size >= this.config.maxSize) {
-      const evicted = this.evictLRU()
-      if (!evicted) break
+      const evicted = this.evictLRU();
+      if (!evicted) break;
     }
   }
 
   private evictLRU(): boolean {
-    let oldestKey: string | null = null
-    let oldestTime = Infinity
-    let lowestHits = Infinity
+    let oldestKey: string | null = null;
+    let oldestTime = Infinity;
+    let lowestHits = Infinity;
 
     for (const [key, entry] of this.memory.entries()) {
       // Prioritize by last access time and hit count
-      const score = entry.timestamp + (entry.hits * 60000) // 1 hit = 1 minute of extra life
-      
+      const score = entry.timestamp + (entry.hits * 60000); // 1 hit = 1 minute of extra life
+
       if (score < oldestTime || (score === oldestTime && entry.hits < lowestHits)) {
-        oldestTime = score
-        lowestHits = entry.hits
-        oldestKey = key
+        oldestTime = score;
+        lowestHits = entry.hits;
+        oldestKey = key;
       }
     }
 
     if (oldestKey) {
-      this.delete(oldestKey)
-      this.stats.evictions++
-      
+      this.delete(oldestKey);
+      this.stats.evictions++;
+
       if (this.config.debug) {
-        console.log(`Cache evicted LRU key: ${oldestKey}`)
+        console.log(`Cache evicted LRU key: ${oldestKey}`);
       }
-      
-      return true
+
+      return true;
     }
 
-    return false
+    return false;
   }
 
   private cleanup(): void {
-    const now = Date.now()
-    const keysToDelete: string[] = []
+    const now = Date.now();
+    const keysToDelete: string[] = [];
 
     for (const [key, entry] of this.memory.entries()) {
       if (now - entry.timestamp > entry.ttl) {
-        keysToDelete.push(key)
+        keysToDelete.push(key);
       }
     }
 
-    keysToDelete.forEach(key => this.delete(key))
+    keysToDelete.forEach(key => this.delete(key));
 
     if (keysToDelete.length > 0 && this.config.debug) {
-      console.log(`Cache cleanup: removed ${keysToDelete.length} expired entries`)
+      console.log(`Cache cleanup: removed ${keysToDelete.length} expired entries`);
     }
   }
 
   // Persistence
   private loadFromPersistence(): void {
     try {
-      const stored = localStorage.getItem(this.config.persistenceKey)
-      if (!stored) return
+      const stored = localStorage.getItem(this.config.persistenceKey);
+      if (!stored) return;
 
-      const data = JSON.parse(stored)
-      const now = Date.now()
+      const data = JSON.parse(stored);
+      const now = Date.now();
 
       for (const [key, entry] of Object.entries(data.entries || {})) {
-        const cacheEntry = entry as CacheEntry
-        
+        const cacheEntry = entry as CacheEntry;
+
         // Skip expired entries
         if (now - cacheEntry.timestamp <= cacheEntry.ttl) {
-          this.memory.set(key, cacheEntry)
+          this.memory.set(key, cacheEntry);
         }
       }
 
       // Restore tags
       if (data.tags) {
         for (const [tag, keys] of Object.entries(data.tags)) {
-          this.tags.set(tag, new Set(keys as string[]))
+          this.tags.set(tag, new Set(keys as string[]));
         }
       }
 
       if (this.config.debug) {
-        console.log(`Cache loaded ${this.memory.size} entries from persistence`)
+        console.log(`Cache loaded ${this.memory.size} entries from persistence`);
       }
     } catch (error) {
       if (this.config.debug) {
-        console.warn('Failed to load cache from persistence:', error)
+        console.warn('Failed to load cache from persistence:', error);
       }
     }
   }
@@ -489,29 +489,29 @@ export class CacheManager {
           Array.from(this.tags.entries()).map(([tag, keys]) => [tag, Array.from(keys)])
         ),
         timestamp: Date.now()
-      }
+      };
 
-      localStorage.setItem(this.config.persistenceKey, JSON.stringify(data))
+      localStorage.setItem(this.config.persistenceKey, JSON.stringify(data));
     } catch (error) {
       if (this.config.debug) {
-        console.warn('Failed to persist cache to storage:', error)
+        console.warn('Failed to persist cache to storage:', error);
       }
     }
   }
 
   private clearPersistence(): void {
     try {
-      localStorage.removeItem(this.config.persistenceKey)
+      localStorage.removeItem(this.config.persistenceKey);
     } catch (error) {
       if (this.config.debug) {
-        console.warn('Failed to clear cache persistence:', error)
+        console.warn('Failed to clear cache persistence:', error);
       }
     }
   }
 
   // Analytics and utilities
   private estimateSize(value: any): number {
-    return JSON.stringify(value).length * 2 // Rough estimation in bytes
+    return JSON.stringify(value).length * 2; // Rough estimation in bytes
   }
 
   private resetStats(): void {
@@ -520,22 +520,22 @@ export class CacheManager {
       misses: 0,
       sets: 0,
       evictions: 0
-    }
+    };
   }
 
   getStats(): CacheStats {
-    const totalRequests = this.stats.hits + this.stats.misses
-    let memoryUsage = 0
-    let compressedSize = 0
-    let totalSize = 0
+    const totalRequests = this.stats.hits + this.stats.misses;
+    let memoryUsage = 0;
+    let compressedSize = 0;
+    let totalSize = 0;
 
     for (const entry of this.memory.values()) {
-      memoryUsage += entry.size
-      
+      memoryUsage += entry.size;
+
       if (entry.compressed) {
-        compressedSize += entry.size
+        compressedSize += entry.size;
       }
-      totalSize += entry.size
+      totalSize += entry.size;
     }
 
     return {
@@ -547,31 +547,31 @@ export class CacheManager {
       totalSets: this.stats.sets,
       memoryUsage,
       compressionRatio: totalSize > 0 ? compressedSize / totalSize : 0
-    }
+    };
   }
 
   keys(): string[] {
-    return Array.from(this.memory.keys())
+    return Array.from(this.memory.keys());
   }
 
   values(): any[] {
-    return Array.from(this.memory.values()).map(entry => entry.value)
+    return Array.from(this.memory.values()).map(entry => entry.value);
   }
 
   entries(): Array<[string, any]> {
-    return Array.from(this.memory.entries()).map(([key, entry]) => [key, entry.value])
+    return Array.from(this.memory.entries()).map(([key, entry]) => [key, entry.value]);
   }
 
   size(): number {
-    return this.memory.size
+    return this.memory.size;
   }
 
   destroy(): void {
-    this.clear()
-    
+    this.clear();
+
     if (this.compressionWorker) {
-      this.compressionWorker.terminate()
-      this.compressionWorker = null
+      this.compressionWorker.terminate();
+      this.compressionWorker = null;
     }
   }
 }
@@ -583,7 +583,7 @@ export class LRUCache<T> extends CacheManager {
       maxSize,
       defaultTTL,
       enablePersistence: false
-    })
+    });
   }
 }
 
@@ -593,50 +593,50 @@ export class TTLCache<T> extends CacheManager {
       defaultTTL,
       maxSize: Number.MAX_SAFE_INTEGER,
       enablePersistence: false
-    })
+    });
   }
 }
 
 // Global cache instances
-const globalCaches = new Map<string, CacheManager>()
+const globalCaches = new Map<string, CacheManager>();
 
 export function getCache(name: string = 'default', config?: CacheConfig): CacheManager {
   if (!globalCaches.has(name)) {
-    globalCaches.set(name, new CacheManager(config))
+    globalCaches.set(name, new CacheManager(config));
   }
-  return globalCaches.get(name)!
+  return globalCaches.get(name)!;
 }
 
 export function createCache(name: string, config?: CacheConfig): CacheManager {
-  const cache = new CacheManager(config)
-  globalCaches.set(name, cache)
-  return cache
+  const cache = new CacheManager(config);
+  globalCaches.set(name, cache);
+  return cache;
 }
 
 export function destroyCache(name: string): boolean {
-  const cache = globalCaches.get(name)
+  const cache = globalCaches.get(name);
   if (cache) {
-    cache.destroy()
-    globalCaches.delete(name)
-    return true
+    cache.destroy();
+    globalCaches.delete(name);
+    return true;
   }
-  return false
+  return false;
 }
 
 // Utility decorators and functions
 export function cached(ttl: number = 300000, keyPrefix: string = '') {
   return function(target: any, propertyName: string, descriptor: PropertyDescriptor) {
-    const originalMethod = descriptor.value
-    const cache = getCache(`method_${target.constructor.name}_${propertyName}`)
+    const originalMethod = descriptor.value;
+    const cache = getCache(`method_${target.constructor.name}_${propertyName}`);
 
     descriptor.value = async function(...args: any[]) {
-      const key = `${keyPrefix}${propertyName}_${JSON.stringify(args)}`
-      
-      return await cache.getOrSet(key, () => originalMethod.apply(this, args), { ttl })
-    }
+      const key = `${keyPrefix}${propertyName}_${JSON.stringify(args)}`;
 
-    return descriptor
-  }
+      return await cache.getOrSet(key, () => originalMethod.apply(this, args), { ttl });
+    };
+
+    return descriptor;
+  };
 }
 
 export async function memoize<T extends (...args: any[]) => any>(
@@ -644,13 +644,13 @@ export async function memoize<T extends (...args: any[]) => any>(
   keyFn?: (...args: Parameters<T>) => string,
   ttl: number = 300000
 ): Promise<T> {
-  const cache = getCache(`memoize_${fn.name || 'anonymous'}`)
-  
+  const cache = getCache(`memoize_${fn.name || 'anonymous'}`);
+
   return (async (...args: Parameters<T>) => {
-    const key = keyFn ? keyFn(...args) : JSON.stringify(args)
-    
-    return await cache.getOrSet(key, () => fn(...args), { ttl })
-  }) as T
+    const key = keyFn ? keyFn(...args) : JSON.stringify(args);
+
+    return await cache.getOrSet(key, () => fn(...args), { ttl });
+  }) as T;
 }
 
-export default CacheManager
+export default CacheManager;

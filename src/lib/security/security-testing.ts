@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server'
+import { NextRequest } from 'next/server';
 
 export interface SecurityTestConfig {
   enableVulnerabilityScanning?: boolean
@@ -67,9 +67,9 @@ export interface SecurityTestReport {
 
 // Security testing framework
 export class SecurityTester {
-  private config: Required<SecurityTestConfig>
-  private tests: SecurityTest[] = []
-  private testResults: Map<string, TestResult> = new Map()
+  private config: Required<SecurityTestConfig>;
+  private tests: SecurityTest[] = [];
+  private testResults: Map<string, TestResult> = new Map();
 
   constructor(config: SecurityTestConfig = {}) {
     this.config = {
@@ -83,9 +83,9 @@ export class SecurityTester {
       reportFormat: 'json',
       debug: process.env.NODE_ENV === 'development',
       ...config
-    }
+    };
 
-    this.initializeTests()
+    this.initializeTests();
   }
 
   private initializeTests(): void {
@@ -101,10 +101,10 @@ export class SecurityTester {
       ...this.getCryptographyTests(),
       ...this.getSessionTests(),
       ...this.config.customTests
-    ]
+    ];
 
     if (this.config.debug) {
-      console.log(`Initialized ${this.tests.length} security tests`)
+      console.log(`Initialized ${this.tests.length} security tests`);
     }
   }
 
@@ -126,27 +126,27 @@ export class SecurityTester {
             "' UNION SELECT * FROM users --",
             "admin'--",
             "' OR 1=1 /*"
-          ]
+          ];
 
-          const vulnerabilities: string[] = []
-          
+          const vulnerabilities: string[] = [];
+
           for (const payload of payloads) {
             try {
               // Test query parameters
-              const testUrl = new URL(context.url)
-              testUrl.searchParams.set('test', payload)
+              const testUrl = new URL(context.url);
+              testUrl.searchParams.set('test', payload);
 
               // Test POST body
-              const testBody = context.body ? { ...context.body, test: payload } : { test: payload }
+              const testBody = context.body ? { ...context.body, test: payload } : { test: payload };
 
               // Check for error messages indicating SQL injection
               if (this.containsSQLError(JSON.stringify(testBody))) {
-                vulnerabilities.push(`Potential SQL injection with payload: ${payload}`)
+                vulnerabilities.push(`Potential SQL injection with payload: ${payload}`);
               }
             } catch (error) {
               // Errors might indicate injection vulnerabilities
               if (error instanceof Error && this.containsSQLError(error.message)) {
-                vulnerabilities.push(`SQL error with payload: ${payload}`)
+                vulnerabilities.push(`SQL error with payload: ${payload}`);
               }
             }
           }
@@ -156,7 +156,7 @@ export class SecurityTester {
             message: vulnerabilities.length > 0 ? 'SQL injection vulnerabilities detected' : 'No SQL injection vulnerabilities found',
             evidence: vulnerabilities,
             recommendation: 'Use parameterized queries and input validation'
-          }
+          };
         }
       },
       {
@@ -173,16 +173,16 @@ export class SecurityTester {
             '{"$where": "this.password.match(/.*/)"}',
             '{"$regex": ".*"}',
             '{"$or": [{}]}'
-          ]
+          ];
 
-          const vulnerabilities: string[] = []
+          const vulnerabilities: string[] = [];
 
           for (const payload of payloads) {
             try {
-              const testBody = { test: JSON.parse(payload) }
+              const testBody = { test: JSON.parse(payload) };
               // In a real implementation, this would make requests to test endpoints
               // For now, we'll simulate the test
-              vulnerabilities.push(`Tested NoSQL injection payload: ${payload}`)
+              vulnerabilities.push(`Tested NoSQL injection payload: ${payload}`);
             } catch (error) {
               // JSON parsing errors are expected for some payloads
             }
@@ -193,10 +193,10 @@ export class SecurityTester {
             message: 'NoSQL injection test completed',
             details: { payloadsTested: payloads.length },
             recommendation: 'Use proper input validation and avoid dynamic query construction'
-          }
+          };
         }
       }
-    ]
+    ];
   }
 
   // Authentication Tests
@@ -210,14 +210,14 @@ export class SecurityTester {
         cweId: 'CWE-521',
         description: 'Tests for weak password policies',
         test: async (context: TestContext) => {
-          const weakPasswords = ['123456', 'password', 'admin', 'test', '']
-          const issues: string[] = []
+          const weakPasswords = ['123456', 'password', 'admin', 'test', ''];
+          const issues: string[] = [];
 
           // Test if weak passwords are accepted
           for (const password of weakPasswords) {
             // Simulate password validation
             if (password.length < 8) {
-              issues.push(`Weak password accepted: ${password}`)
+              issues.push(`Weak password accepted: ${password}`);
             }
           }
 
@@ -226,7 +226,7 @@ export class SecurityTester {
             message: issues.length > 0 ? 'Weak password policy detected' : 'Password policy appears adequate',
             evidence: issues,
             recommendation: 'Implement strong password requirements (min 8 chars, complexity rules)'
-          }
+          };
         }
       },
       {
@@ -237,30 +237,30 @@ export class SecurityTester {
         cweId: 'CWE-307',
         description: 'Tests for brute force attack protection',
         test: async (context: TestContext) => {
-          const attempts = 10
-          let blockedAfter = -1
+          const attempts = 10;
+          let blockedAfter = -1;
 
           // Simulate multiple login attempts
           for (let i = 0; i < attempts; i++) {
             // In a real implementation, this would make actual requests
             // For simulation, assume blocking after 5 attempts
             if (i >= 5) {
-              blockedAfter = i
-              break
+              blockedAfter = i;
+              break;
             }
           }
 
-          const hasProtection = blockedAfter > 0 && blockedAfter <= 5
+          const hasProtection = blockedAfter > 0 && blockedAfter <= 5;
 
           return {
             passed: hasProtection,
             message: hasProtection ? 'Brute force protection detected' : 'No brute force protection found',
             details: { attemptsBeforeBlock: blockedAfter },
             recommendation: 'Implement account lockout and rate limiting for authentication endpoints'
-          }
+          };
         }
       }
-    ]
+    ];
   }
 
   // Authorization Tests
@@ -278,26 +278,26 @@ export class SecurityTester {
             { role: 'user', accessAdminEndpoint: false },
             { role: 'moderator', accessAdminEndpoint: false },
             { role: 'admin', accessAdminEndpoint: true }
-          ]
+          ];
 
-          const violations: string[] = []
+          const violations: string[] = [];
 
           testCases.forEach(({ role, accessAdminEndpoint }) => {
             // Simulate role-based access control testing
             if (role !== 'admin' && accessAdminEndpoint) {
-              violations.push(`User with role '${role}' can access admin endpoints`)
+              violations.push(`User with role '${role}' can access admin endpoints`);
             }
-          })
+          });
 
           return {
             passed: violations.length === 0,
             message: violations.length > 0 ? 'Privilege escalation vulnerabilities found' : 'Authorization controls appear proper',
             evidence: violations,
             recommendation: 'Implement proper role-based access control and validate permissions'
-          }
+          };
         }
       }
-    ]
+    ];
   }
 
   // Input Validation Tests
@@ -320,28 +320,28 @@ export class SecurityTester {
             '<%=7*7%>',
             '\x00',
             'A'.repeat(10000) // Large input
-          ]
+          ];
 
-          const vulnerabilities: string[] = []
+          const vulnerabilities: string[] = [];
 
           maliciousInputs.forEach(input => {
             // Test for proper input sanitization
             if (this.containsSuspiciousPattern(input)) {
               // In real implementation, test if input is properly sanitized
               // For now, flag as potential vulnerability
-              vulnerabilities.push(`Potentially dangerous input pattern: ${input.substring(0, 50)}...`)
+              vulnerabilities.push(`Potentially dangerous input pattern: ${input.substring(0, 50)}...`);
             }
-          })
+          });
 
           return {
             passed: true, // Simplified for demo
             message: 'Input validation tests completed',
             details: { patternsTested: maliciousInputs.length },
             recommendation: 'Implement comprehensive input validation and sanitization'
-          }
+          };
         }
       }
-    ]
+    ];
   }
 
   // XSS Tests
@@ -362,28 +362,28 @@ export class SecurityTester {
             'javascript:alert("XSS")',
             '<svg onload=alert("XSS")>',
             '<iframe src="javascript:alert(`XSS`)">'
-          ]
+          ];
 
-          const vulnerabilities: string[] = []
+          const vulnerabilities: string[] = [];
 
           xssPayloads.forEach(payload => {
             // Test if payload appears unescaped in response
             if (context.body && typeof context.body === 'string') {
               if (context.body.includes(payload)) {
-                vulnerabilities.push(`Potential XSS with payload: ${payload}`)
+                vulnerabilities.push(`Potential XSS with payload: ${payload}`);
               }
             }
-          })
+          });
 
           return {
             passed: vulnerabilities.length === 0,
             message: vulnerabilities.length > 0 ? 'XSS vulnerabilities detected' : 'No XSS vulnerabilities found',
             evidence: vulnerabilities,
             recommendation: 'Implement proper output encoding and Content Security Policy'
-          }
+          };
         }
       }
-    ]
+    ];
   }
 
   // CSRF Tests
@@ -397,30 +397,30 @@ export class SecurityTester {
         cweId: 'CWE-352',
         description: 'Tests for CSRF protection mechanisms',
         test: async (context: TestContext) => {
-          const hasCSRFToken = context.headers['x-csrf-token'] || 
-                              (context.cookies && context.cookies['_csrf'])
-          
+          const hasCSRFToken = context.headers['x-csrf-token'] ||
+                              (context.cookies && context.cookies['_csrf']);
+
           const hasSameSiteCookie = context.headers['cookie']?.includes('SameSite=Strict') ||
-                                  context.headers['cookie']?.includes('SameSite=Lax')
+                                  context.headers['cookie']?.includes('SameSite=Lax');
 
-          const hasRefererCheck = context.headers['referer'] !== undefined
+          const hasRefererCheck = context.headers['referer'] !== undefined;
 
-          const protections: string[] = []
-          if (hasCSRFToken) protections.push('CSRF token')
-          if (hasSameSiteCookie) protections.push('SameSite cookie')
-          if (hasRefererCheck) protections.push('Referer validation')
+          const protections: string[] = [];
+          if (hasCSRFToken) protections.push('CSRF token');
+          if (hasSameSiteCookie) protections.push('SameSite cookie');
+          if (hasRefererCheck) protections.push('Referer validation');
 
-          const hasProtection = protections.length > 0
+          const hasProtection = protections.length > 0;
 
           return {
             passed: hasProtection,
             message: hasProtection ? 'CSRF protection mechanisms found' : 'No CSRF protection detected',
             details: { protections },
             recommendation: 'Implement CSRF tokens and SameSite cookie attributes'
-          }
+          };
         }
       }
-    ]
+    ];
   }
 
   // Configuration Tests
@@ -440,21 +440,21 @@ export class SecurityTester {
             'X-Content-Type-Options',
             'Strict-Transport-Security',
             'Referrer-Policy'
-          ]
+          ];
 
-          const missingHeaders = requiredHeaders.filter(header => 
+          const missingHeaders = requiredHeaders.filter(header =>
             !context.headers[header.toLowerCase()]
-          )
+          );
 
           return {
             passed: missingHeaders.length === 0,
             message: missingHeaders.length > 0 ? 'Missing security headers' : 'Security headers properly configured',
             evidence: missingHeaders,
             recommendation: 'Implement all recommended security headers'
-          }
+          };
         }
       }
-    ]
+    ];
   }
 
   // Cryptography Tests
@@ -468,21 +468,21 @@ export class SecurityTester {
         cweId: 'CWE-327',
         description: 'Tests for weak cryptographic implementations',
         test: async (context: TestContext) => {
-          const weakAlgorithms = ['MD5', 'SHA1', 'DES', 'RC4']
-          const issues: string[] = []
+          const weakAlgorithms = ['MD5', 'SHA1', 'DES', 'RC4'];
+          const issues: string[] = [];
 
           // Check for weak algorithms in headers or response
-          const responseText = JSON.stringify(context)
-          
+          const responseText = JSON.stringify(context);
+
           weakAlgorithms.forEach(algorithm => {
             if (responseText.toLowerCase().includes(algorithm.toLowerCase())) {
-              issues.push(`Weak cryptographic algorithm detected: ${algorithm}`)
+              issues.push(`Weak cryptographic algorithm detected: ${algorithm}`);
             }
-          })
+          });
 
           // Check for weak SSL/TLS (simplified check)
           if (context.url.startsWith('http:') && !context.url.includes('localhost')) {
-            issues.push('Unencrypted HTTP connection detected')
+            issues.push('Unencrypted HTTP connection detected');
           }
 
           return {
@@ -490,10 +490,10 @@ export class SecurityTester {
             message: issues.length > 0 ? 'Weak cryptography detected' : 'Cryptography appears adequate',
             evidence: issues,
             recommendation: 'Use strong cryptographic algorithms (AES, SHA-256+, TLS 1.2+)'
-          }
+          };
         }
       }
-    ]
+    ];
   }
 
   // Session Management Tests
@@ -507,20 +507,20 @@ export class SecurityTester {
         cweId: 'CWE-613',
         description: 'Tests for secure session management',
         test: async (context: TestContext) => {
-          const cookieHeader = context.headers['cookie'] || ''
-          const issues: string[] = []
+          const cookieHeader = context.headers['cookie'] || '';
+          const issues: string[] = [];
 
           // Check for secure session cookies
           if (cookieHeader && !cookieHeader.includes('Secure')) {
-            issues.push('Session cookies missing Secure flag')
+            issues.push('Session cookies missing Secure flag');
           }
 
           if (cookieHeader && !cookieHeader.includes('HttpOnly')) {
-            issues.push('Session cookies missing HttpOnly flag')
+            issues.push('Session cookies missing HttpOnly flag');
           }
 
           if (cookieHeader && !cookieHeader.includes('SameSite')) {
-            issues.push('Session cookies missing SameSite attribute')
+            issues.push('Session cookies missing SameSite attribute');
           }
 
           // Check for session fixation protection
@@ -531,32 +531,32 @@ export class SecurityTester {
             message: issues.length > 0 ? 'Session security issues found' : 'Session security appears adequate',
             evidence: issues,
             recommendation: 'Use secure session cookies with proper attributes'
-          }
+          };
         }
       }
-    ]
+    ];
   }
 
   // Test execution
   public async runSecurityTests(context: TestContext): Promise<SecurityTestReport> {
-    const startTime = Date.now()
-    const results: TestResult[] = []
-    const vulnerabilities: SecurityTestReport['vulnerabilities'] = []
+    const startTime = Date.now();
+    const results: TestResult[] = [];
+    const vulnerabilities: SecurityTestReport['vulnerabilities'] = [];
 
     if (this.config.debug) {
-      console.log(`Running ${this.tests.length} security tests...`)
+      console.log(`Running ${this.tests.length} security tests...`);
     }
 
     for (const test of this.tests) {
       try {
         // Skip tests for excluded paths
         if (this.config.excludePaths.some(path => context.url.includes(path))) {
-          continue
+          continue;
         }
 
-        const result = await test.test(context)
-        results.push(result)
-        this.testResults.set(test.id, result)
+        const result = await test.test(context);
+        results.push(result);
+        this.testResults.set(test.id, result);
 
         if (!result.passed) {
           vulnerabilities.push({
@@ -567,21 +567,21 @@ export class SecurityTester {
             cweId: test.cweId,
             recommendation: result.recommendation,
             evidence: result.evidence
-          })
+          });
         }
 
         if (this.config.debug) {
-          console.log(`Test ${test.name}: ${result.passed ? 'PASS' : 'FAIL'}`)
+          console.log(`Test ${test.name}: ${result.passed ? 'PASS' : 'FAIL'}`);
         }
       } catch (error) {
         if (this.config.debug) {
-          console.error(`Test ${test.name} failed:`, error)
+          console.error(`Test ${test.name} failed:`, error);
         }
-        
+
         results.push({
           passed: false,
           message: `Test execution failed: ${error instanceof Error ? error.message : 'Unknown error'}`
-        })
+        });
       }
     }
 
@@ -590,14 +590,14 @@ export class SecurityTester {
       passed: results.filter(r => r.passed).length,
       failed: results.filter(r => !r.passed).length,
       skipped: this.tests.length - results.length
-    }
+    };
 
     // Calculate risk score
-    const riskScore = this.calculateRiskScore(vulnerabilities)
-    const grade = this.calculateGrade(riskScore)
+    const riskScore = this.calculateRiskScore(vulnerabilities);
+    const grade = this.calculateGrade(riskScore);
 
     // Generate recommendations
-    const recommendations = this.generateRecommendations(vulnerabilities)
+    const recommendations = this.generateRecommendations(vulnerabilities);
 
     const report: SecurityTestReport = {
       timestamp: Date.now(),
@@ -606,14 +606,14 @@ export class SecurityTester {
       riskScore,
       grade,
       recommendations
-    }
+    };
 
     if (this.config.debug) {
-      console.log(`Security testing completed in ${Date.now() - startTime}ms`)
-      console.log(`Risk Score: ${riskScore}, Grade: ${grade}`)
+      console.log(`Security testing completed in ${Date.now() - startTime}ms`);
+      console.log(`Risk Score: ${riskScore}, Grade: ${grade}`);
     }
 
-    return report
+    return report;
   }
 
   // Dependency scanning
@@ -630,7 +630,7 @@ export class SecurityTester {
   }> {
     // This would integrate with tools like npm audit, Snyk, etc.
     // For demo purposes, we'll return a simulated result
-    
+
     const mockVulnerabilities = [
       {
         package: 'example-package',
@@ -639,13 +639,13 @@ export class SecurityTester {
         severity: 'medium',
         recommendation: 'Update to version 1.0.1 or later'
       }
-    ]
+    ];
 
     return {
       vulnerabilities: mockVulnerabilities,
       totalPackages: 100, // Mock number
       vulnerablePackages: mockVulnerabilities.length
-    }
+    };
   }
 
   // Helper methods
@@ -658,11 +658,11 @@ export class SecurityTester {
       'sqlite_master',
       'postgresql error',
       'warning: mysql'
-    ]
+    ];
 
-    return sqlErrorPatterns.some(pattern => 
+    return sqlErrorPatterns.some(pattern =>
       text.toLowerCase().includes(pattern)
-    )
+    );
   }
 
   private containsSuspiciousPattern(input: string): boolean {
@@ -675,72 +675,72 @@ export class SecurityTester {
       '${',
       '{{',
       '<%'
-    ]
+    ];
 
-    return suspiciousPatterns.some(pattern => 
+    return suspiciousPatterns.some(pattern =>
       input.toLowerCase().includes(pattern.toLowerCase())
-    )
+    );
   }
 
   private calculateRiskScore(vulnerabilities: SecurityTestReport['vulnerabilities']): number {
-    let score = 0
-    
+    let score = 0;
+
     vulnerabilities.forEach(vuln => {
       switch (vuln.severity) {
         case 'critical':
-          score += 10
-          break
+          score += 10;
+          break;
         case 'high':
-          score += 7
-          break
+          score += 7;
+          break;
         case 'medium':
-          score += 4
-          break
+          score += 4;
+          break;
         case 'low':
-          score += 1
-          break
+          score += 1;
+          break;
       }
-    })
+    });
 
-    return Math.min(score, 100)
+    return Math.min(score, 100);
   }
 
   private calculateGrade(riskScore: number): 'A+' | 'A' | 'B' | 'C' | 'D' | 'F' {
-    if (riskScore === 0) return 'A+'
-    if (riskScore <= 5) return 'A'
-    if (riskScore <= 15) return 'B'
-    if (riskScore <= 30) return 'C'
-    if (riskScore <= 50) return 'D'
-    return 'F'
+    if (riskScore === 0) return 'A+';
+    if (riskScore <= 5) return 'A';
+    if (riskScore <= 15) return 'B';
+    if (riskScore <= 30) return 'C';
+    if (riskScore <= 50) return 'D';
+    return 'F';
   }
 
   private generateRecommendations(vulnerabilities: SecurityTestReport['vulnerabilities']): string[] {
-    const recommendations = new Set<string>()
+    const recommendations = new Set<string>();
 
     vulnerabilities.forEach(vuln => {
       if (vuln.recommendation) {
-        recommendations.add(vuln.recommendation)
+        recommendations.add(vuln.recommendation);
       }
-    })
+    });
 
     // Add general recommendations
     if (vulnerabilities.length > 0) {
-      recommendations.add('Conduct regular security testing and code reviews')
-      recommendations.add('Implement security training for development team')
+      recommendations.add('Conduct regular security testing and code reviews');
+      recommendations.add('Implement security training for development team');
     }
 
-    return Array.from(recommendations)
+    return Array.from(recommendations);
   }
 
   // Report generation
   public generateReport(report: SecurityTestReport, format: 'json' | 'html' | 'text' = 'json'): string {
     switch (format) {
       case 'html':
-        return this.generateHTMLReport(report)
+        return this.generateHTMLReport(report);
       case 'text':
-        return this.generateTextReport(report)
+        return this.generateTextReport(report);
       default:
-        return JSON.stringify(report, null, 2)
+        return JSON.stringify(report, null, 2);
     }
   }
 
@@ -796,7 +796,7 @@ export class SecurityTester {
         ${report.recommendations.map(rec => `<li>${rec}</li>`).join('')}
     </ul>
 </body>
-</html>`
+</html>`;
   }
 
   private generateTextReport(report: SecurityTestReport): string {
@@ -823,40 +823,40 @@ ${report.vulnerabilities.map(vuln => `
 
 RECOMMENDATIONS:
 ${report.recommendations.map(rec => `- ${rec}`).join('\n')}
-`
+`;
   }
 
   public getTestResults(): Map<string, TestResult> {
-    return new Map(this.testResults)
+    return new Map(this.testResults);
   }
 
   public addCustomTest(test: SecurityTest): void {
-    this.tests.push(test)
+    this.tests.push(test);
   }
 
   public removeTest(testId: string): boolean {
-    const index = this.tests.findIndex(t => t.id === testId)
+    const index = this.tests.findIndex(t => t.id === testId);
     if (index !== -1) {
-      this.tests.splice(index, 1)
-      return true
+      this.tests.splice(index, 1);
+      return true;
     }
-    return false
+    return false;
   }
 }
 
 // Factory functions
 export function createSecurityTester(config?: SecurityTestConfig): SecurityTester {
-  return new SecurityTester(config)
+  return new SecurityTester(config);
 }
 
 export async function runQuickSecurityScan(context: TestContext): Promise<SecurityTestReport> {
-  const tester = createSecurityTester({ testDepth: 'basic' })
-  return await tester.runSecurityTests(context)
+  const tester = createSecurityTester({ testDepth: 'basic' });
+  return await tester.runSecurityTests(context);
 }
 
 export async function runComprehensiveSecurityScan(context: TestContext): Promise<SecurityTestReport> {
-  const tester = createSecurityTester({ testDepth: 'comprehensive' })
-  return await tester.runSecurityTests(context)
+  const tester = createSecurityTester({ testDepth: 'comprehensive' });
+  return await tester.runSecurityTests(context);
 }
 
-export default SecurityTester
+export default SecurityTester;

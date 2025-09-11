@@ -1,4 +1,4 @@
-import { Locale } from '@/i18n'
+import { Locale } from '@/i18n';
 
 // 货币映射配置
 const currencyMap: Record<Locale, string> = {
@@ -12,7 +12,7 @@ const currencyMap: Record<Locale, string> = {
   'es': 'EUR',
   'ru': 'RUB',
   'ar': 'AED', // 阿联酋迪拉姆，常用于阿拉伯地区
-}
+};
 
 // 数字格式化配置
 const numberFormatOptions: Record<Locale, Intl.NumberFormatOptions> = {
@@ -26,18 +26,18 @@ const numberFormatOptions: Record<Locale, Intl.NumberFormatOptions> = {
   'es': { minimumFractionDigits: 0, maximumFractionDigits: 2 },
   'ru': { minimumFractionDigits: 0, maximumFractionDigits: 2 },
   'ar': { minimumFractionDigits: 0, maximumFractionDigits: 2 },
-}
+};
 
 /**
  * 格式化数字
  */
 export function formatNumber(value: number, locale: Locale): string {
   try {
-    const formatter = new Intl.NumberFormat(locale, numberFormatOptions[locale])
-    return formatter.format(value)
+    const formatter = new Intl.NumberFormat(locale, numberFormatOptions[locale]);
+    return formatter.format(value);
   } catch (error) {
-    console.warn(`Failed to format number for locale ${locale}:`, error)
-    return value.toString()
+    console.warn(`Failed to format number for locale ${locale}:`, error);
+    return value.toString();
   }
 }
 
@@ -46,17 +46,17 @@ export function formatNumber(value: number, locale: Locale): string {
  */
 export function formatCurrency(value: number, locale: Locale, currency?: string): string {
   try {
-    const targetCurrency = currency || currencyMap[locale] || 'USD'
+    const targetCurrency = currency || currencyMap[locale] || 'USD';
     const formatter = new Intl.NumberFormat(locale, {
       style: 'currency',
       currency: targetCurrency,
       minimumFractionDigits: 0,
       maximumFractionDigits: 2,
-    })
-    return formatter.format(value)
+    });
+    return formatter.format(value);
   } catch (error) {
-    console.warn(`Failed to format currency for locale ${locale}:`, error)
-    return `${value} ${currency || currencyMap[locale] || 'USD'}`
+    console.warn(`Failed to format currency for locale ${locale}:`, error);
+    return `${value} ${currency || currencyMap[locale] || 'USD'}`;
   }
 }
 
@@ -69,11 +69,11 @@ export function formatPercent(value: number, locale: Locale, decimals: number = 
       style: 'percent',
       minimumFractionDigits: decimals,
       maximumFractionDigits: decimals,
-    })
-    return formatter.format(value / 100) // 输入应该是0-100的数字
+    });
+    return formatter.format(value / 100); // 输入应该是0-100的数字
   } catch (error) {
-    console.warn(`Failed to format percent for locale ${locale}:`, error)
-    return `${value}%`
+    console.warn(`Failed to format percent for locale ${locale}:`, error);
+    return `${value}%`;
   }
 }
 
@@ -86,11 +86,11 @@ export function formatDateShort(date: Date, locale: Locale): string {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
-    })
-    return formatter.format(date)
+    });
+    return formatter.format(date);
   } catch (error) {
-    console.warn(`Failed to format date for locale ${locale}:`, error)
-    return date.toLocaleDateString()
+    console.warn(`Failed to format date for locale ${locale}:`, error);
+    return date.toLocaleDateString();
   }
 }
 
@@ -104,11 +104,11 @@ export function formatDateLong(date: Date, locale: Locale): string {
       month: 'long',
       day: 'numeric',
       weekday: 'long',
-    })
-    return formatter.format(date)
+    });
+    return formatter.format(date);
   } catch (error) {
-    console.warn(`Failed to format date for locale ${locale}:`, error)
-    return date.toLocaleDateString()
+    console.warn(`Failed to format date for locale ${locale}:`, error);
+    return date.toLocaleDateString();
   }
 }
 
@@ -122,11 +122,11 @@ export function formatTime(date: Date, locale: Locale, includeSeconds: boolean =
       minute: '2-digit',
       second: includeSeconds ? '2-digit' : undefined,
       hour12: locale === 'en', // 英语使用12小时制，其他使用24小时制
-    })
-    return formatter.format(date)
+    });
+    return formatter.format(date);
   } catch (error) {
-    console.warn(`Failed to format time for locale ${locale}:`, error)
-    return date.toLocaleTimeString()
+    console.warn(`Failed to format time for locale ${locale}:`, error);
+    return date.toLocaleTimeString();
   }
 }
 
@@ -142,11 +142,11 @@ export function formatDateTime(date: Date, locale: Locale): string {
       hour: 'numeric',
       minute: '2-digit',
       hour12: locale === 'en',
-    })
-    return formatter.format(date)
+    });
+    return formatter.format(date);
   } catch (error) {
-    console.warn(`Failed to format datetime for locale ${locale}:`, error)
-    return date.toLocaleString()
+    console.warn(`Failed to format datetime for locale ${locale}:`, error);
+    return date.toLocaleString();
   }
 }
 
@@ -155,13 +155,13 @@ export function formatDateTime(date: Date, locale: Locale): string {
  */
 export function formatRelativeTime(date: Date, locale: Locale): string {
   try {
-    const now = new Date()
-    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
-    
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
     const rtf = new Intl.RelativeTimeFormat(locale, {
       numeric: 'auto',
       style: 'long',
-    })
+    });
 
     // 定义时间单位（秒）
     const units = [
@@ -172,19 +172,19 @@ export function formatRelativeTime(date: Date, locale: Locale): string {
       { unit: 'hour' as const, seconds: 3600 },
       { unit: 'minute' as const, seconds: 60 },
       { unit: 'second' as const, seconds: 1 },
-    ]
+    ];
 
     for (const { unit, seconds } of units) {
-      const interval = Math.floor(diffInSeconds / seconds)
+      const interval = Math.floor(diffInSeconds / seconds);
       if (interval >= 1) {
-        return rtf.format(-interval, unit)
+        return rtf.format(-interval, unit);
       }
     }
 
-    return rtf.format(0, 'second') // 刚刚
+    return rtf.format(0, 'second'); // 刚刚
   } catch (error) {
-    console.warn(`Failed to format relative time for locale ${locale}:`, error)
-    return formatDateShort(date, locale)
+    console.warn(`Failed to format relative time for locale ${locale}:`, error);
+    return formatDateShort(date, locale);
   }
 }
 
@@ -193,24 +193,24 @@ export function formatRelativeTime(date: Date, locale: Locale): string {
  */
 export function formatFileSize(bytes: number, locale: Locale): string {
   try {
-    const units = ['B', 'KB', 'MB', 'GB', 'TB']
-    let size = bytes
-    let unitIndex = 0
+    const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    let size = bytes;
+    let unitIndex = 0;
 
     while (size >= 1024 && unitIndex < units.length - 1) {
-      size /= 1024
-      unitIndex++
+      size /= 1024;
+      unitIndex++;
     }
 
     const formatter = new Intl.NumberFormat(locale, {
       minimumFractionDigits: 0,
       maximumFractionDigits: unitIndex === 0 ? 0 : 1,
-    })
+    });
 
-    return `${formatter.format(size)} ${units[unitIndex]}`
+    return `${formatter.format(size)} ${units[unitIndex]}`;
   } catch (error) {
-    console.warn(`Failed to format file size for locale ${locale}:`, error)
-    return `${bytes} B`
+    console.warn(`Failed to format file size for locale ${locale}:`, error);
+    return `${bytes} B`;
   }
 }
 
@@ -222,10 +222,10 @@ export function formatCompactNumber(value: number, locale: Locale): string {
     const formatter = new Intl.NumberFormat(locale, {
       notation: 'compact',
       compactDisplay: 'short',
-    })
-    return formatter.format(value)
+    });
+    return formatter.format(value);
   } catch (error) {
-    console.warn(`Failed to format compact number for locale ${locale}:`, error)
-    return formatNumber(value, locale)
+    console.warn(`Failed to format compact number for locale ${locale}:`, error);
+    return formatNumber(value, locale);
   }
 }

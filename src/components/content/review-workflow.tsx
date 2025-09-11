@@ -1,25 +1,14 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Progress } from '@/components/ui/progress'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { 
-  FileText, 
-  Clock, 
-  CheckCircle, 
-  XCircle, 
-  AlertCircle, 
-  User, 
+import { useState, useEffect } from 'react';
+
+import {
+  FileText,
+  Clock,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  User,
   Calendar,
   MessageCircle,
   Edit,
@@ -28,8 +17,21 @@ import {
   Search,
   Plus,
   MoreHorizontal
-} from 'lucide-react'
-import { useLocale } from 'next-intl'
+} from 'lucide-react';
+import { useLocale } from 'next-intl';
+
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Progress } from '@/components/ui/progress';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 
 interface ReviewComment {
   id: string
@@ -143,16 +145,16 @@ const mockReviews: ContentReview[] = [
       revisionCount: 2
     }
   }
-]
+];
 
 export function ReviewWorkflow() {
-  const locale = useLocale()
-  const [reviews, setReviews] = useState<ContentReview[]>(mockReviews)
-  const [selectedReview, setSelectedReview] = useState<ContentReview | null>(null)
-  const [filterStatus, setFilterStatus] = useState<string>('all')
-  const [filterPriority, setFilterPriority] = useState<string>('all')
-  const [searchQuery, setSearchQuery] = useState('')
-  
+  const locale = useLocale();
+  const [reviews, setReviews] = useState<ContentReview[]>(mockReviews);
+  const [selectedReview, setSelectedReview] = useState<ContentReview | null>(null);
+  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [filterPriority, setFilterPriority] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+
   const statusConfig = {
     draft: { label: '草稿', color: 'bg-gray-500', icon: FileText },
     pendingReview: { label: '待审核', color: 'bg-yellow-500', icon: Clock },
@@ -161,50 +163,50 @@ export function ReviewWorkflow() {
     approved: { label: '已批准', color: 'bg-green-500', icon: CheckCircle },
     published: { label: '已发布', color: 'bg-purple-500', icon: CheckCircle },
     archived: { label: '已归档', color: 'bg-gray-400', icon: XCircle }
-  }
-  
+  };
+
   const priorityConfig = {
     low: { label: '低', color: 'bg-gray-100 text-gray-800' },
     medium: { label: '中', color: 'bg-blue-100 text-blue-800' },
     high: { label: '高', color: 'bg-orange-100 text-orange-800' },
     urgent: { label: '紧急', color: 'bg-red-100 text-red-800' }
-  }
-  
+  };
+
   const filteredReviews = reviews.filter(review => {
-    const matchesStatus = filterStatus === 'all' || review.status === filterStatus
-    const matchesPriority = filterPriority === 'all' || review.priority === filterPriority
-    const matchesSearch = !searchQuery || 
+    const matchesStatus = filterStatus === 'all' || review.status === filterStatus;
+    const matchesPriority = filterPriority === 'all' || review.priority === filterPriority;
+    const matchesSearch = !searchQuery ||
       review.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      review.contentType.toLowerCase().includes(searchQuery.toLowerCase())
-    
-    return matchesStatus && matchesPriority && matchesSearch
-  })
-  
+      review.contentType.toLowerCase().includes(searchQuery.toLowerCase());
+
+    return matchesStatus && matchesPriority && matchesSearch;
+  });
+
   const handleStatusChange = (reviewId: string, newStatus: string) => {
-    setReviews(reviews.map(review => 
-      review.id === reviewId 
+    setReviews(reviews.map(review =>
+      review.id === reviewId
         ? { ...review, status: newStatus as ContentReview['status'] }
         : review
-    ))
-  }
-  
+    ));
+  };
+
   const handleAddComment = (reviewId: string, comment: Omit<ReviewComment, 'id' | 'createdAt'>) => {
     const newComment: ReviewComment = {
       ...comment,
       id: Date.now().toString(),
       createdAt: new Date().toISOString()
-    }
-    
-    setReviews(reviews.map(review => 
-      review.id === reviewId 
+    };
+
+    setReviews(reviews.map(review =>
+      review.id === reviewId
         ? { ...review, reviewComments: [...review.reviewComments, newComment] }
         : review
-    ))
-  }
-  
+    ));
+  };
+
   const handleChecklistToggle = (reviewId: string, itemId: string) => {
-    setReviews(reviews.map(review => 
-      review.id === reviewId 
+    setReviews(reviews.map(review =>
+      review.id === reviewId
         ? {
             ...review,
             checklist: review.checklist.map(item =>
@@ -212,21 +214,21 @@ export function ReviewWorkflow() {
             )
           }
         : review
-    ))
-  }
-  
+    ));
+  };
+
   const getProgressPercentage = (checklist: ChecklistItem[]) => {
-    const completed = checklist.filter(item => item.checked).length
-    return checklist.length > 0 ? (completed / checklist.length) * 100 : 0
-  }
-  
+    const completed = checklist.filter(item => item.checked).length;
+    return checklist.length > 0 ? (completed / checklist.length) * 100 : 0;
+  };
+
   return (
     <div className="container mx-auto p-6">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">内容审核工作流</h1>
         <p className="text-gray-600">管理和跟踪内容审核流程</p>
       </div>
-      
+
       <div className="mb-6 flex flex-wrap gap-4 items-center">
         <div className="flex-1 min-w-[200px]">
           <div className="relative">
@@ -239,7 +241,7 @@ export function ReviewWorkflow() {
             />
           </div>
         </div>
-        
+
         <Select value={filterStatus} onValueChange={setFilterStatus}>
           <SelectTrigger className="w-[150px]">
             <SelectValue />
@@ -252,7 +254,7 @@ export function ReviewWorkflow() {
             <SelectItem value="approved">已批准</SelectItem>
           </SelectContent>
         </Select>
-        
+
         <Select value={filterPriority} onValueChange={setFilterPriority}>
           <SelectTrigger className="w-[120px]">
             <SelectValue />
@@ -265,7 +267,7 @@ export function ReviewWorkflow() {
             <SelectItem value="low">低</SelectItem>
           </SelectContent>
         </Select>
-        
+
         <Dialog>
           <DialogTrigger asChild>
             <Button>
@@ -281,12 +283,12 @@ export function ReviewWorkflow() {
           </DialogContent>
         </Dialog>
       </div>
-      
+
       <div className="grid gap-6">
         {filteredReviews.map((review) => {
-          const StatusIcon = statusConfig[review.status].icon
-          const progress = getProgressPercentage(review.checklist)
-          
+          const StatusIcon = statusConfig[review.status].icon;
+          const progress = getProgressPercentage(review.checklist);
+
           return (
             <Card key={review.id} className="hover:shadow-md transition-shadow">
               <CardHeader className="pb-4">
@@ -304,7 +306,7 @@ export function ReviewWorkflow() {
                       </CardDescription>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
                     <Badge className={statusConfig[review.status].color}>
                       {statusConfig[review.status].label}
@@ -315,7 +317,7 @@ export function ReviewWorkflow() {
                   </div>
                 </div>
               </CardHeader>
-              
+
               <CardContent>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-4">
@@ -332,7 +334,7 @@ export function ReviewWorkflow() {
                         <span className="text-sm">{review.submittedBy.name}</span>
                       </div>
                     </div>
-                    
+
                     {review.assignedReviewer && (
                       <div className="flex items-center gap-3">
                         <div className="flex items-center gap-2">
@@ -348,14 +350,14 @@ export function ReviewWorkflow() {
                         </div>
                       </div>
                     )}
-                    
+
                     <div className="flex items-center gap-3">
                       <Calendar className="h-4 w-4" />
                       <span className="text-sm text-gray-600">
                         提交时间: {new Date(review.submittedAt).toLocaleString()}
                       </span>
                     </div>
-                    
+
                     {review.dueDate && (
                       <div className="flex items-center gap-3">
                         <Clock className="h-4 w-4" />
@@ -365,7 +367,7 @@ export function ReviewWorkflow() {
                       </div>
                     )}
                   </div>
-                  
+
                   <div className="space-y-4">
                     <div>
                       <div className="flex items-center justify-between mb-2">
@@ -376,7 +378,7 @@ export function ReviewWorkflow() {
                       </div>
                       <Progress value={progress} className="h-2" />
                     </div>
-                    
+
                     <div className="flex items-center gap-3">
                       <MessageCircle className="h-4 w-4" />
                       <span className="text-sm text-gray-600">
@@ -388,7 +390,7 @@ export function ReviewWorkflow() {
                         )}
                       </span>
                     </div>
-                    
+
                     {review.metadata.changesSummary && (
                       <div className="text-sm text-gray-600">
                         <strong>变更摘要:</strong> {review.metadata.changesSummary}
@@ -396,7 +398,7 @@ export function ReviewWorkflow() {
                     )}
                   </div>
                 </div>
-                
+
                 <div className="flex items-center justify-between pt-4 mt-4 border-t">
                   <div className="flex gap-2">
                     <Button
@@ -406,9 +408,9 @@ export function ReviewWorkflow() {
                     >
                       查看详情
                     </Button>
-                    
-                    <Select 
-                      value={review.status} 
+
+                    <Select
+                      value={review.status}
                       onValueChange={(value) => handleStatusChange(review.id, value)}
                     >
                       <SelectTrigger className="w-[120px] h-8">
@@ -423,22 +425,22 @@ export function ReviewWorkflow() {
                       </SelectContent>
                     </Select>
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
                     <div className="text-xs text-gray-500">
                       工作流: 第 {review.workflow.currentStep + 1}/{review.workflow.steps.length} 步
                     </div>
-                    <Progress 
-                      value={(review.workflow.currentStep / review.workflow.steps.length) * 100} 
+                    <Progress
+                      value={(review.workflow.currentStep / review.workflow.steps.length) * 100}
                       className="w-16 h-2"
                     />
                   </div>
                 </div>
               </CardContent>
             </Card>
-          )
+          );
         })}
-        
+
         {filteredReviews.length === 0 && (
           <div className="text-center py-12">
             <FileText className="h-12 w-12 mx-auto text-gray-300 mb-4" />
@@ -447,7 +449,7 @@ export function ReviewWorkflow() {
           </div>
         )}
       </div>
-      
+
       {/* Review Detail Dialog */}
       {selectedReview && (
         <Dialog open={!!selectedReview} onOpenChange={() => setSelectedReview(null)}>
@@ -461,7 +463,7 @@ export function ReviewWorkflow() {
                 </Badge>
               </DialogTitle>
             </DialogHeader>
-            
+
             <Tabs defaultValue="overview" className="mt-6">
               <TabsList>
                 <TabsTrigger value="overview">概览</TabsTrigger>
@@ -469,7 +471,7 @@ export function ReviewWorkflow() {
                 <TabsTrigger value="comments">评论</TabsTrigger>
                 <TabsTrigger value="workflow">工作流</TabsTrigger>
               </TabsList>
-              
+
               <TabsContent value="overview" className="space-y-4">
                 <div className="grid md:grid-cols-2 gap-6">
                   <Card>
@@ -480,7 +482,7 @@ export function ReviewWorkflow() {
                       <div><strong>内容ID:</strong> {selectedReview.contentId}</div>
                       <div><strong>内容类型:</strong> {selectedReview.contentType}</div>
                       <div><strong>版本:</strong> v{selectedReview.metadata.version}</div>
-                      <div><strong>优先级:</strong> 
+                      <div><strong>优先级:</strong>
                         <Badge className={`ml-2 ${priorityConfig[selectedReview.priority].color}`}>
                           {priorityConfig[selectedReview.priority].label}
                         </Badge>
@@ -488,7 +490,7 @@ export function ReviewWorkflow() {
                       <div><strong>修改次数:</strong> {selectedReview.metadata.revisionCount}</div>
                     </CardContent>
                   </Card>
-                  
+
                   <Card>
                     <CardHeader>
                       <CardTitle>时间信息</CardTitle>
@@ -504,7 +506,7 @@ export function ReviewWorkflow() {
                     </CardContent>
                   </Card>
                 </div>
-                
+
                 {selectedReview.metadata.changesSummary && (
                   <Card>
                     <CardHeader>
@@ -516,12 +518,12 @@ export function ReviewWorkflow() {
                   </Card>
                 )}
               </TabsContent>
-              
+
               <TabsContent value="checklist" className="space-y-4">
                 <div className="space-y-2">
                   {selectedReview.checklist.map((item) => (
                     <div key={item.id} className="flex items-center gap-3 p-3 border rounded-lg">
-                      <Checkbox 
+                      <Checkbox
                         checked={item.checked}
                         onCheckedChange={() => handleChecklistToggle(selectedReview.id, item.id)}
                       />
@@ -537,7 +539,7 @@ export function ReviewWorkflow() {
                   ))}
                 </div>
               </TabsContent>
-              
+
               <TabsContent value="comments" className="space-y-4">
                 <div className="space-y-4">
                   {selectedReview.reviewComments.map((comment) => (
@@ -566,7 +568,7 @@ export function ReviewWorkflow() {
                     </Card>
                   ))}
                 </div>
-                
+
                 <Card>
                   <CardHeader>
                     <CardTitle>添加评论</CardTitle>
@@ -593,7 +595,7 @@ export function ReviewWorkflow() {
                   </CardContent>
                 </Card>
               </TabsContent>
-              
+
               <TabsContent value="workflow" className="space-y-4">
                 <div className="space-y-4">
                   {selectedReview.workflow.steps.map((step, index) => (
@@ -601,13 +603,13 @@ export function ReviewWorkflow() {
                       <CardContent className="pt-4">
                         <div className="flex items-center gap-4">
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                            step.completed ? 'bg-green-500 text-white' : 
+                            step.completed ? 'bg-green-500 text-white' :
                             index === selectedReview.workflow.currentStep ? 'bg-blue-500 text-white' :
                             'bg-gray-200 text-gray-600'
                           }`}>
                             {step.completed ? <CheckCircle className="h-4 w-4" /> : index + 1}
                           </div>
-                          
+
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
                               <span className="font-medium">{step.step}</span>
@@ -618,14 +620,14 @@ export function ReviewWorkflow() {
                                 <Badge className="bg-blue-500">当前步骤</Badge>
                               )}
                             </div>
-                            
+
                             {step.assignee && (
                               <div className="flex items-center gap-2 text-sm text-gray-600">
                                 <User className="h-3 w-3" />
                                 <span>负责人: {step.assignee.name}</span>
                               </div>
                             )}
-                            
+
                             {step.completed && step.completedAt && (
                               <div className="text-sm text-gray-600">
                                 完成时间: {new Date(step.completedAt).toLocaleString()}
@@ -643,5 +645,5 @@ export function ReviewWorkflow() {
         </Dialog>
       )}
     </div>
-  )
+  );
 }

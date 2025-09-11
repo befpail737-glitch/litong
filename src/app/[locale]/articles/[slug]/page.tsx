@@ -1,12 +1,14 @@
-import { notFound } from 'next/navigation'
-import { getArticle } from '@/lib/sanity/queries'
-import { urlFor } from '@/lib/sanity/client'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import Image from 'next/image'
-import Link from 'next/link'
-import PortableText from '@/components/PortableText'
-import { Calendar, Clock, User, Building2, ArrowLeft, Tag } from 'lucide-react'
+import Image from 'next/image';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+
+import { Calendar, Clock, User, Building2, ArrowLeft, Tag } from 'lucide-react';
+
+import PortableText from '@/components/PortableText';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { urlFor } from '@/lib/sanity/client';
+import { getArticle } from '@/lib/sanity/queries';
 
 type Article = {
   _id: string
@@ -45,32 +47,32 @@ interface ArticleDetailPageProps {
   }
 }
 
-// 禁用缓存，确保总是获取最新数据  
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+// 禁用缓存，确保总是获取最新数据
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function ArticleDetailPage({ params: { locale, slug } }: ArticleDetailPageProps) {
-  
+
   // 解码URL编码的slug（处理包含空格的slug）
-  const decodedSlug = decodeURIComponent(slug)
-  console.log('ArticleDetailPage called with slug:', slug, 'decoded:', decodedSlug)
-  
-  let article: Article | null = null
-  let error = null
-  
+  const decodedSlug = decodeURIComponent(slug);
+  console.log('ArticleDetailPage called with slug:', slug, 'decoded:', decodedSlug);
+
+  let article: Article | null = null;
+  let error = null;
+
   try {
-    article = await getArticle(decodedSlug)
-    console.log('Successfully fetched article from Sanity:', article?._id || 'null')
+    article = await getArticle(decodedSlug);
+    console.log('Successfully fetched article from Sanity:', article?._id || 'null');
     console.log('Article brand data:', {
       relatedBrands: article?.relatedBrands?.map(b => b.name)
-    })
+    });
   } catch (err) {
-    error = err instanceof Error ? err.message : 'Failed to fetch article'
-    console.error('Error fetching article from Sanity:', err)
+    error = err instanceof Error ? err.message : 'Failed to fetch article';
+    console.error('Error fetching article from Sanity:', err);
   }
 
   if (!article && !error) {
-    notFound()
+    notFound();
   }
 
   if (error) {
@@ -81,7 +83,7 @@ export default async function ArticleDetailPage({ params: { locale, slug } }: Ar
           <p className="text-red-600 mt-2">{error}</p>
         </div>
       </div>
-    )
+    );
   }
 
   const difficultyLabels: Record<string, string> = {
@@ -89,14 +91,14 @@ export default async function ArticleDetailPage({ params: { locale, slug } }: Ar
     'intermediate': '中级',
     'advanced': '高级',
     'expert': '专家'
-  }
+  };
 
   const difficultyColors: Record<string, string> = {
     'beginner': 'bg-green-100 text-green-800',
     'intermediate': 'bg-blue-100 text-blue-800',
     'advanced': 'bg-orange-100 text-orange-800',
     'expert': 'bg-red-100 text-red-800'
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -105,14 +107,14 @@ export default async function ArticleDetailPage({ params: { locale, slug } }: Ar
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
             {/* 返回技术文章列表的链接 */}
-            <Link 
+            <Link
               href={`/${locale}/articles`}
               className="inline-flex items-center gap-2 text-blue-100 hover:text-white mb-6 transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
               返回技术文章列表
             </Link>
-            
+
             <div className="mb-8">
               {/* 文章标签 */}
               <div className="flex flex-wrap items-center gap-2 mb-4">
@@ -122,8 +124,8 @@ export default async function ArticleDetailPage({ params: { locale, slug } }: Ar
                   </Badge>
                 )}
                 {article!.difficulty && (
-                  <Badge 
-                    variant="secondary" 
+                  <Badge
+                    variant="secondary"
                     className={`${difficultyColors[article!.difficulty]} border-0`}
                   >
                     {difficultyLabels[article!.difficulty] || article!.difficulty}
@@ -141,15 +143,15 @@ export default async function ArticleDetailPage({ params: { locale, slug } }: Ar
                   </Badge>
                 )}
               </div>
-              
+
               <h1 className="text-4xl font-bold mb-4">
                 {article!.title || '未命名文章'}
               </h1>
-              
+
               <p className="text-xl text-blue-100 mb-6">
                 {article!.excerpt || '暂无简介'}
               </p>
-              
+
               {/* 文章元信息 */}
               <div className="flex flex-wrap items-center gap-6 text-sm text-blue-100">
                 {article!.author && (
@@ -337,24 +339,24 @@ export default async function ArticleDetailPage({ params: { locale, slug } }: Ar
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // SEO元数据
 export async function generateMetadata({ params }: ArticleDetailPageProps) {
-  const decodedSlug = decodeURIComponent(params.slug)
-  
+  const decodedSlug = decodeURIComponent(params.slug);
+
   try {
-    const article = await getArticle(decodedSlug)
-    
+    const article = await getArticle(decodedSlug);
+
     if (!article) {
       return {
         title: '文章未找到 | 力通电子'
-      }
+      };
     }
 
-    const brandNames = article.relatedBrands?.map((b: any) => b.name).join(', ') || ''
-    
+    const brandNames = article.relatedBrands?.map((b: any) => b.name).join(', ') || '';
+
     return {
       title: `${article.title} | 力通电子技术文章`,
       description: article.excerpt || `${article.title} - 力通电子技术文章`,
@@ -381,11 +383,11 @@ export async function generateMetadata({ params }: ArticleDetailPageProps) {
           }]
         })
       }
-    }
+    };
   } catch (error) {
-    console.error('Error generating metadata for article:', error)
+    console.error('Error generating metadata for article:', error);
     return {
       title: '技术文章 | 力通电子'
-    }
+    };
   }
 }

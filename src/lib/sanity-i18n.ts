@@ -1,4 +1,4 @@
-import { Locale } from '@/i18n'
+import { Locale } from '@/i18n';
 
 /**
  * 从本地化字段中获取特定语言的值
@@ -9,26 +9,26 @@ export function getLocalizedValue(
   fallbackLocale: Locale = 'zh-CN'
 ): string {
   if (!localizedField || typeof localizedField !== 'object') {
-    return ''
+    return '';
   }
-  
+
   // 转换locale格式 (zh-CN -> zhCN, zh-TW -> zhTW)
-  const sanityLocale = locale.replace('-', '')
-  const sanityFallback = fallbackLocale.replace('-', '')
-  
+  const sanityLocale = locale.replace('-', '');
+  const sanityFallback = fallbackLocale.replace('-', '');
+
   // 首先尝试获取请求的语言
   if (localizedField[sanityLocale]) {
-    return localizedField[sanityLocale]
+    return localizedField[sanityLocale];
   }
-  
+
   // 然后尝试获取默认语言
   if (localizedField[sanityFallback]) {
-    return localizedField[sanityFallback]
+    return localizedField[sanityFallback];
   }
-  
+
   // 最后获取任何可用的值
-  const availableValues = Object.values(localizedField).filter(Boolean)
-  return (availableValues[0] as string) || ''
+  const availableValues = Object.values(localizedField).filter(Boolean);
+  return (availableValues[0] as string) || '';
 }
 
 /**
@@ -40,24 +40,24 @@ export function getLocalizedRichText(
   fallbackLocale: Locale = 'zh-CN'
 ): any[] {
   if (!localizedField || typeof localizedField !== 'object') {
-    return []
+    return [];
   }
-  
+
   // 首先尝试获取请求的语言
   if (localizedField[locale] && Array.isArray(localizedField[locale])) {
-    return localizedField[locale]
+    return localizedField[locale];
   }
-  
+
   // 然后尝试获取默认语言
   if (localizedField[fallbackLocale] && Array.isArray(localizedField[fallbackLocale])) {
-    return localizedField[fallbackLocale]
+    return localizedField[fallbackLocale];
   }
-  
+
   // 最后获取任何可用的值
-  const availableValues = Object.values(localizedField).filter(value => 
+  const availableValues = Object.values(localizedField).filter(value =>
     Array.isArray(value) && value.length > 0
-  )
-  return (availableValues[0] as any[]) || []
+  );
+  return (availableValues[0] as any[]) || [];
 }
 
 /**
@@ -74,15 +74,15 @@ export function getLocalizedSEO(
       description: '',
       keywords: [],
       ogImage: null
-    }
+    };
   }
-  
+
   return {
     title: getLocalizedValue(seoField.title, locale, fallbackLocale),
     description: getLocalizedValue(seoField.description, locale, fallbackLocale),
     keywords: getLocalizedArray(seoField.keywords, locale, fallbackLocale),
     ogImage: seoField.ogImage || null
-  }
+  };
 }
 
 /**
@@ -94,24 +94,24 @@ export function getLocalizedArray(
   fallbackLocale: Locale = 'zh-CN'
 ): string[] {
   if (!localizedField || typeof localizedField !== 'object') {
-    return []
+    return [];
   }
-  
+
   // 首先尝试获取请求的语言
   if (localizedField[locale] && Array.isArray(localizedField[locale])) {
-    return localizedField[locale]
+    return localizedField[locale];
   }
-  
+
   // 然后尝试获取默认语言
   if (localizedField[fallbackLocale] && Array.isArray(localizedField[fallbackLocale])) {
-    return localizedField[fallbackLocale]
+    return localizedField[fallbackLocale];
   }
-  
+
   // 最后获取任何可用的值
-  const availableValues = Object.values(localizedField).filter(value => 
+  const availableValues = Object.values(localizedField).filter(value =>
     Array.isArray(value) && value.length > 0
-  )
-  return (availableValues[0] as string[]) || []
+  );
+  return (availableValues[0] as string[]) || [];
 }
 
 /**
@@ -119,8 +119,8 @@ export function getLocalizedArray(
  * 例如: buildLocalizedProjection('title') => 'title { zh-CN, zh-TW, en, ja, ko, de, fr, es, ru, ar }'
  */
 export function buildLocalizedProjection(fieldName: string): string {
-  const languages = ['zh-CN', 'zh-TW', 'en', 'ja', 'ko', 'de', 'fr', 'es', 'ru', 'ar']
-  return `${fieldName} { ${languages.join(', ')} }`
+  const languages = ['zh-CN', 'zh-TW', 'en', 'ja', 'ko', 'de', 'fr', 'es', 'ru', 'ar'];
+  return `${fieldName} { ${languages.join(', ')} }`;
 }
 
 /**
@@ -132,7 +132,7 @@ export function buildLocalizedSEOProjection(fieldName = 'seo'): string {
     description { zh-CN, zh-TW, en, ja, ko, de, fr, es, ru, ar },
     keywords { zh-CN, zh-TW, en, ja, ko, de, fr, es, ru, ar },
     ogImage
-  }`
+  }`;
 }
 
 /**
@@ -140,12 +140,12 @@ export function buildLocalizedSEOProjection(fieldName = 'seo'): string {
  */
 export function isLocalizedFieldEmpty(localizedField: any): boolean {
   if (!localizedField || typeof localizedField !== 'object') {
-    return true
+    return true;
   }
-  
-  return !Object.values(localizedField).some(value => 
+
+  return !Object.values(localizedField).some(value =>
     value && (typeof value === 'string' ? value.trim() : true)
-  )
+  );
 }
 
 /**
@@ -153,14 +153,14 @@ export function isLocalizedFieldEmpty(localizedField: any): boolean {
  */
 export function getAvailableLanguages(localizedField: any): Locale[] {
   if (!localizedField || typeof localizedField !== 'object') {
-    return []
+    return [];
   }
-  
-  return Object.keys(localizedField).filter(key => 
-    localizedField[key] && (typeof localizedField[key] === 'string' 
-      ? localizedField[key].trim() 
+
+  return Object.keys(localizedField).filter(key =>
+    localizedField[key] && (typeof localizedField[key] === 'string'
+      ? localizedField[key].trim()
       : true)
-  ) as Locale[]
+  ) as Locale[];
 }
 
 /**

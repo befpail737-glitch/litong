@@ -1,7 +1,7 @@
 /**
  * Data Migration System for Electronics Distributor
  * Comprehensive system for migrating product data, brands, and technical documents
- * 
+ *
  * Features:
  * - Product data import with validation
  * - Brand data management and logo processing
@@ -213,49 +213,49 @@ export interface DocumentData {
 }
 
 export class DataMigrationSystem {
-  private config: MigrationConfig
-  private activeJobs: Map<string, MigrationJob> = new Map()
-  private migrationHistory: MigrationJob[] = []
+  private config: MigrationConfig;
+  private activeJobs: Map<string, MigrationJob> = new Map();
+  private migrationHistory: MigrationJob[] = [];
 
   constructor(config: MigrationConfig) {
-    this.config = config
+    this.config = config;
   }
 
   // Product Data Migration
   public async migrateProducts(sourceData?: any[]): Promise<string> {
-    const jobId = this.createMigrationJob('products')
-    const job = this.activeJobs.get(jobId)!
+    const jobId = this.createMigrationJob('products');
+    const job = this.activeJobs.get(jobId)!;
 
     try {
-      job.status = 'running'
-      job.startTime = new Date()
-      
-      console.log(`Starting product data migration: ${jobId}`)
-      
+      job.status = 'running';
+      job.startTime = new Date();
+
+      console.log(`Starting product data migration: ${jobId}`);
+
       // Load source data
-      const productData = sourceData || await this.loadSourceData('products')
-      job.progress.total = productData.length
-      
+      const productData = sourceData || await this.loadSourceData('products');
+      job.progress.total = productData.length;
+
       // Process products in batches
-      const batches = this.createBatches(productData, this.config.processing.batchSize)
-      
+      const batches = this.createBatches(productData, this.config.processing.batchSize);
+
       for (const batch of batches) {
-        await this.processBatch(batch, 'products', job)
+        await this.processBatch(batch, 'products', job);
       }
-      
+
       // Validate data integrity
-      await this.validateDataIntegrity('products', job)
-      
-      job.status = 'completed'
-      job.endTime = new Date()
-      job.summary = this.generateSummary(job)
-      
-      console.log(`Product migration completed: ${jobId}`)
-      console.log(`Processed: ${job.progress.succeeded}/${job.progress.total} products`)
-      
+      await this.validateDataIntegrity('products', job);
+
+      job.status = 'completed';
+      job.endTime = new Date();
+      job.summary = this.generateSummary(job);
+
+      console.log(`Product migration completed: ${jobId}`);
+      console.log(`Processed: ${job.progress.succeeded}/${job.progress.total} products`);
+
     } catch (error) {
-      job.status = 'failed'
-      job.endTime = new Date()
+      job.status = 'failed';
+      job.endTime = new Date();
       job.errors.push({
         id: `error-${Date.now()}`,
         type: 'migration_failure',
@@ -263,40 +263,40 @@ export class DataMigrationSystem {
         data: error,
         timestamp: new Date(),
         severity: 'critical'
-      })
-      
-      console.error(`Product migration failed: ${jobId}`, error)
+      });
+
+      console.error(`Product migration failed: ${jobId}`, error);
     }
 
-    this.migrationHistory.push(job)
-    this.activeJobs.delete(jobId)
-    
-    return jobId
+    this.migrationHistory.push(job);
+    this.activeJobs.delete(jobId);
+
+    return jobId;
   }
 
   private async loadSourceData(type: string): Promise<any[]> {
-    const sourceConfig = this.config.dataSources[type as keyof typeof this.config.dataSources]
-    
-    console.log(`Loading ${type} data from ${sourceConfig.type}: ${sourceConfig.location}`)
-    
+    const sourceConfig = this.config.dataSources[type as keyof typeof this.config.dataSources];
+
+    console.log(`Loading ${type} data from ${sourceConfig.type}: ${sourceConfig.location}`);
+
     // Mock data loading based on source type
     switch (sourceConfig.type) {
       case 'csv':
-        return await this.loadFromCSV(sourceConfig.location)
+        return await this.loadFromCSV(sourceConfig.location);
       case 'json':
-        return await this.loadFromJSON(sourceConfig.location)
+        return await this.loadFromJSON(sourceConfig.location);
       case 'api':
-        return await this.loadFromAPI(sourceConfig.location, sourceConfig.credentials)
+        return await this.loadFromAPI(sourceConfig.location, sourceConfig.credentials);
       case 'database':
-        return await this.loadFromDatabase(sourceConfig.location, sourceConfig.credentials)
+        return await this.loadFromDatabase(sourceConfig.location, sourceConfig.credentials);
       default:
-        throw new Error(`Unsupported source type: ${sourceConfig.type}`)
+        throw new Error(`Unsupported source type: ${sourceConfig.type}`);
     }
   }
 
   private async loadFromCSV(location: string): Promise<any[]> {
-    console.log(`Loading CSV data from: ${location}`)
-    
+    console.log(`Loading CSV data from: ${location}`);
+
     // Mock CSV data for electronics products
     return Array.from({ length: 1000 }, (_, i) => ({
       id: `PROD-${String(i + 1).padStart(4, '0')}`,
@@ -304,7 +304,7 @@ export class DataMigrationSystem {
       part_number: `EC${String(i + 1).padStart(6, '0')}`,
       brand_id: `BRAND-${String(Math.floor(i / 50) + 1).padStart(2, '0')}`,
       category_id: `CAT-${String(Math.floor(i / 100) + 1).padStart(2, '0')}`,
-      description: `High-quality electronic component for industrial applications`,
+      description: 'High-quality electronic component for industrial applications',
       voltage: `${3.3 + (i % 5) * 1.2}V`,
       current: `${100 + (i % 10) * 50}mA`,
       package_type: ['DIP', 'SMD', 'QFP', 'BGA'][i % 4],
@@ -314,52 +314,52 @@ export class DataMigrationSystem {
       image_1: `product_${i + 1}_1.jpg`,
       image_2: `product_${i + 1}_2.jpg`,
       datasheet: `datasheet_${i + 1}.pdf`
-    }))
+    }));
   }
 
   private async loadFromJSON(location: string): Promise<any[]> {
-    console.log(`Loading JSON data from: ${location}`)
-    
+    console.log(`Loading JSON data from: ${location}`);
+
     // Mock JSON data loading
-    await new Promise(resolve => setTimeout(resolve, 500))
-    return []
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return [];
   }
 
   private async loadFromAPI(endpoint: string, credentials: any): Promise<any[]> {
-    console.log(`Loading data from API: ${endpoint}`)
-    
+    console.log(`Loading data from API: ${endpoint}`);
+
     // Mock API data loading
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    return []
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    return [];
   }
 
   private async loadFromDatabase(connectionString: string, credentials: any): Promise<any[]> {
-    console.log(`Loading data from database: ${connectionString}`)
-    
+    console.log(`Loading data from database: ${connectionString}`);
+
     // Mock database data loading
-    await new Promise(resolve => setTimeout(resolve, 800))
-    return []
+    await new Promise(resolve => setTimeout(resolve, 800));
+    return [];
   }
 
   private createBatches<T>(data: T[], batchSize: number): T[][] {
-    const batches: T[][] = []
+    const batches: T[][] = [];
     for (let i = 0; i < data.length; i += batchSize) {
-      batches.push(data.slice(i, i + batchSize))
+      batches.push(data.slice(i, i + batchSize));
     }
-    return batches
+    return batches;
   }
 
   private async processBatch(batch: any[], type: string, job: MigrationJob): Promise<void> {
     const promises = batch.map(async (item, index) => {
       try {
         // Transform data
-        const transformedItem = await this.transformData(item, type)
-        
+        const transformedItem = await this.transformData(item, type);
+
         // Validate data
-        const validationResult = await this.validateData(transformedItem, type)
+        const validationResult = await this.validateData(transformedItem, type);
         if (!validationResult.isValid) {
           if (validationResult.severity === 'error') {
-            job.progress.failed++
+            job.progress.failed++;
             job.errors.push({
               id: `validation-error-${Date.now()}-${index}`,
               type: 'validation_error',
@@ -367,25 +367,25 @@ export class DataMigrationSystem {
               data: item,
               timestamp: new Date(),
               severity: 'medium'
-            })
-            return
+            });
+            return;
           } else {
             job.warnings.push({
               id: `validation-warning-${Date.now()}-${index}`,
               message: validationResult.message,
               data: item,
               timestamp: new Date()
-            })
+            });
           }
         }
-        
+
         // Save to database
-        await this.saveToDatabase(transformedItem, type)
-        
-        job.progress.succeeded++
-        
+        await this.saveToDatabase(transformedItem, type);
+
+        job.progress.succeeded++;
+
       } catch (error) {
-        job.progress.failed++
+        job.progress.failed++;
         job.errors.push({
           id: `processing-error-${Date.now()}-${index}`,
           type: 'processing_error',
@@ -393,116 +393,116 @@ export class DataMigrationSystem {
           data: item,
           timestamp: new Date(),
           severity: 'medium'
-        })
+        });
       } finally {
-        job.progress.processed++
+        job.progress.processed++;
       }
-    })
+    });
 
-    await Promise.all(promises)
-    console.log(`Processed batch: ${job.progress.processed}/${job.progress.total}`)
+    await Promise.all(promises);
+    console.log(`Processed batch: ${job.progress.processed}/${job.progress.total}`);
   }
 
   private async transformData(data: any, type: string): Promise<any> {
-    const sourceConfig = this.config.dataSources[type as keyof typeof this.config.dataSources]
-    const transformed: any = {}
-    
+    const sourceConfig = this.config.dataSources[type as keyof typeof this.config.dataSources];
+    const transformed: any = {};
+
     // Apply field mappings
     for (const mapping of sourceConfig.mapping) {
-      let value = data[mapping.sourceField]
-      
+      let value = data[mapping.sourceField];
+
       // Handle missing required fields
       if ((value === undefined || value === null) && mapping.required) {
         if (mapping.defaultValue !== undefined) {
-          value = mapping.defaultValue
+          value = mapping.defaultValue;
         } else {
-          throw new Error(`Required field missing: ${mapping.sourceField}`)
+          throw new Error(`Required field missing: ${mapping.sourceField}`);
         }
       }
-      
+
       // Type conversion
       if (value !== undefined && value !== null) {
-        value = this.convertDataType(value, mapping.dataType)
+        value = this.convertDataType(value, mapping.dataType);
       }
-      
-      transformed[mapping.targetField] = value
+
+      transformed[mapping.targetField] = value;
     }
-    
+
     // Apply transformations
     if (sourceConfig.transformation) {
       for (const rule of sourceConfig.transformation) {
         transformed[rule.field] = await this.applyTransformation(
-          transformed[rule.field], 
-          rule.operation, 
+          transformed[rule.field],
+          rule.operation,
           rule.parameters
-        )
+        );
       }
     }
-    
-    return transformed
+
+    return transformed;
   }
 
   private convertDataType(value: any, dataType: string): any {
     switch (dataType) {
       case 'string':
-        return String(value)
+        return String(value);
       case 'number':
-        return Number(value)
+        return Number(value);
       case 'boolean':
-        return Boolean(value)
+        return Boolean(value);
       case 'date':
-        return new Date(value)
+        return new Date(value);
       case 'array':
-        return Array.isArray(value) ? value : [value]
+        return Array.isArray(value) ? value : [value];
       case 'object':
-        return typeof value === 'object' ? value : JSON.parse(value)
+        return typeof value === 'object' ? value : JSON.parse(value);
       default:
-        return value
+        return value;
     }
   }
 
   private async applyTransformation(value: any, operation: string, parameters: any): Promise<any> {
     switch (operation) {
       case 'normalize':
-        return String(value).toLowerCase().trim()
+        return String(value).toLowerCase().trim();
       case 'split':
-        return String(value).split(parameters.delimiter || ',')
+        return String(value).split(parameters.delimiter || ',');
       case 'join':
-        return Array.isArray(value) ? value.join(parameters.delimiter || ',') : value
+        return Array.isArray(value) ? value.join(parameters.delimiter || ',') : value;
       case 'format':
-        return this.formatValue(value, parameters.format)
+        return this.formatValue(value, parameters.format);
       case 'lookup':
-        return await this.lookupValue(value, parameters.table, parameters.key)
+        return await this.lookupValue(value, parameters.table, parameters.key);
       case 'calculate':
-        return this.calculateValue(value, parameters.formula)
+        return this.calculateValue(value, parameters.formula);
       default:
-        return value
+        return value;
     }
   }
 
   private formatValue(value: any, format: string): string {
     // Mock formatting logic
-    return String(value).replace(/[^a-zA-Z0-9]/g, '-')
+    return String(value).replace(/[^a-zA-Z0-9]/g, '-');
   }
 
   private async lookupValue(value: any, table: string, key: string): Promise<any> {
     // Mock lookup logic
-    return value
+    return value;
   }
 
   private calculateValue(value: any, formula: string): number {
     // Mock calculation logic
-    return Number(value) * 1.2
+    return Number(value) * 1.2;
   }
 
   private async validateData(data: any, type: string): Promise<{ isValid: boolean; severity?: string; message: string }> {
     if (!this.config.validation.enabled) {
-      return { isValid: true, message: 'Validation disabled' }
+      return { isValid: true, message: 'Validation disabled' };
     }
-    
+
     for (const rule of this.config.validation.rules) {
-      const fieldValue = data[rule.field]
-      
+      const fieldValue = data[rule.field];
+
       switch (rule.rule) {
         case 'required':
           if (fieldValue === undefined || fieldValue === null || fieldValue === '') {
@@ -510,10 +510,10 @@ export class DataMigrationSystem {
               isValid: false,
               severity: rule.severity,
               message: rule.message || `Required field missing: ${rule.field}`
-            }
+            };
           }
-          break
-          
+          break;
+
         case 'unique':
           // Mock uniqueness check
           if (Math.random() < 0.02) { // 2% chance of duplicate
@@ -521,83 +521,83 @@ export class DataMigrationSystem {
               isValid: false,
               severity: rule.severity,
               message: rule.message || `Duplicate value found for: ${rule.field}`
-            }
+            };
           }
-          break
-          
+          break;
+
         case 'format':
-          const regex = new RegExp(rule.parameters.pattern)
+          const regex = new RegExp(rule.parameters.pattern);
           if (!regex.test(fieldValue)) {
             return {
               isValid: false,
               severity: rule.severity,
               message: rule.message || `Invalid format for: ${rule.field}`
-            }
+            };
           }
-          break
-          
+          break;
+
         case 'range':
-          const numValue = Number(fieldValue)
+          const numValue = Number(fieldValue);
           if (numValue < rule.parameters.min || numValue > rule.parameters.max) {
             return {
               isValid: false,
               severity: rule.severity,
               message: rule.message || `Value out of range for: ${rule.field}`
-            }
+            };
           }
-          break
+          break;
       }
     }
-    
-    return { isValid: true, message: 'Validation passed' }
+
+    return { isValid: true, message: 'Validation passed' };
   }
 
   private async saveToDatabase(data: any, type: string): Promise<void> {
     // Mock database save
-    await new Promise(resolve => setTimeout(resolve, 10))
-    
+    await new Promise(resolve => setTimeout(resolve, 10));
+
     // Simulate occasional save failures
     if (Math.random() < 0.01) { // 1% failure rate
-      throw new Error('Database save failed')
+      throw new Error('Database save failed');
     }
   }
 
   // Brand Data Migration
   public async migrateBrands(sourceData?: BrandData[]): Promise<string> {
-    const jobId = this.createMigrationJob('brands')
-    const job = this.activeJobs.get(jobId)!
+    const jobId = this.createMigrationJob('brands');
+    const job = this.activeJobs.get(jobId)!;
 
     try {
-      job.status = 'running'
-      job.startTime = new Date()
-      
-      console.log(`Starting brand data migration: ${jobId}`)
-      
+      job.status = 'running';
+      job.startTime = new Date();
+
+      console.log(`Starting brand data migration: ${jobId}`);
+
       // Generate sample brand data if not provided
-      const brandData = sourceData || this.generateSampleBrandData()
-      job.progress.total = brandData.length
-      
+      const brandData = sourceData || this.generateSampleBrandData();
+      job.progress.total = brandData.length;
+
       for (const brand of brandData) {
         try {
           // Process brand logo
           if (brand.logoUrl) {
-            brand.logoUrl = await this.processLogo(brand.logoUrl, brand.id)
+            brand.logoUrl = await this.processLogo(brand.logoUrl, brand.id);
           }
-          
+
           // Validate brand data
-          const isValid = await this.validateBrandData(brand)
+          const isValid = await this.validateBrandData(brand);
           if (!isValid) {
-            job.progress.failed++
-            continue
+            job.progress.failed++;
+            continue;
           }
-          
+
           // Save brand to database
-          await this.saveBrandToDatabase(brand)
-          
-          job.progress.succeeded++
-          
+          await this.saveBrandToDatabase(brand);
+
+          job.progress.succeeded++;
+
         } catch (error) {
-          job.progress.failed++
+          job.progress.failed++;
           job.errors.push({
             id: `brand-error-${Date.now()}`,
             type: 'brand_processing_error',
@@ -605,28 +605,28 @@ export class DataMigrationSystem {
             data: brand,
             timestamp: new Date(),
             severity: 'medium'
-          })
+          });
         } finally {
-          job.progress.processed++
+          job.progress.processed++;
         }
       }
-      
-      job.status = 'completed'
-      job.endTime = new Date()
-      job.summary = this.generateSummary(job)
-      
-      console.log(`Brand migration completed: ${job.progress.succeeded}/${job.progress.total} brands`)
-      
+
+      job.status = 'completed';
+      job.endTime = new Date();
+      job.summary = this.generateSummary(job);
+
+      console.log(`Brand migration completed: ${job.progress.succeeded}/${job.progress.total} brands`);
+
     } catch (error) {
-      job.status = 'failed'
-      job.endTime = new Date()
-      console.error(`Brand migration failed:`, error)
+      job.status = 'failed';
+      job.endTime = new Date();
+      console.error('Brand migration failed:', error);
     }
 
-    this.migrationHistory.push(job)
-    this.activeJobs.delete(jobId)
-    
-    return jobId
+    this.migrationHistory.push(job);
+    this.activeJobs.delete(jobId);
+
+    return jobId;
   }
 
   private generateSampleBrandData(): BrandData[] {
@@ -635,8 +635,8 @@ export class DataMigrationSystem {
       'Microchip', 'Maxim Integrated', 'ON Semiconductor', 'Cypress', 'Renesas',
       'Broadcom', 'Intel', 'Qualcomm', 'MediaTek', 'Samsung', 'TSMC',
       'Linear Technology', 'Fairchild', 'Vishay', 'Murata'
-    ]
-    
+    ];
+
     return brandNames.map((name, index) => ({
       id: `BRAND-${String(index + 1).padStart(3, '0')}`,
       name: name.toLowerCase().replace(/\s+/g, '_'),
@@ -648,7 +648,7 @@ export class DataMigrationSystem {
       headquarters: ['USA', 'Germany', 'Japan', 'South Korea', 'Taiwan'][Math.floor(Math.random() * 5)],
       specialties: [
         'Microcontrollers',
-        'Analog Circuits', 
+        'Analog Circuits',
         'Power Management',
         'RF Components',
         'Sensors'
@@ -659,77 +659,77 @@ export class DataMigrationSystem {
         revenue: Math.floor(Math.random() * 50) + 5,
         yearlyGrowth: Math.floor(Math.random() * 20) + 5
       }
-    }))
+    }));
   }
 
   private async processLogo(logoUrl: string, brandId: string): Promise<string> {
-    console.log(`Processing logo for brand ${brandId}: ${logoUrl}`)
-    
+    console.log(`Processing logo for brand ${brandId}: ${logoUrl}`);
+
     // Mock logo processing (resize, optimize, upload to CDN)
-    await new Promise(resolve => setTimeout(resolve, 100))
-    
-    return `https://cdn.elec-distributor.com/brands/${brandId}/logo.webp`
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    return `https://cdn.elec-distributor.com/brands/${brandId}/logo.webp`;
   }
 
   private async validateBrandData(brand: BrandData): Promise<boolean> {
     // Basic validation
     if (!brand.name || !brand.displayName) {
-      return false
+      return false;
     }
-    
-    return true
+
+    return true;
   }
 
   private async saveBrandToDatabase(brand: BrandData): Promise<void> {
     // Mock database save
-    await new Promise(resolve => setTimeout(resolve, 50))
-    console.log(`Saved brand: ${brand.displayName}`)
+    await new Promise(resolve => setTimeout(resolve, 50));
+    console.log(`Saved brand: ${brand.displayName}`);
   }
 
   // Technical Document Migration
   public async migrateDocuments(): Promise<string> {
-    const jobId = this.createMigrationJob('documents')
-    const job = this.activeJobs.get(jobId)!
+    const jobId = this.createMigrationJob('documents');
+    const job = this.activeJobs.get(jobId)!;
 
     try {
-      job.status = 'running'
-      job.startTime = new Date()
-      
-      console.log(`Starting document migration: ${jobId}`)
-      
+      job.status = 'running';
+      job.startTime = new Date();
+
+      console.log(`Starting document migration: ${jobId}`);
+
       // Generate sample document data
-      const documents = this.generateSampleDocuments()
-      job.progress.total = documents.length
-      
+      const documents = this.generateSampleDocuments();
+      job.progress.total = documents.length;
+
       // Process documents in batches
-      const batches = this.createBatches(documents, 10)
-      
+      const batches = this.createBatches(documents, 10);
+
       for (const batch of batches) {
-        await this.processDocumentBatch(batch, job)
+        await this.processDocumentBatch(batch, job);
       }
-      
-      job.status = 'completed'
-      job.endTime = new Date()
-      job.summary = this.generateSummary(job)
-      
-      console.log(`Document migration completed: ${job.progress.succeeded}/${job.progress.total} documents`)
-      
+
+      job.status = 'completed';
+      job.endTime = new Date();
+      job.summary = this.generateSummary(job);
+
+      console.log(`Document migration completed: ${job.progress.succeeded}/${job.progress.total} documents`);
+
     } catch (error) {
-      job.status = 'failed'
-      job.endTime = new Date()
-      console.error(`Document migration failed:`, error)
+      job.status = 'failed';
+      job.endTime = new Date();
+      console.error('Document migration failed:', error);
     }
 
-    this.migrationHistory.push(job)
-    this.activeJobs.delete(jobId)
-    
-    return jobId
+    this.migrationHistory.push(job);
+    this.activeJobs.delete(jobId);
+
+    return jobId;
   }
 
   private generateSampleDocuments(): DocumentData[] {
-    const documentTypes = ['datasheet', 'manual', 'application_note', 'certificate']
-    const languages = ['en', 'zh', 'ja', 'de', 'fr']
-    
+    const documentTypes = ['datasheet', 'manual', 'application_note', 'certificate'];
+    const languages = ['en', 'zh', 'ja', 'de', 'fr'];
+
     return Array.from({ length: 500 }, (_, i) => ({
       id: `DOC-${String(i + 1).padStart(4, '0')}`,
       title: `Technical Document ${i + 1}`,
@@ -749,30 +749,30 @@ export class DataMigrationSystem {
         author: 'Technical Documentation Team',
         checksum: `sha256:${Math.random().toString(36).substr(2, 64)}`
       }
-    }))
+    }));
   }
 
   private async processDocumentBatch(batch: DocumentData[], job: MigrationJob): Promise<void> {
     const promises = batch.map(async (doc, index) => {
       try {
         // Upload document to storage
-        const uploadedUrl = await this.uploadDocument(doc.fileUrl, doc.id)
-        doc.fileUrl = uploadedUrl
-        
+        const uploadedUrl = await this.uploadDocument(doc.fileUrl, doc.id);
+        doc.fileUrl = uploadedUrl;
+
         // Extract document metadata
-        const metadata = await this.extractDocumentMetadata(doc)
-        doc.metadata = { ...doc.metadata, ...metadata }
-        
+        const metadata = await this.extractDocumentMetadata(doc);
+        doc.metadata = { ...doc.metadata, ...metadata };
+
         // Create document relationships
-        await this.createDocumentRelationships(doc)
-        
+        await this.createDocumentRelationships(doc);
+
         // Save to database
-        await this.saveDocumentToDatabase(doc)
-        
-        job.progress.succeeded++
-        
+        await this.saveDocumentToDatabase(doc);
+
+        job.progress.succeeded++;
+
       } catch (error) {
-        job.progress.failed++
+        job.progress.failed++;
         job.errors.push({
           id: `doc-error-${Date.now()}-${index}`,
           type: 'document_processing_error',
@@ -780,81 +780,81 @@ export class DataMigrationSystem {
           data: doc,
           timestamp: new Date(),
           severity: 'medium'
-        })
+        });
       } finally {
-        job.progress.processed++
+        job.progress.processed++;
       }
-    })
+    });
 
-    await Promise.all(promises)
+    await Promise.all(promises);
   }
 
   private async uploadDocument(filePath: string, documentId: string): Promise<string> {
-    console.log(`Uploading document: ${filePath}`)
-    
+    console.log(`Uploading document: ${filePath}`);
+
     // Mock document upload to cloud storage
-    await new Promise(resolve => setTimeout(resolve, 200))
-    
-    return `https://cdn.elec-distributor.com/documents/${documentId}/${filePath.split('/').pop()}`
+    await new Promise(resolve => setTimeout(resolve, 200));
+
+    return `https://cdn.elec-distributor.com/documents/${documentId}/${filePath.split('/').pop()}`;
   }
 
   private async extractDocumentMetadata(doc: DocumentData): Promise<any> {
     // Mock metadata extraction (OCR, content analysis, etc.)
-    await new Promise(resolve => setTimeout(resolve, 100))
-    
+    await new Promise(resolve => setTimeout(resolve, 100));
+
     return {
       extractedText: `Sample extracted text for ${doc.title}`,
       keywords: ['microcontroller', 'voltage', 'current', 'specifications'],
       language: doc.language,
       readingTime: Math.floor(Math.random() * 30) + 5
-    }
+    };
   }
 
   private async createDocumentRelationships(doc: DocumentData): Promise<void> {
     // Mock relationship creation
-    await new Promise(resolve => setTimeout(resolve, 50))
-    console.log(`Created relationships for document: ${doc.id}`)
+    await new Promise(resolve => setTimeout(resolve, 50));
+    console.log(`Created relationships for document: ${doc.id}`);
   }
 
   private async saveDocumentToDatabase(doc: DocumentData): Promise<void> {
     // Mock database save
-    await new Promise(resolve => setTimeout(resolve, 30))
+    await new Promise(resolve => setTimeout(resolve, 30));
   }
 
   // Data Validation and Integrity
   private async validateDataIntegrity(type: string, job: MigrationJob): Promise<void> {
-    console.log(`Validating data integrity for: ${type}`)
-    
+    console.log(`Validating data integrity for: ${type}`);
+
     const validationChecks = [
       'referential_integrity',
       'data_completeness',
       'format_consistency',
       'duplicate_detection'
-    ]
-    
+    ];
+
     for (const check of validationChecks) {
-      console.log(`Running integrity check: ${check}`)
-      await new Promise(resolve => setTimeout(resolve, 500))
-      
+      console.log(`Running integrity check: ${check}`);
+      await new Promise(resolve => setTimeout(resolve, 500));
+
       // Mock validation results
-      const issuesFound = Math.floor(Math.random() * 5)
+      const issuesFound = Math.floor(Math.random() * 5);
       if (issuesFound > 0) {
         job.warnings.push({
           id: `integrity-warning-${Date.now()}`,
           message: `${issuesFound} potential issues found in ${check}`,
           data: { check, issuesFound },
           timestamp: new Date()
-        })
+        });
       }
     }
-    
-    console.log('Data integrity validation completed')
+
+    console.log('Data integrity validation completed');
   }
 
   // Utility Methods
   private createMigrationJob(type: 'products' | 'brands' | 'documents' | 'images'): string {
-    const jobId = `migration-${type}-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`
-    
+    const jobId = `migration-${type}-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
+
     const job: MigrationJob = {
       id: jobId,
       type,
@@ -875,32 +875,32 @@ export class DataMigrationSystem {
         recommendations: [],
         nextSteps: []
       }
-    }
-    
-    this.activeJobs.set(jobId, job)
-    return jobId
+    };
+
+    this.activeJobs.set(jobId, job);
+    return jobId;
   }
 
   private generateSummary(job: MigrationJob): MigrationSummary {
-    const duration = job.endTime && job.startTime ? 
-      job.endTime.getTime() - job.startTime.getTime() : 0
-    
-    const throughput = duration > 0 ? (job.progress.processed / duration) * 1000 : 0
-    
-    const dataQualityScore = job.progress.total > 0 ? 
-      (job.progress.succeeded / job.progress.total) * 100 : 0
-    
-    const recommendations = []
+    const duration = job.endTime && job.startTime ?
+      job.endTime.getTime() - job.startTime.getTime() : 0;
+
+    const throughput = duration > 0 ? (job.progress.processed / duration) * 1000 : 0;
+
+    const dataQualityScore = job.progress.total > 0 ?
+      (job.progress.succeeded / job.progress.total) * 100 : 0;
+
+    const recommendations = [];
     if (job.progress.failed > 0) {
-      recommendations.push('Review and fix failed records')
+      recommendations.push('Review and fix failed records');
     }
     if (job.warnings.length > 5) {
-      recommendations.push('Address data quality warnings')
+      recommendations.push('Address data quality warnings');
     }
     if (dataQualityScore < 95) {
-      recommendations.push('Improve data validation rules')
+      recommendations.push('Improve data validation rules');
     }
-    
+
     return {
       duration: Math.round(duration / 1000), // seconds
       throughput: Math.round(throughput * 100) / 100,
@@ -912,39 +912,39 @@ export class DataMigrationSystem {
         'Update search indices',
         'Clear application caches'
       ]
-    }
+    };
   }
 
   // Public Interface Methods
   public getJobStatus(jobId: string): MigrationJob | null {
-    return this.activeJobs.get(jobId) || 
-           this.migrationHistory.find(job => job.id === jobId) || null
+    return this.activeJobs.get(jobId) ||
+           this.migrationHistory.find(job => job.id === jobId) || null;
   }
 
   public getActiveJobs(): MigrationJob[] {
-    return Array.from(this.activeJobs.values())
+    return Array.from(this.activeJobs.values());
   }
 
   public getMigrationHistory(): MigrationJob[] {
-    return this.migrationHistory.slice()
+    return this.migrationHistory.slice();
   }
 
   public async rollbackMigration(jobId: string): Promise<boolean> {
-    console.log(`Rolling back migration: ${jobId}`)
-    
+    console.log(`Rolling back migration: ${jobId}`);
+
     // Mock rollback process
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
-    console.log(`Migration rollback completed: ${jobId}`)
-    return true
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    console.log(`Migration rollback completed: ${jobId}`);
+    return true;
   }
 
   public generateMigrationReport(): any {
-    const totalJobs = this.migrationHistory.length
-    const successfulJobs = this.migrationHistory.filter(job => job.status === 'completed').length
-    const totalRecords = this.migrationHistory.reduce((sum, job) => sum + job.progress.total, 0)
-    const successfulRecords = this.migrationHistory.reduce((sum, job) => sum + job.progress.succeeded, 0)
-    
+    const totalJobs = this.migrationHistory.length;
+    const successfulJobs = this.migrationHistory.filter(job => job.status === 'completed').length;
+    const totalRecords = this.migrationHistory.reduce((sum, job) => sum + job.progress.total, 0);
+    const successfulRecords = this.migrationHistory.reduce((sum, job) => sum + job.progress.succeeded, 0);
+
     return {
       summary: {
         totalJobs,
@@ -959,37 +959,37 @@ export class DataMigrationSystem {
         type: job.type,
         status: job.status,
         duration: job.summary.duration,
-        successRate: job.progress.total > 0 ? 
+        successRate: job.progress.total > 0 ?
           (job.progress.succeeded / job.progress.total) * 100 : 0,
         errorCount: job.errors.length,
         warningCount: job.warnings.length
       })),
       recommendations: this.generateGlobalRecommendations()
-    }
+    };
   }
 
   private generateGlobalRecommendations(): string[] {
-    const recommendations = []
-    const failureRate = this.calculateOverallFailureRate()
-    
+    const recommendations = [];
+    const failureRate = this.calculateOverallFailureRate();
+
     if (failureRate > 5) {
-      recommendations.push('Review data source quality and validation rules')
+      recommendations.push('Review data source quality and validation rules');
     }
     if (this.migrationHistory.some(job => job.warnings.length > 10)) {
-      recommendations.push('Implement stricter data quality checks')
+      recommendations.push('Implement stricter data quality checks');
     }
-    
-    recommendations.push('Schedule regular data integrity checks')
-    recommendations.push('Maintain data migration documentation')
-    
-    return recommendations
+
+    recommendations.push('Schedule regular data integrity checks');
+    recommendations.push('Maintain data migration documentation');
+
+    return recommendations;
   }
 
   private calculateOverallFailureRate(): number {
-    const totalRecords = this.migrationHistory.reduce((sum, job) => sum + job.progress.total, 0)
-    const failedRecords = this.migrationHistory.reduce((sum, job) => sum + job.progress.failed, 0)
-    
-    return totalRecords > 0 ? (failedRecords / totalRecords) * 100 : 0
+    const totalRecords = this.migrationHistory.reduce((sum, job) => sum + job.progress.total, 0);
+    const failedRecords = this.migrationHistory.reduce((sum, job) => sum + job.progress.failed, 0);
+
+    return totalRecords > 0 ? (failedRecords / totalRecords) * 100 : 0;
   }
 }
 
@@ -1102,5 +1102,5 @@ export function createMigrationConfig(): MigrationConfig {
         compression: true
       }
     }
-  }
+  };
 }

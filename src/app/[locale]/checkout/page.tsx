@@ -1,20 +1,11 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import Image from 'next/image'
-import { useOrder } from '@/contexts/OrderContext'
-import { useAuth } from '@/contexts/AuthContext'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Alert } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
-import type { ShippingAddress, PaymentMethod } from '@/contexts/OrderContext'
-import { 
+import { useState, useEffect } from 'react';
+
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+
+import {
   CreditCard,
   MapPin,
   Truck,
@@ -23,31 +14,43 @@ import {
   CheckCircle,
   AlertCircle,
   Plus
-} from 'lucide-react'
+} from 'lucide-react';
+
+import { Alert } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Textarea } from '@/components/ui/textarea';
+import { useAuth } from '@/contexts/AuthContext';
+import { useOrder } from '@/contexts/OrderContext';
+import type { ShippingAddress, PaymentMethod } from '@/contexts/OrderContext';
 
 export default function CheckoutPage() {
-  const router = useRouter()
-  const { user } = useAuth()
-  const { 
-    cartItems, 
-    cartTotal, 
-    addresses, 
+  const router = useRouter();
+  const { user } = useAuth();
+  const {
+    cartItems,
+    cartTotal,
+    addresses,
     addAddress,
-    createOrder, 
-    clearCart 
-  } = useOrder()
-  
-  const [selectedAddress, setSelectedAddress] = useState<ShippingAddress | null>(null)
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('alipay')
-  const [orderNotes, setOrderNotes] = useState('')
-  const [invoiceType, setInvoiceType] = useState<'none' | 'personal' | 'company'>('none')
+    createOrder,
+    clearCart
+  } = useOrder();
+
+  const [selectedAddress, setSelectedAddress] = useState<ShippingAddress | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('alipay');
+  const [orderNotes, setOrderNotes] = useState('');
+  const [invoiceType, setInvoiceType] = useState<'none' | 'personal' | 'company'>('none');
   const [invoiceInfo, setInvoiceInfo] = useState({
     title: '',
     taxNumber: '',
     email: ''
-  })
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [showAddressForm, setShowAddressForm] = useState(false)
+  });
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [showAddressForm, setShowAddressForm] = useState(false);
   const [newAddress, setNewAddress] = useState({
     recipientName: user?.name || '',
     phone: user?.phone || '',
@@ -58,30 +61,30 @@ export default function CheckoutPage() {
     detailAddress: '',
     postalCode: '',
     isDefault: false
-  })
+  });
 
   // 如果没有购物车商品，重定向到购物车页面
   useEffect(() => {
     if (cartItems.length === 0) {
-      router.push('/cart')
-      return
+      router.push('/cart');
+      return;
     }
 
     // 自动选择默认地址
-    const defaultAddress = addresses.find(addr => addr.isDefault)
+    const defaultAddress = addresses.find(addr => addr.isDefault);
     if (defaultAddress) {
-      setSelectedAddress(defaultAddress)
+      setSelectedAddress(defaultAddress);
     } else if (addresses.length > 0) {
-      setSelectedAddress(addresses[0])
+      setSelectedAddress(addresses[0]);
     }
-  }, [cartItems.length, addresses, router])
+  }, [cartItems.length, addresses, router]);
 
   // 如果用户未登录，重定向到登录页
   useEffect(() => {
     if (!user) {
-      router.push('/auth/login?redirect=/checkout')
+      router.push('/auth/login?redirect=/checkout');
     }
-  }, [user, router])
+  }, [user, router]);
 
   if (!user || cartItems.length === 0) {
     return (
@@ -91,21 +94,21 @@ export default function CheckoutPage() {
           <p className="text-gray-600">加载中...</p>
         </div>
       </div>
-    )
+    );
   }
 
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0)
-  const shippingFee = subtotal >= 500 ? 0 : 50
-  const total = subtotal + shippingFee
+  const subtotal = cartItems.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
+  const shippingFee = subtotal >= 500 ? 0 : 50;
+  const total = subtotal + shippingFee;
 
   const handleAddAddress = async () => {
     const result = await addAddress({
       ...newAddress,
       isDefault: addresses.length === 0 || newAddress.isDefault
-    })
-    
+    });
+
     if (result.success) {
-      setShowAddressForm(false)
+      setShowAddressForm(false);
       setNewAddress({
         recipientName: user.name || '',
         phone: user.phone || '',
@@ -116,18 +119,18 @@ export default function CheckoutPage() {
         detailAddress: '',
         postalCode: '',
         isDefault: false
-      })
+      });
       // 刷新地址列表会通过OrderContext自动处理
     }
-  }
+  };
 
   const handleSubmitOrder = async () => {
     if (!selectedAddress) {
-      alert('请选择收货地址')
-      return
+      alert('请选择收货地址');
+      return;
     }
 
-    setIsProcessing(true)
+    setIsProcessing(true);
 
     try {
       const orderData = {
@@ -141,31 +144,31 @@ export default function CheckoutPage() {
           taxNumber: invoiceType === 'company' ? invoiceInfo.taxNumber : undefined,
           email: invoiceInfo.email || undefined
         } : undefined
-      }
+      };
 
-      const result = await createOrder(orderData)
-      
+      const result = await createOrder(orderData);
+
       if (result.success && result.orderId) {
         // 清空购物车
-        clearCart()
+        clearCart();
         // 跳转到订单详情页
-        router.push(`/orders/${result.orderId}`)
+        router.push(`/orders/${result.orderId}`);
       } else {
-        alert(result.error || '创建订单失败，请重试')
+        alert(result.error || '创建订单失败，请重试');
       }
     } catch (error) {
-      alert('创建订单失败，请重试')
+      alert('创建订单失败，请重试');
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
-  }
+  };
 
   const paymentMethods = [
     { value: 'alipay', label: '支付宝', icon: '💳' },
     { value: 'wechat', label: '微信支付', icon: '💚' },
     { value: 'bank_transfer', label: '银行转账', icon: '🏦' },
     { value: 'credit_card', label: '信用卡', icon: '💳' }
-  ] as const
+  ] as const;
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -205,8 +208,8 @@ export default function CheckoutPage() {
                       <div
                         key={address.id}
                         className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                          selectedAddress?.id === address.id 
-                            ? 'border-blue-500 bg-blue-50' 
+                          selectedAddress?.id === address.id
+                            ? 'border-blue-500 bg-blue-50'
                             : 'border-gray-200 hover:bg-gray-50'
                         }`}
                         onClick={() => setSelectedAddress(address)}
@@ -233,9 +236,9 @@ export default function CheckoutPage() {
                         </div>
                       </div>
                     ))}
-                    
-                    <Button 
-                      variant="outline" 
+
+                    <Button
+                      variant="outline"
                       className="w-full"
                       onClick={() => setShowAddressForm(true)}
                     >
@@ -533,5 +536,5 @@ export default function CheckoutPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

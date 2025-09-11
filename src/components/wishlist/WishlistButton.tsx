@@ -1,9 +1,11 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Heart } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { useState, useEffect } from 'react';
+
+import { Heart } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface WishlistButtonProps {
   productId: string
@@ -15,26 +17,26 @@ interface WishlistButtonProps {
 }
 
 // 模拟本地存储的心愿单管理
-const WISHLIST_STORAGE_KEY = 'litong_wishlist'
+const WISHLIST_STORAGE_KEY = 'litong_wishlist';
 
 const getWishlist = (): string[] => {
-  if (typeof window === 'undefined') return []
+  if (typeof window === 'undefined') return [];
   try {
-    const stored = localStorage.getItem(WISHLIST_STORAGE_KEY)
-    return stored ? JSON.parse(stored) : []
+    const stored = localStorage.getItem(WISHLIST_STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
   } catch {
-    return []
+    return [];
   }
-}
+};
 
 const setWishlist = (wishlist: string[]) => {
-  if (typeof window === 'undefined') return
+  if (typeof window === 'undefined') return;
   try {
-    localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(wishlist))
+    localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(wishlist));
   } catch {
     // 静默处理存储错误
   }
-}
+};
 
 export function WishlistButton({
   productId,
@@ -44,70 +46,70 @@ export function WishlistButton({
   className,
   showText = true,
 }: WishlistButtonProps) {
-  const [isInWishlist, setIsInWishlist] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isInWishlist, setIsInWishlist] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const wishlist = getWishlist()
-    setIsInWishlist(wishlist.includes(productId))
-  }, [productId])
+    const wishlist = getWishlist();
+    setIsInWishlist(wishlist.includes(productId));
+  }, [productId]);
 
   const handleToggleWishlist = async () => {
-    setIsLoading(true)
-    
+    setIsLoading(true);
+
     try {
-      const currentWishlist = getWishlist()
-      let newWishlist: string[]
-      
+      const currentWishlist = getWishlist();
+      let newWishlist: string[];
+
       if (isInWishlist) {
         // 从心愿单移除
-        newWishlist = currentWishlist.filter(id => id !== productId)
-        setIsInWishlist(false)
-        
+        newWishlist = currentWishlist.filter(id => id !== productId);
+        setIsInWishlist(false);
+
         // 显示提示信息
         if (productName) {
           // 这里可以添加一个 toast 通知
-          console.log(`已将 ${productName} 从心愿单移除`)
+          console.log(`已将 ${productName} 从心愿单移除`);
         }
       } else {
         // 添加到心愿单
-        newWishlist = [...currentWishlist, productId]
-        setIsInWishlist(true)
-        
+        newWishlist = [...currentWishlist, productId];
+        setIsInWishlist(true);
+
         // 显示提示信息
         if (productName) {
           // 这里可以添加一个 toast 通知
-          console.log(`已将 ${productName} 添加到心愿单`)
+          console.log(`已将 ${productName} 添加到心愿单`);
         }
       }
-      
-      setWishlist(newWishlist)
-      
+
+      setWishlist(newWishlist);
+
       // 触发自定义事件，通知其他组件心愿单已更新
       window.dispatchEvent(new CustomEvent('wishlistUpdated', {
         detail: { productId, isInWishlist: !isInWishlist }
-      }))
-      
+      }));
+
     } catch (error) {
-      console.error('更新心愿单失败:', error)
+      console.error('更新心愿单失败:', error);
       // 恢复状态
-      setIsInWishlist(!isInWishlist)
+      setIsInWishlist(!isInWishlist);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const sizeClasses = {
     sm: 'h-6 w-6 text-xs',
-    md: 'h-8 w-8 text-sm', 
+    md: 'h-8 w-8 text-sm',
     lg: 'h-10 w-10 text-base',
-  }
+  };
 
   const iconSizes = {
     sm: 'h-3 w-3',
     md: 'h-4 w-4',
     lg: 'h-5 w-5',
-  }
+  };
 
   return (
     <Button
@@ -124,13 +126,13 @@ export function WishlistButton({
       )}
       title={isInWishlist ? '从心愿单移除' : '添加到心愿单'}
     >
-      <Heart 
+      <Heart
         className={cn(
           iconSizes[size],
           'transition-all duration-200',
           isInWishlist ? 'fill-current text-red-500' : 'text-gray-400 hover:text-red-500',
           showText && 'mr-2'
-        )} 
+        )}
       />
       {showText && (
         <span className={isLoading ? 'opacity-50' : ''}>
@@ -138,31 +140,31 @@ export function WishlistButton({
         </span>
       )}
     </Button>
-  )
+  );
 }
 
 // 心愿单数量获取 hook
 export function useWishlistCount() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
     const updateCount = () => {
-      const wishlist = getWishlist()
-      setCount(wishlist.length)
-    }
+      const wishlist = getWishlist();
+      setCount(wishlist.length);
+    };
 
     // 初始化计数
-    updateCount()
+    updateCount();
 
     // 监听心愿单更新事件
-    window.addEventListener('wishlistUpdated', updateCount)
-    
-    return () => {
-      window.removeEventListener('wishlistUpdated', updateCount)
-    }
-  }, [])
+    window.addEventListener('wishlistUpdated', updateCount);
 
-  return count
+    return () => {
+      window.removeEventListener('wishlistUpdated', updateCount);
+    };
+  }, []);
+
+  return count;
 }
 
 // 心愿单管理工具函数
@@ -170,28 +172,28 @@ export const wishlistUtils = {
   getWishlist,
   setWishlist,
   addToWishlist: (productId: string) => {
-    const current = getWishlist()
+    const current = getWishlist();
     if (!current.includes(productId)) {
-      setWishlist([...current, productId])
+      setWishlist([...current, productId]);
       window.dispatchEvent(new CustomEvent('wishlistUpdated', {
         detail: { productId, isInWishlist: true }
-      }))
+      }));
     }
   },
   removeFromWishlist: (productId: string) => {
-    const current = getWishlist()
-    setWishlist(current.filter(id => id !== productId))
+    const current = getWishlist();
+    setWishlist(current.filter(id => id !== productId));
     window.dispatchEvent(new CustomEvent('wishlistUpdated', {
       detail: { productId, isInWishlist: false }
-    }))
+    }));
   },
   isInWishlist: (productId: string) => {
-    return getWishlist().includes(productId)
+    return getWishlist().includes(productId);
   },
   clearWishlist: () => {
-    setWishlist([])
+    setWishlist([]);
     window.dispatchEvent(new CustomEvent('wishlistUpdated', {
       detail: { cleared: true }
-    }))
+    }));
   }
-}
+};

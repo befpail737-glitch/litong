@@ -1,28 +1,29 @@
-'use client'
+'use client';
 
-import { useInquiry, CompanyInfo } from '@/contexts/InquiryContext'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { 
-  Building, 
-  User, 
-  Mail, 
-  Phone, 
-  Globe, 
+import {
+  Building,
+  User,
+  Mail,
+  Phone,
+  Globe,
   MapPin,
   Bookmark,
   UserPlus
-} from 'lucide-react'
+} from 'lucide-react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { useInquiry, CompanyInfo } from '@/contexts/InquiryContext';
 
 export function CompanyStep() {
-  const { state, updateCompanyInfo } = useInquiry()
-  const { currentInquiry, companyTemplates } = state
-  const { companyInfo } = currentInquiry
+  const { state, updateCompanyInfo } = useInquiry();
+  const { currentInquiry, companyTemplates } = state;
+  const { companyInfo } = currentInquiry;
 
   // 公司规模选项
   const companySizeOptions = [
@@ -31,7 +32,7 @@ export function CompanyStep() {
     { value: 'medium', label: '中型企业 (51-200人)' },
     { value: 'large', label: '大型企业 (201-1000人)' },
     { value: 'enterprise', label: '集团企业 (1000人以上)' }
-  ]
+  ];
 
   // 年采购量选项
   const annualVolumeOptions = [
@@ -41,7 +42,7 @@ export function CompanyStep() {
     { value: '100k_500k', label: '10-50万元' },
     { value: '500k_1m', label: '50-100万元' },
     { value: 'over_1m', label: '100万元以上' }
-  ]
+  ];
 
   // 行业选项
   const industryOptions = [
@@ -56,12 +57,12 @@ export function CompanyStep() {
     '新能源',
     '物联网',
     '其他'
-  ]
+  ];
 
   // 使用公司模板
   const useCompanyTemplate = (template: CompanyInfo) => {
-    updateCompanyInfo(template)
-  }
+    updateCompanyInfo(template);
+  };
 
   // 检查表单完整性
   const isFormValid = () => {
@@ -70,8 +71,8 @@ export function CompanyStep() {
       companyInfo.contactPerson &&
       companyInfo.email &&
       companyInfo.phone
-    )
-  }
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -137,7 +138,7 @@ export function CompanyStep() {
                 placeholder="请输入完整的公司名称"
               />
             </div>
-            
+
             <div>
               <Label htmlFor="website">公司网站</Label>
               <div className="relative">
@@ -153,7 +154,7 @@ export function CompanyStep() {
               </div>
             </div>
           </div>
-          
+
           <div>
             <Label htmlFor="company-address">公司地址</Label>
             <div className="relative">
@@ -168,12 +169,12 @@ export function CompanyStep() {
               />
             </div>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="industry">所属行业</Label>
-              <Select 
-                value={companyInfo.industry} 
+              <Select
+                value={companyInfo.industry}
                 onValueChange={(value) => updateCompanyInfo({ industry: value })}
               >
                 <SelectTrigger>
@@ -188,11 +189,11 @@ export function CompanyStep() {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div>
               <Label htmlFor="company-size">公司规模</Label>
-              <Select 
-                value={companyInfo.companySize} 
+              <Select
+                value={companyInfo.companySize}
                 onValueChange={(value: any) => updateCompanyInfo({ companySize: value })}
               >
                 <SelectTrigger>
@@ -208,11 +209,11 @@ export function CompanyStep() {
               </Select>
             </div>
           </div>
-          
+
           <div>
             <Label htmlFor="annual-volume">年采购金额预期</Label>
-            <Select 
-              value={companyInfo.annualVolume} 
+            <Select
+              value={companyInfo.annualVolume}
               onValueChange={(value) => updateCompanyInfo({ annualVolume: value })}
             >
               <SelectTrigger>
@@ -256,7 +257,7 @@ export function CompanyStep() {
                 />
               </div>
             </div>
-            
+
             <div>
               <Label htmlFor="position">职位</Label>
               <Input
@@ -267,7 +268,7 @@ export function CompanyStep() {
               />
             </div>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="email" className="flex items-center gap-1">
@@ -286,7 +287,7 @@ export function CompanyStep() {
                 />
               </div>
             </div>
-            
+
             <div>
               <Label htmlFor="phone" className="flex items-center gap-1">
                 联系电话
@@ -323,8 +324,8 @@ export function CompanyStep() {
             </>
           )}
         </div>
-        <Badge variant={isFormValid() ? "default" : "secondary"}>
-          {isFormValid() ? "已完成" : "进行中"}
+        <Badge variant={isFormValid() ? 'default' : 'secondary'}>
+          {isFormValid() ? '已完成' : '进行中'}
         </Badge>
       </div>
 
@@ -333,5 +334,5 @@ export function CompanyStep() {
         <p>🔒 我们承诺严格保护您的企业信息和隐私数据，仅用于本次询价服务，不会泄露给第三方。</p>
       </div>
     </div>
-  )
+  );
 }

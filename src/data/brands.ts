@@ -40,7 +40,7 @@ export const brands: Brand[] = [
   {
     id: 'texas-instruments',
     name: 'Texas Instruments',
-    slug: 'texas-instruments', 
+    slug: 'texas-instruments',
     description: '全球领先的模拟IC和数字信号处理器制造商，为各行业提供半导体技术。',
     website: 'https://www.ti.com',
     founded: '1930',
@@ -235,27 +235,27 @@ export const brands: Brand[] = [
     marketPosition: '可编程系统芯片领导者',
     partnership: 'official_reseller'
   }
-]
+];
 
 export const getFeaturedBrands = (): Brand[] => {
-  return brands.filter(brand => brand.featured)
-}
+  return brands.filter(brand => brand.featured);
+};
 
 export const getBrandBySlug = (slug: string): Brand | undefined => {
-  return brands.find(brand => brand.slug === slug)
-}
+  return brands.find(brand => brand.slug === slug);
+};
 
 export const getBrandsByCategory = (category: string): Brand[] => {
-  return brands.filter(brand => 
-    brand.categories.some(cat => 
+  return brands.filter(brand =>
+    brand.categories.some(cat =>
       cat.toLowerCase().includes(category.toLowerCase())
     )
-  )
-}
+  );
+};
 
 export const getAllBrands = (): Brand[] => {
-  return brands
-}
+  return brands;
+};
 
 export const getBrandStats = () => {
   return {
@@ -263,5 +263,5 @@ export const getBrandStats = () => {
     featured: brands.filter(b => b.featured).length,
     authorized: brands.filter(b => b.partnership === 'authorized_distributor').length,
     totalProducts: brands.reduce((sum, brand) => sum + brand.products.count, 0)
-  }
-}
+  };
+};

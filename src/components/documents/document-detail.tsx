@@ -1,11 +1,9 @@
-'use client'
+'use client';
 
-import { useTranslations } from 'next-intl'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
-import { 
+import Image from 'next/image';
+import Link from 'next/link';
+
+import {
   Download,
   FileText,
   File,
@@ -22,13 +20,17 @@ import {
   Unlock,
   Users,
   Eye
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { useFormatters } from '@/hooks/use-formatters'
-import { getLocalizedValue } from '@/lib/sanity-i18n'
-import type { Locale } from '@/i18n'
-import Link from 'next/link'
-import Image from 'next/image'
+} from 'lucide-react';
+import { useTranslations } from 'next-intl';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { useFormatters } from '@/hooks/use-formatters';
+import type { Locale } from '@/i18n';
+import { getLocalizedValue } from '@/lib/sanity-i18n';
+import { cn } from '@/lib/utils';
 
 // 文档详情类型定义
 interface DocumentDetail {
@@ -97,12 +99,12 @@ export function DocumentDetail({
   onShare,
   className
 }: DocumentDetailProps) {
-  const t = useTranslations('documents')
-  const { dateShort, fileSize } = useFormatters()
-  
-  const title = getLocalizedValue(document.title, locale)
-  const description = getLocalizedValue(document.description, locale)
-  const categoryTitle = getLocalizedValue(document.category.title, locale)
+  const t = useTranslations('documents');
+  const { dateShort, fileSize } = useFormatters();
+
+  const title = getLocalizedValue(document.title, locale);
+  const description = getLocalizedValue(document.description, locale);
+  const categoryTitle = getLocalizedValue(document.category.title, locale);
 
   // 文档类型映射
   const documentTypeMap = {
@@ -116,7 +118,7 @@ export function DocumentDetail({
     whitepaper: { label: t('types.whitepaper'), icon: File, color: 'text-slate-600' },
     'case-study': { label: t('types.caseStudy'), icon: File, color: 'text-pink-600' },
     other: { label: t('types.other'), icon: File, color: 'text-gray-600' }
-  }
+  };
 
   // 访问权限映射
   const accessLevelMap = {
@@ -124,12 +126,12 @@ export function DocumentDetail({
     registered: { label: t('access.registered'), icon: Users, color: 'bg-blue-100 text-blue-800' },
     member: { label: t('access.member'), icon: Users, color: 'bg-purple-100 text-purple-800' },
     internal: { label: t('access.internal'), icon: Lock, color: 'bg-red-100 text-red-800' }
-  }
+  };
 
   // 语言映射
   const languageMap = {
     'zh-CN': '中文',
-    'zh-TW': '繁体中文', 
+    'zh-TW': '繁体中文',
     'en': 'English',
     'ja': '日本語',
     'ko': '한국어',
@@ -139,16 +141,16 @@ export function DocumentDetail({
     'ru': 'Русский',
     'ar': 'العربية',
     'multi': t('language.multi')
-  }
+  };
 
-  const typeInfo = documentTypeMap[document.documentType]
-  const accessInfo = accessLevelMap[document.accessLevel]
-  const IconComponent = typeInfo.icon
+  const typeInfo = documentTypeMap[document.documentType];
+  const accessInfo = accessLevelMap[document.accessLevel];
+  const IconComponent = typeInfo.icon;
 
   const handleDownload = () => {
-    onDownload?.()
-    window.open(document.file.asset.url, '_blank')
-  }
+    onDownload?.();
+    window.open(document.file.asset.url, '_blank');
+  };
 
   return (
     <div className={className}>
@@ -167,11 +169,11 @@ export function DocumentDetail({
         <CardHeader>
           {/* 分类和类型标签 */}
           <div className="flex flex-wrap items-center gap-2 mb-4">
-            <Badge 
-              variant="outline" 
-              style={{ 
+            <Badge
+              variant="outline"
+              style={{
                 borderColor: document.category.color,
-                color: document.category.color 
+                color: document.category.color
               }}
             >
               {categoryTitle}
@@ -196,7 +198,7 @@ export function DocumentDetail({
           <CardTitle className="text-3xl md:text-4xl font-bold leading-tight">
             {title}
           </CardTitle>
-          
+
           {description && (
             <CardDescription className="text-lg mt-4">
               {description}
@@ -210,26 +212,26 @@ export function DocumentDetail({
                 <Calendar className="w-4 h-4" />
                 {dateShort(new Date(document.publishedAt))}
               </div>
-              
+
               {document.fileSize && (
                 <div className="flex items-center gap-2">
                   <HardDrive className="w-4 h-4" />
                   {fileSize(document.fileSize)}
                 </div>
               )}
-              
+
               {document.pageCount && (
                 <div className="flex items-center gap-2">
                   <FileStack className="w-4 h-4" />
                   {document.pageCount} {t('pages')}
                 </div>
               )}
-              
+
               <div className="flex items-center gap-2">
                 <Download className="w-4 h-4" />
                 {document.downloadCount} {t('downloads')}
               </div>
-              
+
               {document.version && (
                 <div className="flex items-center gap-2">
                   <Tag className="w-4 h-4" />
@@ -294,7 +296,7 @@ export function DocumentDetail({
               ) : (
                 <div className="aspect-[4/3] bg-muted rounded-lg flex items-center justify-center">
                   <div className="text-center">
-                    <IconComponent className={cn("w-16 h-16 mx-auto mb-4", typeInfo.color)} />
+                    <IconComponent className={cn('w-16 h-16 mx-auto mb-4', typeInfo.color)} />
                     <p className="text-muted-foreground mb-4">
                       {t('documentPreviewNotSupported', { type: typeInfo.label })}
                     </p>
@@ -391,7 +393,7 @@ export function DocumentDetail({
                         />
                       )}
                       <div>
-                        <Link 
+                        <Link
                           href={`/products/${product.slug.current}`}
                           className="text-sm font-medium hover:text-primary transition-colors"
                         >
@@ -472,5 +474,5 @@ export function DocumentDetail({
         </div>
       )}
     </div>
-  )
+  );
 }

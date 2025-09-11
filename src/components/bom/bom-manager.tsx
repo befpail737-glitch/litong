@@ -1,24 +1,10 @@
-'use client'
+'use client';
 
-import { useState, useCallback } from 'react'
-import { useTranslations } from 'next-intl'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { 
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
-import { 
+import { useState, useCallback } from 'react';
+
+import Link from 'next/link';
+
+import {
   ShoppingCart,
   Plus,
   Copy,
@@ -33,13 +19,31 @@ import {
   Users,
   Clock,
   AlertCircle
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { useFormatters } from '@/hooks/use-formatters'
-import { getLocalizedValue } from '@/lib/sanity-i18n'
-import { BOMTable } from './bom-table'
-import type { Locale } from '@/i18n'
-import Link from 'next/link'
+} from 'lucide-react';
+import { useTranslations } from 'next-intl';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
+import { useFormatters } from '@/hooks/use-formatters';
+import type { Locale } from '@/i18n';
+import { getLocalizedValue } from '@/lib/sanity-i18n';
+import { cn } from '@/lib/utils';
+
+import { BOMTable } from './bom-table';
 
 // BOM模板类型定义
 interface BOMTemplate {
@@ -111,17 +115,17 @@ export function BOMManager({
   onExport,
   className
 }: BOMManagerProps) {
-  const t = useTranslations('bomManager')
-  const { currency, dateShort } = useFormatters()
-  
-  const [selectedTemplate, setSelectedTemplate] = useState<BOMTemplate | null>(currentBOM || null)
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
-  const [isVersionDialogOpen, setIsVersionDialogOpen] = useState(false)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedComplexity, setSelectedComplexity] = useState<string>('all')
-  const [newTemplateName, setNewTemplateName] = useState('')
-  const [newTemplateDescription, setNewTemplateDescription] = useState('')
-  const [newVersionDescription, setNewVersionDescription] = useState('')
+  const t = useTranslations('bomManager');
+  const { currency, dateShort } = useFormatters();
+
+  const [selectedTemplate, setSelectedTemplate] = useState<BOMTemplate | null>(currentBOM || null);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isVersionDialogOpen, setIsVersionDialogOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedComplexity, setSelectedComplexity] = useState<string>('all');
+  const [newTemplateName, setNewTemplateName] = useState('');
+  const [newTemplateDescription, setNewTemplateDescription] = useState('');
+  const [newVersionDescription, setNewVersionDescription] = useState('');
 
   // 复杂度映射
   const complexityMap = {
@@ -129,24 +133,24 @@ export function BOMManager({
     medium: { label: t('complexity.medium'), color: 'bg-blue-100 text-blue-800' },
     complex: { label: t('complexity.complex'), color: 'bg-orange-100 text-orange-800' },
     'high-complex': { label: t('complexity.highComplex'), color: 'bg-red-100 text-red-800' }
-  }
+  };
 
   // 过滤模板
   const filteredTemplates = templates.filter(template => {
-    const name = getLocalizedValue(template.name, locale).toLowerCase()
-    const description = getLocalizedValue(template.description, locale).toLowerCase()
-    const search = searchTerm.toLowerCase()
-    
-    const matchesSearch = !searchTerm || name.includes(search) || description.includes(search)
-    const matchesComplexity = selectedComplexity === 'all' || template.complexity === selectedComplexity
-    
-    return matchesSearch && matchesComplexity && template.isActive
-  })
+    const name = getLocalizedValue(template.name, locale).toLowerCase();
+    const description = getLocalizedValue(template.description, locale).toLowerCase();
+    const search = searchTerm.toLowerCase();
+
+    const matchesSearch = !searchTerm || name.includes(search) || description.includes(search);
+    const matchesComplexity = selectedComplexity === 'all' || template.complexity === selectedComplexity;
+
+    return matchesSearch && matchesComplexity && template.isActive;
+  });
 
   // 创建新模板
   const handleCreateTemplate = useCallback(() => {
-    if (!newTemplateName.trim()) return
-    
+    if (!newTemplateName.trim()) return;
+
     const newTemplate: Omit<BOMTemplate, '_id'> = {
       name: { 'zh-CN': newTemplateName, 'en': newTemplateName } as Record<Locale, string>,
       description: { 'zh-CN': newTemplateDescription, 'en': newTemplateDescription } as Record<Locale, string>,
@@ -159,19 +163,19 @@ export function BOMManager({
       usageCount: 0,
       isActive: true,
       items: []
-    }
-    
-    onTemplateCreate?.(newTemplate)
-    setNewTemplateName('')
-    setNewTemplateDescription('')
-    setIsCreateDialogOpen(false)
-  }, [newTemplateName, newTemplateDescription, onTemplateCreate])
+    };
+
+    onTemplateCreate?.(newTemplate);
+    setNewTemplateName('');
+    setNewTemplateDescription('');
+    setIsCreateDialogOpen(false);
+  }, [newTemplateName, newTemplateDescription, onTemplateCreate]);
 
   // 复制模板
   const handleCopyTemplate = useCallback((template: BOMTemplate) => {
     const copiedTemplate: Omit<BOMTemplate, '_id'> = {
       ...template,
-      name: { 
+      name: {
         ...template.name,
         'zh-CN': getLocalizedValue(template.name, locale) + ' (副本)',
         'en': getLocalizedValue(template.name, locale) + ' (Copy)'
@@ -180,27 +184,27 @@ export function BOMManager({
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       usageCount: 0
-    }
-    
-    onTemplateCreate?.(copiedTemplate)
-  }, [locale, onTemplateCreate])
+    };
+
+    onTemplateCreate?.(copiedTemplate);
+  }, [locale, onTemplateCreate]);
 
   // 创建版本
   const handleCreateVersion = useCallback(() => {
-    if (!selectedTemplate || !newVersionDescription.trim()) return
-    
+    if (!selectedTemplate || !newVersionDescription.trim()) return;
+
     const newVersion: Omit<BOMVersion, '_id'> = {
       version: `${parseFloat(selectedTemplate.version) + 0.1}`,
       description: newVersionDescription,
       createdAt: new Date().toISOString(),
       createdBy: 'Current User', // 实际应用中从用户上下文获取
       changes: []
-    }
-    
-    onVersionCreate?.(newVersion)
-    setNewVersionDescription('')
-    setIsVersionDialogOpen(false)
-  }, [selectedTemplate, newVersionDescription, onVersionCreate])
+    };
+
+    onVersionCreate?.(newVersion);
+    setNewVersionDescription('');
+    setIsVersionDialogOpen(false);
+  }, [selectedTemplate, newVersionDescription, onVersionCreate]);
 
   // 统计信息
   const stats = {
@@ -208,7 +212,7 @@ export function BOMManager({
     activeTemplates: templates.filter(t => t.isActive).length,
     totalCost: templates.reduce((sum, t) => sum + t.totalCost.amount, 0),
     totalItems: templates.reduce((sum, t) => sum + t.itemCount, 0)
-  }
+  };
 
   return (
     <div className={className}>
@@ -222,7 +226,7 @@ export function BOMManager({
                   <ShoppingCart className="w-5 h-5" />
                   {t('bomTemplates')}
                 </CardTitle>
-                
+
                 <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
                   <DialogTrigger asChild>
                     <Button size="sm">
@@ -258,8 +262,8 @@ export function BOMManager({
                         />
                       </div>
                       <div className="flex justify-end gap-2">
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           onClick={() => setIsCreateDialogOpen(false)}
                         >
                           {t('cancel')}
@@ -280,7 +284,7 @@ export function BOMManager({
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                
+
                 <Select value={selectedComplexity} onValueChange={setSelectedComplexity}>
                   <SelectTrigger>
                     <SelectValue placeholder={t('selectComplexity')} />
@@ -299,19 +303,19 @@ export function BOMManager({
 
             <CardContent className="space-y-3">
               {filteredTemplates.map((template) => {
-                const complexityInfo = complexityMap[template.complexity]
-                const isSelected = selectedTemplate?._id === template._id
-                
+                const complexityInfo = complexityMap[template.complexity];
+                const isSelected = selectedTemplate?._id === template._id;
+
                 return (
-                  <Card 
-                    key={template._id} 
+                  <Card
+                    key={template._id}
                     className={cn(
-                      "cursor-pointer transition-all duration-200 hover:shadow-md",
-                      isSelected && "ring-2 ring-primary"
+                      'cursor-pointer transition-all duration-200 hover:shadow-md',
+                      isSelected && 'ring-2 ring-primary'
                     )}
                     onClick={() => {
-                      setSelectedTemplate(template)
-                      onTemplateSelect?.(template)
+                      setSelectedTemplate(template);
+                      onTemplateSelect?.(template);
                     }}
                   >
                     <CardContent className="p-4">
@@ -319,15 +323,15 @@ export function BOMManager({
                         <h4 className="font-medium line-clamp-1">
                           {getLocalizedValue(template.name, locale)}
                         </h4>
-                        <Badge className={cn("text-xs", complexityInfo.color)}>
+                        <Badge className={cn('text-xs', complexityInfo.color)}>
                           {complexityInfo.label}
                         </Badge>
                       </div>
-                      
+
                       <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
                         {getLocalizedValue(template.description, locale)}
                       </p>
-                      
+
                       <div className="flex items-center justify-between text-xs text-muted-foreground">
                         <div className="space-y-1">
                           <p>{t('version')} {template.version}</p>
@@ -340,14 +344,14 @@ export function BOMManager({
                           <p>{template.usageCount} {t('uses')}</p>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center gap-1 mt-3">
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={(e) => {
-                            e.stopPropagation()
-                            handleCopyTemplate(template)
+                            e.stopPropagation();
+                            handleCopyTemplate(template);
                           }}
                           className="h-6 px-2"
                         >
@@ -358,8 +362,8 @@ export function BOMManager({
                           variant="ghost"
                           size="sm"
                           onClick={(e) => {
-                            e.stopPropagation()
-                            onExport?.('excel', template._id)
+                            e.stopPropagation();
+                            onExport?.('excel', template._id);
                           }}
                           className="h-6 px-2"
                         >
@@ -369,9 +373,9 @@ export function BOMManager({
                       </div>
                     </CardContent>
                   </Card>
-                )
+                );
               })}
-              
+
               {filteredTemplates.length === 0 && (
                 <div className="text-center py-8 text-muted-foreground">
                   <ShoppingCart className="w-8 h-8 mx-auto mb-2" />
@@ -418,7 +422,7 @@ export function BOMManager({
                   <TabsTrigger value="history">{t('history')}</TabsTrigger>
                   <TabsTrigger value="settings">{t('settings')}</TabsTrigger>
                 </TabsList>
-                
+
                 <div className="flex items-center gap-2">
                   <Dialog open={isVersionDialogOpen} onOpenChange={setIsVersionDialogOpen}>
                     <DialogTrigger asChild>
@@ -446,8 +450,8 @@ export function BOMManager({
                           />
                         </div>
                         <div className="flex justify-end gap-2">
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             onClick={() => setIsVersionDialogOpen(false)}
                           >
                             {t('cancel')}
@@ -459,7 +463,7 @@ export function BOMManager({
                       </div>
                     </DialogContent>
                   </Dialog>
-                  
+
                   <Button size="sm">
                     <Save className="w-4 h-4 mr-2" />
                     {t('save')}
@@ -498,21 +502,21 @@ export function BOMManager({
                           </p>
                           <p className="text-sm text-muted-foreground">{t('totalCost')}</p>
                         </div>
-                        
+
                         <div className="text-center p-4 bg-muted/50 rounded-lg">
                           <p className="text-2xl font-bold text-green-600">
                             {currency(selectedTemplate.totalCost.amount / selectedTemplate.itemCount)}
                           </p>
                           <p className="text-sm text-muted-foreground">{t('avgItemCost')}</p>
                         </div>
-                        
+
                         <div className="text-center p-4 bg-muted/50 rounded-lg">
                           <p className="text-2xl font-bold text-blue-600">
                             {selectedTemplate.items.filter(i => !i.isOptional).length}
                           </p>
                           <p className="text-sm text-muted-foreground">{t('requiredItems')}</p>
                         </div>
-                        
+
                         <div className="text-center p-4 bg-muted/50 rounded-lg">
                           <p className="text-2xl font-bold text-orange-600">
                             {selectedTemplate.items.filter(i => i.isOptional).length}
@@ -535,9 +539,9 @@ export function BOMManager({
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                         {Object.entries(
                           selectedTemplate.items.reduce((acc, item) => {
-                            const category = item.category
-                            acc[category] = (acc[category] || 0) + (item.quantity * item.unitPrice)
-                            return acc
+                            const category = item.category;
+                            acc[category] = (acc[category] || 0) + (item.quantity * item.unitPrice);
+                            return acc;
                           }, {} as Record<string, number>)
                         ).map(([category, cost]) => (
                           <div key={category} className="text-center p-3 border rounded-lg">
@@ -616,7 +620,7 @@ export function BOMManager({
                               </Button>
                             </div>
                             <p className="text-sm mb-2">{version.description}</p>
-                            
+
                             {version.changes.length > 0 && (
                               <div className="space-y-1">
                                 {version.changes.map((change, index) => (
@@ -662,12 +666,12 @@ export function BOMManager({
                               ...selectedTemplate.name,
                               [locale]: e.target.value
                             }
-                          }
-                          onTemplateUpdate?.(selectedTemplate._id, updates)
+                          };
+                          onTemplateUpdate?.(selectedTemplate._id, updates);
                         }}
                       />
                     </div>
-                    
+
                     <div>
                       <Label>{t('description')}</Label>
                       <Textarea
@@ -678,21 +682,21 @@ export function BOMManager({
                               ...selectedTemplate.description,
                               [locale]: e.target.value
                             }
-                          }
-                          onTemplateUpdate?.(selectedTemplate._id, updates)
+                          };
+                          onTemplateUpdate?.(selectedTemplate._id, updates);
                         }}
                         rows={3}
                       />
                     </div>
-                    
+
                     <div>
                       <Label>{t('complexity')}</Label>
-                      <Select 
+                      <Select
                         value={selectedTemplate.complexity}
                         onValueChange={(value) => {
-                          onTemplateUpdate?.(selectedTemplate._id, { 
+                          onTemplateUpdate?.(selectedTemplate._id, {
                             complexity: value as BOMTemplate['complexity']
-                          })
+                          });
                         }}
                       >
                         <SelectTrigger>
@@ -707,7 +711,7 @@ export function BOMManager({
                         </SelectContent>
                       </Select>
                     </div>
-                    
+
                     <div className="flex items-center justify-between pt-4 border-t">
                       <div>
                         <p className="font-medium text-red-600">{t('dangerZone')}</p>
@@ -715,12 +719,12 @@ export function BOMManager({
                           {t('deleteTemplateWarning')}
                         </p>
                       </div>
-                      <Button 
+                      <Button
                         variant="destructive"
                         onClick={() => {
                           if (confirm(t('confirmDelete'))) {
-                            onTemplateDelete?.(selectedTemplate._id)
-                            setSelectedTemplate(null)
+                            onTemplateDelete?.(selectedTemplate._id);
+                            setSelectedTemplate(null);
                           }
                         }}
                       >
@@ -743,5 +747,5 @@ export function BOMManager({
         </div>
       </div>
     </div>
-  )
+  );
 }

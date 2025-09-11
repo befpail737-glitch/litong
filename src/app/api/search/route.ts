@@ -1,8 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
-import { rateLimit } from '@/lib/rate-limit'
-import { logAPIRequest } from '@/lib/logging'
-import { cacheResponse } from '@/lib/cache'
+import { NextRequest, NextResponse } from 'next/server';
+
+import { z } from 'zod';
+
+import { cacheResponse } from '@/lib/cache';
+import { logAPIRequest } from '@/lib/logging';
+import { rateLimit } from '@/lib/rate-limit';
 
 // Validation Schema
 const SearchQuerySchema = z.object({
@@ -16,12 +18,12 @@ const SearchQuerySchema = z.object({
   maxPrice: z.string().optional().transform(val => val ? parseFloat(val) : undefined),
   sortBy: z.enum(['relevance', 'name', 'price', 'date', 'popularity']).optional().default('relevance'),
   filters: z.string().optional().transform(val => val ? JSON.parse(val) : {})
-})
+});
 
 // Search functions
 async function searchProducts(query: string, filters: any = {}, pagination: any = {}) {
-  const { page = 1, limit = 20 } = pagination
-  const offset = (page - 1) * limit
+  const { page = 1, limit = 20 } = pagination;
+  const offset = (page - 1) * limit;
 
   // Simulate Elasticsearch/search engine query
   let products = Array.from({ length: 50 }, (_, i) => ({
@@ -43,38 +45,38 @@ async function searchProducts(query: string, filters: any = {}, pagination: any 
       name: [`STM32 <mark>${query}</mark> Product ${i + 1}`],
       description: [`High-performance microcontroller matching "<mark>${query}</mark>" with advanced features`]
     }
-  }))
+  }));
 
   // Apply filters
   if (filters.category) {
-    products = products.filter(p => p.category === filters.category)
+    products = products.filter(p => p.category === filters.category);
   }
 
   if (filters.manufacturer) {
-    products = products.filter(p => p.manufacturer === filters.manufacturer)
+    products = products.filter(p => p.manufacturer === filters.manufacturer);
   }
 
   if (filters.minPrice !== undefined) {
-    products = products.filter(p => p.price >= filters.minPrice)
+    products = products.filter(p => p.price >= filters.minPrice);
   }
 
   if (filters.maxPrice !== undefined) {
-    products = products.filter(p => p.price <= filters.maxPrice)
+    products = products.filter(p => p.price <= filters.maxPrice);
   }
 
   // Apply sorting
   if (filters.sortBy === 'relevance') {
-    products.sort((a, b) => b.relevanceScore - a.relevanceScore)
+    products.sort((a, b) => b.relevanceScore - a.relevanceScore);
   } else if (filters.sortBy === 'price') {
-    products.sort((a, b) => a.price - b.price)
+    products.sort((a, b) => a.price - b.price);
   } else if (filters.sortBy === 'name') {
-    products.sort((a, b) => a.name.localeCompare(b.name))
+    products.sort((a, b) => a.name.localeCompare(b.name));
   } else if (filters.sortBy === 'popularity') {
-    products.sort((a, b) => b.reviewCount - a.reviewCount)
+    products.sort((a, b) => b.reviewCount - a.reviewCount);
   }
 
-  const totalCount = products.length
-  const paginatedProducts = products.slice(offset, offset + limit)
+  const totalCount = products.length;
+  const paginatedProducts = products.slice(offset, offset + limit);
 
   // Generate facets/filters
   const facets = {
@@ -103,7 +105,7 @@ async function searchProducts(query: string, filters: any = {}, pagination: any 
       { value: '3+', count: 45, label: '3+ Stars' },
       { value: '2+', count: 48, label: '2+ Stars' }
     ]
-  }
+  };
 
   return {
     items: paginatedProducts,
@@ -116,12 +118,12 @@ async function searchProducts(query: string, filters: any = {}, pagination: any 
       `${query} application note`,
       `${query} reference design`
     ] : []
-  }
+  };
 }
 
 async function searchApplications(query: string, filters: any = {}, pagination: any = {}) {
-  const { page = 1, limit = 20 } = pagination
-  const offset = (page - 1) * limit
+  const { page = 1, limit = 20 } = pagination;
+  const offset = (page - 1) * limit;
 
   const applications = Array.from({ length: 20 }, (_, i) => ({
     id: `app_${i + 1}`,
@@ -136,20 +138,20 @@ async function searchApplications(query: string, filters: any = {}, pagination: 
       title: [`<mark>${query}</mark> Application ${i + 1}`],
       description: [`Industrial application using <mark>${query}</mark> technology`]
     }
-  }))
+  }));
 
-  const totalCount = applications.length
-  const paginatedApps = applications.slice(offset, offset + limit)
+  const totalCount = applications.length;
+  const paginatedApps = applications.slice(offset, offset + limit);
 
   return {
     items: paginatedApps,
     total: totalCount
-  }
+  };
 }
 
 async function searchNews(query: string, filters: any = {}, pagination: any = {}) {
-  const { page = 1, limit = 20 } = pagination
-  const offset = (page - 1) * limit
+  const { page = 1, limit = 20 } = pagination;
+  const offset = (page - 1) * limit;
 
   const news = Array.from({ length: 15 }, (_, i) => ({
     id: `news_${i + 1}`,
@@ -166,20 +168,20 @@ async function searchNews(query: string, filters: any = {}, pagination: any = {}
       title: [`Latest <mark>${query}</mark> Technology News ${i + 1}`],
       excerpt: [`Breaking news about <mark>${query}</mark> technology developments`]
     }
-  }))
+  }));
 
-  const totalCount = news.length
-  const paginatedNews = news.slice(offset, offset + limit)
+  const totalCount = news.length;
+  const paginatedNews = news.slice(offset, offset + limit);
 
   return {
     items: paginatedNews,
     total: totalCount
-  }
+  };
 }
 
 async function searchSolutions(query: string, filters: any = {}, pagination: any = {}) {
-  const { page = 1, limit = 20 } = pagination
-  const offset = (page - 1) * limit
+  const { page = 1, limit = 20 } = pagination;
+  const offset = (page - 1) * limit;
 
   const solutions = Array.from({ length: 12 }, (_, i) => ({
     id: `solution_${i + 1}`,
@@ -196,20 +198,20 @@ async function searchSolutions(query: string, filters: any = {}, pagination: any
       title: [`<mark>${query}</mark> Solution ${i + 1}`],
       description: [`Complete solution featuring <mark>${query}</mark> technology`]
     }
-  }))
+  }));
 
-  const totalCount = solutions.length
-  const paginatedSolutions = solutions.slice(offset, offset + limit)
+  const totalCount = solutions.length;
+  const paginatedSolutions = solutions.slice(offset, offset + limit);
 
   return {
     items: paginatedSolutions,
     total: totalCount
-  }
+  };
 }
 
 async function searchCaseStudies(query: string, filters: any = {}, pagination: any = {}) {
-  const { page = 1, limit = 20 } = pagination
-  const offset = (page - 1) * limit
+  const { page = 1, limit = 20 } = pagination;
+  const offset = (page - 1) * limit;
 
   const caseStudies = Array.from({ length: 10 }, (_, i) => ({
     id: `case_${i + 1}`,
@@ -227,15 +229,15 @@ async function searchCaseStudies(query: string, filters: any = {}, pagination: a
       title: [`<mark>${query}</mark> Implementation Success Story ${i + 1}`],
       description: [`How Company ${i + 1} successfully implemented <mark>${query}</mark> technology`]
     }
-  }))
+  }));
 
-  const totalCount = caseStudies.length
-  const paginatedCaseStudies = caseStudies.slice(offset, offset + limit)
+  const totalCount = caseStudies.length;
+  const paginatedCaseStudies = caseStudies.slice(offset, offset + limit);
 
   return {
     items: paginatedCaseStudies,
     total: totalCount
-  }
+  };
 }
 
 async function getSearchSuggestions(query: string, limit: number = 10) {
@@ -262,110 +264,110 @@ async function getSearchSuggestions(query: string, limit: number = 10) {
     `${query} libraries`,
     `${query} tools`
   ].filter(s => s.toLowerCase().includes(query.toLowerCase()))
-   .slice(0, limit)
+   .slice(0, limit);
 
-  return suggestions
+  return suggestions;
 }
 
 // API Route Handler
 export async function GET(request: NextRequest) {
-  const startTime = Date.now()
+  const startTime = Date.now();
 
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimit(request, { limit: 100, window: 60000 })
+    const rateLimitResult = await rateLimit(request, { limit: 100, window: 60000 });
     if (!rateLimitResult.success) {
       return NextResponse.json(
         { error: 'Rate limit exceeded', retryAfter: rateLimitResult.retryAfter },
         { status: 429 }
-      )
+      );
     }
 
     // Parse and validate query parameters
-    const { searchParams } = new URL(request.url)
-    const queryParams = Object.fromEntries(searchParams.entries())
-    
-    const validation = SearchQuerySchema.safeParse(queryParams)
+    const { searchParams } = new URL(request.url);
+    const queryParams = Object.fromEntries(searchParams.entries());
+
+    const validation = SearchQuerySchema.safeParse(queryParams);
     if (!validation.success) {
       return NextResponse.json(
-        { 
+        {
           error: 'Invalid search parameters',
           details: validation.error.errors
         },
         { status: 400 }
-      )
+      );
     }
 
-    const { q: query, type, page, limit, sortBy, ...filters } = validation.data
+    const { q: query, type, page, limit, sortBy, ...filters } = validation.data;
 
     // Check cache
-    const cacheKey = `search:${JSON.stringify({ query, type, page, limit, sortBy, ...filters })}`
-    const cachedResult = await cacheResponse(cacheKey)
+    const cacheKey = `search:${JSON.stringify({ query, type, page, limit, sortBy, ...filters })}`;
+    const cachedResult = await cacheResponse(cacheKey);
     if (cachedResult) {
       return NextResponse.json({
         ...cachedResult,
         cached: true,
         processingTime: Date.now() - startTime
-      })
+      });
     }
 
     // Perform searches based on type
-    let searchResults: any = {
+    const searchResults: any = {
       query,
       type,
       totalResults: 0,
       processingTime: 0,
       suggestions: await getSearchSuggestions(query, 10)
-    }
+    };
 
     if (type === 'all' || type === 'products') {
-      const productResults = await searchProducts(query, { ...filters, sortBy }, { page, limit })
-      searchResults.products = productResults
+      const productResults = await searchProducts(query, { ...filters, sortBy }, { page, limit });
+      searchResults.products = productResults;
       if (type === 'products') {
-        searchResults.totalResults = productResults.total
+        searchResults.totalResults = productResults.total;
       }
     }
 
     if (type === 'all' || type === 'applications') {
-      const appResults = await searchApplications(query, filters, { page, limit })
-      searchResults.applications = appResults
+      const appResults = await searchApplications(query, filters, { page, limit });
+      searchResults.applications = appResults;
       if (type === 'applications') {
-        searchResults.totalResults = appResults.total
+        searchResults.totalResults = appResults.total;
       }
     }
 
     if (type === 'all' || type === 'news') {
-      const newsResults = await searchNews(query, filters, { page, limit })
-      searchResults.news = newsResults
+      const newsResults = await searchNews(query, filters, { page, limit });
+      searchResults.news = newsResults;
       if (type === 'news') {
-        searchResults.totalResults = newsResults.total
+        searchResults.totalResults = newsResults.total;
       }
     }
 
     if (type === 'all' || type === 'solutions') {
-      const solutionResults = await searchSolutions(query, filters, { page, limit })
-      searchResults.solutions = solutionResults
+      const solutionResults = await searchSolutions(query, filters, { page, limit });
+      searchResults.solutions = solutionResults;
       if (type === 'solutions') {
-        searchResults.totalResults = solutionResults.total
+        searchResults.totalResults = solutionResults.total;
       }
     }
 
     if (type === 'all' || type === 'caseStudies') {
-      const caseResults = await searchCaseStudies(query, filters, { page, limit })
-      searchResults.caseStudies = caseResults
+      const caseResults = await searchCaseStudies(query, filters, { page, limit });
+      searchResults.caseStudies = caseResults;
       if (type === 'caseStudies') {
-        searchResults.totalResults = caseResults.total
+        searchResults.totalResults = caseResults.total;
       }
     }
 
     // Calculate total results for 'all' type
     if (type === 'all') {
-      searchResults.totalResults = 
+      searchResults.totalResults =
         (searchResults.products?.total || 0) +
         (searchResults.applications?.total || 0) +
         (searchResults.news?.total || 0) +
         (searchResults.solutions?.total || 0) +
-        (searchResults.caseStudies?.total || 0)
+        (searchResults.caseStudies?.total || 0);
     }
 
     // Add search analytics
@@ -379,7 +381,7 @@ export async function GET(request: NextRequest) {
       filters: Object.keys(filters).length > 0 ? filters : null,
       userAgent: request.headers.get('user-agent') || '',
       ip: request.ip || ''
-    }
+    };
 
     const response = {
       success: true,
@@ -395,7 +397,7 @@ export async function GET(request: NextRequest) {
       },
       cached: false,
       processingTime: Date.now() - startTime
-    }
+    };
 
     // Log search request
     await logAPIRequest({
@@ -411,15 +413,15 @@ export async function GET(request: NextRequest) {
       },
       userAgent: request.headers.get('user-agent') || '',
       ip: request.ip || ''
-    })
+    });
 
     // Cache response for 5 minutes
-    await cacheResponse(cacheKey, response.data, 300)
+    await cacheResponse(cacheKey, response.data, 300);
 
-    return NextResponse.json(response)
+    return NextResponse.json(response);
 
   } catch (error) {
-    console.error('Search API Error:', error)
+    console.error('Search API Error:', error);
 
     await logAPIRequest({
       method: 'GET',
@@ -430,15 +432,15 @@ export async function GET(request: NextRequest) {
       error: error instanceof Error ? error.message : 'Unknown error',
       userAgent: request.headers.get('user-agent') || '',
       ip: request.ip || ''
-    })
+    });
 
     return NextResponse.json(
-      { 
+      {
         success: false,
         error: 'Internal server error',
         message: 'An error occurred while performing the search'
       },
       { status: 500 }
-    )
+    );
   }
 }

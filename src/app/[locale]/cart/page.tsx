@@ -1,88 +1,91 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
-import { useOrder } from '@/contexts/OrderContext'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Badge } from '@/components/ui/badge'
-import { Alert } from '@/components/ui/alert'
-import { 
-  ShoppingCart, 
-  Plus, 
-  Minus, 
-  Trash2, 
+import { useState } from 'react';
+
+import Image from 'next/image';
+import Link from 'next/link';
+
+import {
+  ShoppingCart,
+  Plus,
+  Minus,
+  Trash2,
   ArrowRight,
   ShoppingBag,
   AlertCircle
-} from 'lucide-react'
+} from 'lucide-react';
+
+import { Alert } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { useOrder } from '@/contexts/OrderContext';
 
 export default function CartPage() {
-  const { 
-    cartItems, 
-    cartCount, 
-    cartTotal, 
-    updateCartItemQuantity, 
-    removeFromCart, 
-    clearCart 
-  } = useOrder()
-  
-  const [selectedItems, setSelectedItems] = useState<string[]>(cartItems.map(item => item.id))
-  const [isLoading, setIsLoading] = useState(false)
+  const {
+    cartItems,
+    cartCount,
+    cartTotal,
+    updateCartItemQuantity,
+    removeFromCart,
+    clearCart
+  } = useOrder();
+
+  const [selectedItems, setSelectedItems] = useState<string[]>(cartItems.map(item => item.id));
+  const [isLoading, setIsLoading] = useState(false);
 
   // 选中商品的统计
-  const selectedCartItems = cartItems.filter(item => selectedItems.includes(item.id))
-  const selectedCount = selectedCartItems.reduce((sum, item) => sum + item.quantity, 0)
-  const selectedTotal = selectedCartItems.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0)
+  const selectedCartItems = cartItems.filter(item => selectedItems.includes(item.id));
+  const selectedCount = selectedCartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const selectedTotal = selectedCartItems.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedItems(cartItems.map(item => item.id))
+      setSelectedItems(cartItems.map(item => item.id));
     } else {
-      setSelectedItems([])
+      setSelectedItems([]);
     }
-  }
+  };
 
   const handleSelectItem = (itemId: string, checked: boolean) => {
     if (checked) {
-      setSelectedItems(prev => [...prev, itemId])
+      setSelectedItems(prev => [...prev, itemId]);
     } else {
-      setSelectedItems(prev => prev.filter(id => id !== itemId))
+      setSelectedItems(prev => prev.filter(id => id !== itemId));
     }
-  }
+  };
 
   const handleQuantityChange = (itemId: string, newQuantity: number) => {
-    const item = cartItems.find(item => item.id === itemId)
-    if (!item) return
-    
+    const item = cartItems.find(item => item.id === itemId);
+    if (!item) return;
+
     if (newQuantity < 1) {
-      removeFromCart(itemId)
-      setSelectedItems(prev => prev.filter(id => id !== itemId))
+      removeFromCart(itemId);
+      setSelectedItems(prev => prev.filter(id => id !== itemId));
     } else if (newQuantity <= item.stock) {
-      updateCartItemQuantity(itemId, newQuantity)
+      updateCartItemQuantity(itemId, newQuantity);
     }
-  }
+  };
 
   const handleRemoveSelected = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     selectedItems.forEach(itemId => {
-      removeFromCart(itemId)
-    })
-    setSelectedItems([])
-    setIsLoading(false)
-  }
+      removeFromCart(itemId);
+    });
+    setSelectedItems([]);
+    setIsLoading(false);
+  };
 
   const handleClearAll = async () => {
     if (confirm('确定要清空购物车吗？')) {
-      setIsLoading(true)
-      clearCart()
-      setSelectedItems([])
-      setIsLoading(false)
+      setIsLoading(true);
+      clearCart();
+      setSelectedItems([]);
+      setIsLoading(false);
     }
-  }
+  };
 
   if (cartItems.length === 0) {
     return (
@@ -101,7 +104,7 @@ export default function CartPage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -111,7 +114,7 @@ export default function CartPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
             <ShoppingCart className="h-8 w-8 text-blue-600" />
-            购物车 
+            购物车
             <Badge variant="secondary" className="ml-2">
               {cartCount} 件商品
             </Badge>
@@ -139,8 +142,8 @@ export default function CartPage() {
                     </span>
                   </div>
                   <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
                       onClick={handleRemoveSelected}
                       disabled={selectedItems.length === 0 || isLoading}
@@ -148,8 +151,8 @@ export default function CartPage() {
                       <Trash2 className="h-4 w-4 mr-1" />
                       删除选中
                     </Button>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
                       onClick={handleClearAll}
                       disabled={isLoading}
@@ -214,7 +217,7 @@ export default function CartPage() {
                             )}
                           </div>
                         </div>
-                        
+
                         {/* 价格和操作 */}
                         <div className="text-right">
                           <div className="text-xl font-semibold text-red-600 mb-2">
@@ -223,7 +226,7 @@ export default function CartPage() {
                           <div className="text-sm text-gray-500 mb-3">
                             单价：¥{item.unitPrice.toFixed(2)}
                           </div>
-                          
+
                           {/* 数量控制 */}
                           <div className="flex items-center gap-2 mb-2">
                             <Button
@@ -238,8 +241,8 @@ export default function CartPage() {
                               type="number"
                               value={item.quantity}
                               onChange={(e) => {
-                                const value = parseInt(e.target.value) || 1
-                                handleQuantityChange(item.id, value)
+                                const value = parseInt(e.target.value) || 1;
+                                handleQuantityChange(item.id, value);
                               }}
                               className="w-16 text-center"
                               min="1"
@@ -254,7 +257,7 @@ export default function CartPage() {
                               <Plus className="h-3 w-3" />
                             </Button>
                           </div>
-                          
+
                           <Button
                             variant="ghost"
                             size="sm"
@@ -265,7 +268,7 @@ export default function CartPage() {
                           </Button>
                         </div>
                       </div>
-                      
+
                       {/* 库存不足警告 */}
                       {item.quantity > item.stock && (
                         <Alert className="mt-3 border-red-200 bg-red-50">
@@ -319,8 +322,8 @@ export default function CartPage() {
                   </div>
                 </div>
 
-                <Button 
-                  className="w-full" 
+                <Button
+                  className="w-full"
                   size="lg"
                   disabled={selectedItems.length === 0}
                   asChild
@@ -344,5 +347,5 @@ export default function CartPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

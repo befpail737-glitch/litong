@@ -1,10 +1,12 @@
-import { Metadata } from 'next'
-import { notFound } from 'next/navigation'
-import Link from 'next/link'
-import { ArrowLeft, Grid3X3, List, Filter, Search } from 'lucide-react'
-import { getProducts } from '@/lib/sanity/queries'
-import { getBrandData } from '@/lib/sanity/brands'
-import { urlFor, validateBrandProductAssociation, checkDocumentPublishStatus } from '@/lib/sanity/client'
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+
+import { ArrowLeft, Grid3X3, List, Filter, Search } from 'lucide-react';
+import { Metadata } from 'next';
+
+import { getBrandData } from '@/lib/sanity/brands';
+import { urlFor, validateBrandProductAssociation, checkDocumentPublishStatus } from '@/lib/sanity/client';
+import { getProducts } from '@/lib/sanity/queries';
 
 interface Props {
   params: {
@@ -20,89 +22,89 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const brandSlug = decodeURIComponent(params.slug)
-  
+  const brandSlug = decodeURIComponent(params.slug);
+
   try {
-    const brand = await getBrandData(brandSlug)
-    
+    const brand = await getBrandData(brandSlug);
+
     if (!brand) {
       return {
         title: '品牌未找到 - 力通电子',
         description: '未找到指定的品牌信息',
-      }
+      };
     }
-    
+
     return {
       title: `${brand.name}产品列表 - 力通电子`,
       description: `查看${brand.name}品牌的所有产品，包括详细规格参数和价格信息`,
       keywords: [`${brand.name}产品`, '电子元器件', '产品列表'],
-    }
+    };
   } catch (error) {
     return {
       title: '产品列表 - 力通电子',
       description: '查看品牌产品列表'
-    }
+    };
   }
 }
 
 export default async function BrandProductsPage({ params, searchParams }: Props) {
-  const brandSlug = decodeURIComponent(params.slug)
-  const currentPage = Number(searchParams.page) || 1
-  const pageSize = 12
-  const view = searchParams.view || 'grid'
-  
-  console.log('BrandProductsPage called with slug:', params.slug, 'decoded:', brandSlug)
-  
+  const brandSlug = decodeURIComponent(params.slug);
+  const currentPage = Number(searchParams.page) || 1;
+  const pageSize = 12;
+  const view = searchParams.view || 'grid';
+
+  console.log('BrandProductsPage called with slug:', params.slug, 'decoded:', brandSlug);
+
   try {
     // 获取品牌信息
-    const brand = await getBrandData(brandSlug)
-    console.log('Brand found:', brand)
-    
+    const brand = await getBrandData(brandSlug);
+    console.log('Brand found:', brand);
+
     if (!brand) {
-      console.error('Brand not found for slug:', brandSlug)
-      notFound()
+      console.error('Brand not found for slug:', brandSlug);
+      notFound();
     }
-    
+
     // 验证品牌发布状态
-    const brandStatus = await checkDocumentPublishStatus(brand._id, 'brandBasic')
-    console.log('Brand publish status:', brandStatus)
-    
+    const brandStatus = await checkDocumentPublishStatus(brand._id, 'brandBasic');
+    console.log('Brand publish status:', brandStatus);
+
     // 验证品牌-产品关联
-    const association = await validateBrandProductAssociation(brandSlug)
-    console.log('Brand-Product association validation:', association)
-    
+    const association = await validateBrandProductAssociation(brandSlug);
+    console.log('Brand-Product association validation:', association);
+
     if (!association.brandExists) {
-      console.error('Brand does not exist in published state:', brandSlug)
-      notFound()
+      console.error('Brand does not exist in published state:', brandSlug);
+      notFound();
     }
-    
+
     if (!association.brandActive) {
-      console.error('Brand is not active:', brandSlug)
-      notFound()
+      console.error('Brand is not active:', brandSlug);
+      notFound();
     }
-    
+
     // 添加详细的查询参数调试
     const queryParams = {
       brand: brandSlug,
       limit: pageSize,
       offset: (currentPage - 1) * pageSize
-    }
-    console.log('About to query products with params:', queryParams)
-    console.log('Expected product count for brand:', association.productCount)
-    
+    };
+    console.log('About to query products with params:', queryParams);
+    console.log('Expected product count for brand:', association.productCount);
+
     // 获取该品牌的产品
-    const productsData = await getProducts(queryParams)
-    
+    const productsData = await getProducts(queryParams);
+
     console.log('BrandProductsPage - Products data for brand:', brandSlug, {
       total: productsData.total,
       fetchedCount: productsData.products?.length || 0,
       expectedCount: association.productCount,
       products: productsData.products?.map((p: any) => ({ id: p._id, partNumber: p.partNumber, slug: p.slug })) || []
-    })
-    
-    const { products, total } = productsData
-    const totalPages = Math.ceil(total / pageSize)
-    
+    });
+
+    const { products, total } = productsData;
+    const totalPages = Math.ceil(total / pageSize);
+
     return (
       <div className="min-h-screen bg-gray-50">
         {/* 页面头部 */}
@@ -117,7 +119,7 @@ export default async function BrandProductsPage({ params, searchParams }: Props)
                 返回品牌页面
               </Link>
             </div>
-            
+
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">{brand?.name || brandSlug} 产品列表</h1>
@@ -125,7 +127,7 @@ export default async function BrandProductsPage({ params, searchParams }: Props)
                   找到 {total} 个产品
                 </p>
               </div>
-              
+
               {/* 视图切换 */}
               <div className="flex items-center gap-2">
                 <Link
@@ -152,7 +154,7 @@ export default async function BrandProductsPage({ params, searchParams }: Props)
             </div>
           </div>
         </div>
-        
+
         <div className="container mx-auto px-4 py-8">
           {products.length === 0 ? (
             /* 空状态 */
@@ -200,7 +202,7 @@ export default async function BrandProductsPage({ params, searchParams }: Props)
                         </div>
                       )}
                     </div>
-                    
+
                     {/* 产品信息 */}
                     <div className="p-4">
                       <h3 className="font-semibold text-gray-900 mb-1">
@@ -214,7 +216,7 @@ export default async function BrandProductsPage({ params, searchParams }: Props)
                           {product.shortDescription}
                         </p>
                       )}
-                      
+
                       {/* 产品状态 */}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -240,7 +242,7 @@ export default async function BrandProductsPage({ params, searchParams }: Props)
                   </div>
                 ))}
               </div>
-              
+
               {/* 分页 */}
               {totalPages > 1 && (
                 <div className="flex justify-center items-center gap-2 mt-12">
@@ -252,7 +254,7 @@ export default async function BrandProductsPage({ params, searchParams }: Props)
                       上一页
                     </Link>
                   )}
-                  
+
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
                     <Link
                       key={pageNum}
@@ -266,7 +268,7 @@ export default async function BrandProductsPage({ params, searchParams }: Props)
                       {pageNum}
                     </Link>
                   ))}
-                  
+
                   {currentPage < totalPages && (
                     <Link
                       href={`?${new URLSearchParams({ ...searchParams, page: String(currentPage + 1) }).toString()}`}
@@ -281,9 +283,9 @@ export default async function BrandProductsPage({ params, searchParams }: Props)
           )}
         </div>
       </div>
-    )
+    );
   } catch (error) {
-    console.error('Error in BrandProductsPage:', error)
-    notFound()
+    console.error('Error in BrandProductsPage:', error);
+    notFound();
   }
 }

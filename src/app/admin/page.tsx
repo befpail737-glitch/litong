@@ -1,8 +1,10 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { 
+import { useState } from 'react';
+
+import Link from 'next/link';
+
+import {
   LayoutDashboard,
   FileText,
   Package,
@@ -20,7 +22,7 @@ import {
   TrendingUp,
   ShoppingCart,
   MessageSquare
-} from 'lucide-react'
+} from 'lucide-react';
 
 // 模拟数据
 const dashboardStats = [
@@ -52,7 +54,7 @@ const dashboardStats = [
     changeType: 'negative' as const,
     icon: MessageSquare
   }
-]
+];
 
 const recentContent = [
   {
@@ -79,17 +81,17 @@ const recentContent = [
     date: '2024-01-13',
     status: 'published'
   }
-]
+];
 
 const quickActions = [
   { name: '内容管理 (Sanity)', href: '/studio', icon: FileText, color: 'bg-blue-500' },
   { name: '产品管理', href: '/admin/products', icon: Package, color: 'bg-green-500' },
   { name: '用户管理', href: '/admin/users', icon: Users, color: 'bg-purple-500' },
   { name: '系统设置', href: '/admin/settings', icon: Settings, color: 'bg-orange-500' }
-]
+];
 
 export default function AdminDashboard() {
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex">
@@ -115,7 +117,7 @@ export default function AdminDashboard() {
               <LayoutDashboard className="w-5 h-5" />
               {sidebarOpen && <span className="font-medium">仪表盘</span>}
             </Link>
-            
+
             <div className="pt-6">
               {sidebarOpen && <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-4">内容管理</p>}
               <div className="space-y-1">
@@ -157,7 +159,7 @@ export default function AdminDashboard() {
         </nav>
 
         <div className="p-4 border-t border-gray-100">
-          <button 
+          <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="w-full flex items-center justify-center p-3 rounded-xl hover:bg-gray-50 transition-all duration-200 text-gray-600 hover:text-gray-900"
             title={sidebarOpen ? '收起侧栏' : '展开侧栏'}
@@ -178,13 +180,13 @@ export default function AdminDashboard() {
                 <p className="text-gray-600 mt-1">欢迎回到力通电子后台管理系统</p>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               <div className="relative">
                 <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
-                <input 
-                  type="text" 
-                  placeholder="搜索功能..." 
+                <input
+                  type="text"
+                  placeholder="搜索功能..."
                   className="pl-10 pr-4 py-3 w-64 border border-gray-300 rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 />
               </div>
@@ -211,8 +213,8 @@ export default function AdminDashboard() {
                     <p className="text-3xl font-bold text-gray-900 tracking-tight">{stat.value}</p>
                     <div className="mt-3 flex items-center">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        stat.changeType === 'positive' 
-                          ? 'bg-green-100 text-green-800' 
+                        stat.changeType === 'positive'
+                          ? 'bg-green-100 text-green-800'
                           : 'bg-red-100 text-red-800'
                       }`}>
                         {stat.change}
@@ -311,5 +313,5 @@ export default function AdminDashboard() {
         </main>
       </div>
     </div>
-  )
+  );
 }

@@ -1,11 +1,13 @@
-import Link from 'next/link'
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { QuickInquiry } from '@/components/inquiry/QuickInquiry'
-import { WishlistButton } from '@/components/wishlist/WishlistButton'
-import { ArrowLeftRight } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import Link from 'next/link';
+
+import { ArrowLeftRight } from 'lucide-react';
+
+import { QuickInquiry } from '@/components/inquiry/QuickInquiry';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { WishlistButton } from '@/components/wishlist/WishlistButton';
+import { cn } from '@/lib/utils';
 
 interface ProductCardProps {
   product: {
@@ -50,7 +52,7 @@ const inventoryStatusMap = {
   low_stock: { label: '库存紧张', variant: 'warning' as const },
   out_of_stock: { label: '缺货', variant: 'error' as const },
   discontinued: { label: '停产', variant: 'secondary' as const },
-}
+};
 
 export function ProductCard({
   product,
@@ -61,10 +63,10 @@ export function ProductCard({
   showCompare = false,
   onAddToCompare,
 }: ProductCardProps) {
-  const inventoryStatus = product.inventory?.status || 'in_stock'
-  const inventoryInfo = inventoryStatusMap[inventoryStatus]
-  const basePrice = product.pricing?.tiers[0]?.price
-  const currency = product.pricing?.currency || 'CNY'
+  const inventoryStatus = product.inventory?.status || 'in_stock';
+  const inventoryInfo = inventoryStatusMap[inventoryStatus];
+  const basePrice = product.pricing?.tiers[0]?.price;
+  const currency = product.pricing?.currency || 'CNY';
 
   return (
     <Card className={cn('group hover:shadow-lg transition-all duration-200', className)}>
@@ -80,7 +82,7 @@ export function ProductCard({
           ) : (
             <div className="text-4xl text-gray-300">📱</div>
           )}
-          
+
           {/* 心愿单按钮 - 悬浮在图片右上角 */}
           <div className="absolute top-2 right-2">
             <WishlistButton
@@ -186,7 +188,7 @@ export function ProductCard({
                 详情
               </Link>
             </Button>
-            
+
             {showCompare && onAddToCompare && (
               <Button
                 size="sm"
@@ -198,9 +200,9 @@ export function ProductCard({
                 <ArrowLeftRight className="h-3 w-3" />
               </Button>
             )}
-            
+
             {inventoryStatus === 'in_stock' && (
-              <QuickInquiry 
+              <QuickInquiry
                 productId={product.id}
                 productName={product.partNumber}
                 className="text-xs px-2 py-1 h-7"
@@ -210,5 +212,5 @@ export function ProductCard({
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

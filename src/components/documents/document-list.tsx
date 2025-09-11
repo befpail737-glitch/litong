@@ -1,20 +1,17 @@
-'use client'
+'use client';
 
-import { useState, useMemo } from 'react'
-import { useTranslations } from 'next-intl'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Separator } from '@/components/ui/separator'
-import { 
-  Download, 
-  FileText, 
-  File, 
+import { useState, useMemo } from 'react';
+
+import Image from 'next/image';
+import Link from 'next/link';
+
+import {
+  Download,
+  FileText,
+  File,
   FileSpreadsheet,
   Presentation,
-  Search, 
+  Search,
   Filter,
   Eye,
   Calendar,
@@ -22,13 +19,19 @@ import {
   Lock,
   Unlock,
   Users
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { useFormatters } from '@/hooks/use-formatters'
-import { getLocalizedValue } from '@/lib/sanity-i18n'
-import type { Locale } from '@/i18n'
-import Link from 'next/link'
-import Image from 'next/image'
+} from 'lucide-react';
+import { useTranslations } from 'next-intl';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import { useFormatters } from '@/hooks/use-formatters';
+import type { Locale } from '@/i18n';
+import { getLocalizedValue } from '@/lib/sanity-i18n';
+import { cn } from '@/lib/utils';
 
 // 文档类型定义
 interface DocumentItem {
@@ -95,15 +98,15 @@ export function DocumentList({
   onDownload,
   className
 }: DocumentListProps) {
-  const t = useTranslations('documents')
-  const { dateShort, fileSize } = useFormatters()
-  
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState<string>('all')
-  const [selectedType, setSelectedType] = useState<string>('all')
-  const [selectedLanguage, setSelectedLanguage] = useState<string>('all')
-  const [selectedAccess, setSelectedAccess] = useState<string>('all')
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const t = useTranslations('documents');
+  const { dateShort, fileSize } = useFormatters();
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedType, setSelectedType] = useState<string>('all');
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('all');
+  const [selectedAccess, setSelectedAccess] = useState<string>('all');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   // 文档类型映射
   const documentTypeMap = {
@@ -117,7 +120,7 @@ export function DocumentList({
     whitepaper: { label: t('types.whitepaper'), icon: File, color: 'text-slate-600' },
     'case-study': { label: t('types.caseStudy'), icon: File, color: 'text-pink-600' },
     other: { label: t('types.other'), icon: File, color: 'text-gray-600' }
-  }
+  };
 
   // 访问权限映射
   const accessLevelMap = {
@@ -125,12 +128,12 @@ export function DocumentList({
     registered: { label: t('access.registered'), icon: Users, color: 'bg-blue-100 text-blue-800' },
     member: { label: t('access.member'), icon: Users, color: 'bg-purple-100 text-purple-800' },
     internal: { label: t('access.internal'), icon: Lock, color: 'bg-red-100 text-red-800' }
-  }
+  };
 
   // 语言映射
   const languageMap = {
     'zh-CN': '中文',
-    'zh-TW': '繁体中文', 
+    'zh-TW': '繁体中文',
     'en': 'English',
     'ja': '日本語',
     'ko': '한국어',
@@ -140,51 +143,51 @@ export function DocumentList({
     'ru': 'Русский',
     'ar': 'العربية',
     'multi': t('language.multi')
-  }
+  };
 
   // 过滤文档
   const filteredDocuments = useMemo(() => {
     return documents.filter(document => {
-      const title = getLocalizedValue(document.title, locale).toLowerCase()
-      const description = getLocalizedValue(document.description, locale).toLowerCase()
-      const search = searchTerm.toLowerCase()
-      
-      const matchesSearch = !searchTerm || 
-        title.includes(search) || 
+      const title = getLocalizedValue(document.title, locale).toLowerCase();
+      const description = getLocalizedValue(document.description, locale).toLowerCase();
+      const search = searchTerm.toLowerCase();
+
+      const matchesSearch = !searchTerm ||
+        title.includes(search) ||
         description.includes(search) ||
-        document.tags.some(tag => tag.toLowerCase().includes(search))
-      
-      const matchesCategory = selectedCategory === 'all' || document.category?.slug.current === selectedCategory
-      const matchesType = selectedType === 'all' || document.documentType === selectedType
-      const matchesLanguage = selectedLanguage === 'all' || document.language === selectedLanguage
-      const matchesAccess = selectedAccess === 'all' || document.accessLevel === selectedAccess
-      
-      return matchesSearch && matchesCategory && matchesType && matchesLanguage && matchesAccess
-    })
-  }, [documents, searchTerm, selectedCategory, selectedType, selectedLanguage, selectedAccess, locale])
+        document.tags.some(tag => tag.toLowerCase().includes(search));
+
+      const matchesCategory = selectedCategory === 'all' || document.category?.slug.current === selectedCategory;
+      const matchesType = selectedType === 'all' || document.documentType === selectedType;
+      const matchesLanguage = selectedLanguage === 'all' || document.language === selectedLanguage;
+      const matchesAccess = selectedAccess === 'all' || document.accessLevel === selectedAccess;
+
+      return matchesSearch && matchesCategory && matchesType && matchesLanguage && matchesAccess;
+    });
+  }, [documents, searchTerm, selectedCategory, selectedType, selectedLanguage, selectedAccess, locale]);
 
   // 分页计算
-  const totalPages = Math.ceil(filteredDocuments.length / pageSize)
-  const startIndex = (currentPage - 1) * pageSize
-  const paginatedDocuments = filteredDocuments.slice(startIndex, startIndex + pageSize)
+  const totalPages = Math.ceil(filteredDocuments.length / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const paginatedDocuments = filteredDocuments.slice(startIndex, startIndex + pageSize);
 
   const DocumentCard = ({ document }: { document: DocumentItem }) => {
-    const title = getLocalizedValue(document.title, locale)
-    const description = getLocalizedValue(document.description, locale)
-    const categoryTitle = getLocalizedValue(document.category.title, locale)
-    const typeInfo = documentTypeMap[document.documentType]
-    const accessInfo = accessLevelMap[document.accessLevel]
-    const IconComponent = typeInfo.icon
+    const title = getLocalizedValue(document.title, locale);
+    const description = getLocalizedValue(document.description, locale);
+    const categoryTitle = getLocalizedValue(document.category.title, locale);
+    const typeInfo = documentTypeMap[document.documentType];
+    const accessInfo = accessLevelMap[document.accessLevel];
+    const IconComponent = typeInfo.icon;
 
     const handleDownload = () => {
-      onDownload?.(document)
+      onDownload?.(document);
       // 在实际应用中，这里会调用API更新下载次数
-      window.open(document.file.asset.url, '_blank')
-    }
+      window.open(document.file.asset.url, '_blank');
+    };
 
     return (
-      <Card className={cn("group hover:shadow-lg transition-all duration-300", viewMode === 'list' && "flex flex-row")}>
-        <div className={cn("relative", viewMode === 'grid' ? "aspect-video" : "w-48 flex-shrink-0")}>
+      <Card className={cn('group hover:shadow-lg transition-all duration-300', viewMode === 'list' && 'flex flex-row')}>
+        <div className={cn('relative', viewMode === 'grid' ? 'aspect-video' : 'w-48 flex-shrink-0')}>
           {document.preview?.asset ? (
             <Image
               src={document.preview.asset.url}
@@ -194,24 +197,24 @@ export function DocumentList({
             />
           ) : (
             <div className="w-full h-full bg-muted flex items-center justify-center rounded-t-lg">
-              <IconComponent className={cn("w-12 h-12", typeInfo.color)} />
+              <IconComponent className={cn('w-12 h-12', typeInfo.color)} />
             </div>
           )}
-          
-          <Badge className={cn("absolute top-2 right-2", accessInfo.color)}>
+
+          <Badge className={cn('absolute top-2 right-2', accessInfo.color)}>
             <accessInfo.icon className="w-3 h-3 mr-1" />
             {accessInfo.label}
           </Badge>
         </div>
-        
+
         <div className="flex-1">
           <CardHeader>
             <div className="flex items-center gap-2 mb-2">
-              <Badge 
-                variant="outline" 
-                style={{ 
+              <Badge
+                variant="outline"
+                style={{
                   borderColor: document.category.color,
-                  color: document.category.color 
+                  color: document.category.color
                 }}
               >
                 {categoryTitle}
@@ -227,20 +230,20 @@ export function DocumentList({
                 </Badge>
               )}
             </div>
-            
+
             <CardTitle className="line-clamp-2 group-hover:text-primary transition-colors">
               <Link href={`/documents/${document.slug.current}`}>
                 {title}
               </Link>
             </CardTitle>
-            
+
             {description && (
               <CardDescription className="line-clamp-2">
                 {description}
               </CardDescription>
             )}
           </CardHeader>
-          
+
           <CardContent>
             {/* 标签 */}
             {document.tags && document.tags.length > 0 && (
@@ -257,7 +260,7 @@ export function DocumentList({
                 )}
               </div>
             )}
-            
+
             {/* 文档信息 */}
             <div className="flex items-center justify-between text-sm text-muted-foreground mb-3">
               <div className="flex items-center gap-4">
@@ -271,13 +274,13 @@ export function DocumentList({
                   <span>{document.version}</span>
                 )}
               </div>
-              
+
               <div className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
                 {dateShort(new Date(document.publishedAt))}
               </div>
             </div>
-            
+
             {/* 下载统计和操作 */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -286,7 +289,7 @@ export function DocumentList({
                   {document.downloadCount} {t('downloads')}
                 </span>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm" asChild>
                   <Link href={`/documents/${document.slug.current}`}>
@@ -303,8 +306,8 @@ export function DocumentList({
           </CardContent>
         </div>
       </Card>
-    )
-  }
+    );
+  };
 
   return (
     <div className={className}>
@@ -321,7 +324,7 @@ export function DocumentList({
               className="pl-10"
             />
           </div>
-          
+
           {/* 过滤器 */}
           <div className="flex flex-wrap gap-2">
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
@@ -337,7 +340,7 @@ export function DocumentList({
                 ))}
               </SelectContent>
             </Select>
-            
+
             <Select value={selectedType} onValueChange={setSelectedType}>
               <SelectTrigger className="w-40">
                 <SelectValue placeholder={t('selectType')} />
@@ -351,7 +354,7 @@ export function DocumentList({
                 ))}
               </SelectContent>
             </Select>
-            
+
             <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
               <SelectTrigger className="w-40">
                 <SelectValue placeholder={t('selectLanguage')} />
@@ -365,7 +368,7 @@ export function DocumentList({
                 ))}
               </SelectContent>
             </Select>
-            
+
             <Select value={selectedAccess} onValueChange={setSelectedAccess}>
               <SelectTrigger className="w-40">
                 <SelectValue placeholder={t('selectAccess')} />
@@ -381,16 +384,16 @@ export function DocumentList({
             </Select>
           </div>
         </div>
-        
+
         {/* 视图切换和结果统计 */}
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            {t('showingResults', { 
-              count: filteredDocuments.length, 
-              total: totalCount 
+            {t('showingResults', {
+              count: filteredDocuments.length,
+              total: totalCount
             })}
           </p>
-          
+
           <div className="flex items-center gap-2">
             <Button
               variant={viewMode === 'grid' ? 'default' : 'outline'}
@@ -418,11 +421,11 @@ export function DocumentList({
           <CardContent>
             <p className="text-muted-foreground mb-4">{t('noDocumentsFound')}</p>
             <Button onClick={() => {
-              setSearchTerm('')
-              setSelectedCategory('all')
-              setSelectedType('all')
-              setSelectedLanguage('all')
-              setSelectedAccess('all')
+              setSearchTerm('');
+              setSelectedCategory('all');
+              setSelectedType('all');
+              setSelectedLanguage('all');
+              setSelectedAccess('all');
             }}>
               {t('clearFilters')}
             </Button>
@@ -430,10 +433,10 @@ export function DocumentList({
         </Card>
       ) : (
         <div className={cn(
-          "gap-6",
-          viewMode === 'grid' 
-            ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3" 
-            : "flex flex-col"
+          'gap-6',
+          viewMode === 'grid'
+            ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3'
+            : 'flex flex-col'
         )}>
           {paginatedDocuments.map((document) => (
             <DocumentCard key={document._id} document={document} />
@@ -451,10 +454,10 @@ export function DocumentList({
           >
             {t('previous')}
           </Button>
-          
+
           <div className="flex items-center gap-1">
             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-              const pageNumber = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i
+              const pageNumber = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
               return (
                 <Button
                   key={pageNumber}
@@ -464,10 +467,10 @@ export function DocumentList({
                 >
                   {pageNumber}
                 </Button>
-              )
+              );
             })}
           </div>
-          
+
           <Button
             variant="outline"
             onClick={() => onPageChange?.(currentPage + 1)}
@@ -478,5 +481,5 @@ export function DocumentList({
         </div>
       )}
     </div>
-  )
+  );
 }

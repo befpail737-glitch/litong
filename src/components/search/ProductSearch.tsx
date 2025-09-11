@@ -1,75 +1,78 @@
-'use client'
+'use client';
 
-import { useState, useMemo } from 'react'
-import { SearchBox } from './SearchBox'
-import { AdvancedFilter } from './AdvancedFilter'
-import { ProductCard } from '@/components/product/ProductCard'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Filter, SortAsc, SortDesc, Grid, List, Settings } from 'lucide-react'
-import { mockProducts, searchProducts, productCategories, type Product } from '@/data/products'
-import { getAllBrands } from '@/data/brands'
+import { useState, useMemo } from 'react';
+
+import { Filter, SortAsc, SortDesc, Grid, List, Settings } from 'lucide-react';
+
+import { ProductCard } from '@/components/product/ProductCard';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { getAllBrands } from '@/data/brands';
+import { mockProducts, searchProducts, productCategories, type Product } from '@/data/products';
+
+import { AdvancedFilter } from './AdvancedFilter';
+import { SearchBox } from './SearchBox';
 
 interface ProductSearchProps {
   initialProducts?: Product[]
   showFilters?: boolean
 }
 
-export function ProductSearch({ 
-  initialProducts = mockProducts, 
-  showFilters = true 
+export function ProductSearch({
+  initialProducts = mockProducts,
+  showFilters = true
 }: ProductSearchProps) {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedBrand, setSelectedBrand] = useState<string>('')
-  const [selectedCategory, setSelectedCategory] = useState<string>('')
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000])
-  const [inStockOnly, setInStockOnly] = useState(false)
-  const [sortBy, setSortBy] = useState<'name' | 'price' | 'brand'>('name')
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedBrand, setSelectedBrand] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
+  const [inStockOnly, setInStockOnly] = useState(false);
+  const [sortBy, setSortBy] = useState<'name' | 'price' | 'brand'>('name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
-  const brands = getAllBrands()
-  
+  const brands = getAllBrands();
+
   const filteredAndSortedProducts = useMemo(() => {
     // Search and filter
-    let results = searchProducts(initialProducts, searchQuery, {
+    const results = searchProducts(initialProducts, searchQuery, {
       brand: selectedBrand || undefined,
       category: selectedCategory || undefined,
       priceRange: priceRange[0] > 0 || priceRange[1] < 1000 ? priceRange : undefined,
       inStock: inStockOnly
-    })
+    });
 
     // Sort
     results.sort((a, b) => {
-      let comparison = 0
-      
+      let comparison = 0;
+
       switch (sortBy) {
         case 'name':
-          comparison = a.title.localeCompare(b.title)
-          break
+          comparison = a.title.localeCompare(b.title);
+          break;
         case 'price':
-          comparison = (a.pricing.tiers[0]?.price || 0) - (b.pricing.tiers[0]?.price || 0)
-          break
+          comparison = (a.pricing.tiers[0]?.price || 0) - (b.pricing.tiers[0]?.price || 0);
+          break;
         case 'brand':
-          comparison = a.brand.name.localeCompare(b.brand.name)
-          break
+          comparison = a.brand.name.localeCompare(b.brand.name);
+          break;
       }
 
-      return sortOrder === 'desc' ? -comparison : comparison
-    })
+      return sortOrder === 'desc' ? -comparison : comparison;
+    });
 
-    return results
-  }, [initialProducts, searchQuery, selectedBrand, selectedCategory, priceRange, inStockOnly, sortBy, sortOrder])
+    return results;
+  }, [initialProducts, searchQuery, selectedBrand, selectedCategory, priceRange, inStockOnly, sortBy, sortOrder]);
 
   const handleClearFilters = () => {
-    setSearchQuery('')
-    setSelectedBrand('')
-    setSelectedCategory('')
-    setPriceRange([0, 1000])
-    setInStockOnly(false)
-  }
+    setSearchQuery('');
+    setSelectedBrand('');
+    setSelectedCategory('');
+    setPriceRange([0, 1000]);
+    setInStockOnly(false);
+  };
 
   const activeFiltersCount = [
     searchQuery,
@@ -77,12 +80,12 @@ export function ProductSearch({
     selectedCategory,
     inStockOnly,
     priceRange[0] > 0 || priceRange[1] < 1000
-  ].filter(Boolean).length
+  ].filter(Boolean).length;
 
   return (
     <div className="space-y-6">
       {/* Search Box */}
-      <SearchBox 
+      <SearchBox
         value={searchQuery}
         onChange={setSearchQuery}
         placeholder="搜索产品型号、品牌或描述..."
@@ -160,7 +163,7 @@ export function ProductSearch({
                     <SelectItem value="brand">按品牌</SelectItem>
                   </SelectContent>
                 </Select>
-                
+
                 <Button
                   variant="outline"
                   size="sm"
@@ -215,14 +218,14 @@ export function ProductSearch({
       {/* Products Grid/List */}
       {filteredAndSortedProducts.length > 0 ? (
         <div className={
-          viewMode === 'grid' 
+          viewMode === 'grid'
             ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
             : 'space-y-4'
         }>
           {filteredAndSortedProducts.map((product) => (
-            <ProductCard 
-              key={product.id} 
-              product={product} 
+            <ProductCard
+              key={product.id}
+              product={product}
               viewMode={viewMode}
             />
           ))}
@@ -242,5 +245,5 @@ export function ProductSearch({
         </div>
       )}
     </div>
-  )
+  );
 }

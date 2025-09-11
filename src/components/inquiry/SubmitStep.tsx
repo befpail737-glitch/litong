@@ -1,37 +1,39 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useInquiry } from '@/contexts/InquiryContext'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { 
-  Send, 
-  CheckCircle2, 
+import { useState } from 'react';
+
+import {
+  Send,
+  CheckCircle2,
   Clock,
   Shield,
   HeadphonesIcon,
   FileText,
   Mail,
   Phone
-} from 'lucide-react'
+} from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useInquiry } from '@/contexts/InquiryContext';
 
 export function SubmitStep() {
-  const { state } = useInquiry()
-  const { currentInquiry, isLoading } = state
-  const { products, companyInfo, projectInfo } = currentInquiry
+  const { state } = useInquiry();
+  const { currentInquiry, isLoading } = state;
+  const { products, companyInfo, projectInfo } = currentInquiry;
 
   const [agreements, setAgreements] = useState({
     terms: false,
     privacy: false,
     contact: true
-  })
+  });
 
   // 生成询价单号预览
-  const inquiryNumber = `INQ-${Date.now().toString().slice(-8)}`
-  const totalProducts = products.reduce((sum, p) => sum + p.quantity, 0)
+  const inquiryNumber = `INQ-${Date.now().toString().slice(-8)}`;
+  const totalProducts = products.reduce((sum, p) => sum + p.quantity, 0);
 
-  const allAgreementsChecked = agreements.terms && agreements.privacy
+  const allAgreementsChecked = agreements.terms && agreements.privacy;
 
   return (
     <div className="space-y-6">
@@ -73,7 +75,7 @@ export function SubmitStep() {
               <p className="text-sm text-purple-700 font-medium">响应时间</p>
             </div>
           </div>
-          
+
           <div className="mt-6 p-4 bg-gray-50 rounded-lg">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
@@ -122,7 +124,7 @@ export function SubmitStep() {
                 <p className="text-sm text-gray-600">收到您的询价后，我们将在1小时内确认收到并开始处理</p>
               </div>
             </div>
-            
+
             <div className="flex items-start gap-4">
               <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
                 <span className="text-sm font-bold text-green-600">2</span>
@@ -132,7 +134,7 @@ export function SubmitStep() {
                 <p className="text-sm text-gray-600">技术团队分析产品规格，为您匹配最优质的供应商资源</p>
               </div>
             </div>
-            
+
             <div className="flex items-start gap-4">
               <div className="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
                 <span className="text-sm font-bold text-purple-600">3</span>
@@ -142,7 +144,7 @@ export function SubmitStep() {
                 <p className="text-sm text-gray-600">24小时内提供详细报价单，包含价格、交期、认证等信息</p>
               </div>
             </div>
-            
+
             <div className="flex items-start gap-4">
               <div className="flex-shrink-0 w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
                 <span className="text-sm font-bold text-orange-600">4</span>
@@ -169,7 +171,7 @@ export function SubmitStep() {
             <Checkbox
               id="terms"
               checked={agreements.terms}
-              onCheckedChange={(checked) => 
+              onCheckedChange={(checked) =>
                 setAgreements(prev => ({ ...prev, terms: !!checked }))
               }
             />
@@ -182,12 +184,12 @@ export function SubmitStep() {
               </p>
             </div>
           </div>
-          
+
           <div className="flex items-start space-x-3">
             <Checkbox
               id="privacy"
               checked={agreements.privacy}
-              onCheckedChange={(checked) => 
+              onCheckedChange={(checked) =>
                 setAgreements(prev => ({ ...prev, privacy: !!checked }))
               }
             />
@@ -200,12 +202,12 @@ export function SubmitStep() {
               </p>
             </div>
           </div>
-          
+
           <div className="flex items-start space-x-3">
             <Checkbox
               id="contact"
               checked={agreements.contact}
-              onCheckedChange={(checked) => 
+              onCheckedChange={(checked) =>
                 setAgreements(prev => ({ ...prev, contact: !!checked }))
               }
             />
@@ -218,7 +220,7 @@ export function SubmitStep() {
               </p>
             </div>
           </div>
-          
+
           {!allAgreementsChecked && (
             <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
               <p className="text-sm text-yellow-800">
@@ -246,7 +248,7 @@ export function SubmitStep() {
                 <p className="text-sm text-gray-600">400-123-4567</p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-3 p-3 border rounded-lg">
               <Mail className="h-5 w-5 text-green-600" />
               <div>
@@ -255,7 +257,7 @@ export function SubmitStep() {
               </div>
             </div>
           </div>
-          
+
           <div className="mt-4 p-3 bg-blue-50 rounded-lg">
             <p className="text-sm text-blue-800">
               <strong>专业提示：</strong>
@@ -268,5 +270,5 @@ export function SubmitStep() {
 
       {/* 提交按钮在父组件中渲染 */}
     </div>
-  )
+  );
 }

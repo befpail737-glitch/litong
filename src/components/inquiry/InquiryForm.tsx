@@ -1,14 +1,16 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Checkbox } from '@/components/ui/checkbox'
-import { X, Plus, Send, User, Mail, Phone, Building, MapPin } from 'lucide-react'
+import { useState } from 'react';
+
+import { X, Plus, Send, User, Mail, Phone, Building, MapPin } from 'lucide-react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 
 interface InquiryProduct {
   id: string
@@ -36,20 +38,20 @@ export function InquiryForm({ initialProducts = [], onSubmit, onCancel }: Inquir
     phone: '',
     position: '',
     address: '',
-    
+
     // 询价信息
     inquiryType: 'quote', // quote, sample, bulk
     projectName: '',
     estimatedVolume: '',
     targetDate: '',
     budgetRange: '',
-    
+
     // 其他要求
     requiresCertification: false,
     requiresCustomPackaging: false,
     requiresTechnicalSupport: false,
     additionalRequirements: '',
-    
+
     // 产品列表
     products: initialProducts.length > 0 ? initialProducts : [{
       id: '1',
@@ -61,7 +63,7 @@ export function InquiryForm({ initialProducts = [], onSubmit, onCancel }: Inquir
       urgency: 'normal' as const,
       notes: ''
     }]
-  })
+  });
 
   const addProduct = () => {
     const newProduct: InquiryProduct = {
@@ -72,33 +74,33 @@ export function InquiryForm({ initialProducts = [], onSubmit, onCancel }: Inquir
       quantity: 1,
       urgency: 'normal',
       notes: ''
-    }
+    };
     setFormData(prev => ({
       ...prev,
       products: [...prev.products, newProduct]
-    }))
-  }
+    }));
+  };
 
   const removeProduct = (id: string) => {
     setFormData(prev => ({
       ...prev,
       products: prev.products.filter(p => p.id !== id)
-    }))
-  }
+    }));
+  };
 
   const updateProduct = (id: string, field: keyof InquiryProduct, value: any) => {
     setFormData(prev => ({
       ...prev,
-      products: prev.products.map(p => 
+      products: prev.products.map(p =>
         p.id === id ? { ...p, [field]: value } : p
       )
-    }))
-  }
+    }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    onSubmit?.(formData)
-  }
+    e.preventDefault();
+    onSubmit?.(formData);
+  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -194,8 +196,8 @@ export function InquiryForm({ initialProducts = [], onSubmit, onCancel }: Inquir
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     询价类型
                   </label>
-                  <Select 
-                    value={formData.inquiryType} 
+                  <Select
+                    value={formData.inquiryType}
                     onValueChange={(value) => setFormData(prev => ({ ...prev, inquiryType: value }))}
                   >
                     <SelectTrigger>
@@ -250,7 +252,7 @@ export function InquiryForm({ initialProducts = [], onSubmit, onCancel }: Inquir
                   添加产品
                 </Button>
               </div>
-              
+
               <div className="space-y-4">
                 {formData.products.map((product, index) => (
                   <Card key={product.id} className="relative">
@@ -266,7 +268,7 @@ export function InquiryForm({ initialProducts = [], onSubmit, onCancel }: Inquir
                           <X className="h-4 w-4" />
                         </Button>
                       )}
-                      
+
                       <div className="grid md:grid-cols-3 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -295,8 +297,8 @@ export function InquiryForm({ initialProducts = [], onSubmit, onCancel }: Inquir
                           <label className="block text-sm font-medium text-gray-700 mb-1">
                             紧急程度
                           </label>
-                          <Select 
-                            value={product.urgency} 
+                          <Select
+                            value={product.urgency}
                             onValueChange={(value) => updateProduct(product.id, 'urgency', value)}
                           >
                             <SelectTrigger>
@@ -332,12 +334,12 @@ export function InquiryForm({ initialProducts = [], onSubmit, onCancel }: Inquir
               <h3 className="text-lg font-semibold mb-4">其他要求</h3>
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
-                  <Checkbox 
+                  <Checkbox
                     id="certification"
                     checked={formData.requiresCertification}
-                    onCheckedChange={(checked) => setFormData(prev => ({ 
-                      ...prev, 
-                      requiresCertification: checked as boolean 
+                    onCheckedChange={(checked) => setFormData(prev => ({
+                      ...prev,
+                      requiresCertification: checked as boolean
                     }))}
                   />
                   <label htmlFor="certification" className="text-sm font-medium">
@@ -345,12 +347,12 @@ export function InquiryForm({ initialProducts = [], onSubmit, onCancel }: Inquir
                   </label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Checkbox 
+                  <Checkbox
                     id="packaging"
                     checked={formData.requiresCustomPackaging}
-                    onCheckedChange={(checked) => setFormData(prev => ({ 
-                      ...prev, 
-                      requiresCustomPackaging: checked as boolean 
+                    onCheckedChange={(checked) => setFormData(prev => ({
+                      ...prev,
+                      requiresCustomPackaging: checked as boolean
                     }))}
                   />
                   <label htmlFor="packaging" className="text-sm font-medium">
@@ -358,19 +360,19 @@ export function InquiryForm({ initialProducts = [], onSubmit, onCancel }: Inquir
                   </label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Checkbox 
+                  <Checkbox
                     id="support"
                     checked={formData.requiresTechnicalSupport}
-                    onCheckedChange={(checked) => setFormData(prev => ({ 
-                      ...prev, 
-                      requiresTechnicalSupport: checked as boolean 
+                    onCheckedChange={(checked) => setFormData(prev => ({
+                      ...prev,
+                      requiresTechnicalSupport: checked as boolean
                     }))}
                   />
                   <label htmlFor="support" className="text-sm font-medium">
                     需要技术支持
                   </label>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     补充说明
@@ -401,5 +403,5 @@ export function InquiryForm({ initialProducts = [], onSubmit, onCancel }: Inquir
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

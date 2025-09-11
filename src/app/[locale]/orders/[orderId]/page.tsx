@@ -1,17 +1,12 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import Image from 'next/image'
-import { useOrder } from '@/contexts/OrderContext'
-import { useAuth } from '@/contexts/AuthContext'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Alert } from '@/components/ui/alert'
-import type { Order } from '@/contexts/OrderContext'
-import { 
+import { useState, useEffect } from 'react';
+
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+
+import {
   Package,
   MapPin,
   CreditCard,
@@ -24,7 +19,15 @@ import {
   ArrowLeft,
   Phone,
   Download
-} from 'lucide-react'
+} from 'lucide-react';
+
+import { Alert } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/contexts/AuthContext';
+import { useOrder } from '@/contexts/OrderContext';
+import type { Order } from '@/contexts/OrderContext';
 
 interface OrderPageProps {
   params: {
@@ -33,92 +36,92 @@ interface OrderPageProps {
 }
 
 export default function OrderPage({ params }: OrderPageProps) {
-  const router = useRouter()
-  const { user } = useAuth()
-  const { 
-    getOrder, 
-    updateOrderStatus, 
-    cancelOrder, 
+  const router = useRouter();
+  const { user } = useAuth();
+  const {
+    getOrder,
+    updateOrderStatus,
+    cancelOrder,
     processPayment,
     getOrderStatusText,
     getPaymentStatusText
-  } = useOrder()
-  
-  const [order, setOrder] = useState<Order | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [showCancelDialog, setShowCancelDialog] = useState(false)
-  const [cancelReason, setCancelReason] = useState('')
+  } = useOrder();
+
+  const [order, setOrder] = useState<Order | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [cancelReason, setCancelReason] = useState('');
 
   useEffect(() => {
     const loadOrder = async () => {
       try {
-        const orderData = await getOrder(params.orderId)
-        setOrder(orderData)
+        const orderData = await getOrder(params.orderId);
+        setOrder(orderData);
       } catch (error) {
-        console.error('Failed to load order:', error)
+        console.error('Failed to load order:', error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    loadOrder()
-  }, [params.orderId, getOrder])
+    loadOrder();
+  }, [params.orderId, getOrder]);
 
   // 如果用户未登录，重定向到登录页
   useEffect(() => {
     if (!user) {
-      router.push('/auth/login?redirect=/orders/' + params.orderId)
+      router.push('/auth/login?redirect=/orders/' + params.orderId);
     }
-  }, [user, router, params.orderId])
+  }, [user, router, params.orderId]);
 
   const handlePayment = async () => {
-    if (!order) return
-    
-    setIsProcessing(true)
+    if (!order) return;
+
+    setIsProcessing(true);
     try {
-      const result = await processPayment(order.id, order.paymentMethod || 'alipay')
+      const result = await processPayment(order.id, order.paymentMethod || 'alipay');
       if (result.success) {
         // 重新加载订单数据
-        const updatedOrder = await getOrder(order.id)
-        setOrder(updatedOrder)
+        const updatedOrder = await getOrder(order.id);
+        setOrder(updatedOrder);
       } else {
-        alert(result.error || '支付失败，请重试')
+        alert(result.error || '支付失败，请重试');
       }
     } catch (error) {
-      alert('支付失败，请重试')
+      alert('支付失败，请重试');
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
-  }
+  };
 
   const handleCancelOrder = async () => {
-    if (!order) return
-    
-    setIsProcessing(true)
+    if (!order) return;
+
+    setIsProcessing(true);
     try {
-      const result = await cancelOrder(order.id, cancelReason)
+      const result = await cancelOrder(order.id, cancelReason);
       if (result.success) {
-        const updatedOrder = await getOrder(order.id)
-        setOrder(updatedOrder)
-        setShowCancelDialog(false)
-        setCancelReason('')
+        const updatedOrder = await getOrder(order.id);
+        setOrder(updatedOrder);
+        setShowCancelDialog(false);
+        setCancelReason('');
       } else {
-        alert(result.error || '取消订单失败，请重试')
+        alert(result.error || '取消订单失败，请重试');
       }
     } catch (error) {
-      alert('取消订单失败，请重试')
+      alert('取消订单失败，请重试');
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
-  }
+  };
 
   const copyOrderNumber = () => {
     if (order) {
-      navigator.clipboard.writeText(order.orderNumber)
+      navigator.clipboard.writeText(order.orderNumber);
       // 这里可以添加一个Toast提示
     }
-  }
+  };
 
   const getStatusColor = (status: string) => {
     const colorMap: Record<string, string> = {
@@ -129,9 +132,9 @@ export default function OrderPage({ params }: OrderPageProps) {
       delivered: 'default',
       cancelled: 'destructive',
       refunded: 'secondary'
-    }
-    return colorMap[status] || 'secondary'
-  }
+    };
+    return colorMap[status] || 'secondary';
+  };
 
   const getPaymentStatusColor = (status: string) => {
     const colorMap: Record<string, string> = {
@@ -140,9 +143,9 @@ export default function OrderPage({ params }: OrderPageProps) {
       completed: 'default',
       failed: 'destructive',
       refunded: 'secondary'
-    }
-    return colorMap[status] || 'secondary'
-  }
+    };
+    return colorMap[status] || 'secondary';
+  };
 
   if (isLoading) {
     return (
@@ -152,7 +155,7 @@ export default function OrderPage({ params }: OrderPageProps) {
           <p className="text-gray-600">加载订单信息...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (!order) {
@@ -169,7 +172,7 @@ export default function OrderPage({ params }: OrderPageProps) {
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
   return (
@@ -207,7 +210,7 @@ export default function OrderPage({ params }: OrderPageProps) {
                   下单时间：{new Date(order.createdAt).toLocaleString('zh-CN')}
                 </p>
               </div>
-              
+
               <div className="flex gap-2">
                 {order.paymentStatus === 'pending' && order.status !== 'cancelled' && (
                   <Button onClick={handlePayment} disabled={isProcessing}>
@@ -215,8 +218,8 @@ export default function OrderPage({ params }: OrderPageProps) {
                   </Button>
                 )}
                 {(order.status === 'pending' || order.status === 'confirmed') && (
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={() => setShowCancelDialog(true)}
                     disabled={isProcessing}
                   >
@@ -294,7 +297,7 @@ export default function OrderPage({ params }: OrderPageProps) {
                           <div className="text-gray-400 text-xs">暂无图片</div>
                         )}
                       </div>
-                      
+
                       <div className="flex-1 min-w-0">
                         <h3 className="font-medium text-gray-900 mb-1">{item.name}</h3>
                         <p className="text-sm text-gray-600">型号：{item.model}</p>
@@ -304,7 +307,7 @@ export default function OrderPage({ params }: OrderPageProps) {
                         {item.brand && (
                           <p className="text-sm text-gray-600">品牌：{item.brand}</p>
                         )}
-                        
+
                         <div className="flex justify-between items-center mt-3">
                           <span className="text-sm text-gray-600">
                             单价：¥{item.unitPrice.toFixed(2)} × {item.quantity}
@@ -375,7 +378,7 @@ export default function OrderPage({ params }: OrderPageProps) {
                     </Badge>
                   </div>
                 </div>
-                
+
                 {order.paymentStatus === 'failed' && (
                   <Alert className="mt-4 border-red-200 bg-red-50">
                     <AlertTriangle className="h-4 w-4" />
@@ -561,15 +564,15 @@ export default function OrderPage({ params }: OrderPageProps) {
                   ))}
                 </div>
                 <div className="flex gap-2">
-                  <Button 
-                    onClick={handleCancelOrder} 
+                  <Button
+                    onClick={handleCancelOrder}
                     disabled={!cancelReason || isProcessing}
                     variant="destructive"
                   >
                     {isProcessing ? '处理中...' : '确认取消'}
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={() => setShowCancelDialog(false)}
                     disabled={isProcessing}
                   >
@@ -582,5 +585,5 @@ export default function OrderPage({ params }: OrderPageProps) {
         )}
       </div>
     </div>
-  )
+  );
 }

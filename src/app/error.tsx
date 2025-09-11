@@ -1,7 +1,8 @@
-'use client'
+'use client';
 
-import { useEffect } from 'react'
-import { RefreshCw } from 'lucide-react'
+import { useEffect } from 'react';
+
+import { RefreshCw } from 'lucide-react';
 
 export default function Error({
   error,
@@ -11,8 +12,8 @@ export default function Error({
   reset: () => void
 }) {
   useEffect(() => {
-    console.error(error)
-  }, [error])
+    console.error(error);
+  }, [error]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -32,5 +33,5 @@ export default function Error({
         </button>
       </div>
     </div>
-  )
+  );
 }

@@ -1,11 +1,12 @@
-import { notFound } from 'next/navigation'
-import { getSolution } from '@/lib/sanity/queries'
-import { urlFor } from '@/lib/sanity/client'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import Image from 'next/image'
-import PortableText from '@/components/PortableText'
-import { getLocalizedValue } from '@/lib/sanity-i18n'
+import Image from 'next/image';
+import { notFound } from 'next/navigation';
+
+import PortableText from '@/components/PortableText';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { urlFor } from '@/lib/sanity/client';
+import { getSolution } from '@/lib/sanity/queries';
+import { getLocalizedValue } from '@/lib/sanity-i18n';
 
 type Solution = {
   _id: string
@@ -38,33 +39,33 @@ interface SolutionDetailPageProps {
   }
 }
 
-// 禁用缓存，确保总是获取最新数据  
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+// 禁用缓存，确保总是获取最新数据
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function SolutionDetailPage({ params: { locale, slug } }: SolutionDetailPageProps) {
-  
+
   // 解码URL编码的slug（处理包含空格的slug）
-  const decodedSlug = decodeURIComponent(slug)
-  console.log('SolutionDetailPage called with slug:', slug, 'decoded:', decodedSlug)
-  
-  let solution: Solution | null = null
-  let error = null
-  
+  const decodedSlug = decodeURIComponent(slug);
+  console.log('SolutionDetailPage called with slug:', slug, 'decoded:', decodedSlug);
+
+  let solution: Solution | null = null;
+  let error = null;
+
   try {
-    solution = await getSolution(decodedSlug)
-    console.log('Successfully fetched solution from Sanity:', solution?._id || 'null')
+    solution = await getSolution(decodedSlug);
+    console.log('Successfully fetched solution from Sanity:', solution?._id || 'null');
     console.log('Solution brand data:', {
       primaryBrand: solution?.primaryBrand?.name,
       relatedBrands: solution?.relatedBrands?.map(b => b.name)
-    })
+    });
   } catch (err) {
-    error = err instanceof Error ? err.message : 'Failed to fetch solution'
-    console.error('Error fetching solution from Sanity:', err)
+    error = err instanceof Error ? err.message : 'Failed to fetch solution';
+    console.error('Error fetching solution from Sanity:', err);
   }
 
   if (!solution && !error) {
-    notFound()
+    notFound();
   }
 
   if (error) {
@@ -75,7 +76,7 @@ export default async function SolutionDetailPage({ params: { locale, slug } }: S
           <p className="text-red-600 mt-2">{error}</p>
         </div>
       </div>
-    )
+    );
   }
 
   const targetMarketLabels: Record<string, string> = {
@@ -87,21 +88,21 @@ export default async function SolutionDetailPage({ params: { locale, slug } }: S
     'power-energy': '电力能源',
     'aerospace': '航空航天',
     'others': '其他'
-  }
+  };
 
   const complexityLabels: Record<string, string> = {
     'simple': '简单',
     'medium': '中等',
     'complex': '复杂',
     'high-complex': '高复杂'
-  }
+  };
 
   const statusLabels: Record<string, string> = {
     'development': '开发中',
     'testing': '测试中',
     'released': '已发布',
     'deprecated': '已弃用'
-  }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -132,15 +133,15 @@ export default async function SolutionDetailPage({ params: { locale, slug } }: S
             {complexityLabels[solution!.complexity] || solution!.complexity}
           </Badge>
         </div>
-        
+
         <h1 className="text-3xl font-bold mb-4">
           {solution!.title || '未命名解决方案'}
         </h1>
-        
+
         <p className="text-lg text-gray-600 mb-6">
           {solution!.summary || '暂无简介'}
         </p>
-        
+
         <div className="flex items-center gap-6 text-sm text-gray-500">
           <span>发布时间: {new Date(solution!.publishedAt).toLocaleDateString('zh-CN')}</span>
           <span>浏览次数: {solution!.viewCount}</span>
@@ -358,5 +359,5 @@ export default async function SolutionDetailPage({ params: { locale, slug } }: S
         </div>
       </div>
     </div>
-  )
+  );
 }

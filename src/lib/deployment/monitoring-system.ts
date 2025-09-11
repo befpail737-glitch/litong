@@ -1,7 +1,7 @@
 /**
  * Production Monitoring and Alerting System
  * Comprehensive monitoring for deployed electronics distributor website
- * 
+ *
  * Features:
  * - Application performance monitoring (APM)
  * - Server and infrastructure monitoring
@@ -270,33 +270,33 @@ export interface Metric {
 }
 
 export class MonitoringSystem {
-  private config: MonitoringConfig
-  private activeAlerts: Map<string, Alert> = new Map()
-  private metrics: Map<string, Metric[]> = new Map()
-  private healthCheckStatus: Map<string, boolean> = new Map()
+  private config: MonitoringConfig;
+  private activeAlerts: Map<string, Alert> = new Map();
+  private metrics: Map<string, Metric[]> = new Map();
+  private healthCheckStatus: Map<string, boolean> = new Map();
 
   constructor(config: MonitoringConfig) {
-    this.config = config
+    this.config = config;
   }
 
   // Health Check System
   public async startHealthChecks(): Promise<void> {
-    console.log('Starting health check monitoring...')
-    
+    console.log('Starting health check monitoring...');
+
     for (const endpoint of this.config.application.healthCheckEndpoints) {
-      this.scheduleHealthCheck(endpoint)
+      this.scheduleHealthCheck(endpoint);
     }
-    
-    console.log(`Health checks started for ${this.config.application.healthCheckEndpoints.length} endpoints`)
+
+    console.log(`Health checks started for ${this.config.application.healthCheckEndpoints.length} endpoints`);
   }
 
   private scheduleHealthCheck(endpoint: HealthCheckEndpoint): void {
     const checkHealth = async () => {
-      const isHealthy = await this.performHealthCheck(endpoint)
-      const previousStatus = this.healthCheckStatus.get(endpoint.name)
-      
-      this.healthCheckStatus.set(endpoint.name, isHealthy)
-      
+      const isHealthy = await this.performHealthCheck(endpoint);
+      const previousStatus = this.healthCheckStatus.get(endpoint.name);
+
+      this.healthCheckStatus.set(endpoint.name, isHealthy);
+
       // Trigger alert if status changed
       if (previousStatus !== undefined && previousStatus !== isHealthy) {
         if (!isHealthy) {
@@ -310,80 +310,80 @@ export class MonitoringSystem {
               endpoint: endpoint.name,
               url: endpoint.url
             }
-          })
+          });
         } else {
-          await this.resolveAlert(`health_check_${endpoint.name}`)
+          await this.resolveAlert(`health_check_${endpoint.name}`);
         }
       }
-      
+
       // Record metric
       this.recordMetric('health_check_status', isHealthy ? 1 : 0, {
         endpoint: endpoint.name,
         url: endpoint.url
-      })
-    }
+      });
+    };
 
     // Initial check
-    checkHealth()
-    
+    checkHealth();
+
     // Schedule recurring checks
-    setInterval(checkHealth, endpoint.interval)
+    setInterval(checkHealth, endpoint.interval);
   }
 
   private async performHealthCheck(endpoint: HealthCheckEndpoint): Promise<boolean> {
     try {
-      const startTime = Date.now()
-      
+      const startTime = Date.now();
+
       // Mock HTTP request - in real implementation, use actual HTTP client
-      await new Promise(resolve => setTimeout(resolve, Math.random() * 100 + 50))
-      
-      const responseTime = Date.now() - startTime
-      const success = responseTime < endpoint.expectedResponseTime && Math.random() > 0.02 // 2% failure rate for demo
-      
+      await new Promise(resolve => setTimeout(resolve, Math.random() * 100 + 50));
+
+      const responseTime = Date.now() - startTime;
+      const success = responseTime < endpoint.expectedResponseTime && Math.random() > 0.02; // 2% failure rate for demo
+
       this.recordMetric('health_check_response_time', responseTime, {
         endpoint: endpoint.name
-      })
-      
-      console.log(`Health check ${endpoint.name}: ${success ? 'PASS' : 'FAIL'} (${responseTime}ms)`)
-      return success
-      
+      });
+
+      console.log(`Health check ${endpoint.name}: ${success ? 'PASS' : 'FAIL'} (${responseTime}ms)`);
+      return success;
+
     } catch (error) {
-      console.error(`Health check failed for ${endpoint.name}:`, error)
-      return false
+      console.error(`Health check failed for ${endpoint.name}:`, error);
+      return false;
     }
   }
 
   // Application Performance Monitoring
   public startAPMMonitoring(): void {
-    console.log('Starting application performance monitoring...')
-    
+    console.log('Starting application performance monitoring...');
+
     // Start performance metrics collection
-    this.startPerformanceMetricsCollection()
-    
+    this.startPerformanceMetricsCollection();
+
     // Start error tracking
-    this.startErrorTracking()
-    
+    this.startErrorTracking();
+
     // Start user experience monitoring
-    this.startUEMMonitoring()
-    
-    console.log('APM monitoring started')
+    this.startUEMMonitoring();
+
+    console.log('APM monitoring started');
   }
 
   private startPerformanceMetricsCollection(): void {
     setInterval(() => {
       // Mock performance metrics
-      const responseTimeP50 = Math.random() * 200 + 100 // 100-300ms
-      const responseTimeP95 = Math.random() * 500 + 300 // 300-800ms
-      const responseTimeP99 = Math.random() * 1000 + 500 // 500-1500ms
-      const throughput = Math.random() * 1000 + 500 // 500-1500 req/s
-      const errorRate = Math.random() * 2 // 0-2%
-      
-      this.recordMetric('response_time_p50', responseTimeP50)
-      this.recordMetric('response_time_p95', responseTimeP95)
-      this.recordMetric('response_time_p99', responseTimeP99)
-      this.recordMetric('throughput', throughput)
-      this.recordMetric('error_rate', errorRate)
-      
+      const responseTimeP50 = Math.random() * 200 + 100; // 100-300ms
+      const responseTimeP95 = Math.random() * 500 + 300; // 300-800ms
+      const responseTimeP99 = Math.random() * 1000 + 500; // 500-1500ms
+      const throughput = Math.random() * 1000 + 500; // 500-1500 req/s
+      const errorRate = Math.random() * 2; // 0-2%
+
+      this.recordMetric('response_time_p50', responseTimeP50);
+      this.recordMetric('response_time_p95', responseTimeP95);
+      this.recordMetric('response_time_p99', responseTimeP99);
+      this.recordMetric('throughput', throughput);
+      this.recordMetric('error_rate', errorRate);
+
       // Check thresholds
       this.checkPerformanceThresholds({
         p50: responseTimeP50,
@@ -391,13 +391,13 @@ export class MonitoringSystem {
         p99: responseTimeP99,
         throughput,
         errorRate
-      })
-    }, 60000) // Every minute
+      });
+    }, 60000); // Every minute
   }
 
   private checkPerformanceThresholds(metrics: any): void {
-    const thresholds = this.config.application.performanceThresholds
-    
+    const thresholds = this.config.application.performanceThresholds;
+
     if (metrics.p95 > thresholds.responseTime.p95) {
       this.triggerAlert({
         metric: 'response_time_p95',
@@ -406,9 +406,9 @@ export class MonitoringSystem {
         severity: 'warning',
         description: `Response time P95 exceeded threshold: ${metrics.p95}ms > ${thresholds.responseTime.p95}ms`,
         labels: { metric_type: 'response_time' }
-      })
+      });
     }
-    
+
     if (metrics.errorRate > thresholds.errorRate.critical) {
       this.triggerAlert({
         metric: 'error_rate',
@@ -417,15 +417,15 @@ export class MonitoringSystem {
         severity: 'critical',
         description: `Error rate exceeded critical threshold: ${metrics.errorRate}% > ${thresholds.errorRate.critical}%`,
         labels: { metric_type: 'error_rate' }
-      })
+      });
     }
   }
 
   private startErrorTracking(): void {
-    if (!this.config.application.errorTracking.enabled) return
-    
-    console.log('Starting error tracking...')
-    
+    if (!this.config.application.errorTracking.enabled) return;
+
+    console.log('Starting error tracking...');
+
     // Mock error generation for demonstration
     setInterval(() => {
       if (Math.random() < 0.1) { // 10% chance of error
@@ -436,19 +436,19 @@ export class MonitoringSystem {
           url: '/api/products',
           userAgent: 'Mozilla/5.0...',
           timestamp: new Date()
-        })
+        });
       }
-    }, 10000)
+    }, 10000);
   }
 
   private trackError(error: any): void {
-    console.log('Error tracked:', error.message)
-    
+    console.log('Error tracked:', error.message);
+
     this.recordMetric('error_count', 1, {
       error_type: error.type,
       url: error.url
-    })
-    
+    });
+
     // Trigger alert for new errors
     if (this.config.application.errorTracking.notifications.newError) {
       this.triggerAlert({
@@ -461,67 +461,67 @@ export class MonitoringSystem {
           error_type: error.type,
           url: error.url
         }
-      })
+      });
     }
   }
 
   private startUEMMonitoring(): void {
-    const uemConfig = this.config.application.userExperienceMonitoring
-    
+    const uemConfig = this.config.application.userExperienceMonitoring;
+
     if (uemConfig.realUserMonitoring.enabled) {
-      console.log('Starting real user monitoring...')
-      this.startRealUserMonitoring()
+      console.log('Starting real user monitoring...');
+      this.startRealUserMonitoring();
     }
-    
+
     if (uemConfig.syntheticMonitoring.enabled) {
-      console.log('Starting synthetic monitoring...')
-      this.startSyntheticMonitoring()
+      console.log('Starting synthetic monitoring...');
+      this.startSyntheticMonitoring();
     }
   }
 
   private startRealUserMonitoring(): void {
     setInterval(() => {
       // Mock RUM metrics
-      const pageLoadTime = Math.random() * 3000 + 1000 // 1-4 seconds
-      const domContentLoaded = Math.random() * 2000 + 500 // 0.5-2.5 seconds
-      const firstContentfulPaint = Math.random() * 2000 + 800 // 0.8-2.8 seconds
-      
-      this.recordMetric('page_load_time', pageLoadTime, { source: 'rum' })
-      this.recordMetric('dom_content_loaded', domContentLoaded, { source: 'rum' })
-      this.recordMetric('first_contentful_paint', firstContentfulPaint, { source: 'rum' })
-    }, 30000) // Every 30 seconds
+      const pageLoadTime = Math.random() * 3000 + 1000; // 1-4 seconds
+      const domContentLoaded = Math.random() * 2000 + 500; // 0.5-2.5 seconds
+      const firstContentfulPaint = Math.random() * 2000 + 800; // 0.8-2.8 seconds
+
+      this.recordMetric('page_load_time', pageLoadTime, { source: 'rum' });
+      this.recordMetric('dom_content_loaded', domContentLoaded, { source: 'rum' });
+      this.recordMetric('first_contentful_paint', firstContentfulPaint, { source: 'rum' });
+    }, 30000); // Every 30 seconds
   }
 
   private startSyntheticMonitoring(): void {
     for (const scenario of this.config.application.userExperienceMonitoring.syntheticMonitoring.scenarios) {
-      this.scheduleSyntheticScenario(scenario)
+      this.scheduleSyntheticScenario(scenario);
     }
   }
 
   private scheduleSyntheticScenario(scenario: SyntheticScenario): void {
     const executeScenario = async () => {
-      const startTime = Date.now()
-      
+      const startTime = Date.now();
+
       try {
         for (const step of scenario.steps) {
-          await this.executeSyntheticStep(step)
+          await this.executeSyntheticStep(step);
         }
-        
-        const duration = Date.now() - startTime
+
+        const duration = Date.now() - startTime;
         this.recordMetric('synthetic_scenario_duration', duration, {
           scenario: scenario.name,
           status: 'success'
-        })
-        
-        console.log(`Synthetic scenario '${scenario.name}' completed successfully in ${duration}ms`)
-        
+        });
+
+        console.log(`Synthetic scenario '${scenario.name}' completed successfully in ${duration}ms`);
+
       } catch (error) {
-        const duration = Date.now() - startTime
+        const duration = Date.now() - startTime;
         this.recordMetric('synthetic_scenario_duration', duration, {
           scenario: scenario.name,
           status: 'failure'
-        })
-        
+        });
+
         this.triggerAlert({
           metric: 'synthetic_scenario_failed',
           currentValue: 1,
@@ -531,67 +531,67 @@ export class MonitoringSystem {
           labels: {
             scenario: scenario.name
           }
-        })
-        
-        console.error(`Synthetic scenario '${scenario.name}' failed:`, error)
+        });
+
+        console.error(`Synthetic scenario '${scenario.name}' failed:`, error);
       }
-    }
+    };
 
     // Initial execution
-    executeScenario()
-    
+    executeScenario();
+
     // Schedule recurring executions
-    setInterval(executeScenario, scenario.frequency)
+    setInterval(executeScenario, scenario.frequency);
   }
 
   private async executeSyntheticStep(step: SyntheticStep): Promise<void> {
     // Mock synthetic step execution
-    console.log(`Executing synthetic step: ${step.type}`)
-    
-    const executionTime = Math.random() * 1000 + 200 // 200-1200ms
-    await new Promise(resolve => setTimeout(resolve, executionTime))
-    
+    console.log(`Executing synthetic step: ${step.type}`);
+
+    const executionTime = Math.random() * 1000 + 200; // 200-1200ms
+    await new Promise(resolve => setTimeout(resolve, executionTime));
+
     // Simulate random failures
     if (Math.random() < 0.02) { // 2% failure rate
-      throw new Error(`Synthetic step failed: ${step.type}`)
+      throw new Error(`Synthetic step failed: ${step.type}`);
     }
   }
 
   // Infrastructure Monitoring
   public startInfrastructureMonitoring(): void {
-    console.log('Starting infrastructure monitoring...')
-    
-    this.startServerMetricsCollection()
-    this.startDatabaseMonitoring()
-    this.startCDNMonitoring()
-    this.startThirdPartyServiceMonitoring()
-    
-    console.log('Infrastructure monitoring started')
+    console.log('Starting infrastructure monitoring...');
+
+    this.startServerMetricsCollection();
+    this.startDatabaseMonitoring();
+    this.startCDNMonitoring();
+    this.startThirdPartyServiceMonitoring();
+
+    console.log('Infrastructure monitoring started');
   }
 
   private startServerMetricsCollection(): void {
     setInterval(() => {
       // Mock server metrics
-      const cpuUsage = Math.random() * 80 + 10 // 10-90%
-      const memoryUsage = Math.random() * 85 + 10 // 10-95%
-      const diskUsage = Math.random() * 70 + 20 // 20-90%
-      const networkIn = Math.random() * 1000 + 100 // 100-1100 Mbps
-      const networkOut = Math.random() * 500 + 50 // 50-550 Mbps
-      
-      this.recordMetric('cpu_usage', cpuUsage, { server: 'web-server-1' })
-      this.recordMetric('memory_usage', memoryUsage, { server: 'web-server-1' })
-      this.recordMetric('disk_usage', diskUsage, { server: 'web-server-1' })
-      this.recordMetric('network_in', networkIn, { server: 'web-server-1' })
-      this.recordMetric('network_out', networkOut, { server: 'web-server-1' })
-      
+      const cpuUsage = Math.random() * 80 + 10; // 10-90%
+      const memoryUsage = Math.random() * 85 + 10; // 10-95%
+      const diskUsage = Math.random() * 70 + 20; // 20-90%
+      const networkIn = Math.random() * 1000 + 100; // 100-1100 Mbps
+      const networkOut = Math.random() * 500 + 50; // 50-550 Mbps
+
+      this.recordMetric('cpu_usage', cpuUsage, { server: 'web-server-1' });
+      this.recordMetric('memory_usage', memoryUsage, { server: 'web-server-1' });
+      this.recordMetric('disk_usage', diskUsage, { server: 'web-server-1' });
+      this.recordMetric('network_in', networkIn, { server: 'web-server-1' });
+      this.recordMetric('network_out', networkOut, { server: 'web-server-1' });
+
       // Check thresholds
-      this.checkServerMetricThresholds({ cpuUsage, memoryUsage, diskUsage })
-    }, 60000) // Every minute
+      this.checkServerMetricThresholds({ cpuUsage, memoryUsage, diskUsage });
+    }, 60000); // Every minute
   }
 
   private checkServerMetricThresholds(metrics: any): void {
-    const serverConfig = this.config.infrastructure.serverMetrics
-    
+    const serverConfig = this.config.infrastructure.serverMetrics;
+
     if (serverConfig.cpu.enabled && metrics.cpuUsage > serverConfig.cpu.criticalThreshold) {
       this.triggerAlert({
         metric: 'cpu_usage',
@@ -600,9 +600,9 @@ export class MonitoringSystem {
         severity: 'critical',
         description: `CPU usage critical: ${metrics.cpuUsage}% > ${serverConfig.cpu.criticalThreshold}%`,
         labels: { server: 'web-server-1' }
-      })
+      });
     }
-    
+
     if (serverConfig.memory.enabled && metrics.memoryUsage > serverConfig.memory.criticalThreshold) {
       this.triggerAlert({
         metric: 'memory_usage',
@@ -611,32 +611,32 @@ export class MonitoringSystem {
         severity: 'critical',
         description: `Memory usage critical: ${metrics.memoryUsage}% > ${serverConfig.memory.criticalThreshold}%`,
         labels: { server: 'web-server-1' }
-      })
+      });
     }
   }
 
   private startDatabaseMonitoring(): void {
     setInterval(() => {
       // Mock database metrics
-      const connectionCount = Math.floor(Math.random() * 50 + 10) // 10-60 connections
-      const slowQueries = Math.floor(Math.random() * 5) // 0-5 slow queries
-      const lockWaitTime = Math.random() * 100 + 10 // 10-110ms
-      const databaseSize = Math.random() * 1000 + 5000 // 5-6GB
-      
-      this.recordMetric('db_connections', connectionCount, { database: 'main' })
-      this.recordMetric('db_slow_queries', slowQueries, { database: 'main' })
-      this.recordMetric('db_lock_wait_time', lockWaitTime, { database: 'main' })
-      this.recordMetric('db_size', databaseSize, { database: 'main' })
-      
+      const connectionCount = Math.floor(Math.random() * 50 + 10); // 10-60 connections
+      const slowQueries = Math.floor(Math.random() * 5); // 0-5 slow queries
+      const lockWaitTime = Math.random() * 100 + 10; // 10-110ms
+      const databaseSize = Math.random() * 1000 + 5000; // 5-6GB
+
+      this.recordMetric('db_connections', connectionCount, { database: 'main' });
+      this.recordMetric('db_slow_queries', slowQueries, { database: 'main' });
+      this.recordMetric('db_lock_wait_time', lockWaitTime, { database: 'main' });
+      this.recordMetric('db_size', databaseSize, { database: 'main' });
+
       // Check thresholds
-      this.checkDatabaseMetricThresholds({ connectionCount, slowQueries, lockWaitTime })
-    }, 60000) // Every minute
+      this.checkDatabaseMetricThresholds({ connectionCount, slowQueries, lockWaitTime });
+    }, 60000); // Every minute
   }
 
   private checkDatabaseMetricThresholds(metrics: any): void {
-    const dbConfig = this.config.infrastructure.databaseMetrics
-    
-    if (dbConfig.connectionPool.enabled && 
+    const dbConfig = this.config.infrastructure.databaseMetrics;
+
+    if (dbConfig.connectionPool.enabled &&
         metrics.connectionCount > dbConfig.connectionPool.warningThreshold) {
       this.triggerAlert({
         metric: 'db_connections',
@@ -645,45 +645,45 @@ export class MonitoringSystem {
         severity: 'warning',
         description: `Database connection count high: ${metrics.connectionCount} > ${dbConfig.connectionPool.warningThreshold}`,
         labels: { database: 'main' }
-      })
+      });
     }
   }
 
   private startCDNMonitoring(): void {
     setInterval(() => {
       // Mock CDN metrics
-      const cacheHitRate = Math.random() * 30 + 70 // 70-100%
-      const originRequestRate = Math.random() * 20 + 5 // 5-25%
-      const errorRate = Math.random() * 1 // 0-1%
-      
-      this.recordMetric('cdn_cache_hit_rate', cacheHitRate)
-      this.recordMetric('cdn_origin_request_rate', originRequestRate)
-      this.recordMetric('cdn_error_rate', errorRate)
-    }, 300000) // Every 5 minutes
+      const cacheHitRate = Math.random() * 30 + 70; // 70-100%
+      const originRequestRate = Math.random() * 20 + 5; // 5-25%
+      const errorRate = Math.random() * 1; // 0-1%
+
+      this.recordMetric('cdn_cache_hit_rate', cacheHitRate);
+      this.recordMetric('cdn_origin_request_rate', originRequestRate);
+      this.recordMetric('cdn_error_rate', errorRate);
+    }, 300000); // Every 5 minutes
   }
 
   private startThirdPartyServiceMonitoring(): void {
     for (const service of this.config.infrastructure.thirdPartyServices) {
-      this.scheduleThirdPartyServiceCheck(service)
+      this.scheduleThirdPartyServiceCheck(service);
     }
   }
 
   private scheduleThirdPartyServiceCheck(service: ThirdPartyServiceConfig): void {
     const checkService = async () => {
-      const startTime = Date.now()
-      const isHealthy = Math.random() > 0.05 // 95% uptime
-      const responseTime = Math.random() * 2000 + 100 // 100-2100ms
-      
+      const startTime = Date.now();
+      const isHealthy = Math.random() > 0.05; // 95% uptime
+      const responseTime = Math.random() * 2000 + 100; // 100-2100ms
+
       this.recordMetric('third_party_service_response_time', responseTime, {
         service: service.name
-      })
-      
+      });
+
       this.recordMetric('third_party_service_status', isHealthy ? 1 : 0, {
         service: service.name
-      })
-      
+      });
+
       if (!isHealthy || responseTime > service.expectedResponseTime) {
-        const severity = service.criticality === 'high' ? 'critical' : 'warning'
+        const severity = service.criticality === 'high' ? 'critical' : 'warning';
         this.triggerAlert({
           metric: 'third_party_service_issue',
           currentValue: isHealthy ? responseTime : 0,
@@ -694,48 +694,48 @@ export class MonitoringSystem {
             service: service.name,
             criticality: service.criticality
           }
-        })
+        });
       }
-    }
+    };
 
     // Initial check
-    checkService()
-    
+    checkService();
+
     // Schedule recurring checks
-    setInterval(checkService, 300000) // Every 5 minutes
+    setInterval(checkService, 300000); // Every 5 minutes
   }
 
   // Alert Management
   private async triggerAlert(alertData: Partial<Alert>): Promise<string> {
-    const alertId = `alert-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`
-    
+    const alertId = `alert-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
+
     const alert: Alert = {
       id: alertId,
       ruleId: 'auto-generated',
       startTime: new Date(),
       status: 'active',
       ...alertData
-    } as Alert
+    } as Alert;
 
-    this.activeAlerts.set(alertId, alert)
-    
-    console.log(`🚨 ALERT TRIGGERED: ${alert.description}`)
-    
+    this.activeAlerts.set(alertId, alert);
+
+    console.log(`🚨 ALERT TRIGGERED: ${alert.description}`);
+
     // Send notifications
-    await this.sendAlertNotifications(alert)
-    
-    return alertId
+    await this.sendAlertNotifications(alert);
+
+    return alertId;
   }
 
   private async resolveAlert(alertId: string): Promise<void> {
-    const alert = this.activeAlerts.get(alertId)
+    const alert = this.activeAlerts.get(alertId);
     if (alert) {
-      alert.status = 'resolved'
-      alert.endTime = new Date()
-      
-      console.log(`✅ ALERT RESOLVED: ${alert.description}`)
-      
-      await this.sendAlertNotifications(alert)
+      alert.status = 'resolved';
+      alert.endTime = new Date();
+
+      console.log(`✅ ALERT RESOLVED: ${alert.description}`);
+
+      await this.sendAlertNotifications(alert);
     }
   }
 
@@ -743,47 +743,47 @@ export class MonitoringSystem {
     // Find matching alert rules and send notifications
     for (const channel of this.config.alerting.channels) {
       if (channel.enabled) {
-        await this.sendNotification(channel, alert)
+        await this.sendNotification(channel, alert);
       }
     }
   }
 
   private async sendNotification(channel: AlertChannel, alert: Alert): Promise<void> {
-    const message = this.formatAlertMessage(alert)
-    
+    const message = this.formatAlertMessage(alert);
+
     switch (channel.type) {
       case 'slack':
-        console.log(`Sending Slack notification to ${channel.name}: ${message}`)
-        break
+        console.log(`Sending Slack notification to ${channel.name}: ${message}`);
+        break;
       case 'email':
-        console.log(`Sending email notification to ${channel.name}: ${message}`)
-        break
+        console.log(`Sending email notification to ${channel.name}: ${message}`);
+        break;
       case 'webhook':
-        console.log(`Sending webhook notification to ${channel.name}: ${message}`)
-        break
+        console.log(`Sending webhook notification to ${channel.name}: ${message}`);
+        break;
       case 'pagerduty':
-        console.log(`Sending PagerDuty notification to ${channel.name}: ${message}`)
-        break
+        console.log(`Sending PagerDuty notification to ${channel.name}: ${message}`);
+        break;
       case 'sms':
-        console.log(`Sending SMS notification to ${channel.name}: ${message}`)
-        break
+        console.log(`Sending SMS notification to ${channel.name}: ${message}`);
+        break;
     }
-    
+
     // Mock notification delay
-    await new Promise(resolve => setTimeout(resolve, 100))
+    await new Promise(resolve => setTimeout(resolve, 100));
   }
 
   private formatAlertMessage(alert: Alert): string {
-    const status = alert.status === 'resolved' ? '✅ RESOLVED' : '🚨 ACTIVE'
-    const severity = alert.severity.toUpperCase()
-    
+    const status = alert.status === 'resolved' ? '✅ RESOLVED' : '🚨 ACTIVE';
+    const severity = alert.severity.toUpperCase();
+
     return `${status} [${severity}] ${alert.description}
 Metric: ${alert.metric}
 Current: ${alert.currentValue}
 Threshold: ${alert.threshold}
 Started: ${alert.startTime.toISOString()}
 ${alert.endTime ? `Resolved: ${alert.endTime.toISOString()}` : ''}
-`
+`;
   }
 
   // Metrics Management
@@ -793,48 +793,48 @@ ${alert.endTime ? `Resolved: ${alert.endTime.toISOString()}` : ''}
       value,
       timestamp: new Date(),
       labels
-    }
+    };
 
     if (!this.metrics.has(name)) {
-      this.metrics.set(name, [])
+      this.metrics.set(name, []);
     }
 
-    const metricHistory = this.metrics.get(name)!
-    metricHistory.push(metric)
-    
+    const metricHistory = this.metrics.get(name)!;
+    metricHistory.push(metric);
+
     // Keep only last 1000 data points per metric
     if (metricHistory.length > 1000) {
-      metricHistory.shift()
+      metricHistory.shift();
     }
   }
 
   public getMetric(name: string, timeRange?: { start: Date; end: Date }): Metric[] {
-    const metrics = this.metrics.get(name) || []
-    
+    const metrics = this.metrics.get(name) || [];
+
     if (!timeRange) {
-      return metrics
+      return metrics;
     }
-    
-    return metrics.filter(metric => 
-      metric.timestamp >= timeRange.start && 
+
+    return metrics.filter(metric =>
+      metric.timestamp >= timeRange.start &&
       metric.timestamp <= timeRange.end
-    )
+    );
   }
 
   public getActiveAlerts(): Alert[] {
     return Array.from(this.activeAlerts.values())
-      .filter(alert => alert.status === 'active')
+      .filter(alert => alert.status === 'active');
   }
 
   public getHealthStatus(): Record<string, boolean> {
-    return Object.fromEntries(this.healthCheckStatus.entries())
+    return Object.fromEntries(this.healthCheckStatus.entries());
   }
 
   // Dashboard and Reporting
   public generateDashboardData(): any {
-    const now = new Date()
-    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000)
-    
+    const now = new Date();
+    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+
     return {
       overview: {
         healthStatus: this.getOverallHealthStatus(),
@@ -849,67 +849,67 @@ ${alert.endTime ? `Resolved: ${alert.endTime.toISOString()}` : ''}
         diskUsage: this.getAverageMetric('disk_usage', oneHourAgo, now)
       },
       thirdPartyServices: this.getThirdPartyServiceStatus()
-    }
+    };
   }
 
   private getOverallHealthStatus(): 'healthy' | 'degraded' | 'unhealthy' {
-    const healthStatuses = Array.from(this.healthCheckStatus.values())
-    const activeAlerts = this.getActiveAlerts()
-    
+    const healthStatuses = Array.from(this.healthCheckStatus.values());
+    const activeAlerts = this.getActiveAlerts();
+
     if (healthStatuses.some(status => !status)) {
-      return 'unhealthy'
+      return 'unhealthy';
     }
-    
+
     if (activeAlerts.some(alert => alert.severity === 'critical')) {
-      return 'unhealthy'
+      return 'unhealthy';
     }
-    
+
     if (activeAlerts.length > 0) {
-      return 'degraded'
+      return 'degraded';
     }
-    
-    return 'healthy'
+
+    return 'healthy';
   }
 
   private getAverageMetric(name: string, start: Date, end: Date): number {
-    const metrics = this.getMetric(name, { start, end })
-    if (metrics.length === 0) return 0
-    
-    const sum = metrics.reduce((acc, metric) => acc + metric.value, 0)
-    return Math.round(sum / metrics.length * 100) / 100
+    const metrics = this.getMetric(name, { start, end });
+    if (metrics.length === 0) return 0;
+
+    const sum = metrics.reduce((acc, metric) => acc + metric.value, 0);
+    return Math.round(sum / metrics.length * 100) / 100;
   }
 
   private getThirdPartyServiceStatus(): Record<string, boolean> {
-    const status: Record<string, boolean> = {}
-    
+    const status: Record<string, boolean> = {};
+
     for (const service of this.config.infrastructure.thirdPartyServices) {
       const metrics = this.getMetric('third_party_service_status')
-        .filter(metric => metric.labels.service === service.name)
-      
+        .filter(metric => metric.labels.service === service.name);
+
       if (metrics.length > 0) {
-        status[service.name] = metrics[metrics.length - 1].value === 1
+        status[service.name] = metrics[metrics.length - 1].value === 1;
       } else {
-        status[service.name] = true // Default to healthy if no data
+        status[service.name] = true; // Default to healthy if no data
       }
     }
-    
-    return status
+
+    return status;
   }
 
   public generateReport(type: 'daily' | 'weekly' | 'monthly'): any {
-    const now = new Date()
-    let startDate: Date
-    
+    const now = new Date();
+    let startDate: Date;
+
     switch (type) {
       case 'daily':
-        startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000)
-        break
+        startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        break;
       case 'weekly':
-        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
-        break
+        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        break;
       case 'monthly':
-        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
-        break
+        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        break;
     }
 
     return {
@@ -919,12 +919,12 @@ ${alert.endTime ? `Resolved: ${alert.endTime.toISOString()}` : ''}
       errorSummary: this.calculateErrorSummary(startDate, now),
       alertSummary: this.calculateAlertSummary(startDate, now),
       trends: this.calculateTrends(startDate, now)
-    }
+    };
   }
 
   private calculateAvailability(start: Date, end: Date): number {
     // Mock availability calculation
-    return Math.random() * 2 + 98 // 98-100%
+    return Math.random() * 2 + 98; // 98-100%
   }
 
   private calculatePerformanceSummary(start: Date, end: Date): any {
@@ -932,39 +932,39 @@ ${alert.endTime ? `Resolved: ${alert.endTime.toISOString()}` : ''}
       averageResponseTime: this.getAverageMetric('response_time_p95', start, end),
       maxResponseTime: Math.max(...this.getMetric('response_time_p95', { start, end }).map(m => m.value)),
       averageThroughput: this.getAverageMetric('throughput', start, end)
-    }
+    };
   }
 
   private calculateErrorSummary(start: Date, end: Date): any {
-    const errorMetrics = this.getMetric('error_rate', { start, end })
-    
+    const errorMetrics = this.getMetric('error_rate', { start, end });
+
     return {
       averageErrorRate: this.getAverageMetric('error_rate', start, end),
       totalErrors: errorMetrics.reduce((sum, m) => sum + m.value, 0),
       errorSpikes: errorMetrics.filter(m => m.value > 5).length
-    }
+    };
   }
 
   private calculateAlertSummary(start: Date, end: Date): any {
     const alerts = Array.from(this.activeAlerts.values())
-      .filter(alert => alert.startTime >= start && alert.startTime <= end)
-    
+      .filter(alert => alert.startTime >= start && alert.startTime <= end);
+
     return {
       totalAlerts: alerts.length,
       criticalAlerts: alerts.filter(a => a.severity === 'critical').length,
       warningAlerts: alerts.filter(a => a.severity === 'warning').length,
       averageResolutionTime: this.calculateAverageResolutionTime(alerts)
-    }
+    };
   }
 
   private calculateAverageResolutionTime(alerts: Alert[]): number {
-    const resolvedAlerts = alerts.filter(alert => alert.endTime)
-    if (resolvedAlerts.length === 0) return 0
-    
-    const totalTime = resolvedAlerts.reduce((sum, alert) => 
-      sum + (alert.endTime!.getTime() - alert.startTime.getTime()), 0)
-    
-    return Math.round(totalTime / resolvedAlerts.length / 60000) // minutes
+    const resolvedAlerts = alerts.filter(alert => alert.endTime);
+    if (resolvedAlerts.length === 0) return 0;
+
+    const totalTime = resolvedAlerts.reduce((sum, alert) =>
+      sum + (alert.endTime!.getTime() - alert.startTime.getTime()), 0);
+
+    return Math.round(totalTime / resolvedAlerts.length / 60000); // minutes
   }
 
   private calculateTrends(start: Date, end: Date): any {
@@ -973,7 +973,7 @@ ${alert.endTime ? `Resolved: ${alert.endTime.toISOString()}` : ''}
       responseTimeTrend: Math.random() > 0.5 ? 'improving' : 'degrading',
       errorRateTrend: Math.random() > 0.7 ? 'improving' : 'stable',
       availabilityTrend: Math.random() > 0.8 ? 'stable' : 'improving'
-    }
+    };
   }
 }
 
@@ -1307,5 +1307,5 @@ export function createProductionMonitoringConfig(): MonitoringConfig {
         }
       ]
     }
-  }
+  };
 }

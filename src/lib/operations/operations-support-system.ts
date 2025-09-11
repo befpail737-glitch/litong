@@ -1,7 +1,7 @@
 /**
  * Operations Support and Training System
  * Comprehensive system for team training, documentation, and technical support
- * 
+ *
  * Features:
  * - Team training program management
  * - Operations documentation system
@@ -497,36 +497,36 @@ export interface ArticleRating {
 }
 
 export class OperationsSupportSystem {
-  private config: OperationsSupportConfig
-  private trainingSessions: Map<string, TrainingSession> = new Map()
-  private supportTickets: Map<string, SupportTicket> = new Map()
-  private knowledgeBase: Map<string, KnowledgeArticle> = new Map()
-  private performanceMetrics: Map<string, number[]> = new Map()
+  private config: OperationsSupportConfig;
+  private trainingSessions: Map<string, TrainingSession> = new Map();
+  private supportTickets: Map<string, SupportTicket> = new Map();
+  private knowledgeBase: Map<string, KnowledgeArticle> = new Map();
+  private performanceMetrics: Map<string, number[]> = new Map();
 
   constructor(config: OperationsSupportConfig) {
-    this.config = config
+    this.config = config;
   }
 
   // Training Management
   public async createTrainingProgram(teamType: 'technical' | 'operations' | 'customer_service'): Promise<string> {
-    const programId = `training-${teamType}-${Date.now()}`
-    
-    console.log(`🎓 Creating training program for ${teamType} team...`)
-    
-    const programs = this.generateTrainingPrograms()
-    const targetProgram = programs[teamType]
-    
+    const programId = `training-${teamType}-${Date.now()}`;
+
+    console.log(`🎓 Creating training program for ${teamType} team...`);
+
+    const programs = this.generateTrainingPrograms();
+    const targetProgram = programs[teamType];
+
     if (!targetProgram) {
-      throw new Error(`No training program defined for team type: ${teamType}`)
+      throw new Error(`No training program defined for team type: ${teamType}`);
     }
 
     // Schedule training sessions
-    const sessions = await this.scheduleTrainingSessions(programId, targetProgram)
-    
-    console.log(`✅ Training program created: ${programId}`)
-    console.log(`📅 Scheduled ${sessions.length} training sessions`)
-    
-    return programId
+    const sessions = await this.scheduleTrainingSessions(programId, targetProgram);
+
+    console.log(`✅ Training program created: ${programId}`);
+    console.log(`📅 Scheduled ${sessions.length} training sessions`);
+
+    return programId;
   }
 
   private generateTrainingPrograms(): Record<string, TrainingProgram> {
@@ -805,22 +805,22 @@ export class OperationsSupportSystem {
         certificationRequired: true,
         refreshInterval: 90
       }
-    }
+    };
   }
 
   private async scheduleTrainingSessions(programId: string, program: TrainingProgram): Promise<TrainingSchedule[]> {
-    const sessions: TrainingSchedule[] = []
-    
+    const sessions: TrainingSchedule[] = [];
+
     // Create training schedules for different batches
-    const batches = Math.ceil(20 / 8) // Assume 20 people, max 8 per batch
-    
+    const batches = Math.ceil(20 / 8); // Assume 20 people, max 8 per batch
+
     for (let batch = 0; batch < batches; batch++) {
-      const startDate = new Date()
-      startDate.setDate(startDate.getDate() + batch * 14) // 2 weeks apart
-      
-      const endDate = new Date(startDate)
-      endDate.setDate(endDate.getDate() + 5) // 5-day program
-      
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() + batch * 14); // 2 weeks apart
+
+      const endDate = new Date(startDate);
+      endDate.setDate(endDate.getDate() + 5); // 5-day program
+
       const schedule: TrainingSchedule = {
         programId,
         startDate,
@@ -830,17 +830,17 @@ export class OperationsSupportSystem {
         location: 'Training Room A',
         format: 'hybrid',
         status: 'scheduled'
-      }
-      
-      sessions.push(schedule)
+      };
+
+      sessions.push(schedule);
     }
-    
-    return sessions
+
+    return sessions;
   }
 
   public async enrollParticipant(programId: string, participantId: string): Promise<string> {
-    const sessionId = `session-${programId}-${participantId}-${Date.now()}`
-    
+    const sessionId = `session-${programId}-${participantId}-${Date.now()}`;
+
     const session: TrainingSession = {
       id: sessionId,
       programId,
@@ -854,29 +854,29 @@ export class OperationsSupportSystem {
         lastActivity: new Date()
       },
       assessmentResults: []
-    }
-    
-    this.trainingSessions.set(sessionId, session)
-    console.log(`👤 Enrolled participant ${participantId} in program ${programId}`)
-    
-    return sessionId
+    };
+
+    this.trainingSessions.set(sessionId, session);
+    console.log(`👤 Enrolled participant ${participantId} in program ${programId}`);
+
+    return sessionId;
   }
 
   // Documentation Management
   public async generateOperationsDocumentation(): Promise<{ userManual: string; adminGuide: string; troubleshooting: string }> {
-    console.log('📚 Generating operations documentation...')
-    
-    const userManual = await this.generateUserManual()
-    const adminGuide = await this.generateAdminGuide()
-    const troubleshootingGuide = await this.generateTroubleshootingGuide()
-    
-    console.log('✅ Operations documentation generated')
-    
+    console.log('📚 Generating operations documentation...');
+
+    const userManual = await this.generateUserManual();
+    const adminGuide = await this.generateAdminGuide();
+    const troubleshootingGuide = await this.generateTroubleshootingGuide();
+
+    console.log('✅ Operations documentation generated');
+
     return {
       userManual,
       adminGuide,
       troubleshooting: troubleshootingGuide
-    }
+    };
   }
 
   private async generateUserManual(): Promise<string> {
@@ -1004,9 +1004,9 @@ For urgent technical issues:
 ---
 
 For additional help, visit our Knowledge Base at https://support.elec-distributor.com
-`
-    
-    return userManualContent
+`;
+
+    return userManualContent;
   }
 
   private async generateAdminGuide(): Promise<string> {
@@ -1191,9 +1191,9 @@ Configure alerts for:
 
 For technical support: admin-support@elec-distributor.com
 Emergency escalation: +1-800-ADMIN-HELP
-`
-    
-    return adminGuideContent
+`;
+
+    return adminGuideContent;
   }
 
   private async generateTroubleshootingGuide(): Promise<string> {
@@ -1478,45 +1478,45 @@ SELECT pg_size_pretty(pg_database_size('electronics_db'));
 Last Updated: $(date)
 Document Version: 1.0
 Next Review: Quarterly
-`
-    
-    return troubleshootingContent
+`;
+
+    return troubleshootingContent;
   }
 
   // Technical Support System
   public async setupTechnicalSupport(): Promise<{ ticketSystem: string; knowledgeBase: string; workflows: string[] }> {
-    console.log('🔧 Setting up technical support system...')
-    
+    console.log('🔧 Setting up technical support system...');
+
     // Initialize ticket system
-    const ticketSystemId = await this.initializeTicketSystem()
-    
+    const ticketSystemId = await this.initializeTicketSystem();
+
     // Setup knowledge base
-    const knowledgeBaseId = await this.setupKnowledgeBase()
-    
+    const knowledgeBaseId = await this.setupKnowledgeBase();
+
     // Create support workflows
-    const workflows = await this.createSupportWorkflows()
-    
-    console.log('✅ Technical support system configured')
-    
+    const workflows = await this.createSupportWorkflows();
+
+    console.log('✅ Technical support system configured');
+
     return {
       ticketSystem: ticketSystemId,
       knowledgeBase: knowledgeBaseId,
       workflows
-    }
+    };
   }
 
   private async initializeTicketSystem(): Promise<string> {
-    const systemId = `ticket-system-${Date.now()}`
-    
+    const systemId = `ticket-system-${Date.now()}`;
+
     // Create sample support categories
     const categories = [
       { id: 'technical', name: 'Technical Issues', slaTarget: 4 }, // 4 hours
-      { id: 'billing', name: 'Billing & Payments', slaTarget: 24 }, // 24 hours  
+      { id: 'billing', name: 'Billing & Payments', slaTarget: 24 }, // 24 hours
       { id: 'orders', name: 'Order Support', slaTarget: 8 }, // 8 hours
       { id: 'products', name: 'Product Information', slaTarget: 12 }, // 12 hours
       { id: 'account', name: 'Account Management', slaTarget: 24 } // 24 hours
-    ]
-    
+    ];
+
     // Setup automation rules
     const automationRules = [
       {
@@ -1531,28 +1531,28 @@ Next Review: Quarterly
         conditions: ['time_to_breach < 1_hour'],
         enabled: true
       }
-    ]
-    
-    console.log(`Ticket system initialized: ${systemId}`)
-    console.log(`Categories: ${categories.length}, Automation rules: ${automationRules.length}`)
-    
-    return systemId
+    ];
+
+    console.log(`Ticket system initialized: ${systemId}`);
+    console.log(`Categories: ${categories.length}, Automation rules: ${automationRules.length}`);
+
+    return systemId;
   }
 
   private async setupKnowledgeBase(): Promise<string> {
-    const kbId = `kb-${Date.now()}`
-    
+    const kbId = `kb-${Date.now()}`;
+
     // Create initial knowledge articles
-    const articles = await this.createInitialKnowledgeArticles()
-    
+    const articles = await this.createInitialKnowledgeArticles();
+
     for (const article of articles) {
-      this.knowledgeBase.set(article.id, article)
+      this.knowledgeBase.set(article.id, article);
     }
-    
-    console.log(`Knowledge base setup: ${kbId}`)
-    console.log(`Initial articles: ${articles.length}`)
-    
-    return kbId
+
+    console.log(`Knowledge base setup: ${kbId}`);
+    console.log(`Initial articles: ${articles.length}`);
+
+    return kbId;
   }
 
   private async createInitialKnowledgeArticles(): Promise<KnowledgeArticle[]> {
@@ -1654,7 +1654,7 @@ Our engineering team can help explain specifications:
         relatedArticles: ['kb-001', 'kb-004'],
         attachments: []
       }
-    ]
+    ];
   }
 
   private async createSupportWorkflows(): Promise<string[]> {
@@ -1664,16 +1664,16 @@ Our engineering team can help explain specifications:
       'order_issue_resolution',
       'product_information_request',
       'billing_dispute_process'
-    ]
-    
-    console.log(`Support workflows created: ${workflows.join(', ')}`)
-    
-    return workflows
+    ];
+
+    console.log(`Support workflows created: ${workflows.join(', ')}`);
+
+    return workflows;
   }
 
   public async createSupportTicket(ticketData: Partial<SupportTicket>): Promise<string> {
-    const ticketId = `TICKET-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
-    
+    const ticketId = `TICKET-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+
     const ticket: SupportTicket = {
       id: ticketId,
       title: ticketData.title || 'Support Request',
@@ -1696,13 +1696,13 @@ Our engineering team can help explain specifications:
           details: { category: ticketData.category, priority: ticketData.priority }
         }
       ]
-    }
-    
-    this.supportTickets.set(ticketId, ticket)
-    
-    console.log(`🎫 Support ticket created: ${ticketId}`)
-    
-    return ticketId
+    };
+
+    this.supportTickets.set(ticketId, ticket);
+
+    console.log(`🎫 Support ticket created: ${ticketId}`);
+
+    return ticketId;
   }
 
   private calculateSLATarget(category: string, priority: string): Date {
@@ -1712,29 +1712,29 @@ Our engineering team can help explain specifications:
       'orders': { 'critical': 1, 'high': 4, 'medium': 8, 'low': 24 },
       'products': { 'critical': 4, 'high': 8, 'medium': 12, 'low': 24 },
       'general': { 'critical': 4, 'high': 8, 'medium': 24, 'low': 48 }
-    }
-    
-    const hours = slaHours[category]?.[priority] || 24
-    const target = new Date()
-    target.setHours(target.getHours() + hours)
-    
-    return target
+    };
+
+    const hours = slaHours[category]?.[priority] || 24;
+    const target = new Date();
+    target.setHours(target.getHours() + hours);
+
+    return target;
   }
 
   // Performance Monitoring
   public generateOperationsReport(): any {
-    const now = new Date()
-    const lastWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
-    
+    const now = new Date();
+    const lastWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
     // Calculate training metrics
-    const trainingMetrics = this.calculateTrainingMetrics()
-    
+    const trainingMetrics = this.calculateTrainingMetrics();
+
     // Calculate support metrics
-    const supportMetrics = this.calculateSupportMetrics(lastWeek, now)
-    
+    const supportMetrics = this.calculateSupportMetrics(lastWeek, now);
+
     // Calculate knowledge base metrics
-    const knowledgeMetrics = this.calculateKnowledgeMetrics()
-    
+    const knowledgeMetrics = this.calculateKnowledgeMetrics();
+
     return {
       reportGenerated: now,
       period: { start: lastWeek, end: now },
@@ -1743,12 +1743,12 @@ Our engineering team can help explain specifications:
       knowledgeBase: knowledgeMetrics,
       operationalHealth: this.assessOperationalHealth(),
       recommendations: this.generateOperationsRecommendations()
-    }
+    };
   }
 
   private calculateTrainingMetrics(): any {
-    const sessions = Array.from(this.trainingSessions.values())
-    
+    const sessions = Array.from(this.trainingSessions.values());
+
     return {
       totalSessions: sessions.length,
       completedSessions: sessions.filter(s => s.status === 'completed').length,
@@ -1757,15 +1757,15 @@ Our engineering team can help explain specifications:
       averageScore: this.calculateAverageAssessmentScore(sessions),
       programsOffered: 3, // technical, operations, customer_service
       upcomingDeadlines: this.getUpcomingTrainingDeadlines()
-    }
+    };
   }
 
   private calculateSupportMetrics(startDate: Date, endDate: Date): any {
     const tickets = Array.from(this.supportTickets.values())
-      .filter(ticket => ticket.createdAt >= startDate && ticket.createdAt <= endDate)
-    
-    const resolvedTickets = tickets.filter(ticket => ticket.status === 'resolved' || ticket.status === 'closed')
-    
+      .filter(ticket => ticket.createdAt >= startDate && ticket.createdAt <= endDate);
+
+    const resolvedTickets = tickets.filter(ticket => ticket.status === 'resolved' || ticket.status === 'closed');
+
     return {
       totalTickets: tickets.length,
       resolvedTickets: resolvedTickets.length,
@@ -1774,81 +1774,81 @@ Our engineering team can help explain specifications:
       slaCompliance: this.calculateSLACompliance(tickets),
       ticketsByCategory: this.groupTicketsByCategory(tickets),
       ticketsByPriority: this.groupTicketsByPriority(tickets)
-    }
+    };
   }
 
   private calculateKnowledgeMetrics(): any {
-    const articles = Array.from(this.knowledgeBase.values())
-    
+    const articles = Array.from(this.knowledgeBase.values());
+
     return {
       totalArticles: articles.length,
       publishedArticles: articles.filter(a => a.status === 'published').length,
       totalViews: articles.reduce((sum, a) => sum + a.views, 0),
       averageRating: this.calculateAverageArticleRating(articles),
-      recentlyUpdated: articles.filter(a => 
+      recentlyUpdated: articles.filter(a =>
         (Date.now() - a.updatedAt.getTime()) < (7 * 24 * 60 * 60 * 1000)
       ).length
-    }
+    };
   }
 
   private assessOperationalHealth(): string {
-    const trainingHealth = this.calculateAverageCompletionRate(Array.from(this.trainingSessions.values()))
-    const supportHealth = this.calculateSLACompliance(Array.from(this.supportTickets.values()))
-    const knowledgeHealth = this.calculateAverageArticleRating(Array.from(this.knowledgeBase.values()))
-    
-    const overallHealth = (trainingHealth + supportHealth + knowledgeHealth) / 3
-    
-    if (overallHealth >= 90) return 'Excellent'
-    if (overallHealth >= 80) return 'Good'
-    if (overallHealth >= 70) return 'Fair'
-    return 'Needs Improvement'
+    const trainingHealth = this.calculateAverageCompletionRate(Array.from(this.trainingSessions.values()));
+    const supportHealth = this.calculateSLACompliance(Array.from(this.supportTickets.values()));
+    const knowledgeHealth = this.calculateAverageArticleRating(Array.from(this.knowledgeBase.values()));
+
+    const overallHealth = (trainingHealth + supportHealth + knowledgeHealth) / 3;
+
+    if (overallHealth >= 90) return 'Excellent';
+    if (overallHealth >= 80) return 'Good';
+    if (overallHealth >= 70) return 'Fair';
+    return 'Needs Improvement';
   }
 
   private generateOperationsRecommendations(): string[] {
-    const recommendations = []
-    
-    const trainingCompletionRate = this.calculateAverageCompletionRate(Array.from(this.trainingSessions.values()))
+    const recommendations = [];
+
+    const trainingCompletionRate = this.calculateAverageCompletionRate(Array.from(this.trainingSessions.values()));
     if (trainingCompletionRate < 80) {
-      recommendations.push('Improve training completion rates through better engagement and follow-up')
+      recommendations.push('Improve training completion rates through better engagement and follow-up');
     }
-    
-    const slaCompliance = this.calculateSLACompliance(Array.from(this.supportTickets.values()))
+
+    const slaCompliance = this.calculateSLACompliance(Array.from(this.supportTickets.values()));
     if (slaCompliance < 90) {
-      recommendations.push('Focus on improving SLA compliance through better resource allocation')
+      recommendations.push('Focus on improving SLA compliance through better resource allocation');
     }
-    
-    const knowledgeRating = this.calculateAverageArticleRating(Array.from(this.knowledgeBase.values()))
+
+    const knowledgeRating = this.calculateAverageArticleRating(Array.from(this.knowledgeBase.values()));
     if (knowledgeRating < 4.0) {
-      recommendations.push('Enhance knowledge base content quality and coverage')
+      recommendations.push('Enhance knowledge base content quality and coverage');
     }
-    
+
     if (recommendations.length === 0) {
-      recommendations.push('Continue current operational excellence practices')
-      recommendations.push('Consider expanding training programs and knowledge base')
+      recommendations.push('Continue current operational excellence practices');
+      recommendations.push('Consider expanding training programs and knowledge base');
     }
-    
-    return recommendations
+
+    return recommendations;
   }
 
   // Utility calculation methods
   private calculateAverageCompletionRate(sessions: TrainingSession[]): number {
-    if (sessions.length === 0) return 0
-    
-    const completionRates = sessions.map(session => 
+    if (sessions.length === 0) return 0;
+
+    const completionRates = sessions.map(session =>
       (session.progress.completedModules / session.progress.totalModules) * 100
-    )
-    
-    return completionRates.reduce((sum, rate) => sum + rate, 0) / completionRates.length
+    );
+
+    return completionRates.reduce((sum, rate) => sum + rate, 0) / completionRates.length;
   }
 
   private calculateAverageAssessmentScore(sessions: TrainingSession[]): number {
-    const allScores = sessions.flatMap(session => 
+    const allScores = sessions.flatMap(session =>
       session.assessmentResults.map(result => (result.score / result.maxScore) * 100)
-    )
-    
-    if (allScores.length === 0) return 0
-    
-    return allScores.reduce((sum, score) => sum + score, 0) / allScores.length
+    );
+
+    if (allScores.length === 0) return 0;
+
+    return allScores.reduce((sum, score) => sum + score, 0) / allScores.length;
   }
 
   private getUpcomingTrainingDeadlines(): string[] {
@@ -1856,72 +1856,72 @@ Our engineering team can help explain specifications:
     return [
       'Technical Team Certification renewal due in 30 days',
       'Customer Service refresher training due in 45 days'
-    ]
+    ];
   }
 
   private calculateAverageResolutionTime(tickets: SupportTicket[]): number {
     const resolutionTimes = tickets
       .filter(ticket => ticket.resolvedAt)
-      .map(ticket => ticket.resolvedAt!.getTime() - ticket.createdAt.getTime())
-    
-    if (resolutionTimes.length === 0) return 0
-    
-    return resolutionTimes.reduce((sum, time) => sum + time, 0) / resolutionTimes.length / (1000 * 60 * 60) // Convert to hours
+      .map(ticket => ticket.resolvedAt!.getTime() - ticket.createdAt.getTime());
+
+    if (resolutionTimes.length === 0) return 0;
+
+    return resolutionTimes.reduce((sum, time) => sum + time, 0) / resolutionTimes.length / (1000 * 60 * 60); // Convert to hours
   }
 
   private calculateSLACompliance(tickets: SupportTicket[]): number {
-    if (tickets.length === 0) return 100
-    
-    const compliantTickets = tickets.filter(ticket => 
+    if (tickets.length === 0) return 100;
+
+    const compliantTickets = tickets.filter(ticket =>
       !ticket.resolvedAt || ticket.resolvedAt <= ticket.slaTarget
-    )
-    
-    return (compliantTickets.length / tickets.length) * 100
+    );
+
+    return (compliantTickets.length / tickets.length) * 100;
   }
 
   private groupTicketsByCategory(tickets: SupportTicket[]): Record<string, number> {
     return tickets.reduce((groups, ticket) => {
-      groups[ticket.category] = (groups[ticket.category] || 0) + 1
-      return groups
-    }, {} as Record<string, number>)
+      groups[ticket.category] = (groups[ticket.category] || 0) + 1;
+      return groups;
+    }, {} as Record<string, number>);
   }
 
   private groupTicketsByPriority(tickets: SupportTicket[]): Record<string, number> {
     return tickets.reduce((groups, ticket) => {
-      groups[ticket.priority] = (groups[ticket.priority] || 0) + 1
-      return groups
-    }, {} as Record<string, number>)
+      groups[ticket.priority] = (groups[ticket.priority] || 0) + 1;
+      return groups;
+    }, {} as Record<string, number>);
   }
 
   private calculateAverageArticleRating(articles: KnowledgeArticle[]): number {
-    const allRatings = articles.flatMap(article => 
+    const allRatings = articles.flatMap(article =>
       article.ratings.map(rating => rating.rating)
-    )
-    
-    if (allRatings.length === 0) return 0
-    
-    return allRatings.reduce((sum, rating) => sum + rating, 0) / allRatings.length
+    );
+
+    if (allRatings.length === 0) return 0;
+
+    return allRatings.reduce((sum, rating) => sum + rating, 0) / allRatings.length;
   }
 
   // Public interface methods
   public getTrainingStatus(participantId: string): TrainingSession[] {
     return Array.from(this.trainingSessions.values())
-      .filter(session => session.participantId === participantId)
+      .filter(session => session.participantId === participantId);
   }
 
   public getSupportTicket(ticketId: string): SupportTicket | null {
-    return this.supportTickets.get(ticketId) || null
+    return this.supportTickets.get(ticketId) || null;
   }
 
   public searchKnowledgeBase(query: string): KnowledgeArticle[] {
-    const articles = Array.from(this.knowledgeBase.values())
-    
-    return articles.filter(article => 
+    const articles = Array.from(this.knowledgeBase.values());
+
+    return articles.filter(article =>
       article.status === 'published' &&
       (article.title.toLowerCase().includes(query.toLowerCase()) ||
        article.content.toLowerCase().includes(query.toLowerCase()) ||
        article.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase())))
-    )
+    );
   }
 }
 
@@ -2273,5 +2273,5 @@ export function createOperationsSupportConfig(): OperationsSupportConfig {
         }
       ]
     }
-  }
+  };
 }

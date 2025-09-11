@@ -1,5 +1,6 @@
-import { Locale, locales } from '@/i18n'
-import { LocalizedString } from './sanity-i18n'
+import { Locale, locales } from '@/i18n';
+
+import { LocalizedString } from './sanity-i18n';
 
 export interface TranslationIssue {
   type: 'missing' | 'empty' | 'length_mismatch' | 'invalid_format' | 'placeholder_mismatch'
@@ -35,11 +36,11 @@ export interface ValidationRules {
  * 翻译验证器类
  */
 export class TranslationValidator {
-  private defaultLocale: Locale = 'zh-CN'
-  private issues: TranslationIssue[] = []
+  private defaultLocale: Locale = 'zh-CN';
+  private issues: TranslationIssue[] = [];
 
   constructor(defaultLocale: Locale = 'zh-CN') {
-    this.defaultLocale = defaultLocale
+    this.defaultLocale = defaultLocale;
   }
 
   /**
@@ -50,7 +51,7 @@ export class TranslationValidator {
     fieldName: string,
     rules: ValidationRules = {}
   ): TranslationIssue[] {
-    this.issues = []
+    this.issues = [];
 
     if (!field) {
       if (rules.required) {
@@ -60,12 +61,12 @@ export class TranslationValidator {
           locale: this.defaultLocale,
           severity: 'error',
           message: `字段 "${fieldName}" 完全缺失`,
-        })
+        });
       }
-      return this.issues
+      return this.issues;
     }
 
-    const defaultValue = field[this.defaultLocale]
+    const defaultValue = field[this.defaultLocale];
 
     // 检查默认语言是否存在
     if (rules.required && !defaultValue?.trim()) {
@@ -76,16 +77,16 @@ export class TranslationValidator {
         severity: 'error',
         message: `默认语言 (${this.defaultLocale}) 的 "${fieldName}" 为空`,
         suggestion: '请先填写默认语言的内容'
-      })
+      });
     }
 
     // 验证每种语言
     locales.forEach(locale => {
-      const value = field[locale]
-      this.validateSingleField(value, fieldName, locale, rules, defaultValue)
-    })
+      const value = field[locale];
+      this.validateSingleField(value, fieldName, locale, rules, defaultValue);
+    });
 
-    return this.issues
+    return this.issues;
   }
 
   /**
@@ -107,7 +108,7 @@ export class TranslationValidator {
           locale,
           severity: 'error',
           message: `"${fieldName}" 在 ${locale} 中为空`,
-        })
+        });
       } else if (locale !== this.defaultLocale && defaultValue?.trim()) {
         this.issues.push({
           type: 'empty',
@@ -116,9 +117,9 @@ export class TranslationValidator {
           severity: 'warning',
           message: `"${fieldName}" 在 ${locale} 中未翻译`,
           suggestion: `参考默认语言内容: "${defaultValue.substring(0, 50)}..."`
-        })
+        });
       }
-      return
+      return;
     }
 
     // 长度验证
@@ -129,7 +130,7 @@ export class TranslationValidator {
         locale,
         severity: 'warning',
         message: `"${fieldName}" 在 ${locale} 中长度过短 (${value.length} < ${rules.minLength})`,
-      })
+      });
     }
 
     if (rules.maxLength && value.length > rules.maxLength) {
@@ -139,14 +140,14 @@ export class TranslationValidator {
         locale,
         severity: 'error',
         message: `"${fieldName}" 在 ${locale} 中长度过长 (${value.length} > ${rules.maxLength})`,
-      })
+      });
     }
 
     // 与默认语言长度差异检查
     if (defaultValue && rules.lengthDifferenceThreshold && locale !== this.defaultLocale) {
-      const lengthDiff = Math.abs(value.length - defaultValue.length)
-      const threshold = defaultValue.length * rules.lengthDifferenceThreshold
-      
+      const lengthDiff = Math.abs(value.length - defaultValue.length);
+      const threshold = defaultValue.length * rules.lengthDifferenceThreshold;
+
       if (lengthDiff > threshold) {
         this.issues.push({
           type: 'length_mismatch',
@@ -155,7 +156,7 @@ export class TranslationValidator {
           severity: 'info',
           message: `"${fieldName}" 在 ${locale} 中与默认语言长度差异较大 (差异: ${lengthDiff})`,
           suggestion: '请检查翻译是否完整或过于冗长'
-        })
+        });
       }
     }
 
@@ -163,8 +164,8 @@ export class TranslationValidator {
     if (rules.requiredPlaceholders) {
       const missingPlaceholders = rules.requiredPlaceholders.filter(
         placeholder => !value.includes(placeholder)
-      )
-      
+      );
+
       if (missingPlaceholders.length > 0) {
         this.issues.push({
           type: 'placeholder_mismatch',
@@ -173,13 +174,13 @@ export class TranslationValidator {
           severity: 'error',
           message: `"${fieldName}" 在 ${locale} 中缺少占位符: ${missingPlaceholders.join(', ')}`,
           suggestion: '请确保所有占位符都已包含在翻译中'
-        })
+        });
       }
     }
 
     // 格式验证
     if (rules.format) {
-      const isValidFormat = this.validateFormat(value, rules.format)
+      const isValidFormat = this.validateFormat(value, rules.format);
       if (!isValidFormat) {
         this.issues.push({
           type: 'invalid_format',
@@ -187,7 +188,7 @@ export class TranslationValidator {
           locale,
           severity: 'error',
           message: `"${fieldName}" 在 ${locale} 中格式无效 (期望格式: ${rules.format})`,
-        })
+        });
       }
     }
   }
@@ -198,23 +199,23 @@ export class TranslationValidator {
   private validateFormat(value: string, format: string): boolean {
     switch (format) {
       case 'email':
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
       case 'url':
         try {
-          new URL(value)
-          return true
+          new URL(value);
+          return true;
         } catch {
-          return false
+          return false;
         }
       case 'phone':
-        return /^\+?[\d\s\-\(\)]{10,}$/.test(value)
+        return /^\+?[\d\s\-\(\)]{10,}$/.test(value);
       case 'html':
         // 简单的HTML标签平衡检查
-        const openTags = (value.match(/<[^\/][^>]*>/g) || []).length
-        const closeTags = (value.match(/<\/[^>]*>/g) || []).length
-        return openTags === closeTags
+        const openTags = (value.match(/<[^\/][^>]*>/g) || []).length;
+        const closeTags = (value.match(/<\/[^>]*>/g) || []).length;
+        return openTags === closeTags;
       default:
-        return true
+        return true;
     }
   }
 
@@ -222,18 +223,18 @@ export class TranslationValidator {
    * 计算翻译完成度统计
    */
   static getTranslationStats(data: Record<string, LocalizedString>): TranslationStats {
-    let totalFields = 0
-    let translatedFields = 0
-    const issues: TranslationIssue[] = []
-    const validator = new TranslationValidator()
+    let totalFields = 0;
+    let translatedFields = 0;
+    const issues: TranslationIssue[] = [];
+    const validator = new TranslationValidator();
 
     Object.entries(data).forEach(([fieldName, field]) => {
       locales.forEach(locale => {
-        totalFields++
-        const value = field?.[locale]
-        
+        totalFields++;
+        const value = field?.[locale];
+
         if (value?.trim()) {
-          translatedFields++
+          translatedFields++;
         } else {
           // 为未翻译的字段创建问题记录
           issues.push({
@@ -242,38 +243,38 @@ export class TranslationValidator {
             locale,
             severity: locale === 'zh-CN' ? 'error' : 'warning',
             message: `"${fieldName}" 在 ${locale} 中未翻译`,
-          })
+          });
         }
-      })
+      });
 
       // 验证每个字段
-      const fieldIssues = validator.validateField(field, fieldName, { required: true })
-      issues.push(...fieldIssues)
-    })
+      const fieldIssues = validator.validateField(field, fieldName, { required: true });
+      issues.push(...fieldIssues);
+    });
 
-    const completionRate = totalFields > 0 ? (translatedFields / totalFields) * 100 : 0
+    const completionRate = totalFields > 0 ? (translatedFields / totalFields) * 100 : 0;
 
     return {
       totalFields,
       translatedFields,
       completionRate,
       issues: this.deduplicateIssues(issues),
-    }
+    };
   }
 
   /**
    * 去重问题记录
    */
   private static deduplicateIssues(issues: TranslationIssue[]): TranslationIssue[] {
-    const seen = new Set<string>()
+    const seen = new Set<string>();
     return issues.filter(issue => {
-      const key = `${issue.type}-${issue.field}-${issue.locale}`
+      const key = `${issue.type}-${issue.field}-${issue.locale}`;
       if (seen.has(key)) {
-        return false
+        return false;
       }
-      seen.add(key)
-      return true
-    })
+      seen.add(key);
+      return true;
+    });
   }
 
   /**
@@ -283,31 +284,31 @@ export class TranslationValidator {
     data: Record<string, LocalizedString>,
     rules: Record<string, ValidationRules> = {}
   ): TranslationStats {
-    const allIssues: TranslationIssue[] = []
-    let totalFields = Object.keys(data).length * locales.length
-    let translatedFields = 0
+    const allIssues: TranslationIssue[] = [];
+    const totalFields = Object.keys(data).length * locales.length;
+    let translatedFields = 0;
 
     Object.entries(data).forEach(([fieldName, field]) => {
-      const fieldRules = rules[fieldName] || {}
-      const fieldIssues = this.validateField(field, fieldName, fieldRules)
-      allIssues.push(...fieldIssues)
+      const fieldRules = rules[fieldName] || {};
+      const fieldIssues = this.validateField(field, fieldName, fieldRules);
+      allIssues.push(...fieldIssues);
 
       // 统计已翻译字段
       locales.forEach(locale => {
         if (field?.[locale]?.trim()) {
-          translatedFields++
+          translatedFields++;
         }
-      })
-    })
+      });
+    });
 
-    const completionRate = totalFields > 0 ? (translatedFields / totalFields) * 100 : 0
+    const completionRate = totalFields > 0 ? (translatedFields / totalFields) * 100 : 0;
 
     return {
       totalFields,
       translatedFields,
       completionRate,
       issues: TranslationValidator.deduplicateIssues(allIssues),
-    }
+    };
   }
 }
 
@@ -368,4 +369,4 @@ export const validationRules = {
     required: true,
     requiredPlaceholders: placeholders,
   }) as ValidationRules,
-}
+};

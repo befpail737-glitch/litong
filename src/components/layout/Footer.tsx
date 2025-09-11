@@ -1,7 +1,7 @@
-import Link from 'next/link'
+import Link from 'next/link';
 
 export function Footer() {
-  const currentYear = new Date().getFullYear()
+  const currentYear = new Date().getFullYear();
 
   const footerSections = [
     {
@@ -48,7 +48,7 @@ export function Footer() {
         { name: 'OEM服务', href: '/oem-services' },
       ]
     }
-  ]
+  ];
 
   return (
     <footer className="bg-gray-900 text-gray-300">
@@ -122,7 +122,7 @@ export function Footer() {
                 </div>
               </div>
             </div>
-            
+
             <div className="flex space-x-8">
               <div className="text-center">
                 <div className="w-20 h-20 bg-gray-800 rounded-lg flex items-center justify-center mb-2">
@@ -155,7 +155,7 @@ export function Footer() {
                 网站地图
               </Link>
             </div>
-            
+
             <div className="flex items-center gap-4 text-sm">
               <span>沪ICP备12345678号</span>
               <span>|</span>
@@ -165,5 +165,5 @@ export function Footer() {
         </div>
       </div>
     </footer>
-  )
+  );
 }

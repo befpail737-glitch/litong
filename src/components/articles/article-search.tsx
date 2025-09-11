@@ -1,20 +1,13 @@
-'use client'
+'use client';
 
-import { useState, useEffect, useMemo } from 'react'
-import { useTranslations } from 'next-intl'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Slider } from '@/components/ui/slider'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { 
-  Search, 
-  Filter, 
-  X, 
+import { useState, useEffect, useMemo } from 'react';
+
+import Link from 'next/link';
+
+import {
+  Search,
+  Filter,
+  X,
   Calendar,
   Clock,
   User,
@@ -22,11 +15,21 @@ import {
   BookOpen,
   TrendingUp,
   History
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { getLocalizedValue } from '@/lib/sanity-i18n'
-import type { Locale } from '@/i18n'
-import Link from 'next/link'
+} from 'lucide-react';
+import { useTranslations } from 'next-intl';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import type { Locale } from '@/i18n';
+import { getLocalizedValue } from '@/lib/sanity-i18n';
+import { cn } from '@/lib/utils';
 
 // 搜索结果类型
 interface SearchResult {
@@ -35,7 +38,7 @@ interface SearchResult {
   title: Record<Locale, string>
   excerpt: Record<Locale, string>
   author: { name: string; slug: { current: string } }
-  category: { 
+  category: {
     title: Record<Locale, string>
     slug: { current: string }
     color?: string
@@ -71,7 +74,7 @@ interface PopularItem {
 
 interface ArticleSearchProps {
   results: SearchResult[]
-  categories: Array<{ 
+  categories: Array<{
     _id: string
     title: Record<Locale, string>
     slug: { current: string }
@@ -105,10 +108,10 @@ export function ArticleSearch({
   totalCount,
   className
 }: ArticleSearchProps) {
-  const t = useTranslations('articles')
-  
-  const [searchQuery, setSearchQuery] = useState('')
-  const [showFilters, setShowFilters] = useState(false)
+  const t = useTranslations('articles');
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<SearchFilters>({
     categories: [],
     authors: [],
@@ -116,7 +119,7 @@ export function ArticleSearch({
     difficulty: [],
     dateRange: {},
     readTimeRange: [0, 60]
-  })
+  });
 
   // 难度选项
   const difficultyOptions = [
@@ -124,18 +127,18 @@ export function ArticleSearch({
     { value: 'intermediate', label: t('difficulty.intermediate') },
     { value: 'advanced', label: t('difficulty.advanced') },
     { value: 'expert', label: t('difficulty.expert') }
-  ]
+  ];
 
   // 应用搜索
   const handleSearch = () => {
-    onSearch(searchQuery, filters)
-  }
+    onSearch(searchQuery, filters);
+  };
 
   // 快速搜索（热门词汇）
   const handleQuickSearch = (term: string) => {
-    setSearchQuery(term)
-    onSearch(term, filters)
-  }
+    setSearchQuery(term);
+    onSearch(term, filters);
+  };
 
   // 清除所有过滤器
   const clearFilters = () => {
@@ -146,58 +149,58 @@ export function ArticleSearch({
       difficulty: [],
       dateRange: {},
       readTimeRange: [0, 60]
-    })
-  }
+    });
+  };
 
   // 活跃过滤器数量
   const activeFiltersCount = useMemo(() => {
-    let count = 0
-    if (filters.categories.length > 0) count++
-    if (filters.authors.length > 0) count++
-    if (filters.tags.length > 0) count++
-    if (filters.difficulty.length > 0) count++
-    if (filters.dateRange.from || filters.dateRange.to) count++
-    if (filters.readTimeRange[0] > 0 || filters.readTimeRange[1] < 60) count++
-    return count
-  }, [filters])
+    let count = 0;
+    if (filters.categories.length > 0) count++;
+    if (filters.authors.length > 0) count++;
+    if (filters.tags.length > 0) count++;
+    if (filters.difficulty.length > 0) count++;
+    if (filters.dateRange.from || filters.dateRange.to) count++;
+    if (filters.readTimeRange[0] > 0 || filters.readTimeRange[1] < 60) count++;
+    return count;
+  }, [filters]);
 
   // 搜索建议
   const searchSuggestions = useMemo(() => {
-    if (!searchQuery || searchQuery.length < 2) return []
-    
-    const suggestions = []
-    
+    if (!searchQuery || searchQuery.length < 2) return [];
+
+    const suggestions = [];
+
     // 从分类中匹配
     categories.forEach(category => {
-      const title = getLocalizedValue(category.title, locale)
+      const title = getLocalizedValue(category.title, locale);
       if (title.toLowerCase().includes(searchQuery.toLowerCase())) {
-        suggestions.push({ type: 'category', label: title, value: title })
+        suggestions.push({ type: 'category', label: title, value: title });
       }
-    })
-    
+    });
+
     // 从作者中匹配
     authors.forEach(author => {
       if (author.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-        suggestions.push({ type: 'author', label: author.name, value: author.name })
+        suggestions.push({ type: 'author', label: author.name, value: author.name });
       }
-    })
-    
+    });
+
     // 从标签中匹配
     popularTags.forEach(tag => {
       if (tag.term.toLowerCase().includes(searchQuery.toLowerCase())) {
-        suggestions.push({ type: 'tag', label: tag.term, value: tag.term })
+        suggestions.push({ type: 'tag', label: tag.term, value: tag.term });
       }
-    })
-    
-    return suggestions.slice(0, 5)
-  }, [searchQuery, categories, authors, popularTags, locale])
+    });
+
+    return suggestions.slice(0, 5);
+  }, [searchQuery, categories, authors, popularTags, locale]);
 
   // 搜索结果高亮
   const highlightText = (text: string, query: string) => {
-    if (!query) return text
-    const regex = new RegExp(`(${query})`, 'gi')
-    return text.replace(regex, '<mark class="bg-yellow-200">$1</mark>')
-  }
+    if (!query) return text;
+    const regex = new RegExp(`(${query})`, 'gi');
+    return text.replace(regex, '<mark class="bg-yellow-200">$1</mark>');
+  };
 
   return (
     <div className={className}>
@@ -269,7 +272,7 @@ export function ArticleSearch({
                   <TabsTrigger value="history">{t('searchHistory')}</TabsTrigger>
                 )}
               </TabsList>
-              
+
               <TabsContent value="popular" className="mt-4">
                 <div className="flex flex-wrap gap-2">
                   {popularSearches.slice(0, 8).map((item, index) => (
@@ -291,7 +294,7 @@ export function ArticleSearch({
                   ))}
                 </div>
               </TabsContent>
-              
+
               <TabsContent value="tags" className="mt-4">
                 <div className="flex flex-wrap gap-2">
                   {popularTags.slice(0, 12).map((tag, index) => (
@@ -310,7 +313,7 @@ export function ArticleSearch({
                   ))}
                 </div>
               </TabsContent>
-              
+
               {searchHistory.length > 0 && (
                 <TabsContent value="history" className="mt-4">
                   <div className="flex flex-wrap gap-2">
@@ -371,12 +374,12 @@ export function ArticleSearch({
                             setFilters(prev => ({
                               ...prev,
                               categories: [...prev.categories, category.slug.current]
-                            }))
+                            }));
                           } else {
                             setFilters(prev => ({
                               ...prev,
                               categories: prev.categories.filter(c => c !== category.slug.current)
-                            }))
+                            }));
                           }
                         }}
                       />
@@ -405,12 +408,12 @@ export function ArticleSearch({
                             setFilters(prev => ({
                               ...prev,
                               difficulty: [...prev.difficulty, option.value]
-                            }))
+                            }));
                           } else {
                             setFilters(prev => ({
                               ...prev,
                               difficulty: prev.difficulty.filter(d => d !== option.value)
-                            }))
+                            }));
                           }
                         }}
                       />
@@ -481,20 +484,20 @@ export function ArticleSearch({
         ) : (
           <div className="space-y-4">
             {results.map((result) => {
-              const title = getLocalizedValue(result.title, locale)
-              const excerpt = getLocalizedValue(result.excerpt, locale)
-              
+              const title = getLocalizedValue(result.title, locale);
+              const excerpt = getLocalizedValue(result.excerpt, locale);
+
               return (
                 <Card key={result._id} className="hover:shadow-md transition-shadow">
                   <CardContent className="pt-6">
                     <div className="flex items-start gap-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <Badge 
+                          <Badge
                             variant="outline"
-                            style={{ 
+                            style={{
                               borderColor: result.category.color,
-                              color: result.category.color 
+                              color: result.category.color
                             }}
                           >
                             {getLocalizedValue(result.category.title, locale)}
@@ -504,9 +507,9 @@ export function ArticleSearch({
                             {result.readTime} min
                           </Badge>
                         </div>
-                        
+
                         <h3 className="text-lg font-semibold mb-2">
-                          <Link 
+                          <Link
                             href={`/articles/${result.slug.current}`}
                             className="hover:text-primary transition-colors"
                             dangerouslySetInnerHTML={{
@@ -514,14 +517,14 @@ export function ArticleSearch({
                             }}
                           />
                         </h3>
-                        
-                        <p 
+
+                        <p
                           className="text-muted-foreground mb-3 line-clamp-2"
                           dangerouslySetInnerHTML={{
                             __html: result.highlightedExcerpt || highlightText(excerpt, searchQuery)
                           }}
                         />
-                        
+
                         <div className="flex items-center justify-between text-sm text-muted-foreground">
                           <div className="flex items-center gap-4">
                             <span className="flex items-center gap-1">
@@ -533,7 +536,7 @@ export function ArticleSearch({
                               {new Date(result.publishedAt).toLocaleDateString()}
                             </span>
                           </div>
-                          
+
                           {result.relevanceScore && (
                             <Badge variant="outline">
                               {Math.round(result.relevanceScore * 100)}% {t('relevance')}
@@ -544,11 +547,11 @@ export function ArticleSearch({
                     </div>
                   </CardContent>
                 </Card>
-              )
+              );
             })}
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }

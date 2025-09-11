@@ -1,4 +1,4 @@
-import { BaseIntegration, IntegrationConfig, IntegrationResponse, WebhookPayload } from './base-integration'
+import { BaseIntegration, IntegrationConfig, IntegrationResponse, WebhookPayload } from './base-integration';
 
 export interface PaymentMethod {
   id?: string
@@ -140,16 +140,16 @@ export interface PaymentIntegrationConfig extends IntegrationConfig {
 }
 
 export class PaymentIntegration extends BaseIntegration {
-  private paymentConfig: PaymentIntegrationConfig
+  private paymentConfig: PaymentIntegrationConfig;
 
   constructor(config: PaymentIntegrationConfig) {
-    super('payment-integration', '1.0.0', config)
-    this.paymentConfig = config
+    super('payment-integration', '1.0.0', config);
+    this.paymentConfig = config;
   }
 
   async connect(): Promise<IntegrationResponse<void>> {
     try {
-      const healthResult = await this.healthCheck()
+      const healthResult = await this.healthCheck();
       if (!healthResult.success) {
         return {
           success: false,
@@ -158,58 +158,58 @@ export class PaymentIntegration extends BaseIntegration {
             message: 'Failed to connect to payment service',
             details: healthResult.error
           }
-        }
+        };
       }
 
-      this.isConnected = true
-      this.lastError = null
+      this.isConnected = true;
+      this.lastError = null;
 
       this.emit('connected', {
         timestamp: new Date().toISOString(),
         provider: this.paymentConfig.provider
-      })
+      });
 
-      return { success: true }
+      return { success: true };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-      this.lastError = error instanceof Error ? error : new Error(errorMessage)
-      
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      this.lastError = error instanceof Error ? error : new Error(errorMessage);
+
       return {
         success: false,
         error: {
           code: 'CONNECTION_ERROR',
           message: errorMessage
         }
-      }
+      };
     }
   }
 
   async disconnect(): Promise<IntegrationResponse<void>> {
     try {
-      this.isConnected = false
+      this.isConnected = false;
 
       this.emit('disconnected', {
         timestamp: new Date().toISOString(),
         provider: this.paymentConfig.provider
-      })
+      });
 
-      return { success: true }
+      return { success: true };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       return {
         success: false,
         error: {
           code: 'DISCONNECTION_ERROR',
           message: errorMessage
         }
-      }
+      };
     }
   }
 
   async healthCheck(): Promise<IntegrationResponse<{ status: string; details?: any }>> {
     try {
-      const response = await this.makeRequest('GET', `${this.config.baseUrl}/health`)
-      
+      const response = await this.makeRequest('GET', `${this.config.baseUrl}/health`);
+
       return {
         success: true,
         data: {
@@ -221,7 +221,7 @@ export class PaymentIntegration extends BaseIntegration {
             fraudDetection: this.paymentConfig.fraudDetection?.enabled
           }
         }
-      }
+      };
     } catch (error) {
       return {
         success: false,
@@ -229,13 +229,13 @@ export class PaymentIntegration extends BaseIntegration {
           code: 'HEALTH_CHECK_FAILED',
           message: error instanceof Error ? error.message : 'Health check failed'
         }
-      }
+      };
     }
   }
 
   async validateConfig(): Promise<IntegrationResponse<void>> {
-    const requiredFields = ['baseUrl', 'apiKey', 'provider', 'currency']
-    const missingFields = requiredFields.filter(field => !this.config[field as keyof IntegrationConfig] && !this.paymentConfig[field as keyof PaymentIntegrationConfig])
+    const requiredFields = ['baseUrl', 'apiKey', 'provider', 'currency'];
+    const missingFields = requiredFields.filter(field => !this.config[field as keyof IntegrationConfig] && !this.paymentConfig[field as keyof PaymentIntegrationConfig]);
 
     if (missingFields.length > 0) {
       return {
@@ -244,7 +244,7 @@ export class PaymentIntegration extends BaseIntegration {
           code: 'INVALID_CONFIG',
           message: `Missing required configuration fields: ${missingFields.join(', ')}`
         }
-      }
+      };
     }
 
     if (!['stripe', 'paypal', 'square', 'braintree', 'razorpay', 'custom'].includes(this.paymentConfig.provider)) {
@@ -254,10 +254,10 @@ export class PaymentIntegration extends BaseIntegration {
           code: 'INVALID_PROVIDER',
           message: `Unsupported payment provider: ${this.paymentConfig.provider}`
         }
-      }
+      };
     }
 
-    return { success: true }
+    return { success: true };
   }
 
   // Payment Intent Management
@@ -271,7 +271,7 @@ export class PaymentIntegration extends BaseIntegration {
           currency: intent.currency || this.paymentConfig.currency,
           capture_method: this.paymentConfig.autoCapture ? 'automatic' : 'manual'
         }
-      )
+      );
 
       if (response.success && response.data) {
         this.emit('payment_intent:created', {
@@ -279,10 +279,10 @@ export class PaymentIntegration extends BaseIntegration {
           amount: response.data.amount,
           currency: response.data.currency,
           timestamp: new Date().toISOString()
-        })
+        });
       }
 
-      return response
+      return response;
     } catch (error) {
       return {
         success: false,
@@ -290,32 +290,32 @@ export class PaymentIntegration extends BaseIntegration {
           code: 'PAYMENT_INTENT_CREATE_ERROR',
           message: error instanceof Error ? error.message : 'Failed to create payment intent'
         }
-      }
+      };
     }
   }
 
   async confirmPaymentIntent(intentId: string, paymentMethodId?: string): Promise<IntegrationResponse<PaymentIntent>> {
     try {
-      const requestData: any = {}
+      const requestData: any = {};
       if (paymentMethodId) {
-        requestData.payment_method = paymentMethodId
+        requestData.payment_method = paymentMethodId;
       }
 
       const response = await this.makeRequest<PaymentIntent>(
         'POST',
         `${this.config.baseUrl}/payment_intents/${intentId}/confirm`,
         requestData
-      )
+      );
 
       if (response.success && response.data) {
         this.emit('payment_intent:confirmed', {
           intentId: response.data.id,
           status: response.data.status,
           timestamp: new Date().toISOString()
-        })
+        });
       }
 
-      return response
+      return response;
     } catch (error) {
       return {
         success: false,
@@ -323,32 +323,32 @@ export class PaymentIntegration extends BaseIntegration {
           code: 'PAYMENT_INTENT_CONFIRM_ERROR',
           message: error instanceof Error ? error.message : 'Failed to confirm payment intent'
         }
-      }
+      };
     }
   }
 
   async capturePaymentIntent(intentId: string, amount?: number): Promise<IntegrationResponse<PaymentIntent>> {
     try {
-      const requestData: any = {}
+      const requestData: any = {};
       if (amount) {
-        requestData.amount_to_capture = amount
+        requestData.amount_to_capture = amount;
       }
 
       const response = await this.makeRequest<PaymentIntent>(
         'POST',
         `${this.config.baseUrl}/payment_intents/${intentId}/capture`,
         requestData
-      )
+      );
 
       if (response.success && response.data) {
         this.emit('payment_intent:captured', {
           intentId: response.data.id,
           amountCaptured: amount || response.data.amount,
           timestamp: new Date().toISOString()
-        })
+        });
       }
 
-      return response
+      return response;
     } catch (error) {
       return {
         success: false,
@@ -356,32 +356,32 @@ export class PaymentIntegration extends BaseIntegration {
           code: 'PAYMENT_INTENT_CAPTURE_ERROR',
           message: error instanceof Error ? error.message : 'Failed to capture payment intent'
         }
-      }
+      };
     }
   }
 
   async cancelPaymentIntent(intentId: string, reason?: string): Promise<IntegrationResponse<PaymentIntent>> {
     try {
-      const requestData: any = {}
+      const requestData: any = {};
       if (reason) {
-        requestData.cancellation_reason = reason
+        requestData.cancellation_reason = reason;
       }
 
       const response = await this.makeRequest<PaymentIntent>(
         'POST',
         `${this.config.baseUrl}/payment_intents/${intentId}/cancel`,
         requestData
-      )
+      );
 
       if (response.success && response.data) {
         this.emit('payment_intent:canceled', {
           intentId: response.data.id,
           reason,
           timestamp: new Date().toISOString()
-        })
+        });
       }
 
-      return response
+      return response;
     } catch (error) {
       return {
         success: false,
@@ -389,7 +389,7 @@ export class PaymentIntegration extends BaseIntegration {
           code: 'PAYMENT_INTENT_CANCEL_ERROR',
           message: error instanceof Error ? error.message : 'Failed to cancel payment intent'
         }
-      }
+      };
     }
   }
 
@@ -400,17 +400,17 @@ export class PaymentIntegration extends BaseIntegration {
         'POST',
         `${this.config.baseUrl}/customers`,
         customer
-      )
+      );
 
       if (response.success && response.data) {
         this.emit('customer:created', {
           customerId: response.data.id,
           email: response.data.email,
           timestamp: new Date().toISOString()
-        })
+        });
       }
 
-      return response
+      return response;
     } catch (error) {
       return {
         success: false,
@@ -418,7 +418,7 @@ export class PaymentIntegration extends BaseIntegration {
           code: 'CUSTOMER_CREATE_ERROR',
           message: error instanceof Error ? error.message : 'Failed to create customer'
         }
-      }
+      };
     }
   }
 
@@ -428,16 +428,16 @@ export class PaymentIntegration extends BaseIntegration {
         'PUT',
         `${this.config.baseUrl}/customers/${customerId}`,
         updates
-      )
+      );
 
       if (response.success && response.data) {
         this.emit('customer:updated', {
           customerId: response.data.id,
           timestamp: new Date().toISOString()
-        })
+        });
       }
 
-      return response
+      return response;
     } catch (error) {
       return {
         success: false,
@@ -445,7 +445,7 @@ export class PaymentIntegration extends BaseIntegration {
           code: 'CUSTOMER_UPDATE_ERROR',
           message: error instanceof Error ? error.message : 'Failed to update customer'
         }
-      }
+      };
     }
   }
 
@@ -454,7 +454,7 @@ export class PaymentIntegration extends BaseIntegration {
       return await this.makeRequest<PaymentCustomer>(
         'GET',
         `${this.config.baseUrl}/customers/${customerId}`
-      )
+      );
     } catch (error) {
       return {
         success: false,
@@ -462,7 +462,7 @@ export class PaymentIntegration extends BaseIntegration {
           code: 'CUSTOMER_GET_ERROR',
           message: error instanceof Error ? error.message : 'Failed to get customer'
         }
-      }
+      };
     }
   }
 
@@ -473,17 +473,17 @@ export class PaymentIntegration extends BaseIntegration {
         'POST',
         `${this.config.baseUrl}/payment_methods`,
         paymentMethod
-      )
+      );
 
       if (response.success && response.data) {
         this.emit('payment_method:created', {
           paymentMethodId: response.data.id,
           type: response.data.type,
           timestamp: new Date().toISOString()
-        })
+        });
       }
 
-      return response
+      return response;
     } catch (error) {
       return {
         success: false,
@@ -491,7 +491,7 @@ export class PaymentIntegration extends BaseIntegration {
           code: 'PAYMENT_METHOD_CREATE_ERROR',
           message: error instanceof Error ? error.message : 'Failed to create payment method'
         }
-      }
+      };
     }
   }
 
@@ -501,17 +501,17 @@ export class PaymentIntegration extends BaseIntegration {
         'POST',
         `${this.config.baseUrl}/payment_methods/${paymentMethodId}/attach`,
         { customer: customerId }
-      )
+      );
 
       if (response.success && response.data) {
         this.emit('payment_method:attached', {
           paymentMethodId: response.data.id,
           customerId,
           timestamp: new Date().toISOString()
-        })
+        });
       }
 
-      return response
+      return response;
     } catch (error) {
       return {
         success: false,
@@ -519,7 +519,7 @@ export class PaymentIntegration extends BaseIntegration {
           code: 'PAYMENT_METHOD_ATTACH_ERROR',
           message: error instanceof Error ? error.message : 'Failed to attach payment method'
         }
-      }
+      };
     }
   }
 
@@ -530,7 +530,7 @@ export class PaymentIntegration extends BaseIntegration {
         'POST',
         `${this.config.baseUrl}/refunds`,
         refund
-      )
+      );
 
       if (response.success && response.data) {
         this.emit('refund:created', {
@@ -538,10 +538,10 @@ export class PaymentIntegration extends BaseIntegration {
           chargeId: response.data.chargeId,
           amount: response.data.amount,
           timestamp: new Date().toISOString()
-        })
+        });
       }
 
-      return response
+      return response;
     } catch (error) {
       return {
         success: false,
@@ -549,7 +549,7 @@ export class PaymentIntegration extends BaseIntegration {
           code: 'REFUND_CREATE_ERROR',
           message: error instanceof Error ? error.message : 'Failed to create refund'
         }
-      }
+      };
     }
   }
 
@@ -562,7 +562,7 @@ export class PaymentIntegration extends BaseIntegration {
           code: 'SUBSCRIPTIONS_DISABLED',
           message: 'Subscriptions are not enabled for this integration'
         }
-      }
+      };
     }
 
     try {
@@ -570,7 +570,7 @@ export class PaymentIntegration extends BaseIntegration {
         'POST',
         `${this.config.baseUrl}/subscriptions`,
         subscription
-      )
+      );
 
       if (response.success && response.data) {
         this.emit('subscription:created', {
@@ -578,10 +578,10 @@ export class PaymentIntegration extends BaseIntegration {
           customerId: response.data.customerId,
           status: response.data.status,
           timestamp: new Date().toISOString()
-        })
+        });
       }
 
-      return response
+      return response;
     } catch (error) {
       return {
         success: false,
@@ -589,7 +589,7 @@ export class PaymentIntegration extends BaseIntegration {
           code: 'SUBSCRIPTION_CREATE_ERROR',
           message: error instanceof Error ? error.message : 'Failed to create subscription'
         }
-      }
+      };
     }
   }
 
@@ -599,17 +599,17 @@ export class PaymentIntegration extends BaseIntegration {
         'DELETE',
         `${this.config.baseUrl}/subscriptions/${subscriptionId}`,
         { cancel_at_period_end: cancelAtPeriodEnd }
-      )
+      );
 
       if (response.success && response.data) {
         this.emit('subscription:canceled', {
           subscriptionId: response.data.id,
           cancelAtPeriodEnd,
           timestamp: new Date().toISOString()
-        })
+        });
       }
 
-      return response
+      return response;
     } catch (error) {
       return {
         success: false,
@@ -617,7 +617,7 @@ export class PaymentIntegration extends BaseIntegration {
           code: 'SUBSCRIPTION_CANCEL_ERROR',
           message: error instanceof Error ? error.message : 'Failed to cancel subscription'
         }
-      }
+      };
     }
   }
 
@@ -631,7 +631,7 @@ export class PaymentIntegration extends BaseIntegration {
           recommendation: 'proceed',
           details: { message: 'Fraud detection disabled' }
         }
-      }
+      };
     }
 
     try {
@@ -639,17 +639,17 @@ export class PaymentIntegration extends BaseIntegration {
         'POST',
         `${this.config.baseUrl}/fraud/analyze`,
         transactionData
-      )
+      );
 
       if (response.success && response.data) {
         this.emit('fraud:analyzed', {
           riskScore: response.data.riskScore,
           recommendation: response.data.recommendation,
           timestamp: new Date().toISOString()
-        })
+        });
       }
 
-      return response
+      return response;
     } catch (error) {
       return {
         success: false,
@@ -657,7 +657,7 @@ export class PaymentIntegration extends BaseIntegration {
           code: 'FRAUD_ANALYSIS_ERROR',
           message: error instanceof Error ? error.message : 'Failed to analyze transaction for fraud'
         }
-      }
+      };
     }
   }
 
@@ -665,40 +665,40 @@ export class PaymentIntegration extends BaseIntegration {
   protected async handleWebhookEvent(payload: WebhookPayload): Promise<void> {
     switch (payload.event) {
       case 'payment_intent.succeeded':
-        this.emit('payment:succeeded', payload)
-        break
-      
+        this.emit('payment:succeeded', payload);
+        break;
+
       case 'payment_intent.payment_failed':
-        this.emit('payment:failed', payload)
-        break
-      
+        this.emit('payment:failed', payload);
+        break;
+
       case 'charge.dispute.created':
-        this.emit('payment:disputed', payload)
-        break
-      
+        this.emit('payment:disputed', payload);
+        break;
+
       case 'customer.subscription.created':
       case 'customer.subscription.updated':
       case 'customer.subscription.deleted':
-        this.emit('subscription:webhook', payload)
-        break
-      
+        this.emit('subscription:webhook', payload);
+        break;
+
       case 'invoice.payment_succeeded':
       case 'invoice.payment_failed':
-        this.emit('invoice:webhook', payload)
-        break
-      
+        this.emit('invoice:webhook', payload);
+        break;
+
       default:
-        this.emit('webhook:unhandled', payload)
+        this.emit('webhook:unhandled', payload);
     }
   }
 
   // Utility methods
   public formatCurrency(amount: number, currency?: string): string {
-    const curr = currency || this.paymentConfig.currency
+    const curr = currency || this.paymentConfig.currency;
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: curr
-    }).format(amount / 100) // Assuming amounts are in cents
+    }).format(amount / 100); // Assuming amounts are in cents
   }
 
   public getProviderSpecificConfig(): any {
@@ -707,20 +707,20 @@ export class PaymentIntegration extends BaseIntegration {
         return {
           publishableKey: this.paymentConfig.publishableKey,
           apiVersion: '2023-10-16'
-        }
+        };
       case 'paypal':
         return {
           clientId: this.paymentConfig.publishableKey,
           environment: this.config.environment === 'production' ? 'live' : 'sandbox'
-        }
+        };
       case 'square':
         return {
           applicationId: this.paymentConfig.publishableKey,
           locationId: this.paymentConfig.merchantId,
           environment: this.config.environment === 'production' ? 'production' : 'sandbox'
-        }
+        };
       default:
-        return {}
+        return {};
     }
   }
 }

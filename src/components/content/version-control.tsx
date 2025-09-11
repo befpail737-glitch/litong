@@ -1,23 +1,14 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { 
-  History, 
-  GitBranch, 
-  Tag, 
-  Download, 
-  Upload, 
-  Eye, 
+import { useState, useEffect } from 'react';
+
+import {
+  History,
+  GitBranch,
+  Tag,
+  Download,
+  Upload,
+  Eye,
   Copy,
   Archive,
   ArrowLeft,
@@ -32,8 +23,19 @@ import {
   MoreHorizontal,
   FileText,
   User
-} from 'lucide-react'
-import { useLocale } from 'next-intl'
+} from 'lucide-react';
+import { useLocale } from 'next-intl';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 
 interface VersionChange {
   field: string
@@ -162,95 +164,95 @@ const mockVersions: ContentVersion[] = [
       schema: 'product-v2'
     }
   }
-]
+];
 
 export function VersionControl() {
-  const locale = useLocale()
-  const [versions, setVersions] = useState<ContentVersion[]>(mockVersions)
-  const [selectedVersion, setSelectedVersion] = useState<ContentVersion | null>(null)
-  const [compareVersion, setCompareVersion] = useState<ContentVersion | null>(null)
-  const [filterStatus, setFilterStatus] = useState<string>('all')
-  const [filterType, setFilterType] = useState<string>('all')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [showComparison, setShowComparison] = useState(false)
-  
+  const locale = useLocale();
+  const [versions, setVersions] = useState<ContentVersion[]>(mockVersions);
+  const [selectedVersion, setSelectedVersion] = useState<ContentVersion | null>(null);
+  const [compareVersion, setCompareVersion] = useState<ContentVersion | null>(null);
+  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [filterType, setFilterType] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showComparison, setShowComparison] = useState(false);
+
   const statusConfig = {
     draft: { label: '草稿', color: 'bg-gray-500', icon: FileText },
     active: { label: '活跃', color: 'bg-green-500', icon: CheckCircle },
     archived: { label: '已归档', color: 'bg-gray-400', icon: Archive },
     deprecated: { label: '已废弃', color: 'bg-red-500', icon: XCircle }
-  }
-  
+  };
+
   const versionTypeConfig = {
     major: { label: '主版本', color: 'bg-red-100 text-red-800' },
     minor: { label: '次版本', color: 'bg-blue-100 text-blue-800' },
     patch: { label: '补丁', color: 'bg-green-100 text-green-800' }
-  }
-  
+  };
+
   const changeTypeConfig = {
     added: { label: '新增', color: 'text-green-600', icon: '➕' },
     modified: { label: '修改', color: 'text-blue-600', icon: '✏️' },
     removed: { label: '删除', color: 'text-red-600', icon: '➖' }
-  }
-  
+  };
+
   const filteredVersions = versions.filter(version => {
-    const matchesStatus = filterStatus === 'all' || version.status === filterStatus
-    const matchesType = filterType === 'all' || version.versionType === filterType
-    const matchesSearch = !searchQuery || 
+    const matchesStatus = filterStatus === 'all' || version.status === filterStatus;
+    const matchesType = filterType === 'all' || version.versionType === filterType;
+    const matchesSearch = !searchQuery ||
       version.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       version.version.includes(searchQuery) ||
-      version.changelog.toLowerCase().includes(searchQuery.toLowerCase())
-    
-    return matchesStatus && matchesType && matchesSearch
-  })
-  
+      version.changelog.toLowerCase().includes(searchQuery.toLowerCase());
+
+    return matchesStatus && matchesType && matchesSearch;
+  });
+
   const handleRollback = (versionId: string) => {
-    const version = versions.find(v => v.id === versionId)
+    const version = versions.find(v => v.id === versionId);
     if (version) {
       // Set as current version and mark others as not current
       setVersions(versions.map(v => ({
         ...v,
         isCurrentVersion: v.id === versionId,
         status: v.id === versionId ? 'active' : v.status
-      })))
+      })));
     }
-  }
-  
+  };
+
   const handleArchive = (versionId: string) => {
-    setVersions(versions.map(v => 
+    setVersions(versions.map(v =>
       v.id === versionId ? { ...v, status: 'archived' } : v
-    ))
-  }
-  
+    ));
+  };
+
   const compareVersions = (version1: ContentVersion, version2: ContentVersion) => {
-    const data1 = JSON.parse(version1.contentSnapshot.data)
-    const data2 = JSON.parse(version2.contentSnapshot.data)
-    
-    const differences = []
-    
+    const data1 = JSON.parse(version1.contentSnapshot.data);
+    const data2 = JSON.parse(version2.contentSnapshot.data);
+
+    const differences = [];
+
     // Compare all keys from both objects
-    const allKeys = new Set([...Object.keys(data1), ...Object.keys(data2)])
-    
+    const allKeys = new Set([...Object.keys(data1), ...Object.keys(data2)]);
+
     for (const key of allKeys) {
       if (data1[key] !== data2[key]) {
         differences.push({
           field: key,
           oldValue: data1[key] || '(未设置)',
           newValue: data2[key] || '(已删除)'
-        })
+        });
       }
     }
-    
-    return differences
-  }
-  
+
+    return differences;
+  };
+
   return (
     <div className="container mx-auto p-6">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">版本控制系统</h1>
         <p className="text-gray-600">管理内容版本历史和变更跟踪</p>
       </div>
-      
+
       <div className="mb-6 flex flex-wrap gap-4 items-center">
         <div className="flex-1 min-w-[200px]">
           <div className="relative">
@@ -263,7 +265,7 @@ export function VersionControl() {
             />
           </div>
         </div>
-        
+
         <Select value={filterStatus} onValueChange={setFilterStatus}>
           <SelectTrigger className="w-[120px]">
             <SelectValue />
@@ -275,7 +277,7 @@ export function VersionControl() {
             <SelectItem value="deprecated">已废弃</SelectItem>
           </SelectContent>
         </Select>
-        
+
         <Select value={filterType} onValueChange={setFilterType}>
           <SelectTrigger className="w-[120px]">
             <SelectValue />
@@ -287,7 +289,7 @@ export function VersionControl() {
             <SelectItem value="patch">补丁</SelectItem>
           </SelectContent>
         </Select>
-        
+
         <Dialog>
           <DialogTrigger asChild>
             <Button>
@@ -303,11 +305,11 @@ export function VersionControl() {
           </DialogContent>
         </Dialog>
       </div>
-      
+
       <div className="grid gap-6">
         {filteredVersions.map((version) => {
-          const StatusIcon = statusConfig[version.status].icon
-          
+          const StatusIcon = statusConfig[version.status].icon;
+
           return (
             <Card key={version.id} className="hover:shadow-md transition-shadow">
               <CardHeader className="pb-4">
@@ -330,7 +332,7 @@ export function VersionControl() {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
                     <Badge className={statusConfig[version.status].color}>
                       {statusConfig[version.status].label}
@@ -341,7 +343,7 @@ export function VersionControl() {
                   </div>
                 </div>
               </CardHeader>
-              
+
               <CardContent>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-4">
@@ -349,14 +351,14 @@ export function VersionControl() {
                       <User className="h-4 w-4" />
                       <span className="text-sm text-gray-600">作者: {version.author.name}</span>
                     </div>
-                    
+
                     <div className="flex items-center gap-3">
                       <Clock className="h-4 w-4" />
                       <span className="text-sm text-gray-600">
                         创建时间: {new Date(version.createdAt).toLocaleString()}
                       </span>
                     </div>
-                    
+
                     {version.parentVersion && (
                       <div className="flex items-center gap-3">
                         <GitBranch className="h-4 w-4" />
@@ -365,7 +367,7 @@ export function VersionControl() {
                         </span>
                       </div>
                     )}
-                    
+
                     {version.tags.length > 0 && (
                       <div className="flex items-center gap-2 flex-wrap">
                         <Tag className="h-4 w-4" />
@@ -377,13 +379,13 @@ export function VersionControl() {
                       </div>
                     )}
                   </div>
-                  
+
                   <div className="space-y-4">
                     <div>
                       <h4 className="text-sm font-medium mb-2">变更摘要</h4>
                       <p className="text-sm text-gray-600">{version.changelog}</p>
                     </div>
-                    
+
                     <div>
                       <h4 className="text-sm font-medium mb-2">主要变更</h4>
                       <div className="space-y-1">
@@ -407,7 +409,7 @@ export function VersionControl() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center justify-between pt-4 mt-4 border-t">
                   <div className="flex gap-2">
                     <Button
@@ -418,19 +420,19 @@ export function VersionControl() {
                       <Eye className="h-4 w-4 mr-1" />
                       查看详情
                     </Button>
-                    
+
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => {
-                        setCompareVersion(version)
-                        setShowComparison(true)
+                        setCompareVersion(version);
+                        setShowComparison(true);
                       }}
                     >
                       <Copy className="h-4 w-4 mr-1" />
                       比较
                     </Button>
-                    
+
                     {!version.isCurrentVersion && (
                       <Button
                         variant="outline"
@@ -442,7 +444,7 @@ export function VersionControl() {
                       </Button>
                     )}
                   </div>
-                  
+
                   <div className="flex gap-2">
                     <Button
                       variant="ghost"
@@ -452,7 +454,7 @@ export function VersionControl() {
                       <Archive className="h-4 w-4 mr-1" />
                       归档
                     </Button>
-                    
+
                     <Button variant="ghost" size="sm">
                       <Download className="h-4 w-4 mr-1" />
                       导出
@@ -461,9 +463,9 @@ export function VersionControl() {
                 </div>
               </CardContent>
             </Card>
-          )
+          );
         })}
-        
+
         {filteredVersions.length === 0 && (
           <div className="text-center py-12">
             <History className="h-12 w-12 mx-auto text-gray-300 mb-4" />
@@ -472,7 +474,7 @@ export function VersionControl() {
           </div>
         )}
       </div>
-      
+
       {/* Version Detail Dialog */}
       {selectedVersion && (
         <Dialog open={!!selectedVersion} onOpenChange={() => setSelectedVersion(null)}>
@@ -486,14 +488,14 @@ export function VersionControl() {
                 )}
               </DialogTitle>
             </DialogHeader>
-            
+
             <Tabs defaultValue="changes" className="mt-6">
               <TabsList>
                 <TabsTrigger value="changes">变更记录</TabsTrigger>
                 <TabsTrigger value="content">内容快照</TabsTrigger>
                 <TabsTrigger value="branches">分支信息</TabsTrigger>
               </TabsList>
-              
+
               <TabsContent value="changes" className="space-y-4">
                 <Card>
                   <CardHeader>
@@ -503,7 +505,7 @@ export function VersionControl() {
                     <p>{selectedVersion.changelog}</p>
                   </CardContent>
                 </Card>
-                
+
                 <Card>
                   <CardHeader>
                     <CardTitle>详细变更</CardTitle>
@@ -521,11 +523,11 @@ export function VersionControl() {
                               {changeTypeConfig[change.changeType].label}
                             </Badge>
                           </div>
-                          
+
                           {change.description && (
                             <p className="text-sm text-gray-600 mb-2">{change.description}</p>
                           )}
-                          
+
                           {change.changeType === 'modified' && (
                             <div className="grid grid-cols-2 gap-4 text-sm">
                               <div>
@@ -538,14 +540,14 @@ export function VersionControl() {
                               </div>
                             </div>
                           )}
-                          
+
                           {change.changeType === 'added' && (
                             <div className="text-sm">
                               <span className="text-green-600 font-medium">+ 新增:</span>
                               <div className="bg-green-50 p-2 rounded mt-1">{change.newValue}</div>
                             </div>
                           )}
-                          
+
                           {change.changeType === 'removed' && (
                             <div className="text-sm">
                               <span className="text-red-600 font-medium">- 删除:</span>
@@ -558,7 +560,7 @@ export function VersionControl() {
                   </CardContent>
                 </Card>
               </TabsContent>
-              
+
               <TabsContent value="content" className="space-y-4">
                 <Card>
                   <CardHeader>
@@ -571,7 +573,7 @@ export function VersionControl() {
                         <Label>数据结构版本</Label>
                         <div className="text-sm text-gray-600">{selectedVersion.contentSnapshot.schema}</div>
                       </div>
-                      
+
                       <div>
                         <Label>内容数据</Label>
                         <ScrollArea className="h-64 w-full border rounded p-4">
@@ -584,7 +586,7 @@ export function VersionControl() {
                   </CardContent>
                 </Card>
               </TabsContent>
-              
+
               <TabsContent value="branches" className="space-y-4">
                 <div className="space-y-4">
                   {selectedVersion.branches.map((branch, index) => (
@@ -594,9 +596,9 @@ export function VersionControl() {
                           <GitBranch className="h-4 w-4" />
                           <span className="font-medium">{branch.name}</span>
                         </div>
-                        
+
                         <p className="text-sm text-gray-600 mb-2">{branch.description}</p>
-                        
+
                         <div className="flex items-center gap-4 text-xs text-gray-500">
                           <span>创建者: {branch.createdBy}</span>
                           <span>创建时间: {new Date(branch.createdAt).toLocaleString()}</span>
@@ -604,7 +606,7 @@ export function VersionControl() {
                       </CardContent>
                     </Card>
                   ))}
-                  
+
                   {selectedVersion.branches.length === 0 && (
                     <div className="text-center py-8 text-gray-500">
                       暂无分支信息
@@ -616,7 +618,7 @@ export function VersionControl() {
           </DialogContent>
         </Dialog>
       )}
-      
+
       {/* Version Comparison Dialog */}
       {showComparison && compareVersion && (
         <Dialog open={showComparison} onOpenChange={setShowComparison}>
@@ -624,7 +626,7 @@ export function VersionControl() {
             <DialogHeader>
               <DialogTitle>版本比较</DialogTitle>
             </DialogHeader>
-            
+
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <Card>
@@ -632,11 +634,11 @@ export function VersionControl() {
                     <CardTitle className="text-base">选择版本 1</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <Select 
+                    <Select
                       value={compareVersion.id}
                       onValueChange={(value) => {
-                        const version = versions.find(v => v.id === value)
-                        if (version) setCompareVersion(version)
+                        const version = versions.find(v => v.id === value);
+                        if (version) setCompareVersion(version);
                       }}
                     >
                       <SelectTrigger>
@@ -652,17 +654,17 @@ export function VersionControl() {
                     </Select>
                   </CardContent>
                 </Card>
-                
+
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-base">选择版本 2</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <Select 
+                    <Select
                       value={selectedVersion?.id || ''}
                       onValueChange={(value) => {
-                        const version = versions.find(v => v.id === value)
-                        if (version) setSelectedVersion(version)
+                        const version = versions.find(v => v.id === value);
+                        if (version) setSelectedVersion(version);
                       }}
                     >
                       <SelectTrigger>
@@ -679,7 +681,7 @@ export function VersionControl() {
                   </CardContent>
                 </Card>
               </div>
-              
+
               {selectedVersion && compareVersion && (
                 <Card>
                   <CardHeader>
@@ -702,7 +704,7 @@ export function VersionControl() {
                           </div>
                         </div>
                       ))}
-                      
+
                       {compareVersions(compareVersion, selectedVersion).length === 0 && (
                         <div className="text-center py-8 text-gray-500">
                           这两个版本没有差异
@@ -717,5 +719,5 @@ export function VersionControl() {
         </Dialog>
       )}
     </div>
-  )
+  );
 }

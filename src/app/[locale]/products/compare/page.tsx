@@ -1,10 +1,13 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
-import { ProductCompare } from '@/components/product/ProductCompare'
-import { Button } from '@/components/ui/button'
-import { ArrowLeft } from 'lucide-react'
+import { useState, useEffect } from 'react';
+
+import { useSearchParams, useRouter } from 'next/navigation';
+
+import { ArrowLeft } from 'lucide-react';
+
+import { ProductCompare } from '@/components/product/ProductCompare';
+import { Button } from '@/components/ui/button';
 
 // 模拟产品数据（实际应用中应该从API获取）
 const mockProductsData = {
@@ -81,39 +84,39 @@ const mockProductsData = {
     isFeatured: true,
     isActive: true,
   }
-}
+};
 
 export default function ProductComparePage() {
-  const searchParams = useSearchParams()
-  const router = useRouter()
-  const [products, setProducts] = useState<any[]>([])
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [products, setProducts] = useState<any[]>([]);
 
   useEffect(() => {
     // 从URL参数获取产品ID列表
-    const productIds = searchParams.get('ids')?.split(',') || []
+    const productIds = searchParams.get('ids')?.split(',') || [];
     const validProducts = productIds
       .map(id => mockProductsData[id as keyof typeof mockProductsData])
-      .filter(Boolean)
-    
-    setProducts(validProducts)
-  }, [searchParams])
+      .filter(Boolean);
+
+    setProducts(validProducts);
+  }, [searchParams]);
 
   const handleRemoveProduct = (productId: string) => {
-    const newProducts = products.filter(p => p.id !== productId)
-    setProducts(newProducts)
-    
+    const newProducts = products.filter(p => p.id !== productId);
+    setProducts(newProducts);
+
     // 更新URL
-    const newIds = newProducts.map(p => p.id).join(',')
+    const newIds = newProducts.map(p => p.id).join(',');
     if (newIds) {
-      router.replace(`/products/compare?ids=${newIds}`)
+      router.replace(`/products/compare?ids=${newIds}`);
     } else {
-      router.replace('/products')
+      router.replace('/products');
     }
-  }
+  };
 
   const handleClose = () => {
-    router.back()
-  }
+    router.back();
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -138,5 +141,5 @@ export default function ProductComparePage() {
         onClose={handleClose}
       />
     </div>
-  )
+  );
 }

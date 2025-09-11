@@ -1,17 +1,17 @@
-'use client'
+'use client';
 
-import { useFormatters, usePriceFormatter, useDateRangeFormatter } from '@/hooks/use-formatters'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useFormatters, usePriceFormatter, useDateRangeFormatter } from '@/hooks/use-formatters';
 
 interface LocalizationDemoProps {
   className?: string
 }
 
 export function LocalizationDemo({ className }: LocalizationDemoProps) {
-  const formatters = useFormatters()
-  const priceFormatter = usePriceFormatter()
-  const dateRangeFormatter = useDateRangeFormatter()
+  const formatters = useFormatters();
+  const priceFormatter = usePriceFormatter();
+  const dateRangeFormatter = useDateRangeFormatter();
 
   // 示例数据
   const sampleData = {
@@ -27,7 +27,7 @@ export function LocalizationDemo({ className }: LocalizationDemoProps) {
       start: new Date('2024-03-01'),
       end: new Date('2024-03-31')
     }
-  }
+  };
 
   const examples = [
     {
@@ -85,7 +85,7 @@ export function LocalizationDemo({ className }: LocalizationDemoProps) {
       value: formatters.locale,
       description: '当前语言环境代码'
     }
-  ]
+  ];
 
   return (
     <Card className={className}>
@@ -116,7 +116,7 @@ export function LocalizationDemo({ className }: LocalizationDemoProps) {
             </div>
           ))}
         </div>
-        
+
         <div className="mt-6 p-4 bg-muted rounded-lg">
           <h4 className="font-medium mb-2">使用示例</h4>
           <pre className="text-xs overflow-x-auto">
@@ -138,5 +138,5 @@ const publishDate = formatters.dateShort(new Date())`}
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

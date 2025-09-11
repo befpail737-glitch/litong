@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { useEffect } from 'react'
+import { useEffect } from 'react';
 
 export default function GlobalError({
   error,
@@ -10,8 +10,8 @@ export default function GlobalError({
   reset: () => void
 }) {
   useEffect(() => {
-    console.error(error)
-  }, [error])
+    console.error(error);
+  }, [error]);
 
   return (
     <html lang="zh-CN">
@@ -32,5 +32,5 @@ export default function GlobalError({
         </div>
       </body>
     </html>
-  )
+  );
 }

@@ -1,16 +1,11 @@
-'use client'
+'use client';
 
-import { useState, useMemo } from 'react'
-import { useTranslations } from 'next-intl'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Separator } from '@/components/ui/separator'
-import { Progress } from '@/components/ui/progress'
-import { 
+import { useState, useMemo } from 'react';
+
+import Image from 'next/image';
+import Link from 'next/link';
+
+import {
   Download,
   FileText,
   File,
@@ -28,13 +23,21 @@ import {
   HardDrive,
   Eye,
   Star
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { useFormatters } from '@/hooks/use-formatters'
-import { getLocalizedValue } from '@/lib/sanity-i18n'
-import type { Locale } from '@/i18n'
-import Link from 'next/link'
-import Image from 'next/image'
+} from 'lucide-react';
+import { useTranslations } from 'next-intl';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Progress } from '@/components/ui/progress';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import { useFormatters } from '@/hooks/use-formatters';
+import type { Locale } from '@/i18n';
+import { getLocalizedValue } from '@/lib/sanity-i18n';
+import { cn } from '@/lib/utils';
 
 // 文档类型定义（复用前面的定义）
 interface DocumentItem {
@@ -97,19 +100,19 @@ export function DocumentDownloadCenter({
   onDownload,
   className
 }: DownloadCenterProps) {
-  const t = useTranslations('documents')
-  const { fileSize } = useFormatters()
-  
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState<string>('all')
-  const [selectedType, setSelectedType] = useState<string>('all')
-  const [selectedLanguage, setSelectedLanguage] = useState<string>('all')
-  const [showOnlyAccessible, setShowOnlyAccessible] = useState(true)
-  const [showOnlyFeatured, setShowOnlyFeatured] = useState(false)
-  
+  const t = useTranslations('documents');
+  const { fileSize } = useFormatters();
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedType, setSelectedType] = useState<string>('all');
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('all');
+  const [showOnlyAccessible, setShowOnlyAccessible] = useState(true);
+  const [showOnlyFeatured, setShowOnlyFeatured] = useState(false);
+
   // 下载购物车
-  const [downloadCart, setDownloadCart] = useState<Set<string>>(new Set())
-  const [downloadProgress, setDownloadProgress] = useState<Record<string, DownloadProgress>>({})
+  const [downloadCart, setDownloadCart] = useState<Set<string>>(new Set());
+  const [downloadProgress, setDownloadProgress] = useState<Record<string, DownloadProgress>>({});
 
   // 文档类型和访问权限映射（复用前面的定义）
   const documentTypeMap = {
@@ -123,7 +126,7 @@ export function DocumentDownloadCenter({
     whitepaper: { label: t('types.whitepaper'), icon: File, color: 'text-slate-600' },
     'case-study': { label: t('types.caseStudy'), icon: File, color: 'text-pink-600' },
     other: { label: t('types.other'), icon: File, color: 'text-gray-600' }
-  }
+  };
 
   const languageMap = {
     'zh-CN': '中文',
@@ -137,110 +140,110 @@ export function DocumentDownloadCenter({
     'ru': 'Русский',
     'ar': 'العربية',
     'multi': t('language.multi')
-  }
+  };
 
   // 检查用户访问权限
   const hasAccess = (documentAccessLevel: string) => {
-    const accessLevels = ['public', 'registered', 'member', 'internal']
-    const userLevel = accessLevels.indexOf(userAccessLevel)
-    const docLevel = accessLevels.indexOf(documentAccessLevel)
-    return userLevel >= docLevel
-  }
+    const accessLevels = ['public', 'registered', 'member', 'internal'];
+    const userLevel = accessLevels.indexOf(userAccessLevel);
+    const docLevel = accessLevels.indexOf(documentAccessLevel);
+    return userLevel >= docLevel;
+  };
 
   // 过滤文档
   const filteredDocuments = useMemo(() => {
     return documents.filter(document => {
-      const title = getLocalizedValue(document.title, locale).toLowerCase()
-      const description = getLocalizedValue(document.description, locale).toLowerCase()
-      const search = searchTerm.toLowerCase()
-      
-      const matchesSearch = !searchTerm || 
-        title.includes(search) || 
+      const title = getLocalizedValue(document.title, locale).toLowerCase();
+      const description = getLocalizedValue(document.description, locale).toLowerCase();
+      const search = searchTerm.toLowerCase();
+
+      const matchesSearch = !searchTerm ||
+        title.includes(search) ||
         description.includes(search) ||
-        document.tags.some(tag => tag.toLowerCase().includes(search))
-      
-      const matchesCategory = selectedCategory === 'all' || document.category?.slug.current === selectedCategory
-      const matchesType = selectedType === 'all' || document.documentType === selectedType
-      const matchesLanguage = selectedLanguage === 'all' || document.language === selectedLanguage
-      const matchesAccess = !showOnlyAccessible || hasAccess(document.accessLevel)
-      const matchesFeatured = !showOnlyFeatured || document.isFeatured
-      
-      return matchesSearch && matchesCategory && matchesType && matchesLanguage && matchesAccess && matchesFeatured
-    })
-  }, [documents, searchTerm, selectedCategory, selectedType, selectedLanguage, showOnlyAccessible, showOnlyFeatured, locale, userAccessLevel])
+        document.tags.some(tag => tag.toLowerCase().includes(search));
+
+      const matchesCategory = selectedCategory === 'all' || document.category?.slug.current === selectedCategory;
+      const matchesType = selectedType === 'all' || document.documentType === selectedType;
+      const matchesLanguage = selectedLanguage === 'all' || document.language === selectedLanguage;
+      const matchesAccess = !showOnlyAccessible || hasAccess(document.accessLevel);
+      const matchesFeatured = !showOnlyFeatured || document.isFeatured;
+
+      return matchesSearch && matchesCategory && matchesType && matchesLanguage && matchesAccess && matchesFeatured;
+    });
+  }, [documents, searchTerm, selectedCategory, selectedType, selectedLanguage, showOnlyAccessible, showOnlyFeatured, locale, userAccessLevel]);
 
   // 购物车操作
   const toggleCart = (documentId: string) => {
-    const newCart = new Set(downloadCart)
+    const newCart = new Set(downloadCart);
     if (newCart.has(documentId)) {
-      newCart.delete(documentId)
+      newCart.delete(documentId);
     } else {
-      newCart.add(documentId)
+      newCart.add(documentId);
     }
-    setDownloadCart(newCart)
-  }
+    setDownloadCart(newCart);
+  };
 
   const clearCart = () => {
-    setDownloadCart(new Set())
-  }
+    setDownloadCart(new Set());
+  };
 
   const selectAll = () => {
-    const accessibleDocs = filteredDocuments.filter(doc => hasAccess(doc.accessLevel))
-    setDownloadCart(new Set(accessibleDocs.map(doc => doc._id)))
-  }
+    const accessibleDocs = filteredDocuments.filter(doc => hasAccess(doc.accessLevel));
+    setDownloadCart(new Set(accessibleDocs.map(doc => doc._id)));
+  };
 
   // 批量下载
   const handleBatchDownload = async () => {
-    const selectedDocs = documents.filter(doc => downloadCart.has(doc._id))
-    if (selectedDocs.length === 0) return
+    const selectedDocs = documents.filter(doc => downloadCart.has(doc._id));
+    if (selectedDocs.length === 0) return;
 
     // 模拟下载进度
     for (const doc of selectedDocs) {
       setDownloadProgress(prev => ({
         ...prev,
         [doc._id]: { documentId: doc._id, progress: 0, status: 'downloading' }
-      }))
+      }));
 
       // 模拟下载过程
       for (let progress = 0; progress <= 100; progress += 10) {
-        await new Promise(resolve => setTimeout(resolve, 100))
+        await new Promise(resolve => setTimeout(resolve, 100));
         setDownloadProgress(prev => ({
           ...prev,
           [doc._id]: { ...prev[doc._id], progress }
-        }))
+        }));
       }
 
       setDownloadProgress(prev => ({
         ...prev,
         [doc._id]: { ...prev[doc._id], status: 'completed' }
-      }))
+      }));
 
       // 实际下载文件
-      window.open(doc.file.asset.url, '_blank')
+      window.open(doc.file.asset.url, '_blank');
     }
 
-    onDownload?.(selectedDocs)
-  }
+    onDownload?.(selectedDocs);
+  };
 
   // 计算购物车统计
-  const cartDocuments = documents.filter(doc => downloadCart.has(doc._id))
-  const totalSize = cartDocuments.reduce((sum, doc) => sum + (doc.fileSize || 0), 0)
+  const cartDocuments = documents.filter(doc => downloadCart.has(doc._id));
+  const totalSize = cartDocuments.reduce((sum, doc) => sum + (doc.fileSize || 0), 0);
 
   const DocumentCard = ({ document }: { document: DocumentItem }) => {
-    const title = getLocalizedValue(document.title, locale)
-    const description = getLocalizedValue(document.description, locale)
-    const categoryTitle = getLocalizedValue(document.category.title, locale)
-    const typeInfo = documentTypeMap[document.documentType]
-    const IconComponent = typeInfo.icon
-    const isSelected = downloadCart.has(document._id)
-    const isAccessible = hasAccess(document.accessLevel)
-    const progress = downloadProgress[document._id]
+    const title = getLocalizedValue(document.title, locale);
+    const description = getLocalizedValue(document.description, locale);
+    const categoryTitle = getLocalizedValue(document.category.title, locale);
+    const typeInfo = documentTypeMap[document.documentType];
+    const IconComponent = typeInfo.icon;
+    const isSelected = downloadCart.has(document._id);
+    const isAccessible = hasAccess(document.accessLevel);
+    const progress = downloadProgress[document._id];
 
     return (
       <Card className={cn(
-        "group relative transition-all duration-300",
-        isSelected && "ring-2 ring-primary",
-        !isAccessible && "opacity-60"
+        'group relative transition-all duration-300',
+        isSelected && 'ring-2 ring-primary',
+        !isAccessible && 'opacity-60'
       )}>
         {/* 选择复选框 */}
         <div className="absolute top-3 left-3 z-10">
@@ -269,7 +272,7 @@ export function DocumentDownloadCenter({
             />
           ) : (
             <div className="w-full h-full bg-muted flex items-center justify-center rounded-t-lg">
-              <IconComponent className={cn("w-12 h-12", typeInfo.color)} />
+              <IconComponent className={cn('w-12 h-12', typeInfo.color)} />
             </div>
           )}
 
@@ -293,14 +296,14 @@ export function DocumentDownloadCenter({
             </div>
           )}
         </div>
-        
+
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2 mb-2">
-            <Badge 
-              variant="outline" 
-              style={{ 
+            <Badge
+              variant="outline"
+              style={{
                 borderColor: document.category.color,
-                color: document.category.color 
+                color: document.category.color
               }}
             >
               {categoryTitle}
@@ -316,18 +319,18 @@ export function DocumentDownloadCenter({
               </Badge>
             )}
           </div>
-          
+
           <CardTitle className="line-clamp-2 text-sm">
             {title}
           </CardTitle>
-          
+
           {description && (
             <CardDescription className="line-clamp-2 text-xs">
               {description}
             </CardDescription>
           )}
         </CardHeader>
-        
+
         <CardContent className="pt-0">
           {/* 文档信息 */}
           <div className="flex items-center justify-between text-xs text-muted-foreground mb-3">
@@ -347,7 +350,7 @@ export function DocumentDownloadCenter({
               {document.downloadCount}
             </span>
           </div>
-          
+
           {/* 操作按钮 */}
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" className="flex-1" asChild>
@@ -356,7 +359,7 @@ export function DocumentDownloadCenter({
                 {t('preview')}
               </Link>
             </Button>
-            
+
             {isAccessible ? (
               <Button
                 size="sm"
@@ -374,8 +377,8 @@ export function DocumentDownloadCenter({
           </div>
         </CardContent>
       </Card>
-    )
-  }
+    );
+  };
 
   return (
     <div className={className}>
@@ -414,7 +417,7 @@ export function DocumentDownloadCenter({
                 ))}
               </SelectContent>
             </Select>
-            
+
             <Select value={selectedType} onValueChange={setSelectedType}>
               <SelectTrigger>
                 <SelectValue placeholder={t('selectType')} />
@@ -428,7 +431,7 @@ export function DocumentDownloadCenter({
                 ))}
               </SelectContent>
             </Select>
-            
+
             <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
               <SelectTrigger>
                 <SelectValue placeholder={t('selectLanguage')} />
@@ -454,7 +457,7 @@ export function DocumentDownloadCenter({
                   {t('onlyAccessible')}
                 </label>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="featured"
@@ -479,11 +482,11 @@ export function DocumentDownloadCenter({
                 {t('clearSelection')}
               </Button>
             </div>
-            
+
             <p className="text-sm text-muted-foreground">
-              {t('showingResults', { 
-                count: filteredDocuments.length, 
-                total: documents.length 
+              {t('showingResults', {
+                count: filteredDocuments.length,
+                total: documents.length
               })}
             </p>
           </div>
@@ -498,12 +501,12 @@ export function DocumentDownloadCenter({
               <CardContent>
                 <p className="text-muted-foreground mb-4">{t('noDocumentsFound')}</p>
                 <Button onClick={() => {
-                  setSearchTerm('')
-                  setSelectedCategory('all')
-                  setSelectedType('all')
-                  setSelectedLanguage('all')
-                  setShowOnlyAccessible(false)
-                  setShowOnlyFeatured(false)
+                  setSearchTerm('');
+                  setSelectedCategory('all');
+                  setSelectedType('all');
+                  setSelectedLanguage('all');
+                  setShowOnlyAccessible(false);
+                  setShowOnlyFeatured(false);
                 }}>
                   {t('clearFilters')}
                 </Button>
@@ -545,19 +548,19 @@ export function DocumentDownloadCenter({
                       <span>{fileSize(totalSize)}</span>
                     </div>
                   </div>
-                  
+
                   <Separator />
-                  
+
                   {/* 购物车文档列表 */}
                   <div className="space-y-2 max-h-64 overflow-y-auto">
                     {cartDocuments.map((doc) => {
-                      const title = getLocalizedValue(doc.title, locale)
-                      const typeInfo = documentTypeMap[doc.documentType]
-                      const IconComponent = typeInfo.icon
-                      
+                      const title = getLocalizedValue(doc.title, locale);
+                      const typeInfo = documentTypeMap[doc.documentType];
+                      const IconComponent = typeInfo.icon;
+
                       return (
                         <div key={doc._id} className="flex items-center gap-2 p-2 bg-muted rounded text-xs">
-                          <IconComponent className={cn("w-4 h-4 flex-shrink-0", typeInfo.color)} />
+                          <IconComponent className={cn('w-4 h-4 flex-shrink-0', typeInfo.color)} />
                           <div className="flex-1 min-w-0">
                             <p className="truncate font-medium">{title}</p>
                             <p className="text-muted-foreground">
@@ -573,25 +576,25 @@ export function DocumentDownloadCenter({
                             <Trash2 className="w-3 h-3" />
                           </Button>
                         </div>
-                      )
+                      );
                     })}
                   </div>
-                  
+
                   <Separator />
-                  
+
                   {/* 下载操作 */}
                   <div className="space-y-2">
-                    <Button 
-                      className="w-full" 
+                    <Button
+                      className="w-full"
                       onClick={handleBatchDownload}
                       disabled={downloadCart.size === 0}
                     >
                       <Package className="w-4 h-4 mr-2" />
                       {t('downloadAll')}
                     </Button>
-                    <Button 
-                      variant="outline" 
-                      className="w-full" 
+                    <Button
+                      variant="outline"
+                      className="w-full"
                       onClick={clearCart}
                     >
                       <Trash2 className="w-4 h-4 mr-2" />
@@ -618,5 +621,5 @@ export function DocumentDownloadCenter({
         </div>
       </div>
     </div>
-  )
+  );
 }

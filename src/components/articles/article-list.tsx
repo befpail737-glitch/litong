@@ -1,20 +1,23 @@
-'use client'
+'use client';
 
-import { useState, useMemo } from 'react'
-import { useTranslations } from 'next-intl'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Separator } from '@/components/ui/separator'
-import { CalendarDays, Clock, User, Tag, Star, Search, Filter } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { useFormatters } from '@/hooks/use-formatters'
-import { getLocalizedValue } from '@/lib/sanity-i18n'
-import type { Locale } from '@/i18n'
-import Link from 'next/link'
-import Image from 'next/image'
+import { useState, useMemo } from 'react';
+
+import Image from 'next/image';
+import Link from 'next/link';
+
+import { CalendarDays, Clock, User, Tag, Star, Search, Filter } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import { useFormatters } from '@/hooks/use-formatters';
+import type { Locale } from '@/i18n';
+import { getLocalizedValue } from '@/lib/sanity-i18n';
+import { cn } from '@/lib/utils';
 
 // 文章类型定义
 interface Article {
@@ -70,13 +73,13 @@ export function ArticleList({
   onPageChange,
   className
 }: ArticleListProps) {
-  const t = useTranslations('articles')
-  const { dateShort } = useFormatters()
-  
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState<string>('all')
-  const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all')
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const t = useTranslations('articles');
+  const { dateShort } = useFormatters();
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   // 难度级别映射
   const difficultyMap = {
@@ -84,36 +87,36 @@ export function ArticleList({
     intermediate: { label: t('difficulty.intermediate'), color: 'bg-blue-100 text-blue-800' },
     advanced: { label: t('difficulty.advanced'), color: 'bg-orange-100 text-orange-800' },
     expert: { label: t('difficulty.expert'), color: 'bg-red-100 text-red-800' }
-  }
+  };
 
   // 过滤文章
   const filteredArticles = useMemo(() => {
     return articles.filter(article => {
-      const title = getLocalizedValue(article.title, locale).toLowerCase()
-      const excerpt = getLocalizedValue(article.excerpt, locale).toLowerCase()
-      const search = searchTerm.toLowerCase()
-      
-      const matchesSearch = !searchTerm || title.includes(search) || excerpt.includes(search)
-      const matchesCategory = selectedCategory === 'all' || article.category?.slug.current === selectedCategory
-      const matchesDifficulty = selectedDifficulty === 'all' || article.difficulty === selectedDifficulty
-      
-      return matchesSearch && matchesCategory && matchesDifficulty
-    })
-  }, [articles, searchTerm, selectedCategory, selectedDifficulty, locale])
+      const title = getLocalizedValue(article.title, locale).toLowerCase();
+      const excerpt = getLocalizedValue(article.excerpt, locale).toLowerCase();
+      const search = searchTerm.toLowerCase();
+
+      const matchesSearch = !searchTerm || title.includes(search) || excerpt.includes(search);
+      const matchesCategory = selectedCategory === 'all' || article.category?.slug.current === selectedCategory;
+      const matchesDifficulty = selectedDifficulty === 'all' || article.difficulty === selectedDifficulty;
+
+      return matchesSearch && matchesCategory && matchesDifficulty;
+    });
+  }, [articles, searchTerm, selectedCategory, selectedDifficulty, locale]);
 
   // 分页计算
-  const totalPages = Math.ceil(filteredArticles.length / pageSize)
-  const startIndex = (currentPage - 1) * pageSize
-  const paginatedArticles = filteredArticles.slice(startIndex, startIndex + pageSize)
+  const totalPages = Math.ceil(filteredArticles.length / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const paginatedArticles = filteredArticles.slice(startIndex, startIndex + pageSize);
 
   const ArticleCard = ({ article }: { article: Article }) => {
-    const title = getLocalizedValue(article.title, locale)
-    const excerpt = getLocalizedValue(article.excerpt, locale)
-    const categoryTitle = getLocalizedValue(article.category.title, locale)
+    const title = getLocalizedValue(article.title, locale);
+    const excerpt = getLocalizedValue(article.excerpt, locale);
+    const categoryTitle = getLocalizedValue(article.category.title, locale);
 
     return (
-      <Card className={cn("group hover:shadow-lg transition-all duration-300", viewMode === 'list' && "flex flex-row")}>
-        <div className={cn("relative", viewMode === 'grid' ? "aspect-video" : "w-48 flex-shrink-0")}>
+      <Card className={cn('group hover:shadow-lg transition-all duration-300', viewMode === 'list' && 'flex flex-row')}>
+        <div className={cn('relative', viewMode === 'grid' ? 'aspect-video' : 'w-48 flex-shrink-0')}>
           {article.image?.asset && (
             <Image
               src={article.image.asset.url}
@@ -128,21 +131,21 @@ export function ArticleList({
               {t('featured')}
             </Badge>
           )}
-          <Badge 
-            className={cn("absolute top-2 right-2", difficultyMap[article.difficulty].color)}
+          <Badge
+            className={cn('absolute top-2 right-2', difficultyMap[article.difficulty].color)}
           >
             {difficultyMap[article.difficulty].label}
           </Badge>
         </div>
-        
+
         <div className="flex-1">
           <CardHeader>
             <div className="flex items-center gap-2 mb-2">
-              <Badge 
-                variant="outline" 
-                style={{ 
+              <Badge
+                variant="outline"
+                style={{
                   borderColor: article.category.color,
-                  color: article.category.color 
+                  color: article.category.color
                 }}
               >
                 {categoryTitle}
@@ -152,20 +155,20 @@ export function ArticleList({
                 {article.readTime} {t('minRead')}
               </Badge>
             </div>
-            
+
             <CardTitle className="line-clamp-2 group-hover:text-primary transition-colors">
               <Link href={`/articles/${article.slug.current}`}>
                 {title}
               </Link>
             </CardTitle>
-            
+
             {excerpt && (
               <CardDescription className="line-clamp-3">
                 {excerpt}
               </CardDescription>
             )}
           </CardHeader>
-          
+
           <CardContent>
             {/* 标签 */}
             {article.tags && article.tags.length > 0 && (
@@ -183,7 +186,7 @@ export function ArticleList({
                 )}
               </div>
             )}
-            
+
             {/* 作者和日期 */}
             <div className="flex items-center justify-between text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
@@ -197,14 +200,14 @@ export function ArticleList({
                   />
                 )}
                 <User className="w-4 h-4" />
-                <Link 
+                <Link
                   href={`/authors/${article.author.slug.current}`}
                   className="hover:text-primary transition-colors"
                 >
                   {article.author.name}
                 </Link>
               </div>
-              
+
               <div className="flex items-center gap-1">
                 <CalendarDays className="w-4 h-4" />
                 {dateShort(new Date(article.publishedAt))}
@@ -213,8 +216,8 @@ export function ArticleList({
           </CardContent>
         </div>
       </Card>
-    )
-  }
+    );
+  };
 
   return (
     <div className={className}>
@@ -231,7 +234,7 @@ export function ArticleList({
               className="pl-10"
             />
           </div>
-          
+
           {/* 分类过滤 */}
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
             <SelectTrigger className="w-full sm:w-48">
@@ -246,7 +249,7 @@ export function ArticleList({
               ))}
             </SelectContent>
           </Select>
-          
+
           {/* 难度过滤 */}
           <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
             <SelectTrigger className="w-full sm:w-48">
@@ -262,16 +265,16 @@ export function ArticleList({
             </SelectContent>
           </Select>
         </div>
-        
+
         {/* 视图切换和结果统计 */}
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            {t('showingResults', { 
-              count: filteredArticles.length, 
-              total: totalCount 
+            {t('showingResults', {
+              count: filteredArticles.length,
+              total: totalCount
             })}
           </p>
-          
+
           <div className="flex items-center gap-2">
             <Button
               variant={viewMode === 'grid' ? 'default' : 'outline'}
@@ -299,9 +302,9 @@ export function ArticleList({
           <CardContent>
             <p className="text-muted-foreground mb-4">{t('noArticlesFound')}</p>
             <Button onClick={() => {
-              setSearchTerm('')
-              setSelectedCategory('all')
-              setSelectedDifficulty('all')
+              setSearchTerm('');
+              setSelectedCategory('all');
+              setSelectedDifficulty('all');
             }}>
               {t('clearFilters')}
             </Button>
@@ -309,10 +312,10 @@ export function ArticleList({
         </Card>
       ) : (
         <div className={cn(
-          "gap-6",
-          viewMode === 'grid' 
-            ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3" 
-            : "flex flex-col"
+          'gap-6',
+          viewMode === 'grid'
+            ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3'
+            : 'flex flex-col'
         )}>
           {paginatedArticles.map((article) => (
             <ArticleCard key={article._id} article={article} />
@@ -330,10 +333,10 @@ export function ArticleList({
           >
             {t('previous')}
           </Button>
-          
+
           <div className="flex items-center gap-1">
             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-              const pageNumber = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i
+              const pageNumber = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
               return (
                 <Button
                   key={pageNumber}
@@ -343,10 +346,10 @@ export function ArticleList({
                 >
                   {pageNumber}
                 </Button>
-              )
+              );
             })}
           </div>
-          
+
           <Button
             variant="outline"
             onClick={() => onPageChange?.(currentPage + 1)}
@@ -357,5 +360,5 @@ export function ArticleList({
         </div>
       )}
     </div>
-  )
+  );
 }

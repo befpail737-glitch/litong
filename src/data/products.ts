@@ -101,7 +101,7 @@ export const productCategories: ProductCategory[] = [
       { id: 'battery-management', name: '电池管理', slug: 'battery-management', description: '电池充电和管理IC' }
     ]
   }
-]
+];
 
 export const mockProducts: Product[] = [
   {
@@ -333,7 +333,7 @@ export const mockProducts: Product[] = [
     isNew: true,
     isActive: true,
   }
-]
+];
 
 export const searchProducts = (
   products: Product[],
@@ -345,93 +345,93 @@ export const searchProducts = (
     inStock?: boolean
   } = {}
 ): Product[] => {
-  let filteredProducts = products.filter(product => product.isActive)
+  let filteredProducts = products.filter(product => product.isActive);
 
   // Text search
   if (query.trim()) {
-    const searchTerm = query.toLowerCase()
-    filteredProducts = filteredProducts.filter(product => 
+    const searchTerm = query.toLowerCase();
+    filteredProducts = filteredProducts.filter(product =>
       product.partNumber.toLowerCase().includes(searchTerm) ||
       product.title.toLowerCase().includes(searchTerm) ||
       product.shortDescription.toLowerCase().includes(searchTerm) ||
       product.brand.name.toLowerCase().includes(searchTerm) ||
       product.tags.some(tag => tag.toLowerCase().includes(searchTerm))
-    )
+    );
   }
 
   // Brand filter
   if (filters.brand) {
-    filteredProducts = filteredProducts.filter(product => 
+    filteredProducts = filteredProducts.filter(product =>
       product.brand.slug === filters.brand
-    )
+    );
   }
 
   // Category filter
   if (filters.category) {
-    filteredProducts = filteredProducts.filter(product => 
+    filteredProducts = filteredProducts.filter(product =>
       product.category.slug === filters.category
-    )
+    );
   }
 
   // Price range filter
   if (filters.priceRange) {
-    const [minPrice, maxPrice] = filters.priceRange
+    const [minPrice, maxPrice] = filters.priceRange;
     filteredProducts = filteredProducts.filter(product => {
-      const price = product.pricing.tiers[0]?.price || 0
-      return price >= minPrice && price <= maxPrice
-    })
+      const price = product.pricing.tiers[0]?.price || 0;
+      return price >= minPrice && price <= maxPrice;
+    });
   }
 
   // In stock filter
   if (filters.inStock) {
-    filteredProducts = filteredProducts.filter(product => 
+    filteredProducts = filteredProducts.filter(product =>
       product.inventory.status === 'in_stock'
-    )
+    );
   }
 
-  return filteredProducts
-}
+  return filteredProducts;
+};
 
 export const getProductsByBrand = (brandSlug: string): Product[] => {
-  return mockProducts.filter(product => 
+  return mockProducts.filter(product =>
     product.brand.slug === brandSlug && product.isActive
-  )
-}
+  );
+};
 
 export const getProductsByCategory = (categorySlug: string): Product[] => {
-  return mockProducts.filter(product => 
+  return mockProducts.filter(product =>
     product.category.slug === categorySlug && product.isActive
-  )
-}
+  );
+};
 
 export const getFeaturedProducts = (): Product[] => {
-  return mockProducts.filter(product => 
+  return mockProducts.filter(product =>
     product.isFeatured && product.isActive
-  )
-}
+  );
+};
 
 export const getNewProducts = (): Product[] => {
-  return mockProducts.filter(product => 
+  return mockProducts.filter(product =>
     product.isNew && product.isActive
-  )
-}
+  );
+};
 
 export const getProductById = (id: string): Product | undefined => {
-  return mockProducts.find(product => product.id === id && product.isActive)
-}
+  return mockProducts.find(product => product.id === id && product.isActive);
+};
 
 export const getProductByPartNumber = (partNumber: string): Product | undefined => {
-  return mockProducts.find(product => 
+  return mockProducts.find(product =>
     product.partNumber === partNumber && product.isActive
-  )
-}
+  );
+};
 
 export const getProductStats = () => {
-  const activeProducts = mockProducts.filter(p => p.isActive)
-  const inStockProducts = activeProducts.filter(p => p.inventory.status === 'in_stock')
-  const brands = new Set(activeProducts.map(p => p.brand.slug))
-  const categories = new Set(activeProducts.map(p => p.category.slug))
-  
+  const activeProducts = mockProducts.filter(p => p.isActive);
+  const inStockProducts = activeProducts.filter(p => p.inventory.status === 'in_stock');
+  const brands = new Set(activeProducts.map(p => p.brand.slug));
+  const categories = new Set(activeProducts.map(p => p.category.slug));
+
   return {
     total: activeProducts.length,
     inStock: inStockProducts.length,
@@ -439,5 +439,5 @@ export const getProductStats = () => {
     categories: categories.size,
     featured: activeProducts.filter(p => p.isFeatured).length,
     new: activeProducts.filter(p => p.isNew).length
-  }
-}
+  };
+};

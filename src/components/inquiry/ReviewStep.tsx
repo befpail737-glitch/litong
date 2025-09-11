@@ -1,11 +1,7 @@
-'use client'
+'use client';
 
-import { useInquiry } from '@/contexts/InquiryContext'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { 
-  Eye, 
+import {
+  Eye,
   Package,
   Building,
   FolderOpen,
@@ -17,19 +13,24 @@ import {
   Mail,
   Phone,
   MapPin
-} from 'lucide-react'
+} from 'lucide-react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useInquiry } from '@/contexts/InquiryContext';
 
 export function ReviewStep() {
-  const { state, setCurrentStep } = useInquiry()
-  const { currentInquiry } = state
-  const { products, companyInfo, projectInfo } = currentInquiry
+  const { state, setCurrentStep } = useInquiry();
+  const { currentInquiry } = state;
+  const { products, companyInfo, projectInfo } = currentInquiry;
 
   // 紧急程度配置
   const urgencyConfig = {
     standard: { label: '标准', color: 'bg-gray-100 text-gray-800' },
     urgent: { label: '紧急', color: 'bg-orange-100 text-orange-800' },
     very_urgent: { label: '非常紧急', color: 'bg-red-100 text-red-800' }
-  }
+  };
 
   // 公司规模标签
   const companySizeLabels = {
@@ -38,12 +39,12 @@ export function ReviewStep() {
     medium: '中型企业 (51-200人)',
     large: '大型企业 (201-1000人)',
     enterprise: '集团企业 (1000人以上)'
-  }
+  };
 
   // 检查完整性
-  const isProductsComplete = products.length > 0
-  const isCompanyComplete = !!(companyInfo.companyName && companyInfo.contactPerson && companyInfo.email && companyInfo.phone)
-  const totalProducts = products.reduce((sum, p) => sum + p.quantity, 0)
+  const isProductsComplete = products.length > 0;
+  const isCompanyComplete = !!(companyInfo.companyName && companyInfo.contactPerson && companyInfo.email && companyInfo.phone);
+  const totalProducts = products.reduce((sum, p) => sum + p.quantity, 0);
 
   return (
     <div className="space-y-6">
@@ -80,8 +81,8 @@ export function ReviewStep() {
                 <Badge className={isProductsComplete ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
                   {isProductsComplete ? '已完成' : '待完善'}
                 </Badge>
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   size="sm"
                   onClick={() => setCurrentStep('products')}
                 >
@@ -89,7 +90,7 @@ export function ReviewStep() {
                 </Button>
               </div>
             </div>
-            
+
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div className="flex items-center gap-3">
                 <Building className="h-5 w-5 text-blue-600" />
@@ -104,8 +105,8 @@ export function ReviewStep() {
                 <Badge className={isCompanyComplete ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
                   {isCompanyComplete ? '已完成' : '待完善'}
                 </Badge>
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   size="sm"
                   onClick={() => setCurrentStep('company')}
                 >
@@ -113,7 +114,7 @@ export function ReviewStep() {
                 </Button>
               </div>
             </div>
-            
+
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div className="flex items-center gap-3">
                 <FolderOpen className="h-5 w-5 text-blue-600" />
@@ -126,8 +127,8 @@ export function ReviewStep() {
               </div>
               <div className="flex items-center gap-2">
                 <Badge className="bg-blue-100 text-blue-800">可选</Badge>
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   size="sm"
                   onClick={() => setCurrentStep('project')}
                 >
@@ -136,7 +137,7 @@ export function ReviewStep() {
               </div>
             </div>
           </div>
-          
+
           {!isProductsComplete || !isCompanyComplete ? (
             <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
               <div className="flex items-center gap-2">
@@ -158,8 +159,8 @@ export function ReviewStep() {
               <Package className="h-5 w-5" />
               产品清单 ({products.length})
             </CardTitle>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="sm"
               onClick={() => setCurrentStep('products')}
             >
@@ -208,8 +209,8 @@ export function ReviewStep() {
               <Building className="h-5 w-5" />
               公司信息
             </CardTitle>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="sm"
               onClick={() => setCurrentStep('company')}
             >
@@ -227,13 +228,13 @@ export function ReviewStep() {
                   <p className="font-medium">{companyInfo.companyName || '待填写'}</p>
                   <p className="text-sm text-gray-600">
                     {companyInfo.industry || '未指定行业'}
-                    {companyInfo.companySize && companySizeLabels[companyInfo.companySize as keyof typeof companySizeLabels] && 
+                    {companyInfo.companySize && companySizeLabels[companyInfo.companySize as keyof typeof companySizeLabels] &&
                       ` · ${companySizeLabels[companyInfo.companySize as keyof typeof companySizeLabels]}`
                     }
                   </p>
                 </div>
               </div>
-              
+
               {companyInfo.address && (
                 <div className="flex items-start gap-3">
                   <MapPin className="h-5 w-5 text-gray-400 mt-0.5" />
@@ -243,7 +244,7 @@ export function ReviewStep() {
                 </div>
               )}
             </div>
-            
+
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <User className="h-5 w-5 text-gray-400" />
@@ -252,12 +253,12 @@ export function ReviewStep() {
                   <p className="text-sm text-gray-600">{companyInfo.position || '未指定职位'}</p>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-3">
                 <Mail className="h-5 w-5 text-gray-400" />
                 <p className="text-sm">{companyInfo.email || '待填写'}</p>
               </div>
-              
+
               <div className="flex items-center gap-3">
                 <Phone className="h-5 w-5 text-gray-400" />
                 <p className="text-sm">{companyInfo.phone || '待填写'}</p>
@@ -276,8 +277,8 @@ export function ReviewStep() {
                 <FolderOpen className="h-5 w-5" />
                 项目信息
               </CardTitle>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={() => setCurrentStep('project')}
               >
@@ -294,14 +295,14 @@ export function ReviewStep() {
                   <p className="text-sm">{projectInfo.projectName}</p>
                 </div>
               )}
-              
+
               {projectInfo.projectDescription && (
                 <div>
                   <p className="font-medium text-gray-700">项目描述</p>
                   <p className="text-sm">{projectInfo.projectDescription}</p>
                 </div>
               )}
-              
+
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
                 {projectInfo.expectedVolume && (
                   <div>
@@ -309,21 +310,21 @@ export function ReviewStep() {
                     <p className="text-sm">{projectInfo.expectedVolume.toLocaleString()} PCS</p>
                   </div>
                 )}
-                
+
                 {projectInfo.targetPrice && (
                   <div>
                     <p className="font-medium text-gray-700 text-sm">目标单价</p>
                     <p className="text-sm">¥{projectInfo.targetPrice}</p>
                   </div>
                 )}
-                
+
                 {projectInfo.timeline && (
                   <div>
                     <p className="font-medium text-gray-700 text-sm">交付时间</p>
                     <p className="text-sm">{projectInfo.timeline}</p>
                   </div>
                 )}
-                
+
                 {projectInfo.budget && (
                   <div>
                     <p className="font-medium text-gray-700 text-sm">预算范围</p>
@@ -331,7 +332,7 @@ export function ReviewStep() {
                   </div>
                 )}
               </div>
-              
+
               {projectInfo.certificationRequirements && projectInfo.certificationRequirements.length > 0 && (
                 <div>
                   <p className="font-medium text-gray-700 mb-2">认证要求</p>
@@ -375,5 +376,5 @@ export function ReviewStep() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

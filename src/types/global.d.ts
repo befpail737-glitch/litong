@@ -6,18 +6,18 @@ declare global {
       NEXT_PUBLIC_SITE_URL: string;
       NEXT_PUBLIC_SITE_NAME: string;
       NEXT_PUBLIC_SITE_DESCRIPTION: string;
-      
+
       // Sanity CMS
       NEXT_PUBLIC_SANITY_PROJECT_ID: string;
       NEXT_PUBLIC_SANITY_DATASET: string;
       SANITY_API_TOKEN: string;
       SANITY_PREVIEW_SECRET: string;
       SANITY_STUDIO_PREVIEW_URL: string;
-      
+
       // 分析工具
       NEXT_PUBLIC_GA_ID?: string;
       VERCEL_ANALYTICS_ID?: string;
-      
+
       // 其他配置
       DATABASE_URL?: string;
       REDIS_URL?: string;

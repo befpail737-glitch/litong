@@ -7,25 +7,25 @@ export interface Logger {
 
 class ConsoleLogger implements Logger {
   info(message: string, ...args: any[]): void {
-    console.log(`[INFO] ${message}`, ...args)
+    console.log(`[INFO] ${message}`, ...args);
   }
 
   warn(message: string, ...args: any[]): void {
-    console.warn(`[WARN] ${message}`, ...args)
+    console.warn(`[WARN] ${message}`, ...args);
   }
 
   error(message: string, ...args: any[]): void {
-    console.error(`[ERROR] ${message}`, ...args)
+    console.error(`[ERROR] ${message}`, ...args);
   }
 
   debug(message: string, ...args: any[]): void {
     if (process.env.NODE_ENV === 'development') {
-      console.debug(`[DEBUG] ${message}`, ...args)
+      console.debug(`[DEBUG] ${message}`, ...args);
     }
   }
 }
 
-export const logger: Logger = new ConsoleLogger()
+export const logger: Logger = new ConsoleLogger();
 
 export interface APIRequestLog {
   method: string
@@ -42,15 +42,15 @@ export async function logAPIRequest(data: APIRequestLog): Promise<void> {
   const logData = {
     ...data,
     timestamp: data.timestamp || new Date()
-  }
+  };
 
   if (data.error) {
-    logger.error(`API ${data.method} ${data.url} - Status: ${data.statusCode} - Duration: ${data.duration}ms - Error: ${data.error}`, logData)
+    logger.error(`API ${data.method} ${data.url} - Status: ${data.statusCode} - Duration: ${data.duration}ms - Error: ${data.error}`, logData);
   } else if (data.statusCode >= 400) {
-    logger.warn(`API ${data.method} ${data.url} - Status: ${data.statusCode} - Duration: ${data.duration}ms`, logData)
+    logger.warn(`API ${data.method} ${data.url} - Status: ${data.statusCode} - Duration: ${data.duration}ms`, logData);
   } else {
-    logger.info(`API ${data.method} ${data.url} - Status: ${data.statusCode} - Duration: ${data.duration}ms`, logData)
+    logger.info(`API ${data.method} ${data.url} - Status: ${data.statusCode} - Duration: ${data.duration}ms`, logData);
   }
 }
 
-export default logger
+export default logger;

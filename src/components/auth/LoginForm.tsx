@@ -1,14 +1,17 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Alert } from '@/components/ui/alert'
-import { useAuth } from '@/contexts/AuthContext'
-import { Mail, Lock, Eye, EyeOff, LogIn } from 'lucide-react'
+import { useState } from 'react';
+
+import { useRouter } from 'next/navigation';
+
+import { Mail, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
+
+import { Alert } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface LoginFormProps {
   onSuccess?: () => void
@@ -21,42 +24,42 @@ export function LoginForm({ onSuccess, redirectTo = '/', showRegisterLink = true
     email: '',
     password: '',
     rememberMe: false
-  })
-  const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { login } = useAuth()
-  const router = useRouter()
+  const { login } = useAuth();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setIsLoading(true)
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
 
     try {
-      const result = await login(formData.email, formData.password)
-      
+      const result = await login(formData.email, formData.password);
+
       if (result.success) {
-        onSuccess?.()
-        router.push(redirectTo)
+        onSuccess?.();
+        router.push(redirectTo);
       } else {
-        setError(result.error || '登录失败')
+        setError(result.error || '登录失败');
       }
     } catch (err) {
-      setError('登录失败，请重试')
+      setError('登录失败，请重试');
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleInputChange = (field: keyof typeof formData) => (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const value = field === 'rememberMe' ? e.target.checked : e.target.value
-    setFormData(prev => ({ ...prev, [field]: value }))
-    if (error) setError('') // 清除错误信息
-  }
+    const value = field === 'rememberMe' ? e.target.checked : e.target.value;
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (error) setError(''); // 清除错误信息
+  };
 
   return (
     <Card className="w-full max-w-md mx-auto">
@@ -69,7 +72,7 @@ export function LoginForm({ onSuccess, redirectTo = '/', showRegisterLink = true
           登录力通电子，享受专业服务
         </p>
       </CardHeader>
-      
+
       <CardContent>
         {error && (
           <Alert className="mb-4 border-red-200 bg-red-50 text-red-800">
@@ -132,7 +135,7 @@ export function LoginForm({ onSuccess, redirectTo = '/', showRegisterLink = true
               <Checkbox
                 id="rememberMe"
                 checked={formData.rememberMe}
-                onCheckedChange={(checked) => 
+                onCheckedChange={(checked) =>
                   setFormData(prev => ({ ...prev, rememberMe: checked as boolean }))
                 }
                 disabled={isLoading}
@@ -195,5 +198,5 @@ export function LoginForm({ onSuccess, redirectTo = '/', showRegisterLink = true
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

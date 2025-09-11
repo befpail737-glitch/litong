@@ -1,10 +1,12 @@
-'use client'
+'use client';
 
-import { useState, useRef } from 'react'
-import { Search, X } from 'lucide-react'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
+import { useState, useRef } from 'react';
+
+import { Search, X } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 
 interface SearchBoxProps {
   placeholder?: string
@@ -25,31 +27,31 @@ export function SearchBox({
   showClearButton = true,
   autoFocus = false,
 }: SearchBoxProps) {
-  const [query, setQuery] = useState('')
-  const inputRef = useRef<HTMLInputElement>(null)
+  const [query, setQuery] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const sizeClasses = {
     sm: 'h-8 text-sm',
     md: 'h-10 text-sm',
     lg: 'h-12 text-base',
-  }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (query.trim()) {
-      onSearch?.(query.trim())
+      onSearch?.(query.trim());
     }
-  }
+  };
 
   const handleClear = () => {
-    setQuery('')
-    onClear?.()
-    inputRef.current?.focus()
-  }
+    setQuery('');
+    onClear?.();
+    inputRef.current?.focus();
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setQuery(e.target.value)
-  }
+    setQuery(e.target.value);
+  };
 
   return (
     <form onSubmit={handleSubmit} className={cn('relative', className)}>
@@ -89,5 +91,5 @@ export function SearchBox({
         </Button>
       </div>
     </form>
-  )
+  );
 }

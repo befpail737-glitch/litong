@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { createContext, useContext, useReducer, useEffect, ReactNode } from 'react'
+import { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
 
 // 询价产品项
 export interface InquiryProduct {
@@ -106,19 +106,19 @@ interface InquiryState {
     currentStep: InquiryFormStep
     isSubmitting: boolean
   }
-  
+
   // 询价历史
   inquiryHistory: InquiryRecord[]
-  
+
   // 草稿询价
   drafts: InquiryRecord[]
-  
+
   // 公司信息模板（用于快速填写）
   companyTemplates: CompanyInfo[]
-  
+
   // 常用产品（快速添加）
   favoriteProducts: InquiryProduct[]
-  
+
   // UI状态
   isLoading: boolean
   error: string | null
@@ -158,7 +158,7 @@ const initialState: InquiryState = {
   favoriteProducts: [],
   isLoading: false,
   error: null
-}
+};
 
 // Reducer
 function inquiryReducer(state: InquiryState, action: InquiryAction): InquiryState {
@@ -170,8 +170,8 @@ function inquiryReducer(state: InquiryState, action: InquiryAction): InquiryStat
           ...state.currentInquiry,
           products: [...state.currentInquiry.products, action.product]
         }
-      }
-      
+      };
+
     case 'REMOVE_PRODUCT':
       return {
         ...state,
@@ -179,19 +179,19 @@ function inquiryReducer(state: InquiryState, action: InquiryAction): InquiryStat
           ...state.currentInquiry,
           products: state.currentInquiry.products.filter(p => p.id !== action.productId)
         }
-      }
-      
+      };
+
     case 'UPDATE_PRODUCT':
       return {
         ...state,
         currentInquiry: {
           ...state.currentInquiry,
-          products: state.currentInquiry.products.map(p => 
+          products: state.currentInquiry.products.map(p =>
             p.id === action.productId ? { ...p, ...action.updates } : p
           )
         }
-      }
-      
+      };
+
     case 'UPDATE_COMPANY_INFO':
       return {
         ...state,
@@ -199,8 +199,8 @@ function inquiryReducer(state: InquiryState, action: InquiryAction): InquiryStat
           ...state.currentInquiry,
           companyInfo: { ...state.currentInquiry.companyInfo, ...action.companyInfo }
         }
-      }
-      
+      };
+
     case 'UPDATE_PROJECT_INFO':
       return {
         ...state,
@@ -208,8 +208,8 @@ function inquiryReducer(state: InquiryState, action: InquiryAction): InquiryStat
           ...state.currentInquiry,
           projectInfo: { ...state.currentInquiry.projectInfo, ...action.projectInfo }
         }
-      }
-      
+      };
+
     case 'SET_CURRENT_STEP':
       return {
         ...state,
@@ -217,8 +217,8 @@ function inquiryReducer(state: InquiryState, action: InquiryAction): InquiryStat
           ...state.currentInquiry,
           currentStep: action.step
         }
-      }
-      
+      };
+
     case 'IMPORT_BOM':
       return {
         ...state,
@@ -226,14 +226,14 @@ function inquiryReducer(state: InquiryState, action: InquiryAction): InquiryStat
           ...state.currentInquiry,
           products: [...state.currentInquiry.products, ...action.products]
         }
-      }
-      
+      };
+
     case 'SAVE_DRAFT':
       return {
         ...state,
         drafts: [action.inquiry, ...state.drafts.filter(d => d.id !== action.inquiry.id)]
-      }
-      
+      };
+
     case 'LOAD_DRAFT':
       return {
         ...state,
@@ -244,54 +244,54 @@ function inquiryReducer(state: InquiryState, action: InquiryAction): InquiryStat
           currentStep: 'products',
           isSubmitting: false
         }
-      }
-      
+      };
+
     case 'SUBMIT_INQUIRY':
       return {
         ...state,
         inquiryHistory: [action.inquiry, ...state.inquiryHistory],
         drafts: state.drafts.filter(d => d.id !== action.inquiry.id),
         currentInquiry: initialState.currentInquiry
-      }
-      
+      };
+
     case 'LOAD_INQUIRY_HISTORY':
       return {
         ...state,
         inquiryHistory: action.inquiries
-      }
-      
+      };
+
     case 'ADD_COMPANY_TEMPLATE':
       return {
         ...state,
         companyTemplates: [action.template, ...state.companyTemplates.slice(0, 4)] // 最多保存5个模板
-      }
-      
+      };
+
     case 'ADD_FAVORITE_PRODUCT':
       return {
         ...state,
         favoriteProducts: [action.product, ...state.favoriteProducts.slice(0, 9)] // 最多保存10个常用产品
-      }
-      
+      };
+
     case 'SET_LOADING':
       return {
         ...state,
         isLoading: action.loading
-      }
-      
+      };
+
     case 'SET_ERROR':
       return {
         ...state,
         error: action.error
-      }
-      
+      };
+
     case 'CLEAR_CURRENT_INQUIRY':
       return {
         ...state,
         currentInquiry: initialState.currentInquiry
-      }
-      
+      };
+
     default:
-      return state
+      return state;
   }
 }
 
@@ -311,86 +311,86 @@ const InquiryContext = createContext<{
   loadDraft: (draftId: string) => void
   submitInquiry: () => Promise<void>
   clearCurrentInquiry: () => void
-} | null>(null)
+} | null>(null);
 
 // Provider组件
 export function InquiryProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(inquiryReducer, initialState)
+  const [state, dispatch] = useReducer(inquiryReducer, initialState);
 
   // 从localStorage加载数据
   useEffect(() => {
     const loadStoredData = () => {
       try {
-        const storedHistory = localStorage.getItem('inquiry_history')
+        const storedHistory = localStorage.getItem('inquiry_history');
         if (storedHistory) {
-          const history = JSON.parse(storedHistory)
-          dispatch({ type: 'LOAD_INQUIRY_HISTORY', inquiries: history })
+          const history = JSON.parse(storedHistory);
+          dispatch({ type: 'LOAD_INQUIRY_HISTORY', inquiries: history });
         }
 
-        const storedDrafts = localStorage.getItem('inquiry_drafts')
+        const storedDrafts = localStorage.getItem('inquiry_drafts');
         if (storedDrafts) {
-          const drafts = JSON.parse(storedDrafts)
+          const drafts = JSON.parse(storedDrafts);
           drafts.forEach((draft: InquiryRecord) => {
-            dispatch({ type: 'SAVE_DRAFT', inquiry: draft })
-          })
+            dispatch({ type: 'SAVE_DRAFT', inquiry: draft });
+          });
         }
 
-        const storedTemplates = localStorage.getItem('company_templates')
+        const storedTemplates = localStorage.getItem('company_templates');
         if (storedTemplates) {
-          const templates = JSON.parse(storedTemplates)
+          const templates = JSON.parse(storedTemplates);
           templates.forEach((template: CompanyInfo) => {
-            dispatch({ type: 'ADD_COMPANY_TEMPLATE', template })
-          })
+            dispatch({ type: 'ADD_COMPANY_TEMPLATE', template });
+          });
         }
 
-        const storedFavorites = localStorage.getItem('favorite_products')
+        const storedFavorites = localStorage.getItem('favorite_products');
         if (storedFavorites) {
-          const favorites = JSON.parse(storedFavorites)
+          const favorites = JSON.parse(storedFavorites);
           favorites.forEach((product: InquiryProduct) => {
-            dispatch({ type: 'ADD_FAVORITE_PRODUCT', product })
-          })
+            dispatch({ type: 'ADD_FAVORITE_PRODUCT', product });
+          });
         }
       } catch (error) {
-        console.error('Failed to load stored inquiry data:', error)
+        console.error('Failed to load stored inquiry data:', error);
       }
-    }
+    };
 
-    loadStoredData()
-  }, [])
+    loadStoredData();
+  }, []);
 
   // 保存数据到localStorage
   useEffect(() => {
-    localStorage.setItem('inquiry_history', JSON.stringify(state.inquiryHistory))
-  }, [state.inquiryHistory])
+    localStorage.setItem('inquiry_history', JSON.stringify(state.inquiryHistory));
+  }, [state.inquiryHistory]);
 
   useEffect(() => {
-    localStorage.setItem('inquiry_drafts', JSON.stringify(state.drafts))
-  }, [state.drafts])
+    localStorage.setItem('inquiry_drafts', JSON.stringify(state.drafts));
+  }, [state.drafts]);
 
   useEffect(() => {
-    localStorage.setItem('company_templates', JSON.stringify(state.companyTemplates))
-  }, [state.companyTemplates])
+    localStorage.setItem('company_templates', JSON.stringify(state.companyTemplates));
+  }, [state.companyTemplates]);
 
   useEffect(() => {
-    localStorage.setItem('favorite_products', JSON.stringify(state.favoriteProducts))
-  }, [state.favoriteProducts])
+    localStorage.setItem('favorite_products', JSON.stringify(state.favoriteProducts));
+  }, [state.favoriteProducts]);
 
   // 便捷方法
   const addProduct = (product: InquiryProduct) => {
-    dispatch({ type: 'ADD_PRODUCT', product })
-  }
+    dispatch({ type: 'ADD_PRODUCT', product });
+  };
 
   const removeProduct = (productId: string) => {
-    dispatch({ type: 'REMOVE_PRODUCT', productId })
-  }
+    dispatch({ type: 'REMOVE_PRODUCT', productId });
+  };
 
   const updateProduct = (productId: string, updates: Partial<InquiryProduct>) => {
-    dispatch({ type: 'UPDATE_PRODUCT', productId, updates })
-  }
+    dispatch({ type: 'UPDATE_PRODUCT', productId, updates });
+  };
 
   const updateCompanyInfo = (companyInfo: Partial<CompanyInfo>) => {
-    dispatch({ type: 'UPDATE_COMPANY_INFO', companyInfo })
-    
+    dispatch({ type: 'UPDATE_COMPANY_INFO', companyInfo });
+
     // 如果公司信息完整，保存为模板
     if (companyInfo.companyName && companyInfo.email && companyInfo.contactPerson) {
       const template: CompanyInfo = {
@@ -400,45 +400,45 @@ export function InquiryProvider({ children }: { children: ReactNode }) {
         phone: companyInfo.phone || '',
         position: companyInfo.position || '',
         ...companyInfo
-      }
-      dispatch({ type: 'ADD_COMPANY_TEMPLATE', template })
+      };
+      dispatch({ type: 'ADD_COMPANY_TEMPLATE', template });
     }
-  }
+  };
 
   const updateProjectInfo = (projectInfo: Partial<ProjectInfo>) => {
-    dispatch({ type: 'UPDATE_PROJECT_INFO', projectInfo })
-  }
+    dispatch({ type: 'UPDATE_PROJECT_INFO', projectInfo });
+  };
 
   const setCurrentStep = (step: InquiryFormStep) => {
-    dispatch({ type: 'SET_CURRENT_STEP', step })
-  }
+    dispatch({ type: 'SET_CURRENT_STEP', step });
+  };
 
   const importBOM = async (file: File): Promise<BOMParseResult> => {
-    dispatch({ type: 'SET_LOADING', loading: true })
-    
+    dispatch({ type: 'SET_LOADING', loading: true });
+
     try {
       // 这里实现BOM文件解析逻辑
       // 支持CSV, Excel格式
-      const result = await parseBOMFile(file)
-      
+      const result = await parseBOMFile(file);
+
       if (result.success) {
-        dispatch({ type: 'IMPORT_BOM', products: result.products })
+        dispatch({ type: 'IMPORT_BOM', products: result.products });
       }
-      
-      return result
+
+      return result;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : '解析BOM文件失败'
-      dispatch({ type: 'SET_ERROR', error: errorMessage })
+      const errorMessage = error instanceof Error ? error.message : '解析BOM文件失败';
+      dispatch({ type: 'SET_ERROR', error: errorMessage });
       return {
         success: false,
         products: [],
         errors: [{ row: 0, message: errorMessage }],
         warnings: []
-      }
+      };
     } finally {
-      dispatch({ type: 'SET_LOADING', loading: false })
+      dispatch({ type: 'SET_LOADING', loading: false });
     }
-  }
+  };
 
   const saveDraft = async () => {
     const draft: InquiryRecord = {
@@ -450,21 +450,21 @@ export function InquiryProvider({ children }: { children: ReactNode }) {
       status: 'draft',
       totalItems: state.currentInquiry.products.length,
       submittedAt: new Date()
-    }
-    
-    dispatch({ type: 'SAVE_DRAFT', inquiry: draft })
-  }
+    };
+
+    dispatch({ type: 'SAVE_DRAFT', inquiry: draft });
+  };
 
   const loadDraft = (draftId: string) => {
-    const draft = state.drafts.find(d => d.id === draftId)
+    const draft = state.drafts.find(d => d.id === draftId);
     if (draft) {
-      dispatch({ type: 'LOAD_DRAFT', inquiry: draft })
+      dispatch({ type: 'LOAD_DRAFT', inquiry: draft });
     }
-  }
+  };
 
   const submitInquiry = async () => {
-    dispatch({ type: 'SET_LOADING', loading: true })
-    
+    dispatch({ type: 'SET_LOADING', loading: true });
+
     try {
       const inquiry: InquiryRecord = {
         id: `inquiry_${Date.now()}`,
@@ -476,24 +476,24 @@ export function InquiryProvider({ children }: { children: ReactNode }) {
         totalItems: state.currentInquiry.products.length,
         submittedAt: new Date(),
         expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30天后过期
-      }
-      
+      };
+
       // 这里会调用API提交询价
       // await submitInquiryAPI(inquiry)
-      
-      dispatch({ type: 'SUBMIT_INQUIRY', inquiry })
-      dispatch({ type: 'SET_ERROR', error: null })
+
+      dispatch({ type: 'SUBMIT_INQUIRY', inquiry });
+      dispatch({ type: 'SET_ERROR', error: null });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : '提交询价失败'
-      dispatch({ type: 'SET_ERROR', error: errorMessage })
+      const errorMessage = error instanceof Error ? error.message : '提交询价失败';
+      dispatch({ type: 'SET_ERROR', error: errorMessage });
     } finally {
-      dispatch({ type: 'SET_LOADING', loading: false })
+      dispatch({ type: 'SET_LOADING', loading: false });
     }
-  }
+  };
 
   const clearCurrentInquiry = () => {
-    dispatch({ type: 'CLEAR_CURRENT_INQUIRY' })
-  }
+    dispatch({ type: 'CLEAR_CURRENT_INQUIRY' });
+  };
 
   return (
     <InquiryContext.Provider
@@ -515,84 +515,84 @@ export function InquiryProvider({ children }: { children: ReactNode }) {
     >
       {children}
     </InquiryContext.Provider>
-  )
+  );
 }
 
 // Hook
 export function useInquiry() {
-  const context = useContext(InquiryContext)
+  const context = useContext(InquiryContext);
   if (!context) {
-    throw new Error('useInquiry must be used within an InquiryProvider')
+    throw new Error('useInquiry must be used within an InquiryProvider');
   }
-  return context
+  return context;
 }
 
 // BOM文件解析函数
 async function parseBOMFile(file: File): Promise<BOMParseResult> {
   return new Promise((resolve) => {
-    const reader = new FileReader()
-    
+    const reader = new FileReader();
+
     reader.onload = (e) => {
       try {
-        const content = e.target?.result as string
-        const lines = content.split('\n').filter(line => line.trim())
-        
+        const content = e.target?.result as string;
+        const lines = content.split('\n').filter(line => line.trim());
+
         if (lines.length < 2) {
           resolve({
             success: false,
             products: [],
             errors: [{ row: 0, message: '文件内容不足，至少需要标题行和一行数据' }],
             warnings: []
-          })
-          return
+          });
+          return;
         }
-        
-        const headers = lines[0].split(',').map(h => h.trim().toLowerCase())
-        const products: InquiryProduct[] = []
-        const errors: Array<{ row: number; message: string }> = []
-        const warnings: Array<{ row: number; message: string }> = []
-        
+
+        const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+        const products: InquiryProduct[] = [];
+        const errors: Array<{ row: number; message: string }> = [];
+        const warnings: Array<{ row: number; message: string }> = [];
+
         // 检查必需的列
-        const requiredColumns = ['part_number', 'quantity']
-        const missingColumns = requiredColumns.filter(col => !headers.includes(col) && !headers.includes(col.replace('_', '')))
-        
+        const requiredColumns = ['part_number', 'quantity'];
+        const missingColumns = requiredColumns.filter(col => !headers.includes(col) && !headers.includes(col.replace('_', '')));
+
         if (missingColumns.length > 0) {
           resolve({
             success: false,
             products: [],
             errors: [{ row: 0, message: `缺少必需的列: ${missingColumns.join(', ')}` }],
             warnings: []
-          })
-          return
+          });
+          return;
         }
-        
+
         // 解析数据行
         for (let i = 1; i < lines.length; i++) {
-          const values = lines[i].split(',').map(v => v.trim())
-          
+          const values = lines[i].split(',').map(v => v.trim());
+
           if (values.length !== headers.length) {
-            errors.push({ row: i + 1, message: '列数不匹配' })
-            continue
+            errors.push({ row: i + 1, message: '列数不匹配' });
+            continue;
           }
-          
-          const rowData: Record<string, string> = {}
+
+          const rowData: Record<string, string> = {};
           headers.forEach((header, index) => {
-            rowData[header] = values[index]
-          })
-          
+            rowData[header] = values[index];
+          });
+
           // 解析产品数据
-          const partNumber = rowData['part_number'] || rowData['partnumber'] || rowData['model']
-          const quantity = parseInt(rowData['quantity'] || rowData['qty'] || '1')
-          
+          const partNumber = rowData['part_number'] || rowData['partnumber'] || rowData['model'];
+          const quantity = parseInt(rowData['quantity'] || rowData['qty'] || '1');
+
           if (!partNumber) {
-            errors.push({ row: i + 1, message: '缺少零件号' })
-            continue
+            errors.push({ row: i + 1, message: '缺少零件号' });
+            continue;
           }
-          
+
           if (!quantity || quantity <= 0) {
-            warnings.push({ row: i + 1, message: '数量无效，已设置为1' })
+            warnings.push({ row: i + 1, message: '数量无效，已设置为1' });
           }
-          
+
           const product: InquiryProduct = {
             id: `bom_${Date.now()}_${i}`,
             productId: partNumber,
@@ -605,43 +605,43 @@ async function parseBOMFile(file: File): Promise<BOMParseResult> {
             urgency: 'standard',
             description: rowData['remarks'] || rowData['notes'],
             specifications: {}
-          }
-          
+          };
+
           // 添加其他规格信息
           Object.entries(rowData).forEach(([key, value]) => {
             if (!['part_number', 'partnumber', 'model', 'quantity', 'qty', 'description', 'name', 'manufacturer', 'brand', 'category', 'remarks', 'notes'].includes(key) && value) {
-              product.specifications![key] = value
+              product.specifications![key] = value;
             }
-          })
-          
-          products.push(product)
+          });
+
+          products.push(product);
         }
-        
+
         resolve({
           success: errors.length === 0,
           products,
           errors,
           warnings
-        })
+        });
       } catch (error) {
         resolve({
           success: false,
           products: [],
           errors: [{ row: 0, message: '解析文件失败' }],
           warnings: []
-        })
+        });
       }
-    }
-    
+    };
+
     reader.onerror = () => {
       resolve({
         success: false,
         products: [],
         errors: [{ row: 0, message: '读取文件失败' }],
         warnings: []
-      })
-    }
-    
-    reader.readAsText(file)
-  })
+      });
+    };
+
+    reader.readAsText(file);
+  });
 }

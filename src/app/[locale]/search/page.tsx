@@ -1,12 +1,10 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useSearch } from '@/contexts/SearchContext'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { 
+import { useEffect, useState } from 'react';
+
+import { useRouter } from 'next/navigation';
+
+import {
   Search,
   Filter,
   Grid,
@@ -20,23 +18,28 @@ import {
   ExternalLink,
   ShoppingCart,
   Heart
-} from 'lucide-react'
+} from 'lucide-react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useSearch } from '@/contexts/SearchContext';
 
 export default function SearchPage() {
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
-  const [showFilters, setShowFilters] = useState(false)
-  const { 
-    searchQuery, 
-    searchResults, 
-    isLoading, 
-    error, 
-    sortBy, 
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [showFilters, setShowFilters] = useState(false);
+  const {
+    searchQuery,
+    searchResults,
+    isLoading,
+    error,
+    sortBy,
     updateSort,
     formatPrice,
     formatStock,
     getSortText
-  } = useSearch()
-  const router = useRouter()
+  } = useSearch();
+  const router = useRouter();
 
   // 如果没有搜索结果，显示搜索提示
   if (!searchResults && !isLoading && !searchQuery) {
@@ -58,7 +61,7 @@ export default function SearchPage() {
           </Button>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -102,7 +105,7 @@ export default function SearchPage() {
           >
             <List className="h-4 w-4" />
           </Button>
-          
+
           <select
             value={sortBy}
             onChange={(e) => updateSort(e.target.value as any)}
@@ -185,7 +188,7 @@ export default function SearchPage() {
                       </div>
                     </div>
                   </CardHeader>
-                  
+
                   <CardContent className="space-y-4">
                     <p className="text-sm text-gray-600 line-clamp-2">
                       {product.description}
@@ -215,8 +218,8 @@ export default function SearchPage() {
                         )}
                       </div>
                       <div className="text-right">
-                        <Badge 
-                          variant={product.stock > 0 ? "default" : "secondary"}
+                        <Badge
+                          variant={product.stock > 0 ? 'default' : 'secondary'}
                           className="text-xs"
                         >
                           {formatStock(product.stock)}
@@ -254,34 +257,34 @@ export default function SearchPage() {
           {/* 分页 */}
           {searchResults.totalPages > 1 && (
             <div className="flex items-center justify-center gap-2 mt-8">
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 disabled={searchResults.page === 1}
               >
                 上一页
               </Button>
-              
+
               <div className="flex items-center gap-1">
                 {Array.from({ length: Math.min(5, searchResults.totalPages) }, (_, i) => {
-                  const page = i + 1
+                  const page = i + 1;
                   return (
                     <Button
                       key={page}
-                      variant={page === searchResults.page ? "default" : "outline"}
+                      variant={page === searchResults.page ? 'default' : 'outline'}
                       size="sm"
                       className="w-8 h-8 p-0"
                     >
                       {page}
                     </Button>
-                  )
+                  );
                 })}
                 {searchResults.totalPages > 5 && <span className="text-gray-500">...</span>}
               </div>
-              
-              <Button 
-                variant="outline" 
-                size="sm" 
+
+              <Button
+                variant="outline"
+                size="sm"
                 disabled={searchResults.page === searchResults.totalPages}
               >
                 下一页
@@ -291,5 +294,5 @@ export default function SearchPage() {
         </>
       )}
     </div>
-  )
+  );
 }

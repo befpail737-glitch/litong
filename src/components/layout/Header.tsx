@@ -1,38 +1,41 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { useAuth } from '@/contexts/AuthContext'
-import { useOrder } from '@/contexts/OrderContext'
-import { useSearch } from '@/contexts/SearchContext'
-import { Heart, User, LogOut, ShoppingCart } from 'lucide-react'
+import { useState } from 'react';
+
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+
+import { Heart, User, LogOut, ShoppingCart } from 'lucide-react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
+import { useOrder } from '@/contexts/OrderContext';
+import { useSearch } from '@/contexts/SearchContext';
 
 export function Header() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [showSuggestions, setShowSuggestions] = useState(false)
-  const router = useRouter()
-  const { user, logout } = useAuth()
-  const { cartCount } = useOrder()
-  const { searchQuery, setSearchQuery, search, searchSuggestions, updateSearchSuggestions } = useSearch()
-  const wishlistCount = 0 // 临时设置为0，后续会从Context获取
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const router = useRouter();
+  const { user, logout } = useAuth();
+  const { cartCount } = useOrder();
+  const { searchQuery, setSearchQuery, search, searchSuggestions, updateSearchSuggestions } = useSearch();
+  const wishlistCount = 0; // 临时设置为0，后续会从Context获取
 
   const navigation = [
     { name: '首页', href: '/' },
     { name: '品牌中心', href: '/brands' },
     { name: '产品分类', href: '/categories' },
     { name: '关于我们', href: '/about' },
-  ]
+  ];
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (searchQuery.trim()) {
-      search(searchQuery.trim())
-      router.push('/search')
+      search(searchQuery.trim());
+      router.push('/search');
     }
-  }
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
@@ -67,16 +70,16 @@ export function Header() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => {
-                    setSearchQuery(e.target.value)
-                    updateSearchSuggestions(e.target.value)
-                    setShowSuggestions(e.target.value.length > 0)
+                    setSearchQuery(e.target.value);
+                    updateSearchSuggestions(e.target.value);
+                    setShowSuggestions(e.target.value.length > 0);
                   }}
                   onFocus={() => setShowSuggestions(searchQuery.length > 0)}
                   onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                   placeholder="搜索产品..."
                   className="w-64 px-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
-                <button 
+                <button
                   type="submit"
                   className="absolute right-3 top-2.5 hover:text-blue-600 transition-colors"
                 >
@@ -85,7 +88,7 @@ export function Header() {
                   </svg>
                 </button>
               </form>
-              
+
               {/* Search Suggestions Dropdown */}
               {showSuggestions && searchSuggestions.length > 0 && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
@@ -93,10 +96,10 @@ export function Header() {
                     <button
                       key={index}
                       onClick={() => {
-                        setSearchQuery(suggestion)
-                        search(suggestion)
-                        router.push('/search')
-                        setShowSuggestions(false)
+                        setSearchQuery(suggestion);
+                        search(suggestion);
+                        router.push('/search');
+                        setShowSuggestions(false);
                       }}
                       className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm text-gray-700 border-b border-gray-100 last:border-b-0"
                     >
@@ -111,7 +114,7 @@ export function Header() {
                 </div>
               )}
             </div>
-            
+
             <Button variant="ghost" size="sm" asChild className="relative">
               <Link href="/cart">
                 <ShoppingCart className="h-4 w-4" />
@@ -122,7 +125,7 @@ export function Header() {
                 )}
               </Link>
             </Button>
-            
+
             <Button variant="ghost" size="sm" asChild className="relative">
               <Link href="/wishlist">
                 <Heart className="h-4 w-4" />
@@ -133,7 +136,7 @@ export function Header() {
                 )}
               </Link>
             </Button>
-            
+
             <Button size="sm" asChild>
               <Link href="/inquiry">
                 获取报价
@@ -149,9 +152,9 @@ export function Header() {
                     {user.name}
                   </Link>
                 </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={logout}
                   className="text-gray-600 hover:text-red-600"
                 >
@@ -233,7 +236,7 @@ export function Header() {
                     获取报价
                   </Link>
                 </Button>
-                
+
                 {/* 移动端用户认证 */}
                 <div className="border-t pt-3 mt-3">
                   {user ? (
@@ -244,12 +247,12 @@ export function Header() {
                           {user.name}
                         </Link>
                       </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={() => {
-                          logout()
-                          setIsMenuOpen(false)
+                          logout();
+                          setIsMenuOpen(false);
                         }}
                         className="w-full justify-start text-red-600 hover:text-red-800"
                       >
@@ -278,5 +281,5 @@ export function Header() {
         )}
       </div>
     </header>
-  )
+  );
 }

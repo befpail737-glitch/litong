@@ -1,8 +1,10 @@
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { getProducts, getProductCategories } from '@/lib/sanity/queries'
-import { urlFor } from '@/lib/sanity/client'
-import { Suspense } from 'react'
+import { Suspense } from 'react';
+
+import Link from 'next/link';
+
+import { Button } from '@/components/ui/button';
+import { urlFor } from '@/lib/sanity/client';
+import { getProducts, getProductCategories } from '@/lib/sanity/queries';
 
 interface ProductsPageProps {
   searchParams: {
@@ -18,17 +20,17 @@ function ProductCard({ product }: { product: any }) {
     brand: product.brand,
     hasImage: !!product.image,
     hasPricing: !!product.pricing
-  })
-  
-  const imageUrl = product.image ? urlFor(product.image).width(300).height(300).url() : null
+  });
+
+  const imageUrl = product.image ? urlFor(product.image).width(300).height(300).url() : null;
 
   return (
     <div className="card p-4 hover:shadow-lg transition-shadow">
       {/* 产品图片 */}
       <div className="aspect-square bg-gray-100 rounded-md mb-4 flex items-center justify-center overflow-hidden">
         {imageUrl ? (
-          <img 
-            src={imageUrl} 
+          <img
+            src={imageUrl}
             alt={product.title}
             className="w-full h-full object-cover"
           />
@@ -92,14 +94,14 @@ function ProductCard({ product }: { product: any }) {
               </Button>
             </Link>
           </div>
-          
+
           <Button variant="outline" size="sm" className="w-full">
             立即询价
           </Button>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // 分类列表组件
@@ -122,7 +124,7 @@ function CategoryList({ categories }: { categories: any[] }) {
         ))}
       </div>
     </div>
-  )
+  );
 }
 
 // 产品网格组件
@@ -136,7 +138,7 @@ function ProductGrid({ products }: { products: any[] }) {
           请稍后再试，或联系我们获取更多产品信息。
         </p>
       </div>
-    )
+    );
   }
 
   return (
@@ -145,26 +147,26 @@ function ProductGrid({ products }: { products: any[] }) {
         <ProductCard key={product._id} product={product} />
       ))}
     </div>
-  )
+  );
 }
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
-  const currentPage = parseInt(searchParams.page || '1')
-  const pageSize = 12
-  const offset = (currentPage - 1) * pageSize
-  
+  const currentPage = parseInt(searchParams.page || '1');
+  const pageSize = 12;
+  const offset = (currentPage - 1) * pageSize;
+
   // 获取产品和分类数据
   const [productsData, categories] = await Promise.all([
-    getProducts({ 
-      limit: pageSize, 
-      offset, 
-      category: searchParams.category 
+    getProducts({
+      limit: pageSize,
+      offset,
+      category: searchParams.category
     }),
     getProductCategories()
-  ])
+  ]);
 
-  const { products, total } = productsData
-  const totalPages = Math.ceil(total / pageSize)
+  const { products, total } = productsData;
+  const totalPages = Math.ceil(total / pageSize);
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
@@ -207,39 +209,39 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
           {/* 分页 */}
           {totalPages > 1 && (
             <div className="flex justify-center items-center gap-4">
-              <Link href={`?${new URLSearchParams({ 
-                ...searchParams, 
-                page: Math.max(1, currentPage - 1).toString() 
+              <Link href={`?${new URLSearchParams({
+                ...searchParams,
+                page: Math.max(1, currentPage - 1).toString()
               })}`}>
                 <Button variant="outline" disabled={currentPage <= 1}>
                   上一页
                 </Button>
               </Link>
-              
+
               <div className="flex gap-2">
                 {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
-                  const page = i + 1
-                  const isActive = page === currentPage
+                  const page = i + 1;
+                  const isActive = page === currentPage;
                   return (
-                    <Link key={page} href={`?${new URLSearchParams({ 
-                      ...searchParams, 
-                      page: page.toString() 
+                    <Link key={page} href={`?${new URLSearchParams({
+                      ...searchParams,
+                      page: page.toString()
                     })}`}>
-                      <Button 
-                        size="sm" 
-                        variant={isActive ? "default" : "outline"}
+                      <Button
+                        size="sm"
+                        variant={isActive ? 'default' : 'outline'}
                       >
                         {page}
                       </Button>
                     </Link>
-                  )
+                  );
                 })}
                 {totalPages > 7 && (
                   <>
                     <span className="px-3 py-2 text-gray-500">...</span>
-                    <Link href={`?${new URLSearchParams({ 
-                      ...searchParams, 
-                      page: totalPages.toString() 
+                    <Link href={`?${new URLSearchParams({
+                      ...searchParams,
+                      page: totalPages.toString()
                     })}`}>
                       <Button size="sm" variant="outline">{totalPages}</Button>
                     </Link>
@@ -247,9 +249,9 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                 )}
               </div>
 
-              <Link href={`?${new URLSearchParams({ 
-                ...searchParams, 
-                page: Math.min(totalPages, currentPage + 1).toString() 
+              <Link href={`?${new URLSearchParams({
+                ...searchParams,
+                page: Math.min(totalPages, currentPage + 1).toString()
               })}`}>
                 <Button variant="outline" disabled={currentPage >= totalPages}>
                   下一页
@@ -260,5 +262,5 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
         </div>
       </div>
     </div>
-  )
+  );
 }

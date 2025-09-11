@@ -1,22 +1,23 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
-import { ArrowLeft, Plus, Search, Filter, ExternalLink } from 'lucide-react'
+import Link from 'next/link';
+
+import { ArrowLeft, Plus, Search, Filter, ExternalLink } from 'lucide-react';
 
 export default function AdminProducts() {
   // 处理添加产品按钮点击，跳转到Sanity Studio
   const handleAddProduct = () => {
     // 打开Sanity Studio的产品创建页面
-    window.open('/studio/structure/product;new', '_blank')
-  }
+    window.open('/studio/structure/product;new', '_blank');
+  };
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 顶部导航 */}
       <div className="bg-white shadow-sm border-b px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link 
-              href="/admin" 
+            <Link
+              href="/admin"
               className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -25,7 +26,7 @@ export default function AdminProducts() {
             <div className="h-6 w-px bg-gray-300"></div>
             <h1 className="text-2xl font-semibold text-gray-900">产品管理</h1>
           </div>
-          <button 
+          <button
             onClick={handleAddProduct}
             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
           >
@@ -43,9 +44,9 @@ export default function AdminProducts() {
           <div className="flex gap-4">
             <div className="flex-1 relative">
               <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
-              <input 
-                type="text" 
-                placeholder="搜索产品名称、型号..." 
+              <input
+                type="text"
+                placeholder="搜索产品名称、型号..."
                 className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
@@ -70,7 +71,7 @@ export default function AdminProducts() {
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">暂无产品数据</h3>
               <p className="text-gray-600 mb-6">开始添加您的第一个产品</p>
-              <button 
+              <button
                 onClick={handleAddProduct}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center gap-2 justify-center"
               >
@@ -83,5 +84,5 @@ export default function AdminProducts() {
         </div>
       </div>
     </div>
-  )
+  );
 }

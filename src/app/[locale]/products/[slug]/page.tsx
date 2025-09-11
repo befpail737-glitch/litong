@@ -1,11 +1,13 @@
-import { Metadata } from 'next'
-import { notFound } from 'next/navigation'
-import Link from 'next/link'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { getProduct } from '@/lib/sanity/queries'
-import { urlFor } from '@/lib/sanity/client'
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+
+import { Metadata } from 'next';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { urlFor } from '@/lib/sanity/client';
+import { getProduct } from '@/lib/sanity/queries';
 
 interface PageProps {
   params: {
@@ -15,13 +17,13 @@ interface PageProps {
 }
 
 export default async function ProductDetailPage({ params }: PageProps) {
-  const productSlug = decodeURIComponent(params.slug)
-  
-  console.log('ProductDetailPage called with slug:', params.slug, 'decoded:', productSlug)
+  const productSlug = decodeURIComponent(params.slug);
+
+  console.log('ProductDetailPage called with slug:', params.slug, 'decoded:', productSlug);
 
   try {
-    const product = await getProduct(productSlug)
-    console.log('Product found:', product)
+    const product = await getProduct(productSlug);
+    console.log('Product found:', product);
 
     return (
       <div className="container mx-auto px-4 py-8">
@@ -33,8 +35,8 @@ export default async function ProductDetailPage({ params }: PageProps) {
           <span>/</span>
           {product.brand && (
             <>
-              <Link 
-                href={`/${params.locale}/brands/${product.brand.slug}`} 
+              <Link
+                href={`/${params.locale}/brands/${product.brand.slug}`}
                 className="hover:text-blue-600"
               >
                 {product.brand.name}
@@ -153,7 +155,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
                 <h2 className="text-lg font-medium text-gray-900">
                   {product.title || product.partNumber}
                 </h2>
-                
+
                 {product.brand && (
                   <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-2">
@@ -170,8 +172,8 @@ export default async function ProductDetailPage({ params }: PageProps) {
                           </span>
                         </div>
                       )}
-                      <Link 
-                        href={`/${params.locale}/brands/${product.brand.slug}`} 
+                      <Link
+                        href={`/${params.locale}/brands/${product.brand.slug}`}
                         className="text-sm text-blue-600 hover:underline"
                       >
                         {product.brand.name}
@@ -189,7 +191,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
                 {product.category && (
                   <div className="flex items-center space-x-4 text-sm">
                     <span className="text-gray-600">分类:</span>
-                    <Link 
+                    <Link
                       href={`/${params.locale}/products?category=${product.category.slug}`}
                       className="text-blue-600 hover:underline"
                     >
@@ -284,9 +286,9 @@ export default async function ProductDetailPage({ params }: PageProps) {
                 <CardContent>
                   <div className="space-y-3">
                     {product.documents.map((doc, index) => (
-                      <Link 
+                      <Link
                         key={index}
-                        href={doc.url || '#'} 
+                        href={doc.url || '#'}
                         className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded-md"
                       >
                         <span className="text-red-600">📄</span>
@@ -311,28 +313,28 @@ export default async function ProductDetailPage({ params }: PageProps) {
           </div>
         </div>
       </div>
-    )
+    );
   } catch (error) {
-    console.error('Error loading product:', error)
-    notFound()
+    console.error('Error loading product:', error);
+    notFound();
   }
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const productSlug = decodeURIComponent(params.slug)
-  
+  const productSlug = decodeURIComponent(params.slug);
+
   try {
-    const product = await getProduct(productSlug)
-    
+    const product = await getProduct(productSlug);
+
     return {
       title: `${product.title || product.partNumber} - 力通电子`,
       description: product.shortDescription || product.description?.substring(0, 160) || `${product.partNumber} - 力通电子原装正品现货供应`,
       keywords: `${product.partNumber}, ${product.brand?.name || ''}, ${product.category?.name || ''}, 电子元器件`,
-    }
+    };
   } catch (error) {
     return {
       title: '产品详情 - 力通电子',
       description: '查看产品详细信息'
-    }
+    };
   }
 }

@@ -1,24 +1,13 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Progress } from '@/components/ui/progress'
-import { Switch } from '@/components/ui/switch'
-import { Slider } from '@/components/ui/slider'
-import { 
-  Brain, 
-  Target, 
-  TrendingUp, 
-  Users, 
-  Eye, 
+import { useState, useEffect } from 'react';
+
+import {
+  Brain,
+  Target,
+  TrendingUp,
+  Users,
+  Eye,
   MousePointer,
   BarChart3,
   RefreshCw,
@@ -38,8 +27,21 @@ import {
   Upload,
   AlertCircle,
   CheckCircle
-} from 'lucide-react'
-import { useLocale } from 'next-intl'
+} from 'lucide-react';
+import { useLocale } from 'next-intl';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Progress } from '@/components/ui/progress';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 
 interface RecommendationItem {
   contentId: string
@@ -190,23 +192,23 @@ const mockRecommendations: ContentRecommendation[] = [
     },
     lastUpdated: '2025-01-15T10:30:00Z'
   }
-]
+];
 
 export function RecommendationEngine() {
-  const locale = useLocale()
-  const [recommendations, setRecommendations] = useState<ContentRecommendation[]>(mockRecommendations)
-  const [selectedRec, setSelectedRec] = useState<ContentRecommendation | null>(null)
-  const [isTraining, setIsTraining] = useState(false)
-  const [filterType, setFilterType] = useState<string>('all')
-  const [searchQuery, setSearchQuery] = useState('')
-  
+  const locale = useLocale();
+  const [recommendations, setRecommendations] = useState<ContentRecommendation[]>(mockRecommendations);
+  const [selectedRec, setSelectedRec] = useState<ContentRecommendation | null>(null);
+  const [isTraining, setIsTraining] = useState(false);
+  const [filterType, setFilterType] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+
   const typeConfig = {
     content_based: { label: '基于内容', color: 'bg-blue-100 text-blue-800', icon: '📄' },
     collaborative: { label: '协同过滤', color: 'bg-green-100 text-green-800', icon: '👥' },
     hybrid: { label: '混合推荐', color: 'bg-purple-100 text-purple-800', icon: '🔄' },
     manual: { label: '人工推荐', color: 'bg-orange-100 text-orange-800', icon: '✋' }
-  }
-  
+  };
+
   const reasonConfig = {
     similar_content: { label: '相似内容', icon: '🔗' },
     same_category: { label: '同类产品', icon: '📂' },
@@ -216,25 +218,25 @@ export function RecommendationEngine() {
     complementary: { label: '互补产品', icon: '🧩' },
     cross_selling: { label: '交叉销售', icon: '↗️' },
     up_selling: { label: '升级推荐', icon: '⬆️' }
-  }
-  
+  };
+
   const getPerformanceColor = (value: number, type: 'ctr' | 'conversion' | 'rating') => {
     if (type === 'ctr') {
-      return value >= 0.1 ? 'text-green-600' : value >= 0.05 ? 'text-yellow-600' : 'text-red-600'
+      return value >= 0.1 ? 'text-green-600' : value >= 0.05 ? 'text-yellow-600' : 'text-red-600';
     } else if (type === 'conversion') {
-      return value >= 0.2 ? 'text-green-600' : value >= 0.1 ? 'text-yellow-600' : 'text-red-600'
+      return value >= 0.2 ? 'text-green-600' : value >= 0.1 ? 'text-yellow-600' : 'text-red-600';
     } else if (type === 'rating') {
-      return value >= 4.0 ? 'text-green-600' : value >= 3.0 ? 'text-yellow-600' : 'text-red-600'
+      return value >= 4.0 ? 'text-green-600' : value >= 3.0 ? 'text-yellow-600' : 'text-red-600';
     }
-    return 'text-gray-600'
-  }
-  
+    return 'text-gray-600';
+  };
+
   const trainModel = async (recId: string) => {
-    setIsTraining(true)
-    
+    setIsTraining(true);
+
     // Simulate model training
-    await new Promise(resolve => setTimeout(resolve, 3000))
-    
+    await new Promise(resolve => setTimeout(resolve, 3000));
+
     setRecommendations(recs => recs.map(rec => {
       if (rec.id === recId) {
         return {
@@ -245,38 +247,38 @@ export function RecommendationEngine() {
             ctr: Math.min(0.2, rec.performance.ctr + Math.random() * 0.02)
           },
           lastUpdated: new Date().toISOString()
-        }
+        };
       }
-      return rec
-    }))
-    
-    setIsTraining(false)
-  }
-  
+      return rec;
+    }));
+
+    setIsTraining(false);
+  };
+
   const toggleRecommendation = (recId: string) => {
-    setRecommendations(recs => recs.map(rec => 
-      rec.id === recId 
+    setRecommendations(recs => recs.map(rec =>
+      rec.id === recId
         ? { ...rec, settings: { ...rec.settings, enabled: !rec.settings.enabled } }
         : rec
-    ))
-  }
-  
+    ));
+  };
+
   const filteredRecommendations = recommendations.filter(rec => {
-    const matchesType = filterType === 'all' || rec.recommendationType === filterType
-    const matchesSearch = !searchQuery || 
+    const matchesType = filterType === 'all' || rec.recommendationType === filterType;
+    const matchesSearch = !searchQuery ||
       rec.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      rec.sourceContent.contentTitle.toLowerCase().includes(searchQuery.toLowerCase())
-    
-    return matchesType && matchesSearch
-  })
-  
+      rec.sourceContent.contentTitle.toLowerCase().includes(searchQuery.toLowerCase());
+
+    return matchesType && matchesSearch;
+  });
+
   return (
     <div className="container mx-auto p-6">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">内容推荐算法</h1>
         <p className="text-gray-600">智能推荐引擎管理和优化</p>
       </div>
-      
+
       <div className="mb-6 flex flex-wrap gap-4 items-center">
         <div className="flex-1 min-w-[200px]">
           <div className="relative">
@@ -289,7 +291,7 @@ export function RecommendationEngine() {
             />
           </div>
         </div>
-        
+
         <Select value={filterType} onValueChange={setFilterType}>
           <SelectTrigger className="w-[150px]">
             <SelectValue />
@@ -302,7 +304,7 @@ export function RecommendationEngine() {
             <SelectItem value="manual">人工推荐</SelectItem>
           </SelectContent>
         </Select>
-        
+
         <Dialog>
           <DialogTrigger asChild>
             <Button>
@@ -318,11 +320,11 @@ export function RecommendationEngine() {
           </DialogContent>
         </Dialog>
       </div>
-      
+
       <div className="grid gap-6">
         {filteredRecommendations.map((rec) => {
-          const config = typeConfig[rec.recommendationType]
-          
+          const config = typeConfig[rec.recommendationType];
+
           return (
             <Card key={rec.id} className="hover:shadow-md transition-shadow">
               <CardHeader className="pb-4">
@@ -348,7 +350,7 @@ export function RecommendationEngine() {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center gap-4">
                     <div className="text-center">
                       <div className={`text-lg font-semibold ${getPerformanceColor(rec.performance.relevance_score, 'rating')}`}>
@@ -356,15 +358,15 @@ export function RecommendationEngine() {
                       </div>
                       <div className="text-xs text-gray-500">相关性评分</div>
                     </div>
-                    
-                    <Switch 
+
+                    <Switch
                       checked={rec.settings.enabled}
                       onCheckedChange={() => toggleRecommendation(rec.id)}
                     />
                   </div>
                 </div>
               </CardHeader>
-              
+
               <CardContent>
                 <div className="space-y-4">
                   <div className="grid md:grid-cols-4 gap-4">
@@ -389,7 +391,7 @@ export function RecommendationEngine() {
                       <div className="text-sm text-gray-600">推荐项目</div>
                     </div>
                   </div>
-                  
+
                   <div className="border-t pt-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium">用户反馈</span>
@@ -400,15 +402,15 @@ export function RecommendationEngine() {
                         <span className="text-sm">{rec.performance.user_feedback.not_helpful_votes}</span>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1">
                         {[1, 2, 3, 4, 5].map((star) => (
-                          <Star 
+                          <Star
                             key={star}
                             className={`h-4 w-4 ${
-                              star <= rec.performance.user_feedback.average_rating 
-                                ? 'text-yellow-400 fill-yellow-400' 
+                              star <= rec.performance.user_feedback.average_rating
+                                ? 'text-yellow-400 fill-yellow-400'
                                 : 'text-gray-300'
                             }`}
                           />
@@ -422,7 +424,7 @@ export function RecommendationEngine() {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div>
                     <div className="flex items-center gap-2 mb-2">
                       <Target className="h-4 w-4" />
@@ -447,7 +449,7 @@ export function RecommendationEngine() {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center justify-between pt-4 border-t">
                     <div className="flex gap-2">
                       <Button
@@ -458,7 +460,7 @@ export function RecommendationEngine() {
                         <Eye className="h-4 w-4 mr-1" />
                         详细分析
                       </Button>
-                      
+
                       <Button
                         variant="outline"
                         size="sm"
@@ -468,7 +470,7 @@ export function RecommendationEngine() {
                         <RefreshCw className={`h-4 w-4 mr-1 ${isTraining ? 'animate-spin' : ''}`} />
                         重新训练
                       </Button>
-                      
+
                       {rec.settings.a_b_testing.enabled && (
                         <Button variant="outline" size="sm">
                           <TestTube className="h-4 w-4 mr-1" />
@@ -476,7 +478,7 @@ export function RecommendationEngine() {
                         </Button>
                       )}
                     </div>
-                    
+
                     <div className="text-xs text-gray-500">
                       最后更新: {new Date(rec.lastUpdated).toLocaleString()}
                     </div>
@@ -484,9 +486,9 @@ export function RecommendationEngine() {
                 </div>
               </CardContent>
             </Card>
-          )
+          );
         })}
-        
+
         {filteredRecommendations.length === 0 && (
           <div className="text-center py-12">
             <Brain className="h-12 w-12 mx-auto text-gray-300 mb-4" />
@@ -495,7 +497,7 @@ export function RecommendationEngine() {
           </div>
         )}
       </div>
-      
+
       {/* Detailed Recommendation Analysis Dialog */}
       {selectedRec && (
         <Dialog open={!!selectedRec} onOpenChange={() => setSelectedRec(null)}>
@@ -509,7 +511,7 @@ export function RecommendationEngine() {
                 </Badge>
               </DialogTitle>
             </DialogHeader>
-            
+
             <Tabs defaultValue="performance" className="mt-6">
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="performance">性能分析</TabsTrigger>
@@ -517,7 +519,7 @@ export function RecommendationEngine() {
                 <TabsTrigger value="algorithm">算法配置</TabsTrigger>
                 <TabsTrigger value="settings">系统设置</TabsTrigger>
               </TabsList>
-              
+
               <TabsContent value="performance" className="space-y-6">
                 <div className="grid md:grid-cols-3 gap-6">
                   <Card>
@@ -551,7 +553,7 @@ export function RecommendationEngine() {
                       </div>
                     </CardContent>
                   </Card>
-                  
+
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-base">用户反馈</CardTitle>
@@ -567,17 +569,17 @@ export function RecommendationEngine() {
                           <span className="text-lg font-semibold">{selectedRec.performance.user_feedback.not_helpful_votes}</span>
                         </div>
                       </div>
-                      
+
                       <div>
                         <div className="flex items-center gap-2 mb-2">
                           <span className="text-sm">用户评分:</span>
                           <div className="flex items-center gap-1">
                             {[1, 2, 3, 4, 5].map((star) => (
-                              <Star 
+                              <Star
                                 key={star}
                                 className={`h-4 w-4 ${
-                                  star <= selectedRec.performance.user_feedback.average_rating 
-                                    ? 'text-yellow-400 fill-yellow-400' 
+                                  star <= selectedRec.performance.user_feedback.average_rating
+                                    ? 'text-yellow-400 fill-yellow-400'
                                     : 'text-gray-300'
                                 }`}
                               />
@@ -588,7 +590,7 @@ export function RecommendationEngine() {
                           {selectedRec.performance.user_feedback.average_rating.toFixed(1)} / 5.0
                         </div>
                       </div>
-                      
+
                       <div className="text-center">
                         <div className={`text-lg font-semibold ${getPerformanceColor(selectedRec.performance.relevance_score, 'rating')}`}>
                           {selectedRec.performance.relevance_score.toFixed(1)}
@@ -597,7 +599,7 @@ export function RecommendationEngine() {
                       </div>
                     </CardContent>
                   </Card>
-                  
+
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-base">系统状态</CardTitle>
@@ -611,22 +613,22 @@ export function RecommendationEngine() {
                           <Badge variant="secondary">已暂停</Badge>
                         )}
                       </div>
-                      
+
                       <div className="flex justify-between items-center">
                         <span>刷新频率</span>
                         <span className="font-semibold">{selectedRec.settings.refresh_frequency}小时</span>
                       </div>
-                      
+
                       <div className="flex justify-between items-center">
                         <span>缓存时长</span>
                         <span className="font-semibold">{selectedRec.settings.cache_duration}分钟</span>
                       </div>
-                      
+
                       <div className="flex justify-between items-center">
                         <span>个性化级别</span>
                         <Badge variant="outline">{selectedRec.settings.personalization}</Badge>
                       </div>
-                      
+
                       {selectedRec.settings.a_b_testing.enabled && (
                         <div>
                           <div className="flex items-center gap-2 mb-2">
@@ -641,7 +643,7 @@ export function RecommendationEngine() {
                     </CardContent>
                   </Card>
                 </div>
-                
+
                 <Card>
                   <CardHeader>
                     <CardTitle>性能趋势</CardTitle>
@@ -656,12 +658,12 @@ export function RecommendationEngine() {
                   </CardContent>
                 </Card>
               </TabsContent>
-              
+
               <TabsContent value="recommendations" className="space-y-6">
                 <div className="space-y-4">
                   {selectedRec.recommendations.map((item, index) => {
-                    const reasonInfo = reasonConfig[item.reason as keyof typeof reasonConfig] || { label: item.reason, icon: '💡' }
-                    
+                    const reasonInfo = reasonConfig[item.reason as keyof typeof reasonConfig] || { label: item.reason, icon: '💡' };
+
                     return (
                       <Card key={item.contentId}>
                         <CardContent className="pt-4">
@@ -680,7 +682,7 @@ export function RecommendationEngine() {
                                 </div>
                               </div>
                             </div>
-                            
+
                             <div className="text-right space-y-1">
                               <div className="text-lg font-semibold">
                                 {Math.round(item.score * 100)}%
@@ -690,7 +692,7 @@ export function RecommendationEngine() {
                               </div>
                             </div>
                           </div>
-                          
+
                           <div className="mt-4 pt-4 border-t">
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                               <div>
@@ -722,11 +724,11 @@ export function RecommendationEngine() {
                           </div>
                         </CardContent>
                       </Card>
-                    )
+                    );
                   })}
                 </div>
               </TabsContent>
-              
+
               <TabsContent value="algorithm" className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <Card>
@@ -737,10 +739,10 @@ export function RecommendationEngine() {
                       <div>
                         <Label>相似度阈值</Label>
                         <div className="mt-2">
-                          <Slider 
-                            value={[selectedRec.algorithm.parameters.similarity_threshold]} 
-                            max={1} 
-                            min={0} 
+                          <Slider
+                            value={[selectedRec.algorithm.parameters.similarity_threshold]}
+                            max={1}
+                            min={0}
                             step={0.1}
                             className="w-full"
                           />
@@ -749,23 +751,23 @@ export function RecommendationEngine() {
                           </div>
                         </div>
                       </div>
-                      
+
                       <div>
                         <Label>最大推荐数量</Label>
-                        <Input 
-                          type="number" 
+                        <Input
+                          type="number"
                           value={selectedRec.algorithm.parameters.max_recommendations}
                           className="mt-1"
                         />
                       </div>
-                      
+
                       <div>
                         <Label>最小评分</Label>
                         <div className="mt-2">
-                          <Slider 
-                            value={[selectedRec.algorithm.parameters.min_score]} 
-                            max={1} 
-                            min={0} 
+                          <Slider
+                            value={[selectedRec.algorithm.parameters.min_score]}
+                            max={1}
+                            min={0}
                             step={0.1}
                             className="w-full"
                           />
@@ -776,7 +778,7 @@ export function RecommendationEngine() {
                       </div>
                     </CardContent>
                   </Card>
-                  
+
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-base">权重配置</CardTitle>
@@ -784,48 +786,48 @@ export function RecommendationEngine() {
                     <CardContent className="space-y-4">
                       <div>
                         <Label>内容相似度权重 ({(selectedRec.algorithm.parameters.weight_factors.content_similarity * 100).toFixed(0)}%)</Label>
-                        <Slider 
-                          value={[selectedRec.algorithm.parameters.weight_factors.content_similarity]} 
-                          max={1} 
-                          min={0} 
+                        <Slider
+                          value={[selectedRec.algorithm.parameters.weight_factors.content_similarity]}
+                          max={1}
+                          min={0}
                           step={0.1}
                           className="w-full mt-2"
                         />
                       </div>
-                      
+
                       <div>
                         <Label>用户行为权重 ({(selectedRec.algorithm.parameters.weight_factors.user_behavior * 100).toFixed(0)}%)</Label>
-                        <Slider 
-                          value={[selectedRec.algorithm.parameters.weight_factors.user_behavior]} 
-                          max={1} 
-                          min={0} 
+                        <Slider
+                          value={[selectedRec.algorithm.parameters.weight_factors.user_behavior]}
+                          max={1}
+                          min={0}
                           step={0.1}
                           className="w-full mt-2"
                         />
                       </div>
-                      
+
                       <div>
                         <Label>热度权重 ({(selectedRec.algorithm.parameters.weight_factors.popularity * 100).toFixed(0)}%)</Label>
-                        <Slider 
-                          value={[selectedRec.algorithm.parameters.weight_factors.popularity]} 
-                          max={1} 
-                          min={0} 
+                        <Slider
+                          value={[selectedRec.algorithm.parameters.weight_factors.popularity]}
+                          max={1}
+                          min={0}
                           step={0.1}
                           className="w-full mt-2"
                         />
                       </div>
-                      
+
                       <div>
                         <Label>时效性权重 ({(selectedRec.algorithm.parameters.weight_factors.recency * 100).toFixed(0)}%)</Label>
-                        <Slider 
-                          value={[selectedRec.algorithm.parameters.weight_factors.recency]} 
-                          max={1} 
-                          min={0} 
+                        <Slider
+                          value={[selectedRec.algorithm.parameters.weight_factors.recency]}
+                          max={1}
+                          min={0}
                           step={0.1}
                           className="w-full mt-2"
                         />
                       </div>
-                      
+
                       <div className="pt-2 text-sm text-gray-500">
                         权重总和: {(
                           selectedRec.algorithm.parameters.weight_factors.content_similarity +
@@ -837,7 +839,7 @@ export function RecommendationEngine() {
                     </CardContent>
                   </Card>
                 </div>
-                
+
                 <Card>
                   <CardHeader>
                     <CardTitle>算法类型</CardTitle>
@@ -859,7 +861,7 @@ export function RecommendationEngine() {
                   </CardContent>
                 </Card>
               </TabsContent>
-              
+
               <TabsContent value="settings" className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <Card>
@@ -871,25 +873,25 @@ export function RecommendationEngine() {
                         <Label>启用推荐</Label>
                         <Switch checked={selectedRec.settings.enabled} />
                       </div>
-                      
+
                       <div>
                         <Label>刷新频率 (小时)</Label>
-                        <Input 
-                          type="number" 
+                        <Input
+                          type="number"
                           value={selectedRec.settings.refresh_frequency}
                           className="mt-1"
                         />
                       </div>
-                      
+
                       <div>
                         <Label>缓存时长 (分钟)</Label>
-                        <Input 
-                          type="number" 
+                        <Input
+                          type="number"
                           value={selectedRec.settings.cache_duration}
                           className="mt-1"
                         />
                       </div>
-                      
+
                       <div>
                         <Label>个性化级别</Label>
                         <Select value={selectedRec.settings.personalization}>
@@ -906,7 +908,7 @@ export function RecommendationEngine() {
                       </div>
                     </CardContent>
                   </Card>
-                  
+
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-base">A/B测试设置</CardTitle>
@@ -916,29 +918,29 @@ export function RecommendationEngine() {
                         <Label>启用A/B测试</Label>
                         <Switch checked={selectedRec.settings.a_b_testing.enabled} />
                       </div>
-                      
+
                       {selectedRec.settings.a_b_testing.enabled && (
                         <>
                           <div>
                             <Label>变体分割比例 (%)</Label>
-                            <Input 
-                              type="number" 
+                            <Input
+                              type="number"
                               value={selectedRec.settings.a_b_testing.variant_split}
                               min={0}
                               max={100}
                               className="mt-1"
                             />
                           </div>
-                          
+
                           <div>
                             <Label>测试持续时间 (天)</Label>
-                            <Input 
-                              type="number" 
+                            <Input
+                              type="number"
                               value={selectedRec.settings.a_b_testing.test_duration_days}
                               className="mt-1"
                             />
                           </div>
-                          
+
                           <div className="p-3 bg-blue-50 rounded-lg">
                             <div className="flex items-center gap-2 mb-2">
                               <TestTube className="h-4 w-4 text-blue-600" />
@@ -953,7 +955,7 @@ export function RecommendationEngine() {
                     </CardContent>
                   </Card>
                 </div>
-                
+
                 <Card>
                   <CardHeader>
                     <CardTitle>操作记录</CardTitle>
@@ -970,7 +972,7 @@ export function RecommendationEngine() {
                           {new Date(selectedRec.lastUpdated).toLocaleString()}
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center gap-3 p-3 border rounded-lg">
                         <AlertCircle className="h-5 w-5 text-orange-500" />
                         <div className="flex-1">
@@ -988,5 +990,5 @@ export function RecommendationEngine() {
         </Dialog>
       )}
     </div>
-  )
+  );
 }

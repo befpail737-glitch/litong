@@ -1,13 +1,15 @@
-import Link from 'next/link'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Building2, Globe, MapPin, Users, Award, TrendingUp } from 'lucide-react'
-import { client, urlFor } from '@/lib/sanity/client'
-import Image from 'next/image'
+import Image from 'next/image';
+import Link from 'next/link';
+
+import { Building2, Globe, MapPin, Users, Award, TrendingUp } from 'lucide-react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { client, urlFor } from '@/lib/sanity/client';
 
 // 强制动态渲染
-export const dynamic = 'force-dynamic'
+export const dynamic = 'force-dynamic';
 
 // 直接在组件中定义获取函数
 async function getAllBrands() {
@@ -25,13 +27,13 @@ async function getAllBrands() {
       logo,
       headquarters,
       established
-    }`
-    
-    const brands = await client.fetch(query)
-    return brands || []
+    }`;
+
+    const brands = await client.fetch(query);
+    return brands || [];
   } catch (error) {
-    console.error('Error fetching brands:', error)
-    return []
+    console.error('Error fetching brands:', error);
+    return [];
   }
 }
 
@@ -41,27 +43,27 @@ async function getBrandStats() {
       "total": count(*[_type == "brandBasic" && isActive == true]),
       "featured": count(*[_type == "brandBasic" && isActive == true && isFeatured == true]),
       "solutions": count(*[_type == "solution" && isPublished == true])
-    }`
-    
-    const stats = await client.fetch(query)
+    }`;
+
+    const stats = await client.fetch(query);
     return {
       total: stats?.total || 0,
       authorized: stats?.featured || 0,
       totalProducts: (stats?.solutions || 0) * 1000, // 估算产品数量
-    }
+    };
   } catch (error) {
-    console.error('Error fetching brand stats:', error)
+    console.error('Error fetching brand stats:', error);
     return {
       total: 0,
       authorized: 0,
       totalProducts: 0,
-    }
+    };
   }
 }
 
 export default async function BrandsPage() {
-  const brands = await getAllBrands()
-  const brandStats = await getBrandStats()
+  const brands = await getAllBrands();
+  const brandStats = await getBrandStats();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -141,7 +143,7 @@ export default async function BrandsPage() {
                       {brand.description}
                     </p>
                   )}
-                  
+
                   <div className="space-y-3 mb-6">
                     {brand.established && (
                       <div className="flex items-center text-sm">
@@ -221,9 +223,9 @@ export default async function BrandsPage() {
                       {brand.name}
                     </h3>
                     <div className="text-xs text-gray-500 mb-2">
-                      {brand.headquarters && brand.established ? `${brand.headquarters} • ${brand.established}` : 
-                       brand.headquarters ? brand.headquarters : 
-                       brand.established ? brand.established : 
+                      {brand.headquarters && brand.established ? `${brand.headquarters} • ${brand.established}` :
+                       brand.headquarters ? brand.headquarters :
+                       brand.established ? brand.established :
                        brand.country || ''}
                     </div>
                     <div className="text-xs text-gray-600">
@@ -237,5 +239,5 @@ export default async function BrandsPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

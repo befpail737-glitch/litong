@@ -1,40 +1,42 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Badge } from '@/components/ui/badge'
-import { Slider } from '@/components/ui/slider'
-import { X, Filter, RotateCcw } from 'lucide-react'
+import { useState } from 'react';
+
+import { X, Filter, RotateCcw } from 'lucide-react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
 
 interface FilterState {
   // 价格筛选
   priceRange: [number, number]
   currency: string
-  
+
   // 分类筛选
   categories: string[]
   subcategories: string[]
-  
+
   // 品牌筛选
   brands: string[]
-  
+
   // 库存状态
   stockStatus: string[]
-  
+
   // 产品状态
   isNew: boolean
   isFeatured: boolean
   isOnSale: boolean
-  
+
   // 规格筛选
   packageTypes: string[]
   operatingVoltage: string
   operatingTemp: string
-  
+
   // 认证标准
   certifications: string[]
 }
@@ -61,7 +63,7 @@ const defaultFilters: FilterState = {
   operatingVoltage: '',
   operatingTemp: '',
   certifications: [],
-}
+};
 
 // 筛选选项数据
 const filterOptions = {
@@ -109,33 +111,33 @@ const filterOptions = {
     { value: 'ul', label: 'UL认证' },
     { value: 'ccc', label: 'CCC认证' },
   ],
-}
+};
 
-export function AdvancedFilter({ 
-  isOpen, 
-  onClose, 
-  onApply, 
+export function AdvancedFilter({
+  isOpen,
+  onClose,
+  onApply,
   onReset,
-  initialFilters = {} 
+  initialFilters = {}
 }: AdvancedFilterProps) {
   const [filters, setFilters] = useState<FilterState>({
     ...defaultFilters,
     ...initialFilters,
-  })
+  });
 
   const handleApply = () => {
-    onApply(filters)
-    onClose()
-  }
+    onApply(filters);
+    onClose();
+  };
 
   const handleReset = () => {
-    setFilters(defaultFilters)
-    onReset()
-  }
+    setFilters(defaultFilters);
+    onReset();
+  };
 
   const updateFilter = (key: keyof FilterState, value: any) => {
-    setFilters(prev => ({ ...prev, [key]: value }))
-  }
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
 
   const toggleArrayFilter = (key: keyof FilterState, value: string) => {
     setFilters(prev => ({
@@ -143,23 +145,23 @@ export function AdvancedFilter({
       [key]: (prev[key] as string[]).includes(value)
         ? (prev[key] as string[]).filter(item => item !== value)
         : [...(prev[key] as string[]), value]
-    }))
-  }
+    }));
+  };
 
   const getActiveFiltersCount = () => {
-    let count = 0
-    if (filters.categories.length > 0) count++
-    if (filters.brands.length > 0) count++
-    if (filters.stockStatus.length > 0) count++
-    if (filters.packageTypes.length > 0) count++
-    if (filters.certifications.length > 0) count++
-    if (filters.isNew || filters.isFeatured || filters.isOnSale) count++
-    if (filters.operatingVoltage || filters.operatingTemp) count++
-    if (filters.priceRange[0] > 0 || filters.priceRange[1] < 1000) count++
-    return count
-  }
+    let count = 0;
+    if (filters.categories.length > 0) count++;
+    if (filters.brands.length > 0) count++;
+    if (filters.stockStatus.length > 0) count++;
+    if (filters.packageTypes.length > 0) count++;
+    if (filters.certifications.length > 0) count++;
+    if (filters.isNew || filters.isFeatured || filters.isOnSale) count++;
+    if (filters.operatingVoltage || filters.operatingTemp) count++;
+    if (filters.priceRange[0] > 0 || filters.priceRange[1] < 1000) count++;
+    return count;
+  };
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2 sm:p-4">
@@ -232,7 +234,7 @@ export function AdvancedFilter({
                         checked={filters.categories.includes(category.value)}
                         onCheckedChange={() => toggleArrayFilter('categories', category.value)}
                       />
-                      <label 
+                      <label
                         htmlFor={`category-${category.value}`}
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
@@ -258,7 +260,7 @@ export function AdvancedFilter({
                         checked={filters.brands.includes(brand.value)}
                         onCheckedChange={() => toggleArrayFilter('brands', brand.value)}
                       />
-                      <label 
+                      <label
                         htmlFor={`brand-${brand.value}`}
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
@@ -284,7 +286,7 @@ export function AdvancedFilter({
                         checked={filters.stockStatus.includes(status.value)}
                         onCheckedChange={() => toggleArrayFilter('stockStatus', status.value)}
                       />
-                      <label 
+                      <label
                         htmlFor={`stock-${status.value}`}
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
@@ -345,7 +347,7 @@ export function AdvancedFilter({
                         checked={filters.packageTypes.includes(packageType.value)}
                         onCheckedChange={() => toggleArrayFilter('packageTypes', packageType.value)}
                       />
-                      <label 
+                      <label
                         htmlFor={`package-${packageType.value}`}
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
@@ -367,8 +369,8 @@ export function AdvancedFilter({
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     工作电压
                   </label>
-                  <Select 
-                    value={filters.operatingVoltage} 
+                  <Select
+                    value={filters.operatingVoltage}
                     onValueChange={(value) => updateFilter('operatingVoltage', value)}
                   >
                     <SelectTrigger>
@@ -388,8 +390,8 @@ export function AdvancedFilter({
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     工作温度
                   </label>
-                  <Select 
-                    value={filters.operatingTemp} 
+                  <Select
+                    value={filters.operatingTemp}
                     onValueChange={(value) => updateFilter('operatingTemp', value)}
                   >
                     <SelectTrigger>
@@ -421,7 +423,7 @@ export function AdvancedFilter({
                         checked={filters.certifications.includes(cert.value)}
                         onCheckedChange={() => toggleArrayFilter('certifications', cert.value)}
                       />
-                      <label 
+                      <label
                         htmlFor={`cert-${cert.value}`}
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
@@ -452,5 +454,5 @@ export function AdvancedFilter({
         </div>
       </div>
     </div>
-  )
+  );
 }

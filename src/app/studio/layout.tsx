@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Sanity Studio - 力通电子内容管理',
@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     index: false,
     follow: false,
   },
-}
+};
 
 export default function StudioLayout({
   children,
@@ -20,5 +20,5 @@ export default function StudioLayout({
         {children}
       </body>
     </html>
-  )
+  );
 }

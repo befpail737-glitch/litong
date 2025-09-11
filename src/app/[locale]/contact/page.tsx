@@ -1,15 +1,16 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { 
-  MapPin, 
-  Phone, 
-  Mail, 
-  Clock, 
+import {
+  MapPin,
+  Phone,
+  Mail,
+  Clock,
   Building2,
   Users,
   Award,
   Globe
-} from 'lucide-react'
+} from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function ContactPage() {
   return (
@@ -46,7 +47,7 @@ export default function ContactPage() {
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-3">
                 <Phone className="h-5 w-5 text-gray-500" />
                 <div>
@@ -54,7 +55,7 @@ export default function ContactPage() {
                   <p className="text-gray-600 text-sm">销售热线</p>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-3">
                 <Mail className="h-5 w-5 text-gray-500" />
                 <div>
@@ -62,7 +63,7 @@ export default function ContactPage() {
                   <p className="text-gray-600 text-sm">销售邮箱</p>
                 </div>
               </div>
-              
+
               <div className="flex items-start gap-3">
                 <Clock className="h-5 w-5 text-gray-500 mt-0.5" />
                 <div>
@@ -87,13 +88,13 @@ export default function ContactPage() {
                 <p className="text-sm text-gray-600">上海市浦东新区张江高科技园区</p>
                 <p className="text-sm text-gray-600">电话: +86-21-6888-9999</p>
               </div>
-              
+
               <div>
                 <h4 className="font-medium text-gray-900 mb-1">北京分公司</h4>
                 <p className="text-sm text-gray-600">北京市海淀区中关村科技园</p>
                 <p className="text-sm text-gray-600">电话: +86-10-8888-9999</p>
               </div>
-              
+
               <div>
                 <h4 className="font-medium text-gray-900 mb-1">成都分公司</h4>
                 <p className="text-sm text-gray-600">四川省成都市高新区天府软件园</p>
@@ -291,7 +292,7 @@ export default function ContactPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
 
 // SEO元数据
@@ -299,4 +300,4 @@ export const metadata = {
   title: '联系我们 - 专业电子元器件供应商 | 力通电子',
   description: '联系力通电子获取专业的电子元器件采购服务。深圳总部及全国分支机构，提供24小时技术支持和快速报价服务。',
   keywords: '联系力通电子,电子元器件供应商,深圳电子元件,技术支持,产品报价',
-}
+};

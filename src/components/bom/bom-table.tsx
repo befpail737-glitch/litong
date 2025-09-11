@@ -1,23 +1,11 @@
-'use client'
+'use client';
 
-import { useState, useCallback, useMemo } from 'react'
-import { useTranslations } from 'next-intl'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Checkbox } from '@/components/ui/checkbox'
-import { 
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import { 
+import { useState, useCallback, useMemo } from 'react';
+
+import Image from 'next/image';
+import Link from 'next/link';
+
+import {
   ShoppingCart,
   Plus,
   Minus,
@@ -34,13 +22,28 @@ import {
   Clock,
   DollarSign,
   Package
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { useFormatters } from '@/hooks/use-formatters'
-import { getLocalizedValue } from '@/lib/sanity-i18n'
-import type { Locale } from '@/i18n'
-import Link from 'next/link'
-import Image from 'next/image'
+} from 'lucide-react';
+import { useTranslations } from 'next-intl';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { useFormatters } from '@/hooks/use-formatters';
+import type { Locale } from '@/i18n';
+import { getLocalizedValue } from '@/lib/sanity-i18n';
+import { cn } from '@/lib/utils';
 
 // BOM项目类型定义
 interface BOMItem {
@@ -100,14 +103,14 @@ export function BOMTable({
   onImport,
   className
 }: BOMTableProps) {
-  const t = useTranslations('bom')
-  const { currency, fileSize } = useFormatters()
-  
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState<string>('all')
-  const [showOptional, setShowOptional] = useState(true)
-  const [editingItem, setEditingItem] = useState<string | null>(null)
-  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
+  const t = useTranslations('bom');
+  const { currency, fileSize } = useFormatters();
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [showOptional, setShowOptional] = useState(true);
+  const [editingItem, setEditingItem] = useState<string | null>(null);
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
 
   // 分类映射
   const categoryMap = {
@@ -121,100 +124,100 @@ export function BOMTable({
     connector: { label: t('categories.connector'), color: 'bg-indigo-100 text-indigo-800', icon: '🔗' },
     mechanical: { label: t('categories.mechanical'), color: 'bg-gray-100 text-gray-800', icon: '⚙️' },
     others: { label: t('categories.others'), color: 'bg-slate-100 text-slate-800', icon: '📦' }
-  }
+  };
 
   // 过滤项目
   const filteredItems = useMemo(() => {
     return items.filter(item => {
-      const productName = getLocalizedValue(item.product.name, locale).toLowerCase()
-      const supplier = item.supplier?.toLowerCase() || ''
-      const notes = item.notes?.toLowerCase() || ''
-      const search = searchTerm.toLowerCase()
-      
-      const matchesSearch = !searchTerm || 
-        productName.includes(search) || 
-        supplier.includes(search) || 
-        notes.includes(search)
-      
-      const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory
-      const matchesOptional = showOptional || !item.isOptional
-      
-      return matchesSearch && matchesCategory && matchesOptional
-    })
-  }, [items, searchTerm, selectedCategory, showOptional, locale])
+      const productName = getLocalizedValue(item.product.name, locale).toLowerCase();
+      const supplier = item.supplier?.toLowerCase() || '';
+      const notes = item.notes?.toLowerCase() || '';
+      const search = searchTerm.toLowerCase();
+
+      const matchesSearch = !searchTerm ||
+        productName.includes(search) ||
+        supplier.includes(search) ||
+        notes.includes(search);
+
+      const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
+      const matchesOptional = showOptional || !item.isOptional;
+
+      return matchesSearch && matchesCategory && matchesOptional;
+    });
+  }, [items, searchTerm, selectedCategory, showOptional, locale]);
 
   // 计算总计
   const totals = useMemo(() => {
     const selectedTotal = filteredItems
       .filter(item => selectedItems.has(item._id))
-      .reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0)
-    
-    const grandTotal = filteredItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0)
+      .reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
+
+    const grandTotal = filteredItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
     const requiredTotal = filteredItems
       .filter(item => !item.isOptional)
-      .reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0)
+      .reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
     const optionalTotal = filteredItems
       .filter(item => item.isOptional)
-      .reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0)
-    
+      .reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
+
     return {
       selected: selectedTotal,
       grand: grandTotal,
       required: requiredTotal,
       optional: optionalTotal
-    }
-  }, [filteredItems, selectedItems])
+    };
+  }, [filteredItems, selectedItems]);
 
   // 供应商统计
   const suppliers = useMemo(() => {
-    const supplierMap = new Map<string, number>()
+    const supplierMap = new Map<string, number>();
     filteredItems.forEach(item => {
       if (item.supplier) {
-        supplierMap.set(item.supplier, (supplierMap.get(item.supplier) || 0) + 1)
+        supplierMap.set(item.supplier, (supplierMap.get(item.supplier) || 0) + 1);
       }
-    })
-    return Array.from(supplierMap.entries()).sort((a, b) => b[1] - a[1])
-  }, [filteredItems])
+    });
+    return Array.from(supplierMap.entries()).sort((a, b) => b[1] - a[1]);
+  }, [filteredItems]);
 
   // 处理选择
   const handleSelectAll = useCallback((checked: boolean) => {
     if (checked) {
-      setSelectedItems(new Set(filteredItems.map(item => item._id)))
+      setSelectedItems(new Set(filteredItems.map(item => item._id)));
     } else {
-      setSelectedItems(new Set())
+      setSelectedItems(new Set());
     }
-  }, [filteredItems])
+  }, [filteredItems]);
 
   const handleSelectItem = useCallback((itemId: string, checked: boolean) => {
-    const newSelected = new Set(selectedItems)
+    const newSelected = new Set(selectedItems);
     if (checked) {
-      newSelected.add(itemId)
+      newSelected.add(itemId);
     } else {
-      newSelected.delete(itemId)
+      newSelected.delete(itemId);
     }
-    setSelectedItems(newSelected)
-  }, [selectedItems])
+    setSelectedItems(newSelected);
+  }, [selectedItems]);
 
   // 处理数量变化
   const handleQuantityChange = useCallback((itemId: string, quantity: number) => {
     if (quantity > 0) {
-      onQuantityChange?.(itemId, quantity)
+      onQuantityChange?.(itemId, quantity);
       if (onItemUpdate) {
-        const item = items.find(i => i._id === itemId)
+        const item = items.find(i => i._id === itemId);
         if (item) {
-          onItemUpdate(itemId, { quantity })
+          onItemUpdate(itemId, { quantity });
         }
       }
     }
-  }, [items, onQuantityChange, onItemUpdate])
+  }, [items, onQuantityChange, onItemUpdate]);
 
   // 获取交货期状态
   const getLeadTimeStatus = (leadTime?: number) => {
-    if (!leadTime) return { color: 'bg-gray-100 text-gray-800', icon: Clock }
-    if (leadTime <= 7) return { color: 'bg-green-100 text-green-800', icon: CheckCircle }
-    if (leadTime <= 30) return { color: 'bg-yellow-100 text-yellow-800', icon: Clock }
-    return { color: 'bg-red-100 text-red-800', icon: AlertTriangle }
-  }
+    if (!leadTime) return { color: 'bg-gray-100 text-gray-800', icon: Clock };
+    if (leadTime <= 7) return { color: 'bg-green-100 text-green-800', icon: CheckCircle };
+    if (leadTime <= 30) return { color: 'bg-yellow-100 text-yellow-800', icon: Clock };
+    return { color: 'bg-red-100 text-red-800', icon: AlertTriangle };
+  };
 
   return (
     <div className={className}>
@@ -230,7 +233,7 @@ export function BOMTable({
                 {t('itemsCount', { count: filteredItems.length, total: items.length })}
               </CardDescription>
             </div>
-            
+
             <div className="flex items-center gap-2">
               {editable && (
                 <Button onClick={() => onItemAdd?.({} as any)}>
@@ -238,12 +241,12 @@ export function BOMTable({
                   {t('addItem')}
                 </Button>
               )}
-              
+
               <Button variant="outline" onClick={() => onExport?.('excel')}>
                 <Download className="w-4 h-4 mr-2" />
                 {t('export')}
               </Button>
-              
+
               {editable && (
                 <Button variant="outline">
                   <Upload className="w-4 h-4 mr-2" />
@@ -252,8 +255,8 @@ export function BOMTable({
                     type="file"
                     accept=".csv,.xlsx,.xls"
                     onChange={(e) => {
-                      const file = e.target.files?.[0]
-                      if (file) onImport?.(file)
+                      const file = e.target.files?.[0];
+                      if (file) onImport?.(file);
                     }}
                     className="absolute inset-0 opacity-0 cursor-pointer"
                   />
@@ -273,7 +276,7 @@ export function BOMTable({
                 className="pl-10"
               />
             </div>
-            
+
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
               <SelectTrigger className="w-48">
                 <SelectValue placeholder={t('selectCategory')} />
@@ -287,7 +290,7 @@ export function BOMTable({
                 ))}
               </SelectContent>
             </Select>
-            
+
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="showOptional"
@@ -384,14 +387,14 @@ export function BOMTable({
               </TableHeader>
               <TableBody>
                 {filteredItems.map((item) => {
-                  const categoryInfo = categoryMap[item.category]
-                  const leadTimeStatus = getLeadTimeStatus(item.leadTime)
-                  const LeadTimeIcon = leadTimeStatus.icon
-                  
+                  const categoryInfo = categoryMap[item.category];
+                  const leadTimeStatus = getLeadTimeStatus(item.leadTime);
+                  const LeadTimeIcon = leadTimeStatus.icon;
+
                   return (
                     <TableRow key={item._id} className={cn(
-                      item.isOptional && "bg-muted/30",
-                      selectedItems.has(item._id) && "bg-primary/5"
+                      item.isOptional && 'bg-muted/30',
+                      selectedItems.has(item._id) && 'bg-primary/5'
                     )}>
                       <TableCell>
                         <Checkbox
@@ -399,7 +402,7 @@ export function BOMTable({
                           onCheckedChange={(checked) => handleSelectItem(item._id, !!checked)}
                         />
                       </TableCell>
-                      
+
                       <TableCell>
                         {item.product.image?.asset ? (
                           <Image
@@ -415,7 +418,7 @@ export function BOMTable({
                           </div>
                         )}
                       </TableCell>
-                      
+
                       <TableCell>
                         <div>
                           <Link
@@ -436,13 +439,13 @@ export function BOMTable({
                           )}
                         </div>
                       </TableCell>
-                      
+
                       <TableCell>
-                        <Badge className={cn("text-xs", categoryInfo.color)}>
+                        <Badge className={cn('text-xs', categoryInfo.color)}>
                           {categoryInfo.icon} {categoryInfo.label}
                         </Badge>
                       </TableCell>
-                      
+
                       <TableCell className="text-center">
                         {editable ? (
                           <div className="flex items-center gap-1">
@@ -475,7 +478,7 @@ export function BOMTable({
                           <span className="font-medium">{item.quantity}</span>
                         )}
                       </TableCell>
-                      
+
                       {showPricing && (
                         <>
                           <TableCell className="text-right">
@@ -486,16 +489,16 @@ export function BOMTable({
                           </TableCell>
                         </>
                       )}
-                      
+
                       <TableCell>
                         {item.supplier || (
                           <span className="text-muted-foreground text-sm">{t('noSupplier')}</span>
                         )}
                       </TableCell>
-                      
+
                       <TableCell className="text-center">
                         {item.leadTime ? (
-                          <Badge className={cn("text-xs", leadTimeStatus.color)}>
+                          <Badge className={cn('text-xs', leadTimeStatus.color)}>
                             <LeadTimeIcon className="w-3 h-3 mr-1" />
                             {item.leadTime}d
                           </Badge>
@@ -503,7 +506,7 @@ export function BOMTable({
                           <span className="text-muted-foreground text-sm">-</span>
                         )}
                       </TableCell>
-                      
+
                       <TableCell className="text-center">
                         {item.minimumOrderQuantity > 1 ? (
                           <span className="text-xs">{item.minimumOrderQuantity}</span>
@@ -511,7 +514,7 @@ export function BOMTable({
                           <span className="text-muted-foreground text-sm">1</span>
                         )}
                       </TableCell>
-                      
+
                       {showAlternatives && (
                         <TableCell>
                           {item.alternatives && item.alternatives.length > 0 ? (
@@ -532,7 +535,7 @@ export function BOMTable({
                           )}
                         </TableCell>
                       )}
-                      
+
                       <TableCell>
                         {item.notes ? (
                           <div className="max-w-32">
@@ -544,7 +547,7 @@ export function BOMTable({
                           <span className="text-muted-foreground text-sm">-</span>
                         )}
                       </TableCell>
-                      
+
                       {editable && (
                         <TableCell className="text-center">
                           <div className="flex items-center gap-1">
@@ -568,7 +571,7 @@ export function BOMTable({
                         </TableCell>
                       )}
                     </TableRow>
-                  )
+                  );
                 })}
               </TableBody>
             </Table>
@@ -586,7 +589,7 @@ export function BOMTable({
                     {t('selectedTotal')}: <span className="font-medium">{currency(totals.selected)}</span>
                   </p>
                 </div>
-                
+
                 <div className="flex items-center gap-2">
                   <Button variant="outline" size="sm">
                     <Calculator className="w-4 h-4 mr-2" />
@@ -622,5 +625,5 @@ export function BOMTable({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

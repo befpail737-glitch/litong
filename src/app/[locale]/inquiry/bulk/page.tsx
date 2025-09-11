@@ -1,4 +1,4 @@
-import { BulkInquiry } from '@/components/inquiry/BulkInquiry'
+import { BulkInquiry } from '@/components/inquiry/BulkInquiry';
 
 export default function BulkInquiryPage() {
   return (
@@ -12,12 +12,12 @@ export default function BulkInquiryPage() {
       </div>
 
       {/* 批量询价表单 */}
-      <BulkInquiry 
+      <BulkInquiry
         onSubmit={(data) => {
-          console.log('批量询价单提交:', data)
+          console.log('批量询价单提交:', data);
           // 这里会处理批量询价单提交逻辑
         }}
       />
     </div>
-  )
+  );
 }

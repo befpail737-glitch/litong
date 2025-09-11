@@ -1,12 +1,11 @@
-'use client'
+'use client';
 
-import { useState, useMemo } from 'react'
-import { useTranslations } from 'next-intl'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
-import { 
+import { useState, useMemo } from 'react';
+
+import Image from 'next/image';
+import Link from 'next/link';
+
+import {
   FileText,
   Download,
   Star,
@@ -25,12 +24,16 @@ import {
   ChevronRight,
   Target,
   Zap
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { useFormatters } from '@/hooks/use-formatters'
-import type { Locale } from '@/i18n'
-import Link from 'next/link'
-import Image from 'next/image'
+} from 'lucide-react';
+import { useTranslations } from 'next-intl';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { useFormatters } from '@/hooks/use-formatters';
+import type { Locale } from '@/i18n';
+import { cn } from '@/lib/utils';
 
 // 搜索结果类型
 interface SearchResult {
@@ -112,23 +115,23 @@ export function SearchResults({
   locale,
   className
 }: SearchResultsProps) {
-  const t = useTranslations('search')
-  const { dateShort, fileSize: formatFileSize } = useFormatters()
-  const [expandedResults, setExpandedResults] = useState<Set<string>>(new Set())
+  const t = useTranslations('search');
+  const { dateShort, fileSize: formatFileSize } = useFormatters();
+  const [expandedResults, setExpandedResults] = useState<Set<string>>(new Set());
 
   // 内容类型图标映射
   const contentTypeIcons = {
     article: FileText,
     document: Download,
     product: Star
-  }
+  };
 
   // 内容类型颜色映射
   const contentTypeColors = {
     article: 'text-blue-600 bg-blue-100',
     document: 'text-green-600 bg-green-100',
     product: 'text-purple-600 bg-purple-100'
-  }
+  };
 
   // 难度级别映射
   const difficultyMap = {
@@ -136,7 +139,7 @@ export function SearchResults({
     intermediate: { label: t('difficulty.intermediate'), color: 'bg-blue-100 text-blue-800' },
     advanced: { label: t('difficulty.advanced'), color: 'bg-orange-100 text-orange-800' },
     expert: { label: t('difficulty.expert'), color: 'bg-red-100 text-red-800' }
-  }
+  };
 
   // 语言映射
   const languageMap: Record<string, string> = {
@@ -145,7 +148,7 @@ export function SearchResults({
     'en': 'English',
     'ja': '日本語',
     'ko': '한국어'
-  }
+  };
 
   // 排序选项
   const sortOptions = [
@@ -153,53 +156,53 @@ export function SearchResults({
     { value: 'date', label: t('sortBy.date'), icon: Calendar },
     { value: 'popularity', label: t('sortBy.popularity'), icon: TrendingUp },
     { value: 'title', label: t('sortBy.title'), icon: ArrowUpDown }
-  ]
+  ];
 
   // 切换结果展开
   const toggleExpanded = (resultId: string) => {
-    const newExpanded = new Set(expandedResults)
+    const newExpanded = new Set(expandedResults);
     if (newExpanded.has(resultId)) {
-      newExpanded.delete(resultId)
+      newExpanded.delete(resultId);
     } else {
-      newExpanded.add(resultId)
+      newExpanded.add(resultId);
     }
-    setExpandedResults(newExpanded)
-  }
+    setExpandedResults(newExpanded);
+  };
 
   // 高亮搜索关键词
   const highlightText = (text: string, highlights: string[]) => {
-    if (!highlights.length) return text
-    
-    let highlightedText = text
+    if (!highlights.length) return text;
+
+    let highlightedText = text;
     highlights.forEach(highlight => {
-      const regex = new RegExp(`(${highlight})`, 'gi')
+      const regex = new RegExp(`(${highlight})`, 'gi');
       highlightedText = highlightedText.replace(
-        regex, 
+        regex,
         '<mark class="bg-yellow-200 px-1 rounded">$1</mark>'
-      )
-    })
-    
-    return highlightedText
-  }
+      );
+    });
+
+    return highlightedText;
+  };
 
   // 结果项组件
   const ResultItem = ({ result }: { result: SearchResult }) => {
-    const IconComponent = contentTypeIcons[result.type]
-    const isExpanded = expandedResults.has(result.id)
-    const contentTypeColor = contentTypeColors[result.type]
+    const IconComponent = contentTypeIcons[result.type];
+    const isExpanded = expandedResults.has(result.id);
+    const contentTypeColor = contentTypeColors[result.type];
 
     const handleClick = () => {
-      onResultClick?.(result)
-    }
+      onResultClick?.(result);
+    };
 
     return (
       <Card className={cn(
-        "group hover:shadow-lg transition-all duration-300",
-        viewMode === 'list' && "flex flex-row"
+        'group hover:shadow-lg transition-all duration-300',
+        viewMode === 'list' && 'flex flex-row'
       )}>
         <div className={cn(
-          "relative",
-          viewMode === 'grid' ? "aspect-video" : "w-48 flex-shrink-0"
+          'relative',
+          viewMode === 'grid' ? 'aspect-video' : 'w-48 flex-shrink-0'
         )}>
           {result.image?.url ? (
             <Image
@@ -210,7 +213,7 @@ export function SearchResults({
             />
           ) : (
             <div className={cn(
-              "w-full h-full flex items-center justify-center rounded-t-lg",
+              'w-full h-full flex items-center justify-center rounded-t-lg',
               contentTypeColor
             )}>
               <IconComponent className="w-12 h-12" />
@@ -218,7 +221,7 @@ export function SearchResults({
           )}
 
           {/* 内容类型标识 */}
-          <Badge className={cn("absolute top-2 left-2", contentTypeColor)}>
+          <Badge className={cn('absolute top-2 left-2', contentTypeColor)}>
             <IconComponent className="w-3 h-3 mr-1" />
             {t(`contentTypes.${result.type}`)}
           </Badge>
@@ -238,20 +241,20 @@ export function SearchResults({
         </div>
 
         <div className="flex-1">
-          <CardHeader className={cn(viewMode === 'list' && "py-4")}>
+          <CardHeader className={cn(viewMode === 'list' && 'py-4')}>
             <div className="flex items-center gap-2 mb-2">
               {result.metadata.category && (
                 <Badge variant="outline">
                   {result.metadata.category}
                 </Badge>
               )}
-              
+
               {result.metadata.difficulty && (
                 <Badge className={difficultyMap[result.metadata.difficulty as keyof typeof difficultyMap]?.color}>
                   {difficultyMap[result.metadata.difficulty as keyof typeof difficultyMap]?.label}
                 </Badge>
               )}
-              
+
               {result.metadata.language && (
                 <Badge variant="secondary">
                   {languageMap[result.metadata.language] || result.metadata.language}
@@ -262,19 +265,19 @@ export function SearchResults({
             <CardTitle className="line-clamp-2 group-hover:text-primary transition-colors">
               <Link href={result.url} onClick={handleClick}>
                 <span
-                  dangerouslySetInnerHTML={{ 
-                    __html: highlightText(result.title, result.highlights) 
+                  dangerouslySetInnerHTML={{
+                    __html: highlightText(result.title, result.highlights)
                   }}
                 />
               </Link>
             </CardTitle>
 
             <CardDescription className={cn(
-              isExpanded ? "line-clamp-none" : "line-clamp-2"
+              isExpanded ? 'line-clamp-none' : 'line-clamp-2'
             )}>
               <span
-                dangerouslySetInnerHTML={{ 
-                  __html: highlightText(result.excerpt, result.highlights) 
+                dangerouslySetInnerHTML={{
+                  __html: highlightText(result.excerpt, result.highlights)
                 }}
               />
             </CardDescription>
@@ -291,7 +294,7 @@ export function SearchResults({
             )}
           </CardHeader>
 
-          <CardContent className={cn(viewMode === 'list' && "py-0 pb-4")}>
+          <CardContent className={cn(viewMode === 'list' && 'py-0 pb-4')}>
             {/* 标签 */}
             {result.metadata.tags && result.metadata.tags.length > 0 && (
               <div className="flex flex-wrap gap-1 mb-3">
@@ -380,12 +383,12 @@ export function SearchResults({
           </CardContent>
         </div>
       </Card>
-    )
-  }
+    );
+  };
 
   if (loading) {
     return (
-      <div className={cn("space-y-4", className)}>
+      <div className={cn('space-y-4', className)}>
         {Array.from({ length: 6 }).map((_, index) => (
           <Card key={index} className="animate-pulse">
             <CardContent className="p-6">
@@ -398,7 +401,7 @@ export function SearchResults({
           </Card>
         ))}
       </div>
-    )
+    );
   }
 
   return (
@@ -441,7 +444,7 @@ export function SearchResults({
               <CardContent>
                 <div className="space-y-2">
                   {stats.facets.contentTypes.map(facet => {
-                    const IconComponent = contentTypeIcons[facet.type as keyof typeof contentTypeIcons]
+                    const IconComponent = contentTypeIcons[facet.type as keyof typeof contentTypeIcons];
                     return (
                       <button
                         key={facet.type}
@@ -454,7 +457,7 @@ export function SearchResults({
                         </div>
                         <Badge variant="secondary">{facet.count}</Badge>
                       </button>
-                    )
+                    );
                   })}
                 </div>
               </CardContent>
@@ -528,7 +531,7 @@ export function SearchResults({
                 {sortOptions.map(option => (
                   <Button
                     key={option.value}
-                    variant={sortBy === option.value ? "default" : "outline"}
+                    variant={sortBy === option.value ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => onSortChange?.(option.value)}
                   >
@@ -543,14 +546,14 @@ export function SearchResults({
               {/* 视图切换 */}
               <div className="flex items-center">
                 <Button
-                  variant={viewMode === 'list' ? "default" : "outline"}
+                  variant={viewMode === 'list' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => onViewModeChange?.('list')}
                 >
                   <List className="w-4 h-4" />
                 </Button>
                 <Button
-                  variant={viewMode === 'grid' ? "default" : "outline"}
+                  variant={viewMode === 'grid' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => onViewModeChange?.('grid')}
                 >
@@ -581,10 +584,10 @@ export function SearchResults({
             </Card>
           ) : (
             <div className={cn(
-              "gap-6",
-              viewMode === 'grid' 
-                ? "grid grid-cols-1 md:grid-cols-2" 
-                : "flex flex-col"
+              'gap-6',
+              viewMode === 'grid'
+                ? 'grid grid-cols-1 md:grid-cols-2'
+                : 'flex flex-col'
             )}>
               {results.map((result) => (
                 <ResultItem key={result.id} result={result} />
@@ -602,10 +605,10 @@ export function SearchResults({
               >
                 {t('previous')}
               </Button>
-              
+
               <div className="flex items-center gap-1">
                 {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                  const pageNumber = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i
+                  const pageNumber = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
                   return (
                     <Button
                       key={pageNumber}
@@ -615,10 +618,10 @@ export function SearchResults({
                     >
                       {pageNumber}
                     </Button>
-                  )
+                  );
                 })}
               </div>
-              
+
               <Button
                 variant="outline"
                 onClick={() => onPageChange?.(currentPage + 1)}
@@ -631,5 +634,5 @@ export function SearchResults({
         </div>
       </div>
     </div>
-  )
+  );
 }

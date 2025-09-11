@@ -1,35 +1,37 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useInquiry, InquiryProduct } from '@/contexts/InquiryContext'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Alert } from '@/components/ui/alert'
-import { 
-  Plus, 
-  Trash2, 
-  Upload, 
-  Search, 
+import { useState } from 'react';
+
+import {
+  Plus,
+  Trash2,
+  Upload,
+  Search,
   Package,
   AlertCircle,
   FileSpreadsheet,
   Download
-} from 'lucide-react'
+} from 'lucide-react';
+
+import { Alert } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { useInquiry, InquiryProduct } from '@/contexts/InquiryContext';
 
 export function ProductsStep() {
-  const { state, addProduct, removeProduct, updateProduct, importBOM } = useInquiry()
-  const { currentInquiry, favoriteProducts, isLoading } = state
-  const { products } = currentInquiry
+  const { state, addProduct, removeProduct, updateProduct, importBOM } = useInquiry();
+  const { currentInquiry, favoriteProducts, isLoading } = state;
+  const { products } = currentInquiry;
 
-  const [showAddForm, setShowAddForm] = useState(false)
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [bomFile, setBomFile] = useState<File | null>(null)
-  const [bomParseResult, setBomParseResult] = useState<any>(null)
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [bomFile, setBomFile] = useState<File | null>(null);
+  const [bomParseResult, setBomParseResult] = useState<any>(null);
 
   // 新产品表单状态
   const [newProduct, setNewProduct] = useState<Partial<InquiryProduct>>({
@@ -41,13 +43,13 @@ export function ProductsStep() {
     quantity: 1,
     urgency: 'standard',
     description: ''
-  })
+  });
 
   // 处理添加产品
   const handleAddProduct = () => {
     if (!newProduct.name || !newProduct.model) {
-      alert('请填写产品名称和型号')
-      return
+      alert('请填写产品名称和型号');
+      return;
     }
 
     const product: InquiryProduct = {
@@ -62,10 +64,10 @@ export function ProductsStep() {
       urgency: (newProduct.urgency as any) || 'standard',
       description: newProduct.description,
       specifications: {}
-    }
+    };
 
-    addProduct(product)
-    
+    addProduct(product);
+
     // 重置表单
     setNewProduct({
       name: '',
@@ -76,40 +78,40 @@ export function ProductsStep() {
       quantity: 1,
       urgency: 'standard',
       description: ''
-    })
-    setShowAddForm(false)
-  }
+    });
+    setShowAddForm(false);
+  };
 
   // 处理BOM文件上传
   const handleBOMUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-    setBomFile(file)
-    
+    setBomFile(file);
+
     try {
-      const result = await importBOM(file)
-      setBomParseResult(result)
-      
+      const result = await importBOM(file);
+      setBomParseResult(result);
+
       if (result.success) {
-        alert(`成功导入 ${result.products.length} 个产品`)
+        alert(`成功导入 ${result.products.length} 个产品`);
       } else {
-        alert(`导入失败: ${result.errors.map(e => e.message).join(', ')}`)
+        alert(`导入失败: ${result.errors.map(e => e.message).join(', ')}`);
       }
     } catch (error) {
-      alert('BOM文件解析失败')
+      alert('BOM文件解析失败');
     } finally {
       // 清空文件输入
-      event.target.value = ''
+      event.target.value = '';
     }
-  }
+  };
 
   // 紧急程度选项
   const urgencyOptions = [
     { value: 'standard', label: '标准', color: 'bg-gray-100 text-gray-800' },
     { value: 'urgent', label: '紧急', color: 'bg-orange-100 text-orange-800' },
     { value: 'very_urgent', label: '非常紧急', color: 'bg-red-100 text-red-800' }
-  ]
+  ];
 
   return (
     <div className="space-y-6">
@@ -126,14 +128,14 @@ export function ProductsStep() {
 
       {/* 操作按钮区 */}
       <div className="flex gap-3">
-        <Button 
+        <Button
           onClick={() => setShowAddForm(!showAddForm)}
           className="flex-1 sm:flex-none"
         >
           <Plus className="h-4 w-4 mr-2" />
           添加产品
         </Button>
-        
+
         <div className="relative">
           <input
             type="file"
@@ -142,8 +144,8 @@ export function ProductsStep() {
             className="hidden"
             id="bom-upload"
           />
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={() => document.getElementById('bom-upload')?.click()}
             disabled={isLoading}
           >
@@ -198,7 +200,7 @@ export function ProductsStep() {
                   placeholder="例：STM32F103C8T6"
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="product-model">产品型号 *</Label>
                 <Input
@@ -208,7 +210,7 @@ export function ProductsStep() {
                   placeholder="例：STM32F103C8T6"
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="product-brand">品牌</Label>
                 <Input
@@ -218,7 +220,7 @@ export function ProductsStep() {
                   placeholder="例：STMicroelectronics"
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="product-manufacturer">制造商</Label>
                 <Input
@@ -228,7 +230,7 @@ export function ProductsStep() {
                   placeholder="例：STMicroelectronics"
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="product-quantity">数量</Label>
                 <Input
@@ -239,11 +241,11 @@ export function ProductsStep() {
                   onChange={(e) => setNewProduct({ ...newProduct, quantity: parseInt(e.target.value) || 1 })}
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="product-urgency">紧急程度</Label>
-                <Select 
-                  value={newProduct.urgency} 
+                <Select
+                  value={newProduct.urgency}
                   onValueChange={(value: any) => setNewProduct({ ...newProduct, urgency: value })}
                 >
                   <SelectTrigger>
@@ -259,7 +261,7 @@ export function ProductsStep() {
                 </Select>
               </div>
             </div>
-            
+
             <div>
               <Label htmlFor="product-description">产品描述</Label>
               <Textarea
@@ -270,7 +272,7 @@ export function ProductsStep() {
                 rows={3}
               />
             </div>
-            
+
             <div className="flex gap-2">
               <Button onClick={handleAddProduct}>
                 <Plus className="h-4 w-4 mr-2" />
@@ -291,7 +293,7 @@ export function ProductsStep() {
             <h3 className="text-lg font-medium">询价产品列表</h3>
             <Badge variant="secondary">{products.length} 个产品</Badge>
           </div>
-          
+
           {products.map((product) => (
             <Card key={product.id}>
               <CardContent className="pt-4">
@@ -299,7 +301,7 @@ export function ProductsStep() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <h4 className="font-medium text-gray-900">{product.name}</h4>
-                      <Badge 
+                      <Badge
                         className={urgencyOptions.find(u => u.value === product.urgency)?.color}
                       >
                         {urgencyOptions.find(u => u.value === product.urgency)?.label}
@@ -314,7 +316,7 @@ export function ProductsStep() {
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="flex gap-2 ml-4">
                     <Button
                       variant="outline"
@@ -362,5 +364,5 @@ export function ProductsStep() {
         </Button>
       </div>
     </div>
-  )
+  );
 }

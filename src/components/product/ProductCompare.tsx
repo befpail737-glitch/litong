@@ -1,11 +1,13 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Checkbox } from '@/components/ui/checkbox'
-import { X, ArrowLeftRight, Scale, Star, CheckCircle, XCircle } from 'lucide-react'
+import { useState, useEffect } from 'react';
+
+import { X, ArrowLeftRight, Scale, Star, CheckCircle, XCircle } from 'lucide-react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface Product {
   id: string
@@ -58,43 +60,43 @@ const specCategories = {
   mechanical: '机械参数',
   environmental: '环境参数',
   performance: '性能参数',
-}
+};
 
 export function ProductCompare({ products, onRemoveProduct, onClose, className }: ProductCompareProps) {
-  const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set(products.map(p => p.id)))
+  const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set(products.map(p => p.id)));
 
   // 获取所有规格项目的并集
   const allSpecs = Array.from(
     new Set(
-      products.flatMap(product => 
+      products.flatMap(product =>
         product.specifications?.map(spec => `${spec.category}-${spec.name}`) || []
       )
     )
-  ).sort()
+  ).sort();
 
   const getSpecValue = (product: Product, specKey: string) => {
-    const [category, name] = specKey.split('-', 2)
-    const spec = product.specifications?.find(s => s.category === category && s.name === name)
-    return spec ? `${spec.value}${spec.unit || ''}` : '-'
-  }
+    const [category, name] = specKey.split('-', 2);
+    const spec = product.specifications?.find(s => s.category === category && s.name === name);
+    return spec ? `${spec.value}${spec.unit || ''}` : '-';
+  };
 
   const getSpecsByCategory = (category: string) => {
-    return allSpecs.filter(spec => spec.startsWith(category + '-'))
-  }
+    return allSpecs.filter(spec => spec.startsWith(category + '-'));
+  };
 
   const toggleProductSelection = (productId: string) => {
     setSelectedProducts(prev => {
-      const newSet = new Set(prev)
+      const newSet = new Set(prev);
       if (newSet.has(productId)) {
-        newSet.delete(productId)
+        newSet.delete(productId);
       } else {
-        newSet.add(productId)
+        newSet.add(productId);
       }
-      return newSet
-    })
-  }
+      return newSet;
+    });
+  };
 
-  const selectedProductsList = products.filter(p => selectedProducts.has(p.id))
+  const selectedProductsList = products.filter(p => selectedProducts.has(p.id));
 
   if (products.length === 0) {
     return (
@@ -103,7 +105,7 @@ export function ProductCompare({ products, onRemoveProduct, onClose, className }
         <h3 className="text-lg font-semibold text-gray-900 mb-2">暂无产品比较</h3>
         <p className="text-gray-600">请先添加产品到比较列表</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -140,7 +142,7 @@ export function ProductCompare({ products, onRemoveProduct, onClose, className }
                 <div className="p-4 bg-gray-50 font-semibold">
                   产品信息
                 </div>
-                
+
                 {/* 产品列 */}
                 {products.map((product) => (
                   <div key={product.id} className="p-4">
@@ -158,7 +160,7 @@ export function ProductCompare({ products, onRemoveProduct, onClose, className }
                         <X className="h-3 w-3" />
                       </Button>
                     </div>
-                    
+
                     <div className="space-y-3">
                       {/* 产品图片 */}
                       <div className="aspect-square bg-gray-100 rounded-md flex items-center justify-center">
@@ -172,18 +174,18 @@ export function ProductCompare({ products, onRemoveProduct, onClose, className }
                           <div className="text-2xl text-gray-300">📱</div>
                         )}
                       </div>
-                      
+
                       {/* 产品信息 */}
                       <div>
                         <div className="flex flex-wrap gap-1 mb-2">
                           {product.isNew && <Badge variant="success" className="text-xs">新品</Badge>}
                           {product.isFeatured && <Badge variant="default" className="text-xs">推荐</Badge>}
                         </div>
-                        
+
                         <h3 className="font-semibold text-sm mb-1">{product.partNumber}</h3>
                         <p className="text-xs text-gray-600 mb-1">{product.brand.name}</p>
                         <p className="text-xs text-gray-700 line-clamp-2 mb-2">{product.title}</p>
-                        
+
                         {product.pricing && (
                           <div className="text-blue-600 font-semibold">
                             ¥{product.pricing.tiers[0]?.price.toFixed(2)}
@@ -200,8 +202,8 @@ export function ProductCompare({ products, onRemoveProduct, onClose, className }
 
           {/* 规格比较表格 */}
           {Object.entries(specCategories).map(([category, categoryName]) => {
-            const categorySpecs = getSpecsByCategory(category)
-            if (categorySpecs.length === 0) return null
+            const categorySpecs = getSpecsByCategory(category);
+            if (categorySpecs.length === 0) return null;
 
             return (
               <Card key={category} className="mb-4">
@@ -210,14 +212,14 @@ export function ProductCompare({ products, onRemoveProduct, onClose, className }
                 </CardHeader>
                 <CardContent className="p-0">
                   {categorySpecs.map((specKey) => {
-                    const specName = specKey.split('-')[1]
-                    const specValues = products.map(product => getSpecValue(product, specKey))
-                    const hasVariation = new Set(specValues.filter(v => v !== '-')).size > 1
-                    
+                    const specName = specKey.split('-')[1];
+                    const specValues = products.map(product => getSpecValue(product, specKey));
+                    const hasVariation = new Set(specValues.filter(v => v !== '-')).size > 1;
+
                     return (
-                      <div 
-                        key={specKey} 
-                        className="grid divide-x border-b last:border-b-0" 
+                      <div
+                        key={specKey}
+                        className="grid divide-x border-b last:border-b-0"
                         style={{gridTemplateColumns: `200px repeat(${products.length}, 1fr)`}}
                       >
                         <div className={`p-3 bg-gray-50 text-sm font-medium ${hasVariation ? 'bg-yellow-50' : ''}`}>
@@ -228,28 +230,28 @@ export function ProductCompare({ products, onRemoveProduct, onClose, className }
                             </span>
                           )}
                         </div>
-                        
+
                         {products.map((product, index) => {
-                          const value = getSpecValue(product, specKey)
-                          const isSelected = selectedProducts.has(product.id)
-                          
+                          const value = getSpecValue(product, specKey);
+                          const isSelected = selectedProducts.has(product.id);
+
                           return (
-                            <div 
-                              key={product.id} 
+                            <div
+                              key={product.id}
                               className={`p-3 text-sm ${!isSelected ? 'opacity-50 bg-gray-100' : ''} ${hasVariation ? 'bg-yellow-50' : ''}`}
                             >
                               <span className={hasVariation && value !== '-' ? 'font-medium' : ''}>
                                 {value}
                               </span>
                             </div>
-                          )
+                          );
                         })}
                       </div>
-                    )
+                    );
                   })}
                 </CardContent>
               </Card>
-            )
+            );
           })}
 
           {/* 比较结果摘要 */}
@@ -282,7 +284,7 @@ export function ProductCompare({ products, onRemoveProduct, onClose, className }
                         ))}
                     </div>
                   </div>
-                  
+
                   <div>
                     <h4 className="font-semibold mb-2">推荐理由</h4>
                     <div className="space-y-2">
@@ -304,5 +306,5 @@ export function ProductCompare({ products, onRemoveProduct, onClose, className }
         </div>
       </div>
     </div>
-  )
+  );
 }

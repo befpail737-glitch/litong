@@ -1,10 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
-import { rateLimit } from '@/lib/rate-limit'
-import { authenticateRequest } from '@/lib/auth'
-import { validateRequest } from '@/lib/validation'
-import { logAPIRequest } from '@/lib/logging'
-import { cacheResponse } from '@/lib/cache'
+import { NextRequest, NextResponse } from 'next/server';
+
+import { z } from 'zod';
+
+import { authenticateRequest } from '@/lib/auth';
+import { cacheResponse } from '@/lib/cache';
+import { logAPIRequest } from '@/lib/logging';
+import { rateLimit } from '@/lib/rate-limit';
+import { validateRequest } from '@/lib/validation';
 
 // Validation Schemas
 const ProductQuerySchema = z.object({
@@ -19,7 +21,7 @@ const ProductQuerySchema = z.object({
   sortBy: z.enum(['name', 'price', 'createdAt', 'popularity', 'rating']).optional().default('name'),
   sortOrder: z.enum(['asc', 'desc']).optional().default('asc'),
   tags: z.string().optional().transform(val => val ? val.split(',') : undefined)
-})
+});
 
 const ProductCreateSchema = z.object({
   name: z.string().min(1).max(255),
@@ -34,14 +36,14 @@ const ProductCreateSchema = z.object({
   documents: z.array(z.string().url()).optional().default([]),
   tags: z.array(z.string()).optional().default([]),
   status: z.enum(['ACTIVE', 'INACTIVE', 'DISCONTINUED', 'COMING_SOON']).optional().default('ACTIVE')
-})
+});
 
-const ProductUpdateSchema = ProductCreateSchema.partial()
+const ProductUpdateSchema = ProductCreateSchema.partial();
 
 // Mock Database Functions
 async function getProducts(filters: any = {}, pagination: any = {}) {
-  const { page = 1, limit = 20 } = pagination
-  const offset = (page - 1) * limit
+  const { page = 1, limit = 20 } = pagination;
+  const offset = (page - 1) * limit;
 
   // Simulate database query
   let products = Array.from({ length: 150 }, (_, i) => ({
@@ -92,71 +94,71 @@ async function getProducts(filters: any = {}, pagination: any = {}) {
     },
     createdAt: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
     updatedAt: new Date().toISOString()
-  }))
+  }));
 
   // Apply filters
   if (filters.search) {
-    const searchLower = filters.search.toLowerCase()
-    products = products.filter(p => 
+    const searchLower = filters.search.toLowerCase();
+    products = products.filter(p =>
       p.name.toLowerCase().includes(searchLower) ||
       p.description.toLowerCase().includes(searchLower) ||
       p.manufacturer.toLowerCase().includes(searchLower) ||
       p.tags.some((tag: string) => tag.toLowerCase().includes(searchLower))
-    )
+    );
   }
 
   if (filters.category) {
-    products = products.filter(p => p.category === filters.category)
+    products = products.filter(p => p.category === filters.category);
   }
 
   if (filters.manufacturer) {
-    products = products.filter(p => p.manufacturer === filters.manufacturer)
+    products = products.filter(p => p.manufacturer === filters.manufacturer);
   }
 
   if (filters.minPrice !== undefined) {
-    products = products.filter(p => p.price >= filters.minPrice)
+    products = products.filter(p => p.price >= filters.minPrice);
   }
 
   if (filters.maxPrice !== undefined) {
-    products = products.filter(p => p.price <= filters.maxPrice)
+    products = products.filter(p => p.price <= filters.maxPrice);
   }
 
   if (filters.inStock) {
-    products = products.filter(p => p.inventory.available > 0)
+    products = products.filter(p => p.inventory.available > 0);
   }
 
   if (filters.tags && filters.tags.length > 0) {
-    products = products.filter(p => 
+    products = products.filter(p =>
       filters.tags.some((tag: string) => p.tags.includes(tag))
-    )
+    );
   }
 
   // Apply sorting
   if (filters.sortBy) {
     products.sort((a: any, b: any) => {
-      let aVal = a[filters.sortBy]
-      let bVal = b[filters.sortBy]
+      let aVal = a[filters.sortBy];
+      let bVal = b[filters.sortBy];
 
       if (filters.sortBy === 'rating') {
-        aVal = a.metrics.rating
-        bVal = b.metrics.rating
+        aVal = a.metrics.rating;
+        bVal = b.metrics.rating;
       } else if (filters.sortBy === 'popularity') {
-        aVal = a.metrics.views
-        bVal = b.metrics.views
+        aVal = a.metrics.views;
+        bVal = b.metrics.views;
       }
 
       if (typeof aVal === 'string') {
-        aVal = aVal.toLowerCase()
-        bVal = bVal.toLowerCase()
+        aVal = aVal.toLowerCase();
+        bVal = bVal.toLowerCase();
       }
 
-      const order = filters.sortOrder === 'desc' ? -1 : 1
-      return aVal > bVal ? order : aVal < bVal ? -order : 0
-    })
+      const order = filters.sortOrder === 'desc' ? -1 : 1;
+      return aVal > bVal ? order : aVal < bVal ? -order : 0;
+    });
   }
 
-  const totalCount = products.length
-  const paginatedProducts = products.slice(offset, offset + limit)
+  const totalCount = products.length;
+  const paginatedProducts = products.slice(offset, offset + limit);
 
   return {
     data: paginatedProducts,
@@ -177,7 +179,7 @@ async function getProducts(filters: any = {}, pagination: any = {}) {
       },
       tags: [...new Set(products.flatMap(p => p.tags))]
     }
-  }
+  };
 }
 
 async function getProductById(id: string) {
@@ -239,7 +241,7 @@ async function getProductById(id: string) {
       },
       {
         id: `doc_${id}_2`,
-        name: `Reference Manual`,
+        name: 'Reference Manual',
         url: `https://cdn.example.com/docs/${id}/reference.pdf`,
         type: 'MANUAL',
         size: 15728640,
@@ -306,7 +308,7 @@ async function getProductById(id: string) {
     relatedProducts: [
       { id: (parseInt(id) + 1).toString(), name: `STM32 Product ${parseInt(id) + 1}`, relationship: 'similar' },
       { id: (parseInt(id) + 2).toString(), name: `STM32 Product ${parseInt(id) + 2}`, relationship: 'upgrade' },
-      { id: (parseInt(id) + 10).toString(), name: `Development Board for STM32`, relationship: 'accessory' }
+      { id: (parseInt(id) + 10).toString(), name: 'Development Board for STM32', relationship: 'accessory' }
     ],
     seo: {
       metaTitle: `STM32H${743 + parseInt(id)} - High Performance ARM Cortex-M7 Microcontroller`,
@@ -330,12 +332,12 @@ async function getProductById(id: string) {
     },
     createdAt: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
     updatedAt: new Date().toISOString()
-  }
+  };
 
   // Increment view count
-  product.metrics.views += 1
+  product.metrics.views += 1;
 
-  return product
+  return product;
 }
 
 async function createProduct(data: any) {
@@ -364,9 +366,9 @@ async function createProduct(data: any) {
     },
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
-  }
+  };
 
-  return newProduct
+  return newProduct;
 }
 
 async function updateProduct(id: string, data: any) {
@@ -375,60 +377,60 @@ async function updateProduct(id: string, data: any) {
     ...await getProductById(id),
     ...data,
     updatedAt: new Date().toISOString()
-  }
+  };
 
-  return updatedProduct
+  return updatedProduct;
 }
 
 async function deleteProduct(id: string) {
   // Simulate database delete
-  return { success: true, message: 'Product deleted successfully' }
+  return { success: true, message: 'Product deleted successfully' };
 }
 
 // API Route Handlers
 export async function GET(request: NextRequest) {
-  const startTime = Date.now()
+  const startTime = Date.now();
 
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimit(request, { limit: 100, window: 60000 })
+    const rateLimitResult = await rateLimit(request, { limit: 100, window: 60000 });
     if (!rateLimitResult.success) {
       return NextResponse.json(
         { error: 'Rate limit exceeded', retryAfter: rateLimitResult.retryAfter },
         { status: 429 }
-      )
+      );
     }
 
     // Parse and validate query parameters
-    const { searchParams } = new URL(request.url)
-    const queryParams = Object.fromEntries(searchParams.entries())
-    
-    const validation = ProductQuerySchema.safeParse(queryParams)
+    const { searchParams } = new URL(request.url);
+    const queryParams = Object.fromEntries(searchParams.entries());
+
+    const validation = ProductQuerySchema.safeParse(queryParams);
     if (!validation.success) {
       return NextResponse.json(
-        { 
+        {
           error: 'Invalid query parameters',
           details: validation.error.errors
         },
         { status: 400 }
-      )
+      );
     }
 
-    const { page, limit, sortBy, sortOrder, ...filters } = validation.data
+    const { page, limit, sortBy, sortOrder, ...filters } = validation.data;
 
     // Check cache
-    const cacheKey = `products:${JSON.stringify({ page, limit, sortBy, sortOrder, ...filters })}`
-    const cachedResult = await cacheResponse(cacheKey)
+    const cacheKey = `products:${JSON.stringify({ page, limit, sortBy, sortOrder, ...filters })}`;
+    const cachedResult = await cacheResponse(cacheKey);
     if (cachedResult) {
       return NextResponse.json({
         ...cachedResult,
         cached: true,
         processingTime: Date.now() - startTime
-      })
+      });
     }
 
     // Fetch products
-    const result = await getProducts(filters, { page, limit, sortBy, sortOrder })
+    const result = await getProducts(filters, { page, limit, sortBy, sortOrder });
 
     const response = {
       success: true,
@@ -437,7 +439,7 @@ export async function GET(request: NextRequest) {
       filters: result.filters,
       processingTime: Date.now() - startTime,
       cached: false
-    }
+    };
 
     // Log API request
     await logAPIRequest({
@@ -448,15 +450,15 @@ export async function GET(request: NextRequest) {
       status: 200,
       userAgent: request.headers.get('user-agent') || '',
       ip: request.ip || ''
-    })
+    });
 
     // Cache response for 5 minutes
-    await cacheResponse(cacheKey, response, 300)
+    await cacheResponse(cacheKey, response, 300);
 
-    return NextResponse.json(response)
+    return NextResponse.json(response);
 
   } catch (error) {
-    console.error('Products API Error:', error)
+    console.error('Products API Error:', error);
 
     await logAPIRequest({
       method: 'GET',
@@ -467,64 +469,64 @@ export async function GET(request: NextRequest) {
       error: error instanceof Error ? error.message : 'Unknown error',
       userAgent: request.headers.get('user-agent') || '',
       ip: request.ip || ''
-    })
+    });
 
     return NextResponse.json(
-      { 
+      {
         success: false,
         error: 'Internal server error',
         message: 'An error occurred while fetching products'
       },
       { status: 500 }
-    )
+    );
   }
 }
 
 export async function POST(request: NextRequest) {
-  const startTime = Date.now()
+  const startTime = Date.now();
 
   try {
     // Rate limiting
-    const rateLimitResult = await rateLimit(request, { limit: 10, window: 60000 })
+    const rateLimitResult = await rateLimit(request, { limit: 10, window: 60000 });
     if (!rateLimitResult.success) {
       return NextResponse.json(
         { error: 'Rate limit exceeded', retryAfter: rateLimitResult.retryAfter },
         { status: 429 }
-      )
+      );
     }
 
     // Authentication
-    const authResult = await authenticateRequest(request)
+    const authResult = await authenticateRequest(request);
     if (!authResult.success || !['ADMIN', 'MANAGER'].includes(authResult.user?.role)) {
       return NextResponse.json(
         { error: 'Unauthorized', message: 'Admin or Manager role required' },
         { status: 401 }
-      )
+      );
     }
 
     // Parse and validate request body
-    const body = await request.json()
-    const validation = ProductCreateSchema.safeParse(body)
-    
+    const body = await request.json();
+    const validation = ProductCreateSchema.safeParse(body);
+
     if (!validation.success) {
       return NextResponse.json(
-        { 
+        {
           error: 'Invalid request data',
           details: validation.error.errors
         },
         { status: 400 }
-      )
+      );
     }
 
     // Create product
-    const newProduct = await createProduct(validation.data)
+    const newProduct = await createProduct(validation.data);
 
     const response = {
       success: true,
       data: newProduct,
       message: 'Product created successfully',
       processingTime: Date.now() - startTime
-    }
+    };
 
     // Log API request
     await logAPIRequest({
@@ -535,12 +537,12 @@ export async function POST(request: NextRequest) {
       status: 201,
       userAgent: request.headers.get('user-agent') || '',
       ip: request.ip || ''
-    })
+    });
 
-    return NextResponse.json(response, { status: 201 })
+    return NextResponse.json(response, { status: 201 });
 
   } catch (error) {
-    console.error('Create Product API Error:', error)
+    console.error('Create Product API Error:', error);
 
     await logAPIRequest({
       method: 'POST',
@@ -550,15 +552,15 @@ export async function POST(request: NextRequest) {
       error: error instanceof Error ? error.message : 'Unknown error',
       userAgent: request.headers.get('user-agent') || '',
       ip: request.ip || ''
-    })
+    });
 
     return NextResponse.json(
-      { 
+      {
         success: false,
         error: 'Internal server error',
         message: 'An error occurred while creating the product'
       },
       { status: 500 }
-    )
+    );
   }
 }

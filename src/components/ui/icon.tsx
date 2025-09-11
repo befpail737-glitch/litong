@@ -1,5 +1,6 @@
-import * as React from 'react'
-import { type LucideProps } from 'lucide-react'
+import * as React from 'react';
+
+import { type LucideProps } from 'lucide-react';
 import {
   Search,
   X,
@@ -83,7 +84,7 @@ import {
   FolderOpen,
   Image,
   File,
-} from 'lucide-react'
+} from 'lucide-react';
 
 // 图标映射对象
 export const Icons = {
@@ -98,7 +99,7 @@ export const Icons = {
   plus: Plus,
   minus: Minus,
   send: Send,
-  
+
   // 联系方式
   mail: Mail,
   phone: Phone,
@@ -106,52 +107,52 @@ export const Icons = {
   building: Building,
   user: User,
   messageCircle: MessageCircle,
-  
+
   // 筛选和排序
   filter: Filter,
   sortAsc: SortAsc,
   sortDesc: SortDesc,
   grid: Grid,
   list: List,
-  
+
   // 互动
   star: Star,
   heart: Heart,
   shoppingCart: ShoppingCart,
   download: Download,
   upload: Upload,
-  
+
   // 可见性
   eye: Eye,
   eyeOff: EyeOff,
-  
+
   // 编辑
   edit: Edit,
   trash: Trash2,
   copy: Copy,
   externalLink: ExternalLink,
-  
+
   // 箭头
   arrowLeft: ArrowLeft,
   arrowRight: ArrowRight,
   arrowUp: ArrowUp,
   arrowDown: ArrowDown,
-  
+
   // 界面
   menu: Menu,
   settings: Settings,
   help: HelpCircle,
   info: Info,
-  
+
   // 状态
   alertCircle: AlertCircle,
   checkCircle: CheckCircle,
   xCircle: XCircle,
-  
+
   // 时间
   clock: Clock,
   calendar: Calendar,
-  
+
   // 网络和安全
   globe: Globe,
   shield: Shield,
@@ -159,7 +160,7 @@ export const Icons = {
   unlock: Unlock,
   wifi: Wifi,
   wifiOff: WifiOff,
-  
+
   // 硬件和设备
   battery: Battery,
   zap: Zap,
@@ -171,7 +172,7 @@ export const Icons = {
   laptop: Laptop,
   camera: Camera,
   video: Video,
-  
+
   // 音频控制
   volume: Volume2,
   volumeOff: VolumeX,
@@ -182,17 +183,17 @@ export const Icons = {
   skipForward: SkipForward,
   repeat: Repeat,
   shuffle: Shuffle,
-  
+
   // 社交和分享
   share: Share,
   bookmark: Bookmark,
   flag: Flag,
   tag: Tag,
-  
+
   // 商业
   package: Package,
   truck: Truck,
-  
+
   // 文件和文件夹
   home: Home,
   fileText: FileText,
@@ -200,7 +201,7 @@ export const Icons = {
   folderOpen: FolderOpen,
   image: Image,
   file: File,
-} as const
+} as const;
 
 // 图标类型定义
 export type IconName = keyof typeof Icons
@@ -212,27 +213,27 @@ export interface IconProps extends LucideProps {
 
 // 通用图标组件
 export function Icon({ name, ...props }: IconProps) {
-  const IconComponent = Icons[name]
-  
+  const IconComponent = Icons[name];
+
   if (!IconComponent) {
-    console.warn(`Icon "${name}" not found`)
-    return null
+    console.warn(`Icon "${name}" not found`);
+    return null;
   }
-  
-  return <IconComponent {...props} />
+
+  return <IconComponent {...props} />;
 }
 
 // 预设尺寸的便捷组件
 export function SmallIcon({ name, ...props }: IconProps) {
-  return <Icon name={name} size={16} {...props} />
+  return <Icon name={name} size={16} {...props} />;
 }
 
 export function MediumIcon({ name, ...props }: IconProps) {
-  return <Icon name={name} size={20} {...props} />
+  return <Icon name={name} size={20} {...props} />;
 }
 
 export function LargeIcon({ name, ...props }: IconProps) {
-  return <Icon name={name} size={24} {...props} />
+  return <Icon name={name} size={24} {...props} />;
 }
 
 // 导出所有图标以便直接使用
@@ -319,4 +320,4 @@ export {
   FolderOpen,
   Image,
   File,
-}
+};

@@ -1,5 +1,6 @@
-import { groq } from 'next-sanity'
-import { client, GROQ_FRAGMENTS, withRetry, SanityError } from './client'
+import { groq } from 'next-sanity';
+
+import { client, GROQ_FRAGMENTS, withRetry, SanityError } from './client';
 
 // 产品查询
 export async function getProducts(params: {
@@ -17,20 +18,20 @@ export async function getProducts(params: {
     brand,
     featured,
     preview = false
-  } = params
+  } = params;
 
-  let filter = `_type == "product" && isActive == true && !(_id in path("drafts.**"))`
-  
+  let filter = '_type == "product" && isActive == true && !(_id in path("drafts.**"))';
+
   if (category) {
-    filter += ` && category->slug.current == "${category}"`
+    filter += ` && category->slug.current == "${category}"`;
   }
-  
+
   if (brand) {
-    filter += ` && brand->slug.current == "${brand}"`
+    filter += ` && brand->slug.current == "${brand}"`;
   }
-  
+
   if (featured) {
-    filter += ` && isFeatured == true`
+    filter += ' && isFeatured == true';
   }
 
   const query = groq`
@@ -40,21 +41,21 @@ export async function getProducts(params: {
       },
       "total": count(*[${filter}])
     }
-  `
+  `;
 
   try {
-    console.log('Fetching products with query:', query)
-    console.log('Query parameters:', { limit, offset, category, brand, featured })
-    const result = await withRetry(() => client.fetch(query))
+    console.log('Fetching products with query:', query);
+    console.log('Query parameters:', { limit, offset, category, brand, featured });
+    const result = await withRetry(() => client.fetch(query));
     console.log('Products fetch result:', {
       totalProducts: result.total,
       fetchedProducts: result.products?.length || 0,
       firstProduct: result.products?.[0] || null
-    })
-    return result
+    });
+    return result;
   } catch (error) {
-    console.error('Error fetching products:', error)
-    throw new SanityError('Failed to fetch products', 'FETCH_PRODUCTS_ERROR')
+    console.error('Error fetching products:', error);
+    throw new SanityError('Failed to fetch products', 'FETCH_PRODUCTS_ERROR');
   }
 }
 
@@ -64,61 +65,61 @@ export async function getProduct(slug: string, preview = false) {
     *[_type == "product" && slug.current == $slug && isActive == true && !(_id in path("drafts.**"))][0] {
       ${GROQ_FRAGMENTS.productDetail}
     }
-  `
+  `;
 
   try {
-    const product = await withRetry(() => client.fetch(query, { slug }))
+    const product = await withRetry(() => client.fetch(query, { slug }));
     if (!product) {
-      throw new SanityError('Product not found', 'PRODUCT_NOT_FOUND')
+      throw new SanityError('Product not found', 'PRODUCT_NOT_FOUND');
     }
-    return product
+    return product;
   } catch (error) {
-    if (error instanceof SanityError) throw error
-    throw new SanityError('Failed to fetch product', 'FETCH_PRODUCT_ERROR')
+    if (error instanceof SanityError) throw error;
+    throw new SanityError('Failed to fetch product', 'FETCH_PRODUCT_ERROR');
   }
 }
 
 // 获取产品分类
 export async function getProductCategories(parentId?: string) {
-  let filter = `_type == "productCategory" && isVisible == true`
-  
+  let filter = '_type == "productCategory" && isVisible == true';
+
   if (parentId) {
-    filter += ` && parent._ref == "${parentId}"`
+    filter += ` && parent._ref == "${parentId}"`;
   } else {
-    filter += ` && !defined(parent)`
+    filter += ' && !defined(parent)';
   }
 
   const query = groq`
     *[${filter}] | order(sortOrder asc, name asc) {
       ${GROQ_FRAGMENTS.category}
     }
-  `
+  `;
 
   try {
-    return await withRetry(() => client.fetch(query))
+    return await withRetry(() => client.fetch(query));
   } catch (error) {
-    throw new SanityError('Failed to fetch categories', 'FETCH_CATEGORIES_ERROR')
+    throw new SanityError('Failed to fetch categories', 'FETCH_CATEGORIES_ERROR');
   }
 }
 
 // 获取品牌列表
 export async function getBrands(featured = false) {
-  let filter = `_type == "brandBasic" && isActive == true && !(_id in path("drafts.**"))`
-  
+  let filter = '_type == "brandBasic" && isActive == true && !(_id in path("drafts.**"))';
+
   if (featured) {
-    filter += ` && isFeatured == true`
+    filter += ' && isFeatured == true';
   }
 
   const query = groq`
     *[${filter}] | order(name asc) {
       ${GROQ_FRAGMENTS.brand}
     }
-  `
+  `;
 
   try {
-    return await withRetry(() => client.fetch(query))
+    return await withRetry(() => client.fetch(query));
   } catch (error) {
-    throw new SanityError('Failed to fetch brands', 'FETCH_BRANDS_ERROR')
+    throw new SanityError('Failed to fetch brands', 'FETCH_BRANDS_ERROR');
   }
 }
 
@@ -136,12 +137,12 @@ export async function searchProducts(searchTerm: string, limit = 10) {
     ] | order(title asc) [0...${limit}] {
       ${GROQ_FRAGMENTS.productBase}
     }
-  `
+  `;
 
   try {
-    return await withRetry(() => client.fetch(query, { searchTerm }))
+    return await withRetry(() => client.fetch(query, { searchTerm }));
   } catch (error) {
-    throw new SanityError('Failed to search products', 'SEARCH_PRODUCTS_ERROR')
+    throw new SanityError('Failed to search products', 'SEARCH_PRODUCTS_ERROR');
   }
 }
 
@@ -156,12 +157,12 @@ export async function getRelatedProducts(productId: string, categoryId: string, 
     ] | order(_createdAt desc) [0...${limit}] {
       ${GROQ_FRAGMENTS.productBase}
     }
-  `
+  `;
 
   try {
-    return await withRetry(() => client.fetch(query, { productId, categoryId }))
+    return await withRetry(() => client.fetch(query, { productId, categoryId }));
   } catch (error) {
-    throw new SanityError('Failed to fetch related products', 'FETCH_RELATED_PRODUCTS_ERROR')
+    throw new SanityError('Failed to fetch related products', 'FETCH_RELATED_PRODUCTS_ERROR');
   }
 }
 
@@ -179,20 +180,20 @@ export async function getArticles(params: {
     category,
     brand,
     featured
-  } = params
+  } = params;
 
-  let filter = `_type == "article" && isPublished == true`
-  
+  let filter = '_type == "article" && isPublished == true';
+
   if (category) {
-    filter += ` && category->slug.current == "${category}"`
+    filter += ` && category->slug.current == "${category}"`;
   }
-  
+
   if (brand) {
-    filter += ` && "${brand}" in relatedBrands[]->slug.current`
+    filter += ` && "${brand}" in relatedBrands[]->slug.current`;
   }
-  
+
   if (featured) {
-    filter += ` && isFeatured == true`
+    filter += ' && isFeatured == true';
   }
 
   const query = groq`
@@ -202,12 +203,12 @@ export async function getArticles(params: {
       },
       "total": count(*[${filter}])
     }
-  `
+  `;
 
   try {
-    return await withRetry(() => client.fetch(query))
+    return await withRetry(() => client.fetch(query));
   } catch (error) {
-    throw new SanityError('Failed to fetch articles', 'FETCH_ARTICLES_ERROR')
+    throw new SanityError('Failed to fetch articles', 'FETCH_ARTICLES_ERROR');
   }
 }
 
@@ -217,17 +218,17 @@ export async function getArticle(slug: string) {
     *[_type == "article" && slug.current == $slug && isPublished == true][0] {
       ${GROQ_FRAGMENTS.article}
     }
-  `
+  `;
 
   try {
-    const article = await withRetry(() => client.fetch(query, { slug }))
+    const article = await withRetry(() => client.fetch(query, { slug }));
     if (!article) {
-      throw new SanityError('Article not found', 'ARTICLE_NOT_FOUND')
+      throw new SanityError('Article not found', 'ARTICLE_NOT_FOUND');
     }
-    return article
+    return article;
   } catch (error) {
-    if (error instanceof SanityError) throw error
-    throw new SanityError('Failed to fetch article', 'FETCH_ARTICLE_ERROR')
+    if (error instanceof SanityError) throw error;
+    throw new SanityError('Failed to fetch article', 'FETCH_ARTICLE_ERROR');
   }
 }
 
@@ -245,16 +246,16 @@ export async function getSolutions(params: {
     targetMarket,
     featured,
     preview = false
-  } = params
+  } = params;
 
-  let filter = `_type == "solution" && isPublished == true && !(_id in path("drafts.**"))`
-  
+  let filter = '_type == "solution" && isPublished == true && !(_id in path("drafts.**"))';
+
   if (targetMarket) {
-    filter += ` && targetMarket == "${targetMarket}"`
+    filter += ` && targetMarket == "${targetMarket}"`;
   }
-  
+
   if (featured) {
-    filter += ` && isFeatured == true`
+    filter += ' && isFeatured == true';
   }
 
   const query = groq`
@@ -264,21 +265,21 @@ export async function getSolutions(params: {
       },
       "total": count(*[${filter}])
     }
-  `
+  `;
 
   try {
-    console.log('Fetching solutions with query:', query)
-    console.log('Query parameters:', { limit, offset, targetMarket, featured })
-    const result = await withRetry(() => client.fetch(query))
+    console.log('Fetching solutions with query:', query);
+    console.log('Query parameters:', { limit, offset, targetMarket, featured });
+    const result = await withRetry(() => client.fetch(query));
     console.log('Solutions fetch result:', {
       totalSolutions: result.total,
       fetchedSolutions: result.solutions?.length || 0,
       firstSolution: result.solutions?.[0] || null
-    })
-    return result
+    });
+    return result;
   } catch (error) {
-    console.error('Error fetching solutions:', error)
-    throw new SanityError('Failed to fetch solutions', 'FETCH_SOLUTIONS_ERROR')
+    console.error('Error fetching solutions:', error);
+    throw new SanityError('Failed to fetch solutions', 'FETCH_SOLUTIONS_ERROR');
   }
 }
 
@@ -288,17 +289,17 @@ export async function getSolution(slug: string, preview = false) {
     *[_type == "solution" && slug.current == $slug && isPublished == true && !(_id in path("drafts.**"))][0] {
       ${GROQ_FRAGMENTS.solution}
     }
-  `
+  `;
 
   try {
-    const solution = await withRetry(() => client.fetch(query, { slug }))
+    const solution = await withRetry(() => client.fetch(query, { slug }));
     if (!solution) {
-      throw new SanityError('Solution not found', 'SOLUTION_NOT_FOUND')
+      throw new SanityError('Solution not found', 'SOLUTION_NOT_FOUND');
     }
-    return solution
+    return solution;
   } catch (error) {
-    if (error instanceof SanityError) throw error
-    throw new SanityError('Failed to fetch solution', 'FETCH_SOLUTION_ERROR')
+    if (error instanceof SanityError) throw error;
+    throw new SanityError('Failed to fetch solution', 'FETCH_SOLUTION_ERROR');
   }
 }
 
@@ -315,12 +316,12 @@ export async function searchSolutions(searchTerm: string, limit = 10) {
     ] | order(title asc) [0...${limit}] {
       ${GROQ_FRAGMENTS.solution}
     }
-  `
+  `;
 
   try {
-    return await withRetry(() => client.fetch(query, { searchTerm }))
+    return await withRetry(() => client.fetch(query, { searchTerm }));
   } catch (error) {
-    throw new SanityError('Failed to search solutions', 'SEARCH_SOLUTIONS_ERROR')
+    throw new SanityError('Failed to search solutions', 'SEARCH_SOLUTIONS_ERROR');
   }
 }
 
@@ -335,12 +336,12 @@ export async function getRelatedSolutions(solutionId: string, targetMarket: stri
     ] | order(publishedAt desc) [0...${limit}] {
       ${GROQ_FRAGMENTS.solution}
     }
-  `
+  `;
 
   try {
-    return await withRetry(() => client.fetch(query, { solutionId, targetMarket }))
+    return await withRetry(() => client.fetch(query, { solutionId, targetMarket }));
   } catch (error) {
-    throw new SanityError('Failed to fetch related solutions', 'FETCH_RELATED_SOLUTIONS_ERROR')
+    throw new SanityError('Failed to fetch related solutions', 'FETCH_RELATED_SOLUTIONS_ERROR');
   }
 }
 
@@ -354,11 +355,11 @@ export async function getSiteStats() {
       "featuredProducts": count(*[_type == "product" && isActive == true && isFeatured == true]),
       "totalSolutions": count(*[_type == "solution" && isPublished == true])
     }
-  `
+  `;
 
   try {
-    return await withRetry(() => client.fetch(query))
+    return await withRetry(() => client.fetch(query));
   } catch (error) {
-    throw new SanityError('Failed to fetch site stats', 'FETCH_STATS_ERROR')
+    throw new SanityError('Failed to fetch site stats', 'FETCH_STATS_ERROR');
   }
 }

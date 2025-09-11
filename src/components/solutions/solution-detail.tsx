@@ -1,13 +1,11 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useTranslations } from 'next-intl'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { 
+import { useState } from 'react';
+
+import Image from 'next/image';
+import Link from 'next/link';
+
+import {
   Lightbulb,
   ArrowLeft,
   Star,
@@ -26,14 +24,19 @@ import {
   Shield,
   Award,
   MessageCircle
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { useFormatters } from '@/hooks/use-formatters'
-import { getLocalizedValue, getLocalizedRichText } from '@/lib/sanity-i18n'
-import { PortableTextRenderer } from '@/components/rich-text/portable-text-renderer'
-import type { Locale } from '@/i18n'
-import Link from 'next/link'
-import Image from 'next/image'
+} from 'lucide-react';
+import { useTranslations } from 'next-intl';
+
+import { PortableTextRenderer } from '@/components/rich-text/portable-text-renderer';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useFormatters } from '@/hooks/use-formatters';
+import type { Locale } from '@/i18n';
+import { getLocalizedValue, getLocalizedRichText } from '@/lib/sanity-i18n';
+import { cn } from '@/lib/utils';
 
 // 解决方案详情类型定义
 interface SolutionDetail {
@@ -140,14 +143,14 @@ export function SolutionDetail({
   onShare,
   className
 }: SolutionDetailProps) {
-  const t = useTranslations('solutions')
-  const { dateShort, currency } = useFormatters()
-  const [selectedImage, setSelectedImage] = useState(0)
-  const [activeTab, setActiveTab] = useState('overview')
+  const t = useTranslations('solutions');
+  const { dateShort, currency } = useFormatters();
+  const [selectedImage, setSelectedImage] = useState(0);
+  const [activeTab, setActiveTab] = useState('overview');
 
-  const title = getLocalizedValue(solution.title, locale)
-  const summary = getLocalizedValue(solution.summary, locale)
-  const description = getLocalizedRichText(solution.description, locale)
+  const title = getLocalizedValue(solution.title, locale);
+  const summary = getLocalizedValue(solution.summary, locale);
+  const description = getLocalizedRichText(solution.description, locale);
 
   // 目标市场映射
   const targetMarketMap: Record<string, { label: string; color: string }> = {
@@ -159,31 +162,31 @@ export function SolutionDetail({
     'power-energy': { label: t('markets.powerEnergy'), color: 'bg-orange-100 text-orange-800' },
     'aerospace': { label: t('markets.aerospace'), color: 'bg-indigo-100 text-indigo-800' },
     'others': { label: t('markets.others'), color: 'bg-gray-100 text-gray-800' }
-  }
+  };
 
   const complexityMap: Record<string, { label: string; color: string }> = {
     simple: { label: t('complexity.simple'), color: 'bg-green-100 text-green-800' },
     medium: { label: t('complexity.medium'), color: 'bg-blue-100 text-blue-800' },
     complex: { label: t('complexity.complex'), color: 'bg-orange-100 text-orange-800' },
     'high-complex': { label: t('complexity.highComplex'), color: 'bg-red-100 text-red-800' }
-  }
+  };
 
   const statusMap: Record<string, { label: string; color: string }> = {
     development: { label: t('status.development'), color: 'bg-yellow-100 text-yellow-800' },
     testing: { label: t('status.testing'), color: 'bg-blue-100 text-blue-800' },
     released: { label: t('status.released'), color: 'bg-green-100 text-green-800' },
     deprecated: { label: t('status.deprecated'), color: 'bg-gray-100 text-gray-800' }
-  }
+  };
 
-  const marketInfo = targetMarketMap[solution.targetMarket]
-  const complexityInfo = complexityMap[solution.complexity]
-  const statusInfo = statusMap[solution.status]
+  const marketInfo = targetMarketMap[solution.targetMarket];
+  const complexityInfo = complexityMap[solution.complexity];
+  const statusInfo = statusMap[solution.status];
 
   // 图片列表（封面图 + 画廊）
   const images = [
     solution.coverImage,
     ...(solution.gallery || [])
-  ].filter(Boolean)
+  ].filter(Boolean);
 
   return (
     <div className={className}>
@@ -207,19 +210,19 @@ export function SolutionDetail({
                 {marketInfo.label}
               </Badge>
             )}
-            
+
             {complexityInfo && (
               <Badge className={complexityInfo.color}>
                 {complexityInfo.label}
               </Badge>
             )}
-            
+
             {statusInfo && (
               <Badge className={statusInfo.color}>
                 {statusInfo.label}
               </Badge>
             )}
-            
+
             {solution.isFeatured && (
               <Badge className="bg-yellow-500 text-white">
                 <Star className="w-3 h-3 mr-1" />
@@ -239,7 +242,7 @@ export function SolutionDetail({
           <CardTitle className="text-3xl md:text-4xl font-bold leading-tight">
             {title}
           </CardTitle>
-          
+
           {summary && (
             <CardDescription className="text-lg mt-4">
               {summary}
@@ -255,7 +258,7 @@ export function SolutionDetail({
                   <span>{solution.developmentCycle} {t('days')}</span>
                 </div>
               )}
-              
+
               {solution.costRange && (
                 <div className="flex items-center gap-2">
                   <DollarSign className="w-4 h-4" />
@@ -264,12 +267,12 @@ export function SolutionDetail({
                   </span>
                 </div>
               )}
-              
+
               <div className="flex items-center gap-2">
                 <Eye className="w-4 h-4" />
                 <span>{solution.viewCount || 0} {t('views')}</span>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <Users className="w-4 h-4" />
                 <span>{solution.inquiryCount || 0} {t('inquiries')}</span>
@@ -306,7 +309,7 @@ export function SolutionDetail({
                 priority
               />
             </div>
-            
+
             {/* 图片缩略图 */}
             {images.length > 1 && (
               <div className="flex gap-2 mt-4 overflow-x-auto">
@@ -315,8 +318,8 @@ export function SolutionDetail({
                     key={index}
                     onClick={() => setSelectedImage(index)}
                     className={cn(
-                      "relative w-20 h-16 rounded border-2 overflow-hidden flex-shrink-0",
-                      selectedImage === index ? "border-primary" : "border-muted"
+                      'relative w-20 h-16 rounded border-2 overflow-hidden flex-shrink-0',
+                      selectedImage === index ? 'border-primary' : 'border-muted'
                     )}
                   >
                     <Image
@@ -329,7 +332,7 @@ export function SolutionDetail({
                 ))}
               </div>
             )}
-            
+
             {images[selectedImage]?.caption && (
               <p className="text-center text-sm text-muted-foreground mt-2">
                 {images[selectedImage].caption}
@@ -439,7 +442,7 @@ export function SolutionDetail({
                             <p className="text-muted-foreground mb-4">
                               {getLocalizedValue(advantage.description, locale)}
                             </p>
-                            
+
                             {/* 性能指标 */}
                             {advantage.metrics && advantage.metrics.length > 0 && (
                               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -458,7 +461,7 @@ export function SolutionDetail({
                                 ))}
                               </div>
                             )}
-                            
+
                             {index < solution.advantages.length - 1 && (
                               <Separator className="mt-6" />
                             )}
@@ -673,7 +676,7 @@ export function SolutionDetail({
                         />
                       )}
                       <div className="flex-1">
-                        <Link 
+                        <Link
                           href={`/products/${product.slug.current}`}
                           className="text-sm font-medium hover:text-primary transition-colors line-clamp-2"
                         >
@@ -709,9 +712,9 @@ export function SolutionDetail({
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {relatedSolutions.slice(0, 3).map((relatedSolution) => {
-              const relatedMarketInfo = targetMarketMap[relatedSolution.targetMarket]
-              const relatedComplexityInfo = complexityMap[relatedSolution.complexity]
-              
+              const relatedMarketInfo = targetMarketMap[relatedSolution.targetMarket];
+              const relatedComplexityInfo = complexityMap[relatedSolution.complexity];
+
               return (
                 <Card key={relatedSolution._id} className="group hover:shadow-lg transition-all duration-300">
                   {relatedSolution.coverImage?.asset && (
@@ -747,11 +750,11 @@ export function SolutionDetail({
                     </CardDescription>
                   </CardHeader>
                 </Card>
-              )
+              );
             })}
           </div>
         </div>
       )}
     </div>
-  )
+  );
 }

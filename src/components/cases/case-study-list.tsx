@@ -1,14 +1,11 @@
-'use client'
+'use client';
 
-import { useState, useMemo } from 'react'
-import { useTranslations } from 'next-intl'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Separator } from '@/components/ui/separator'
-import { 
+import { useState, useMemo } from 'react';
+
+import Image from 'next/image';
+import Link from 'next/link';
+
+import {
   BookOpen,
   Search,
   Filter,
@@ -25,13 +22,19 @@ import {
   Clock,
   Target,
   CheckCircle
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { useFormatters } from '@/hooks/use-formatters'
-import { getLocalizedValue } from '@/lib/sanity-i18n'
-import type { Locale } from '@/i18n'
-import Link from 'next/link'
-import Image from 'next/image'
+} from 'lucide-react';
+import { useTranslations } from 'next-intl';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import { useFormatters } from '@/hooks/use-formatters';
+import type { Locale } from '@/i18n';
+import { getLocalizedValue } from '@/lib/sanity-i18n';
+import { cn } from '@/lib/utils';
 
 // 案例研究类型定义
 interface CaseStudy {
@@ -118,15 +121,15 @@ export function CaseStudyList({
   onPageChange,
   className
 }: CaseStudyListProps) {
-  const t = useTranslations('caseStudies')
-  const { dateShort, currency } = useFormatters()
-  
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedIndustry, setSelectedIndustry] = useState<string>('all')
-  const [selectedType, setSelectedType] = useState<string>('all')
-  const [selectedComplexity, setSelectedComplexity] = useState<string>('all')
-  const [sortBy, setSortBy] = useState<'latest' | 'popular' | 'featured' | 'roi'>('latest')
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const t = useTranslations('caseStudies');
+  const { dateShort, currency } = useFormatters();
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedIndustry, setSelectedIndustry] = useState<string>('all');
+  const [selectedType, setSelectedType] = useState<string>('all');
+  const [selectedComplexity, setSelectedComplexity] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<'latest' | 'popular' | 'featured' | 'roi'>('latest');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   // 案例类型映射
   const caseTypeMap = {
@@ -136,7 +139,7 @@ export function CaseStudyList({
     'cost-optimization': { label: t('caseTypes.costOptimization'), color: 'bg-orange-100 text-orange-800', icon: '💰' },
     'performance-improvement': { label: t('caseTypes.performanceImprovement'), color: 'bg-red-100 text-red-800', icon: '📈' },
     'problem-solving': { label: t('caseTypes.problemSolving'), color: 'bg-yellow-100 text-yellow-800', icon: '🔧' }
-  }
+  };
 
   // 复杂度映射
   const complexityMap = {
@@ -144,7 +147,7 @@ export function CaseStudyList({
     medium: { label: t('complexity.medium'), color: 'bg-blue-100 text-blue-800' },
     complex: { label: t('complexity.complex'), color: 'bg-orange-100 text-orange-800' },
     'high-complex': { label: t('complexity.highComplex'), color: 'bg-red-100 text-red-800' }
-  }
+  };
 
   // 严重程度映射
   const severityMap = {
@@ -152,89 +155,89 @@ export function CaseStudyList({
     medium: { label: t('severity.medium'), color: 'bg-yellow-100 text-yellow-800' },
     high: { label: t('severity.high'), color: 'bg-orange-100 text-orange-800' },
     critical: { label: t('severity.critical'), color: 'bg-red-100 text-red-800' }
-  }
+  };
 
   // 过滤案例
   const filteredCases = useMemo(() => {
     return cases.filter(caseStudy => {
-      const title = getLocalizedValue(caseStudy.title, locale).toLowerCase()
-      const summary = getLocalizedValue(caseStudy.summary, locale).toLowerCase()
-      const customerName = caseStudy.customer.name.toLowerCase()
-      const search = searchTerm.toLowerCase()
-      
-      const matchesSearch = !searchTerm || 
-        title.includes(search) || 
+      const title = getLocalizedValue(caseStudy.title, locale).toLowerCase();
+      const summary = getLocalizedValue(caseStudy.summary, locale).toLowerCase();
+      const customerName = caseStudy.customer.name.toLowerCase();
+      const search = searchTerm.toLowerCase();
+
+      const matchesSearch = !searchTerm ||
+        title.includes(search) ||
         summary.includes(search) ||
         customerName.includes(search) ||
         caseStudy.applications?.some(app => app.toLowerCase().includes(search)) ||
-        caseStudy.tags?.some(tag => tag.toLowerCase().includes(search))
-      
-      const matchesIndustry = selectedIndustry === 'all' || 
-        caseStudy.industries?.some(industry => industry._id === selectedIndustry)
-      
-      const matchesType = selectedType === 'all' || caseStudy.caseType === selectedType
-      const matchesComplexity = selectedComplexity === 'all' || caseStudy.complexity === selectedComplexity
-      
-      return matchesSearch && matchesIndustry && matchesType && matchesComplexity
-    })
-  }, [cases, searchTerm, selectedIndustry, selectedType, selectedComplexity, locale])
+        caseStudy.tags?.some(tag => tag.toLowerCase().includes(search));
+
+      const matchesIndustry = selectedIndustry === 'all' ||
+        caseStudy.industries?.some(industry => industry._id === selectedIndustry);
+
+      const matchesType = selectedType === 'all' || caseStudy.caseType === selectedType;
+      const matchesComplexity = selectedComplexity === 'all' || caseStudy.complexity === selectedComplexity;
+
+      return matchesSearch && matchesIndustry && matchesType && matchesComplexity;
+    });
+  }, [cases, searchTerm, selectedIndustry, selectedType, selectedComplexity, locale]);
 
   // 排序案例
   const sortedCases = useMemo(() => {
     return [...filteredCases].sort((a, b) => {
       switch (sortBy) {
         case 'popular':
-          return b.viewCount - a.viewCount
+          return b.viewCount - a.viewCount;
         case 'featured':
-          if (a.isFeatured && !b.isFeatured) return -1
-          if (!a.isFeatured && b.isFeatured) return 1
-          return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+          if (a.isFeatured && !b.isFeatured) return -1;
+          if (!a.isFeatured && b.isFeatured) return 1;
+          return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
         case 'roi':
-          const aROI = a.results?.roi || 0
-          const bROI = b.results?.roi || 0
-          return bROI - aROI
+          const aROI = a.results?.roi || 0;
+          const bROI = b.results?.roi || 0;
+          return bROI - aROI;
         case 'latest':
         default:
-          return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+          return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
       }
-    })
-  }, [filteredCases, sortBy])
+    });
+  }, [filteredCases, sortBy]);
 
   // 分页计算
-  const totalPages = Math.ceil(sortedCases.length / pageSize)
-  const startIndex = (currentPage - 1) * pageSize
-  const paginatedCases = sortedCases.slice(startIndex, startIndex + pageSize)
+  const totalPages = Math.ceil(sortedCases.length / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const paginatedCases = sortedCases.slice(startIndex, startIndex + pageSize);
 
   const CaseStudyCard = ({ caseStudy }: { caseStudy: CaseStudy }) => {
-    const title = getLocalizedValue(caseStudy.title, locale)
-    const summary = getLocalizedValue(caseStudy.summary, locale)
-    const projectName = getLocalizedValue(caseStudy.project.name, locale)
-    const typeInfo = caseTypeMap[caseStudy.caseType]
-    const complexityInfo = complexityMap[caseStudy.complexity]
+    const title = getLocalizedValue(caseStudy.title, locale);
+    const summary = getLocalizedValue(caseStudy.summary, locale);
+    const projectName = getLocalizedValue(caseStudy.project.name, locale);
+    const typeInfo = caseTypeMap[caseStudy.caseType];
+    const complexityInfo = complexityMap[caseStudy.complexity];
 
     // 计算项目持续时间
-    const duration = caseStudy.project.duration || 
-      Math.ceil((new Date(caseStudy.project.endDate).getTime() - new Date(caseStudy.project.startDate).getTime()) / (1000 * 60 * 60 * 24 * 30))
+    const duration = caseStudy.project.duration ||
+      Math.ceil((new Date(caseStudy.project.endDate).getTime() - new Date(caseStudy.project.startDate).getTime()) / (1000 * 60 * 60 * 24 * 30));
 
     // 获取最高严重程度的挑战
     const highestSeverity = caseStudy.challenges?.reduce((max, challenge) => {
-      const severityOrder = { low: 1, medium: 2, high: 3, critical: 4 }
-      return severityOrder[challenge.severity] > severityOrder[max] ? challenge.severity : max
-    }, 'low' as keyof typeof severityMap)
+      const severityOrder = { low: 1, medium: 2, high: 3, critical: 4 };
+      return severityOrder[challenge.severity] > severityOrder[max] ? challenge.severity : max;
+    }, 'low' as keyof typeof severityMap);
 
     // 平均评分
-    const avgRating = caseStudy.testimonials?.length 
+    const avgRating = caseStudy.testimonials?.length
       ? caseStudy.testimonials.reduce((sum, t) => sum + t.rating, 0) / caseStudy.testimonials.length
-      : 0
+      : 0;
 
     return (
       <Card className={cn(
-        "group hover:shadow-lg transition-all duration-300",
-        viewMode === 'list' && "flex flex-row"
+        'group hover:shadow-lg transition-all duration-300',
+        viewMode === 'list' && 'flex flex-row'
       )}>
         <div className={cn(
-          "relative",
-          viewMode === 'grid' ? "aspect-video" : "w-64 flex-shrink-0"
+          'relative',
+          viewMode === 'grid' ? 'aspect-video' : 'w-64 flex-shrink-0'
         )}>
           {caseStudy.coverImage?.asset && (
             <Image
@@ -254,13 +257,13 @@ export function CaseStudyList({
           )}
 
           {/* 复杂度标识 */}
-          <Badge className={cn("absolute top-3 right-3", complexityInfo.color)}>
+          <Badge className={cn('absolute top-3 right-3', complexityInfo.color)}>
             {complexityInfo.label}
           </Badge>
 
           {/* 挑战严重程度 */}
           {highestSeverity && highestSeverity !== 'low' && (
-            <Badge className={cn("absolute bottom-3 left-3", severityMap[highestSeverity].color)}>
+            <Badge className={cn('absolute bottom-3 left-3', severityMap[highestSeverity].color)}>
               {severityMap[highestSeverity].label}
             </Badge>
           )}
@@ -272,14 +275,14 @@ export function CaseStudyList({
             </div>
           )}
         </div>
-        
+
         <div className="flex-1">
-          <CardHeader className={cn(viewMode === 'list' && "py-4")}>
+          <CardHeader className={cn(viewMode === 'list' && 'py-4')}>
             <div className="flex items-center gap-2 mb-2">
               <Badge className={typeInfo.color}>
                 {typeInfo.icon} {typeInfo.label}
               </Badge>
-              
+
               {caseStudy.industries && caseStudy.industries.length > 0 && (
                 <Badge variant="outline">
                   {getLocalizedValue(caseStudy.industries[0].name, locale)}
@@ -287,21 +290,21 @@ export function CaseStudyList({
                 </Badge>
               )}
             </div>
-            
+
             <CardTitle className="line-clamp-2 group-hover:text-primary transition-colors">
               <Link href={`/cases/${caseStudy.slug.current}`}>
                 {title}
               </Link>
             </CardTitle>
-            
+
             {summary && (
               <CardDescription className="line-clamp-3">
                 {summary}
               </CardDescription>
             )}
           </CardHeader>
-          
-          <CardContent className={cn(viewMode === 'list' && "py-0 pb-4")}>
+
+          <CardContent className={cn(viewMode === 'list' && 'py-0 pb-4')}>
             {/* 客户信息 */}
             <div className="flex items-center gap-3 mb-4">
               {caseStudy.customer.logo?.asset && (
@@ -342,7 +345,7 @@ export function CaseStudyList({
                   {duration} {t('months')}
                 </span>
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <span className="flex items-center gap-1">
                   <Users className="w-4 h-4" />
@@ -383,7 +386,7 @@ export function CaseStudyList({
                   </Badge>
                 )}
               </div>
-              
+
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 {avgRating > 0 && (
                   <div className="flex items-center gap-1">
@@ -400,8 +403,8 @@ export function CaseStudyList({
           </CardContent>
         </div>
       </Card>
-    )
-  }
+    );
+  };
 
   return (
     <div className={className}>
@@ -418,7 +421,7 @@ export function CaseStudyList({
               className="pl-10"
             />
           </div>
-          
+
           {/* 过滤器 */}
           <div className="flex flex-wrap gap-2">
             <Select value={selectedIndustry} onValueChange={setSelectedIndustry}>
@@ -434,7 +437,7 @@ export function CaseStudyList({
                 ))}
               </SelectContent>
             </Select>
-            
+
             <Select value={selectedType} onValueChange={setSelectedType}>
               <SelectTrigger className="w-48">
                 <SelectValue placeholder={t('selectType')} />
@@ -448,7 +451,7 @@ export function CaseStudyList({
                 ))}
               </SelectContent>
             </Select>
-            
+
             <Select value={selectedComplexity} onValueChange={setSelectedComplexity}>
               <SelectTrigger className="w-40">
                 <SelectValue placeholder={t('selectComplexity')} />
@@ -464,16 +467,16 @@ export function CaseStudyList({
             </Select>
           </div>
         </div>
-        
+
         {/* 排序和视图切换 */}
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            {t('showingResults', { 
-              count: sortedCases.length, 
-              total: totalCount 
+            {t('showingResults', {
+              count: sortedCases.length,
+              total: totalCount
             })}
           </p>
-          
+
           <div className="flex items-center gap-4">
             {/* 排序 */}
             <Select value={sortBy} onValueChange={(value) => setSortBy(value as typeof sortBy)}>
@@ -493,14 +496,14 @@ export function CaseStudyList({
             {/* 视图切换 */}
             <div className="flex items-center">
               <Button
-                variant={viewMode === 'grid' ? "default" : "outline"}
+                variant={viewMode === 'grid' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setViewMode('grid')}
               >
                 <Grid3X3 className="w-4 h-4" />
               </Button>
               <Button
-                variant={viewMode === 'list' ? "default" : "outline"}
+                variant={viewMode === 'list' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setViewMode('list')}
               >
@@ -521,10 +524,10 @@ export function CaseStudyList({
             <p className="text-lg font-medium mb-2">{t('noCasesFound')}</p>
             <p className="text-muted-foreground mb-4">{t('tryAdjustingFilters')}</p>
             <Button onClick={() => {
-              setSearchTerm('')
-              setSelectedIndustry('all')
-              setSelectedType('all')
-              setSelectedComplexity('all')
+              setSearchTerm('');
+              setSelectedIndustry('all');
+              setSelectedType('all');
+              setSelectedComplexity('all');
             }}>
               {t('clearFilters')}
             </Button>
@@ -532,10 +535,10 @@ export function CaseStudyList({
         </Card>
       ) : (
         <div className={cn(
-          "gap-6",
-          viewMode === 'grid' 
-            ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3" 
-            : "flex flex-col"
+          'gap-6',
+          viewMode === 'grid'
+            ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3'
+            : 'flex flex-col'
         )}>
           {paginatedCases.map((caseStudy) => (
             <CaseStudyCard key={caseStudy._id} caseStudy={caseStudy} />
@@ -553,10 +556,10 @@ export function CaseStudyList({
           >
             {t('previous')}
           </Button>
-          
+
           <div className="flex items-center gap-1">
             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-              const pageNumber = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i
+              const pageNumber = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
               return (
                 <Button
                   key={pageNumber}
@@ -566,10 +569,10 @@ export function CaseStudyList({
                 >
                   {pageNumber}
                 </Button>
-              )
+              );
             })}
           </div>
-          
+
           <Button
             variant="outline"
             onClick={() => onPageChange?.(currentPage + 1)}
@@ -638,7 +641,7 @@ export function CaseStudyList({
                 <p className="text-2xl font-bold">
                   {(sortedCases
                     .filter(c => c.results?.roi)
-                    .reduce((sum, c) => sum + (c.results?.roi || 0), 0) / 
+                    .reduce((sum, c) => sum + (c.results?.roi || 0), 0) /
                     sortedCases.filter(c => c.results?.roi).length || 0
                   ).toFixed(1)}%
                 </p>
@@ -649,5 +652,5 @@ export function CaseStudyList({
         </Card>
       </div>
     </div>
-  )
+  );
 }

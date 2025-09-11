@@ -1,4 +1,4 @@
-import { client, GROQ_FRAGMENTS } from './client'
+import { client, GROQ_FRAGMENTS } from './client';
 
 export interface Brand {
   _id: string
@@ -30,13 +30,13 @@ export async function getAllBrands(): Promise<Brand[]> {
       logo,
       headquarters,
       established
-    }`
-    
-    const brands = await client.fetch(query)
-    return brands || []
+    }`;
+
+    const brands = await client.fetch(query);
+    return brands || [];
   } catch (error) {
-    console.error('Error fetching brands:', error)
-    return []
+    console.error('Error fetching brands:', error);
+    return [];
   }
 }
 
@@ -56,13 +56,13 @@ export async function getFeaturedBrands(): Promise<Brand[]> {
       logo,
       headquarters,
       established
-    }`
-    
-    const brands = await client.fetch(query)
-    return brands || []
+    }`;
+
+    const brands = await client.fetch(query);
+    return brands || [];
   } catch (error) {
-    console.error('Error fetching featured brands:', error)
-    return []
+    console.error('Error fetching featured brands:', error);
+    return [];
   }
 }
 
@@ -82,13 +82,13 @@ export async function getBrandByName(name: string): Promise<Brand | null> {
       logo,
       headquarters,
       established
-    }`
-    
-    const brand = await client.fetch(query, { name })
-    return brand || null
+    }`;
+
+    const brand = await client.fetch(query, { name });
+    return brand || null;
   } catch (error) {
-    console.error('Error fetching brand by name:', error)
-    return null
+    console.error('Error fetching brand by name:', error);
+    return null;
   }
 }
 
@@ -108,13 +108,13 @@ export async function getBrandData(slug: string): Promise<Brand | null> {
       logo,
       headquarters,
       established
-    }`
-    
-    const brand = await client.fetch(query, { slug })
-    return brand || null
+    }`;
+
+    const brand = await client.fetch(query, { slug });
+    return brand || null;
   } catch (error) {
-    console.error('Error fetching brand data:', error)
-    return null
+    console.error('Error fetching brand data:', error);
+    return null;
   }
 }
 
@@ -125,20 +125,20 @@ export async function getBrandStats() {
       "total": count(*[_type == "brandBasic" && isActive == true && !(_id in path("drafts.**"))]),
       "featured": count(*[_type == "brandBasic" && isActive == true && isFeatured == true && !(_id in path("drafts.**"))]),
       "solutions": count(*[_type == "solution" && isPublished == true && !(_id in path("drafts.**"))])
-    }`
-    
-    const stats = await client.fetch(query)
+    }`;
+
+    const stats = await client.fetch(query);
     return {
       total: stats?.total || 0,
       authorized: stats?.featured || 0,
       totalProducts: stats?.solutions || 0 * 1000, // 估算产品数量
-    }
+    };
   } catch (error) {
-    console.error('Error fetching brand stats:', error)
+    console.error('Error fetching brand stats:', error);
     return {
       total: 0,
       authorized: 0,
       totalProducts: 0,
-    }
+    };
   }
 }

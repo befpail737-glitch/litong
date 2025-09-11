@@ -1,14 +1,13 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { 
-  Building2, 
-  Users, 
-  Award, 
-  Globe, 
-  TrendingUp, 
-  Shield, 
-  Clock, 
+import Link from 'next/link';
+
+import {
+  Building2,
+  Users,
+  Award,
+  Globe,
+  TrendingUp,
+  Shield,
+  Clock,
   CheckCircle2,
   Target,
   Zap,
@@ -18,8 +17,11 @@ import {
   Phone,
   Mail,
   Calendar
-} from 'lucide-react'
-import Link from 'next/link'
+} from 'lucide-react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function AboutPage() {
   return (
@@ -424,7 +426,7 @@ export default function AboutPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }
 
 // SEO元数据
@@ -432,4 +434,4 @@ export const metadata = {
   title: '关于我们 - 15年专业电子元器件供应商 | 力通电子',
   description: '力通电子成立于2009年，专注电子元器件供应链服务15年。全球供应网络，专业技术支持，为10,000+客户提供优质服务。',
   keywords: '力通电子,关于我们,电子元器件供应商,供应链服务,深圳电子公司,原厂授权代理',
-}
+};

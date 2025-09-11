@@ -1,27 +1,28 @@
-'use client'
+'use client';
 
-import { useInquiry } from '@/contexts/InquiryContext'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Badge } from '@/components/ui/badge'
-import { 
-  FolderOpen, 
-  Target, 
-  Calendar, 
+import {
+  FolderOpen,
+  Target,
+  Calendar,
   DollarSign,
   FileText,
   Shield,
   AlertCircle
-} from 'lucide-react'
+} from 'lucide-react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { useInquiry } from '@/contexts/InquiryContext';
 
 export function ProjectStep() {
-  const { state, updateProjectInfo } = useInquiry()
-  const { currentInquiry } = state
-  const { projectInfo } = currentInquiry
+  const { state, updateProjectInfo } = useInquiry();
+  const { currentInquiry } = state;
+  const { projectInfo } = currentInquiry;
 
   // 认证要求选项
   const certificationOptions = [
@@ -33,7 +34,7 @@ export function ProjectStep() {
     { id: 'iso14001', label: 'ISO 14001', description: '环境管理体系认证' },
     { id: 'iatf16949', label: 'IATF 16949', description: '汽车行业质量管理体系' },
     { id: 'mil', label: 'MIL标准', description: '军用标准认证' }
-  ]
+  ];
 
   // 时间线选项
   const timelineOptions = [
@@ -44,7 +45,7 @@ export function ProjectStep() {
     '3-6个月',
     '6个月以上',
     '持续供货'
-  ]
+  ];
 
   // 预算范围选项
   const budgetOptions = [
@@ -54,7 +55,7 @@ export function ProjectStep() {
     '10-50万元',
     '50-100万元',
     '100万元以上'
-  ]
+  ];
 
   // 应用领域选项
   const applicationOptions = [
@@ -69,16 +70,16 @@ export function ProjectStep() {
     '物联网',
     '人工智能',
     '其他'
-  ]
+  ];
 
   // 更新认证要求
   const updateCertifications = (certId: string, checked: boolean) => {
-    const current = projectInfo.certificationRequirements || []
-    const updated = checked 
+    const current = projectInfo.certificationRequirements || [];
+    const updated = checked
       ? [...current, certId]
-      : current.filter(c => c !== certId)
-    updateProjectInfo({ certificationRequirements: updated })
-  }
+      : current.filter(c => c !== certId);
+    updateProjectInfo({ certificationRequirements: updated });
+  };
 
   return (
     <div className="space-y-6">
@@ -111,7 +112,7 @@ export function ProjectStep() {
               placeholder="请输入项目名称"
             />
           </div>
-          
+
           <div>
             <Label htmlFor="project-description">项目描述</Label>
             <Textarea
@@ -122,7 +123,7 @@ export function ProjectStep() {
               rows={3}
             />
           </div>
-          
+
           <div>
             <Label htmlFor="application">应用领域</Label>
             <select
@@ -165,7 +166,7 @@ export function ProjectStep() {
                 </span>
               </div>
             </div>
-            
+
             <div>
               <Label htmlFor="target-price">目标单价</Label>
               <div className="relative">
@@ -183,7 +184,7 @@ export function ProjectStep() {
               </div>
             </div>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="timeline">交付时间要求</Label>
@@ -199,7 +200,7 @@ export function ProjectStep() {
                 ))}
               </select>
             </div>
-            
+
             <div>
               <Label htmlFor="budget">项目预算范围</Label>
               <select
@@ -244,18 +245,18 @@ export function ProjectStep() {
               </div>
             ))}
           </div>
-          
+
           {(projectInfo.certificationRequirements?.length || 0) > 0 && (
             <div className="mt-4 p-3 bg-blue-50 rounded-lg">
               <p className="text-sm text-blue-800 mb-2">已选择的认证要求：</p>
               <div className="flex flex-wrap gap-2">
                 {(projectInfo.certificationRequirements || []).map(certId => {
-                  const cert = certificationOptions.find(c => c.id === certId)
+                  const cert = certificationOptions.find(c => c.id === certId);
                   return cert ? (
                     <Badge key={certId} variant="secondary" className="bg-blue-100 text-blue-800">
                       {cert.label}
                     </Badge>
-                  ) : null
+                  ) : null;
                 })}
               </div>
             </div>
@@ -301,5 +302,5 @@ export function ProjectStep() {
         </div>
       </div>
     </div>
-  )
+  );
 }

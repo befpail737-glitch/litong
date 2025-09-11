@@ -1,11 +1,13 @@
-import { notFound } from 'next/navigation'
-import Link from 'next/link'
-import { getArticles } from '@/lib/sanity/queries'
-import { client } from '@/lib/sanity/client'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import SearchInput from '@/components/SearchInput'
-import { Building2, ArrowLeft, FileText, Download, ExternalLink } from 'lucide-react'
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+
+import { Building2, ArrowLeft, FileText, Download, ExternalLink } from 'lucide-react';
+
+import SearchInput from '@/components/SearchInput';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { client } from '@/lib/sanity/client';
+import { getArticles } from '@/lib/sanity/queries';
 
 // 从Sanity获取品牌数据
 const getBrandData = async (slug: string) => {
@@ -18,14 +20,14 @@ const getBrandData = async (slug: string) => {
         description,
         isActive
       }
-    `, { slug })
-    
-    return brand
+    `, { slug });
+
+    return brand;
   } catch (error) {
-    console.error('Error fetching brand from Sanity:', error)
-    return null
+    console.error('Error fetching brand from Sanity:', error);
+    return null;
   }
-}
+};
 
 interface BrandSupportPageProps {
   params: {
@@ -39,53 +41,53 @@ interface BrandSupportPageProps {
 }
 
 // 禁用缓存，确保总是获取最新数据
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function BrandSupportPage({ params, searchParams }: BrandSupportPageProps) {
   // 解码URL编码的slug（处理中文slug）
-  const decodedSlug = decodeURIComponent(params.slug)
-  console.log('BrandSupportPage called with slug:', params.slug, 'decoded:', decodedSlug)
-  
+  const decodedSlug = decodeURIComponent(params.slug);
+  console.log('BrandSupportPage called with slug:', params.slug, 'decoded:', decodedSlug);
+
   // 从Sanity获取品牌数据
-  const brand = await getBrandData(decodedSlug)
-  console.log('Brand from Sanity:', brand)
-  
+  const brand = await getBrandData(decodedSlug);
+  console.log('Brand from Sanity:', brand);
+
   if (!brand) {
-    console.log('Brand not found, calling notFound()')
-    notFound()
+    console.log('Brand not found, calling notFound()');
+    notFound();
   }
 
   // 获取该品牌相关的技术支持文章
-  let articles: any[] = []
-  let total = 0
-  let error = null
-  
+  let articles: any[] = [];
+  let total = 0;
+  let error = null;
+
   try {
     // 直接获取与品牌相关的技术支持文章
-    const result = await getArticles({ 
+    const result = await getArticles({
       limit: 100,
       category: searchParams.category,
       brand: decodedSlug
-    })
-    articles = result.articles
-    
+    });
+    articles = result.articles;
+
     // 如果有搜索词，进一步筛选
     if (searchParams.search) {
-      const searchTerm = searchParams.search.toLowerCase()
+      const searchTerm = searchParams.search.toLowerCase();
       articles = articles.filter((article: any) => {
-        const title = (article.title || '').toLowerCase()
-        const excerpt = (article.excerpt || '').toLowerCase()
-        return title.includes(searchTerm) || excerpt.includes(searchTerm)
-      })
+        const title = (article.title || '').toLowerCase();
+        const excerpt = (article.excerpt || '').toLowerCase();
+        return title.includes(searchTerm) || excerpt.includes(searchTerm);
+      });
     }
-    
-    total = articles.length
-    console.log(`Found ${total} support articles for brand ${brand.name}`)
-    
+
+    total = articles.length;
+    console.log(`Found ${total} support articles for brand ${brand.name}`);
+
   } catch (err) {
-    error = err instanceof Error ? err.message : 'Failed to fetch support articles'
-    console.error('Error fetching support articles for brand:', err)
+    error = err instanceof Error ? err.message : 'Failed to fetch support articles';
+    console.error('Error fetching support articles for brand:', err);
   }
 
   const difficultyLabels: Record<string, string> = {
@@ -93,14 +95,14 @@ export default async function BrandSupportPage({ params, searchParams }: BrandSu
     'intermediate': '中级',
     'advanced': '高级',
     'expert': '专家'
-  }
+  };
 
   const difficultyColors: Record<string, string> = {
     'beginner': 'bg-green-100 text-green-800',
     'intermediate': 'bg-blue-100 text-blue-800',
     'advanced': 'bg-orange-100 text-orange-800',
     'expert': 'bg-red-100 text-red-800'
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -109,14 +111,14 @@ export default async function BrandSupportPage({ params, searchParams }: BrandSu
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
             {/* 返回品牌页面的链接 */}
-            <Link 
+            <Link
               href={`/${params.locale}/brands/${params.slug}`}
               className="inline-flex items-center gap-2 text-blue-100 hover:text-white mb-6 transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
               返回 {brand.name} 品牌页面
             </Link>
-            
+
             <div className="flex items-start gap-6 mb-8">
               <div className="flex-shrink-0">
                 <div className="w-16 h-16 bg-white rounded-lg flex items-center justify-center">
@@ -166,8 +168,8 @@ export default async function BrandSupportPage({ params, searchParams }: BrandSu
                 <Link
                   href={`/${params.locale}/brands/${params.slug}/support`}
                   className={`px-4 py-2 rounded-lg transition-colors ${
-                    !searchParams.category 
-                      ? 'bg-blue-600 text-white' 
+                    !searchParams.category
+                      ? 'bg-blue-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -177,7 +179,7 @@ export default async function BrandSupportPage({ params, searchParams }: BrandSu
                   href={`/${params.locale}/brands/${params.slug}/support?category=technical-guide`}
                   className={`px-4 py-2 rounded-lg transition-colors ${
                     searchParams.category === 'technical-guide'
-                      ? 'bg-blue-600 text-white' 
+                      ? 'bg-blue-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -187,7 +189,7 @@ export default async function BrandSupportPage({ params, searchParams }: BrandSu
                   href={`/${params.locale}/brands/${params.slug}/support?category=datasheet`}
                   className={`px-4 py-2 rounded-lg transition-colors ${
                     searchParams.category === 'datasheet'
-                      ? 'bg-blue-600 text-white' 
+                      ? 'bg-blue-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -197,7 +199,7 @@ export default async function BrandSupportPage({ params, searchParams }: BrandSu
                   href={`/${params.locale}/brands/${params.slug}/support?category=application-note`}
                   className={`px-4 py-2 rounded-lg transition-colors ${
                     searchParams.category === 'application-note'
-                      ? 'bg-blue-600 text-white' 
+                      ? 'bg-blue-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -232,13 +234,13 @@ export default async function BrandSupportPage({ params, searchParams }: BrandSu
               <p>4. 发布文章</p>
             </div>
             <div className="flex justify-center gap-4">
-              <Link 
+              <Link
                 href={`/${params.locale}/brands/${params.slug}/solutions`}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
               >
                 查看解决方案
               </Link>
-              <Link 
+              <Link
                 href={`/${params.locale}/brands/${params.slug}`}
                 className="bg-white hover:bg-gray-50 text-gray-900 border border-gray-300 px-6 py-2 rounded-lg transition-colors"
               >
@@ -260,8 +262,8 @@ export default async function BrandSupportPage({ params, searchParams }: BrandSu
                       </Badge>
                     )}
                     {article.difficulty && (
-                      <Badge 
-                        variant="secondary" 
+                      <Badge
+                        variant="secondary"
                         className={difficultyColors[article.difficulty] || 'bg-gray-100 text-gray-800'}
                       >
                         {difficultyLabels[article.difficulty] || article.difficulty}
@@ -273,7 +275,7 @@ export default async function BrandSupportPage({ params, searchParams }: BrandSu
                       </Badge>
                     )}
                   </div>
-                  
+
                   <CardTitle className="line-clamp-2">
                     {article.title || '未命名文档'}
                   </CardTitle>
@@ -282,7 +284,7 @@ export default async function BrandSupportPage({ params, searchParams }: BrandSu
                   <CardDescription className="line-clamp-3 mb-4">
                     {article.excerpt || '暂无描述'}
                   </CardDescription>
-                  
+
                   {/* 标签 */}
                   {article.tags && article.tags.length > 0 && (
                     <div className="mb-4">
@@ -300,10 +302,10 @@ export default async function BrandSupportPage({ params, searchParams }: BrandSu
                       </div>
                     </div>
                   )}
-                  
+
                   <div className="flex justify-between items-center">
                     {article.slug ? (
-                      <Link 
+                      <Link
                         href={`/${params.locale}/articles/${article.slug}`}
                         className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 font-medium"
                       >
@@ -326,23 +328,23 @@ export default async function BrandSupportPage({ params, searchParams }: BrandSu
         )}
       </div>
     </div>
-  )
+  );
 }
 
 // SEO元数据
 export async function generateMetadata({ params }: BrandSupportPageProps) {
-  const decodedSlug = decodeURIComponent(params.slug)
-  const brand = await getBrandData(decodedSlug)
-  
+  const decodedSlug = decodeURIComponent(params.slug);
+  const brand = await getBrandData(decodedSlug);
+
   if (!brand) {
     return {
       title: '品牌未找到'
-    }
+    };
   }
 
   return {
     title: `${brand.name} 技术支持 | 力通电子`,
     description: `${brand.name} 专业技术支持文档和资料，包括技术指南、数据手册、应用笔记等。力通电子提供全面的${brand.name}技术支持服务。`,
     keywords: `${brand.name}技术支持,${brand.name}技术文档,${brand.name}数据手册,${brand.name}应用笔记,${brand.name}技术指南`,
-  }
+  };
 }

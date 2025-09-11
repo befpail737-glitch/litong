@@ -1,6 +1,6 @@
-import { GraphQLResolveInfo, GraphQLScalarType } from 'graphql'
-import { DateTimeResolver, JSONResolver, EmailAddressResolver, URLResolver } from 'graphql-scalars'
-import DataLoader from 'dataloader'
+import DataLoader from 'dataloader';
+import { GraphQLResolveInfo, GraphQLScalarType } from 'graphql';
+import { DateTimeResolver, JSONResolver, EmailAddressResolver, URLResolver } from 'graphql-scalars';
 
 // Types
 interface Context {
@@ -69,10 +69,10 @@ const createProductLoader = () => new DataLoader(async (ids: string[]) => {
       views: Math.floor(Math.random() * 1000),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
-    }
-  }))
-  return products
-})
+    };
+  }));
+  return products;
+});
 
 const createUserLoader = () => new DataLoader(async (ids: string[]) => {
   const users = await Promise.all(ids.map(async (id) => {
@@ -86,10 +86,10 @@ const createUserLoader = () => new DataLoader(async (ids: string[]) => {
       isActive: true,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
-    }
-  }))
-  return users
-})
+    };
+  }));
+  return users;
+});
 
 const createInventoryLoader = () => new DataLoader(async (productIds: string[]) => {
   const inventories = await Promise.all(productIds.map(async (productId) => {
@@ -104,14 +104,14 @@ const createInventoryLoader = () => new DataLoader(async (productIds: string[]) 
       supplier: 'Official Distributor',
       location: 'Warehouse A',
       lastUpdated: new Date().toISOString()
-    }
-  }))
-  return inventories
-})
+    };
+  }));
+  return inventories;
+});
 
 const createReviewLoader = () => new DataLoader(async (productIds: string[]) => {
   const reviews = await Promise.all(productIds.map(async (productId) => {
-    const reviewCount = Math.floor(Math.random() * 10)
+    const reviewCount = Math.floor(Math.random() * 10);
     return Array.from({ length: reviewCount }, (_, i) => ({
       id: `review_${productId}_${i}`,
       productId,
@@ -125,10 +125,10 @@ const createReviewLoader = () => new DataLoader(async (productIds: string[]) => 
       helpful: Math.floor(Math.random() * 20),
       createdAt: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
       updatedAt: new Date().toISOString()
-    }))
-  }))
-  return reviews
-})
+    }));
+  }));
+  return reviews;
+});
 
 // Resolvers
 export const resolvers = {
@@ -146,72 +146,72 @@ export const resolvers = {
   Query: {
     // Product Queries
     product: async (_: any, { id }: ProductArgs, context: Context) => {
-      return context.loaders.productLoader.load(id)
+      return context.loaders.productLoader.load(id);
     },
 
     products: async (_: any, args: ProductsArgs, context: Context) => {
-      const { filter = {}, sort, pagination = { page: 1, limit: 20 } } = args
-      
+      const { filter = {}, sort, pagination = { page: 1, limit: 20 } } = args;
+
       // Simulate database query with filters
       let products = await Promise.all(
-        Array.from({ length: 100 }, (_, i) => 
+        Array.from({ length: 100 }, (_, i) =>
           context.loaders.productLoader.load((i + 1).toString())
         )
-      )
+      );
 
       // Apply filters
       if (filter.search) {
-        products = products.filter(p => 
+        products = products.filter(p =>
           p.name.toLowerCase().includes(filter.search!.toLowerCase()) ||
           p.description?.toLowerCase().includes(filter.search!.toLowerCase())
-        )
+        );
       }
 
       if (filter.category) {
-        products = products.filter(p => p.category === filter.category)
+        products = products.filter(p => p.category === filter.category);
       }
 
       if (filter.manufacturer) {
-        products = products.filter(p => p.manufacturer === filter.manufacturer)
+        products = products.filter(p => p.manufacturer === filter.manufacturer);
       }
 
       if (filter.minPrice !== undefined) {
-        products = products.filter(p => p.price >= filter.minPrice!)
+        products = products.filter(p => p.price >= filter.minPrice!);
       }
 
       if (filter.maxPrice !== undefined) {
-        products = products.filter(p => p.price <= filter.maxPrice!)
+        products = products.filter(p => p.price <= filter.maxPrice!);
       }
 
       if (filter.tags && filter.tags.length > 0) {
-        products = products.filter(p => 
+        products = products.filter(p =>
           filter.tags!.some(tag => p.tags.includes(tag))
-        )
+        );
       }
 
       // Apply sorting
       if (sort) {
         products.sort((a, b) => {
-          let aVal: any = a[sort.field as keyof typeof a]
-          let bVal: any = b[sort.field as keyof typeof b]
+          let aVal: any = a[sort.field as keyof typeof a];
+          let bVal: any = b[sort.field as keyof typeof b];
 
           if (typeof aVal === 'string') {
-            aVal = aVal.toLowerCase()
-            bVal = bVal.toLowerCase()
+            aVal = aVal.toLowerCase();
+            bVal = bVal.toLowerCase();
           }
 
           if (sort.direction === 'DESC') {
-            return bVal > aVal ? 1 : bVal < aVal ? -1 : 0
+            return bVal > aVal ? 1 : bVal < aVal ? -1 : 0;
           } else {
-            return aVal > bVal ? 1 : aVal < bVal ? -1 : 0
+            return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
           }
-        })
+        });
       }
 
       // Apply pagination
-      const { page, limit } = pagination
-      const offset = (page - 1) * limit
-      const paginatedProducts = products.slice(offset, offset + limit)
+      const { page, limit } = pagination;
+      const offset = (page - 1) * limit;
+      const paginatedProducts = products.slice(offset, offset + limit);
 
       return {
         nodes: paginatedProducts,
@@ -222,74 +222,74 @@ export const resolvers = {
         pageInfo: {
           hasNextPage: offset + limit < products.length,
           hasPreviousPage: page > 1,
-          startCursor: paginatedProducts.length > 0 ? 
+          startCursor: paginatedProducts.length > 0 ?
             Buffer.from(offset.toString()).toString('base64') : null,
-          endCursor: paginatedProducts.length > 0 ? 
+          endCursor: paginatedProducts.length > 0 ?
             Buffer.from((offset + paginatedProducts.length - 1).toString()).toString('base64') : null,
         },
         totalCount: products.length
-      }
+      };
     },
 
     popularProducts: async (_: any, { limit = 10 }, context: Context) => {
       const products = await Promise.all(
-        Array.from({ length: limit }, (_, i) => 
+        Array.from({ length: limit }, (_, i) =>
           context.loaders.productLoader.load((i + 1).toString())
         )
-      )
-      return products.sort((a, b) => b.views - a.views)
+      );
+      return products.sort((a, b) => b.views - a.views);
     },
 
     featuredProducts: async (_: any, { limit = 10 }, context: Context) => {
       const products = await Promise.all(
-        Array.from({ length: limit }, (_, i) => 
+        Array.from({ length: limit }, (_, i) =>
           context.loaders.productLoader.load((i + 1).toString())
         )
-      )
-      return products.sort((a, b) => b.rating - a.rating)
+      );
+      return products.sort((a, b) => b.rating - a.rating);
     },
 
     newProducts: async (_: any, { limit = 10 }, context: Context) => {
       const products = await Promise.all(
-        Array.from({ length: limit }, (_, i) => 
+        Array.from({ length: limit }, (_, i) =>
           context.loaders.productLoader.load((i + 1).toString())
         )
-      )
-      return products.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      );
+      return products.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     },
 
     relatedProducts: async (_: any, { productId, limit = 10 }, context: Context) => {
-      const sourceProduct = await context.loaders.productLoader.load(productId)
+      const sourceProduct = await context.loaders.productLoader.load(productId);
       const allProducts = await Promise.all(
-        Array.from({ length: 50 }, (_, i) => 
+        Array.from({ length: 50 }, (_, i) =>
           context.loaders.productLoader.load((i + 1).toString())
         )
-      )
-      
+      );
+
       // Simple related products logic based on same category
       const related = allProducts
         .filter(p => p.id !== productId && p.category === sourceProduct.category)
-        .slice(0, limit)
-      
-      return related
+        .slice(0, limit);
+
+      return related;
     },
 
     // User Queries
     user: async (_: any, { id }, context: Context) => {
-      return context.loaders.userLoader.load(id)
+      return context.loaders.userLoader.load(id);
     },
 
     currentUser: async (_: any, __: any, context: Context) => {
       if (!context.user) {
-        throw new Error('Not authenticated')
+        throw new Error('Not authenticated');
       }
-      return context.loaders.userLoader.load(context.user.id)
+      return context.loaders.userLoader.load(context.user.id);
     },
 
     // Search Queries
     search: async (_: any, { query, filters = {}, pagination = { page: 1, limit: 20 } }) => {
-      const { page, limit } = pagination
-      
+      const { page, limit } = pagination;
+
       // Simulate search across different content types
       const products = await Promise.all(
         Array.from({ length: 20 }, (_, i) => ({
@@ -301,7 +301,7 @@ export const resolvers = {
           price: 15.50 + Math.random() * 50,
           // ... other product fields
         }))
-      )
+      );
 
       return {
         products: {
@@ -334,7 +334,7 @@ export const resolvers = {
         news: { items: [], total: 0 },
         solutions: { items: [], total: 0 },
         suggestions: [`${query} datasheet`, `${query} development board`, `${query} application note`]
-      }
+      };
     },
 
     searchSuggestions: async (_: any, { query, limit = 10 }) => {
@@ -349,8 +349,8 @@ export const resolvers = {
         `${query} schematic`,
         `${query} layout`,
         `${query} tutorial`
-      ]
-      return suggestions.slice(0, limit)
+      ];
+      return suggestions.slice(0, limit);
     },
 
     // System Queries
@@ -366,7 +366,7 @@ export const resolvers = {
         'Amplifiers',
         'Interface',
         'Development Tools'
-      ]
+      ];
     },
 
     manufacturers: async () => {
@@ -381,7 +381,7 @@ export const resolvers = {
         'Broadcom',
         'Qualcomm',
         'Intel'
-      ]
+      ];
     },
 
     countries: async () => {
@@ -396,11 +396,11 @@ export const resolvers = {
         'Australia',
         'South Korea',
         'India'
-      ]
+      ];
     },
 
     currencies: async () => {
-      return ['USD', 'EUR', 'GBP', 'JPY', 'CNY', 'CAD', 'AUD', 'CHF', 'SEK', 'NOK']
+      return ['USD', 'EUR', 'GBP', 'JPY', 'CNY', 'CAD', 'AUD', 'CHF', 'SEK', 'NOK'];
     }
   },
 
@@ -409,7 +409,7 @@ export const resolvers = {
     // Product Mutations
     createProduct: async (_: any, { input }, context: Context) => {
       if (!context.user || !['ADMIN', 'MANAGER'].includes(context.user.role)) {
-        throw new Error('Insufficient permissions')
+        throw new Error('Insufficient permissions');
       }
 
       const newProduct = {
@@ -420,41 +420,41 @@ export const resolvers = {
         views: 0,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
-      }
+      };
 
       // Simulate database save
-      return newProduct
+      return newProduct;
     },
 
     updateProduct: async (_: any, { input }, context: Context) => {
       if (!context.user || !['ADMIN', 'MANAGER'].includes(context.user.role)) {
-        throw new Error('Insufficient permissions')
+        throw new Error('Insufficient permissions');
       }
 
-      const existingProduct = await context.loaders.productLoader.load(input.id)
+      const existingProduct = await context.loaders.productLoader.load(input.id);
       if (!existingProduct) {
-        throw new Error('Product not found')
+        throw new Error('Product not found');
       }
 
       const updatedProduct = {
         ...existingProduct,
         ...input,
         updatedAt: new Date().toISOString()
-      }
+      };
 
-      return updatedProduct
+      return updatedProduct;
     },
 
     deleteProduct: async (_: any, { id }, context: Context) => {
       if (!context.user || !['ADMIN', 'MANAGER'].includes(context.user.role)) {
-        throw new Error('Insufficient permissions')
+        throw new Error('Insufficient permissions');
       }
 
       // Simulate database delete
       return {
         success: true,
         message: 'Product deleted successfully'
-      }
+      };
     },
 
     // Authentication Mutations
@@ -471,9 +471,9 @@ export const resolvers = {
             role: 'ADMIN'
           },
           expiresIn: 3600
-        }
+        };
       }
-      throw new Error('Invalid credentials')
+      throw new Error('Invalid credentials');
     },
 
     logout: async (_: any, __: any, context: Context) => {
@@ -481,7 +481,7 @@ export const resolvers = {
       return {
         success: true,
         message: 'Logged out successfully'
-      }
+      };
     },
 
     // Inquiry Mutations
@@ -499,16 +499,16 @@ export const resolvers = {
         responses: [],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
-      }
+      };
 
-      return newInquiry
+      return newInquiry;
     },
 
     // File Upload Mutations
     uploadFile: async (_: any, { file }) => {
       // Simulate file upload
-      const { filename, mimetype, encoding } = await file
-      
+      const { filename, mimetype, encoding } = await file;
+
       return {
         id: `file_${Date.now()}`,
         filename,
@@ -518,13 +518,13 @@ export const resolvers = {
         size: Math.floor(Math.random() * 1024 * 1024),
         success: true,
         message: 'File uploaded successfully'
-      }
+      };
     },
 
     uploadFiles: async (_: any, { files }) => {
       const results = await Promise.all(
         files.map(async (file: any) => {
-          const { filename, mimetype, encoding } = await file
+          const { filename, mimetype, encoding } = await file;
           return {
             id: `file_${Date.now()}_${Math.random()}`,
             filename,
@@ -534,66 +534,66 @@ export const resolvers = {
             size: Math.floor(Math.random() * 1024 * 1024),
             success: true,
             message: 'File uploaded successfully'
-          }
+          };
         })
-      )
-      return results
+      );
+      return results;
     },
 
     // Cart Mutations
     addToCart: async (_: any, { productId, quantity }, context: Context) => {
       if (!context.user) {
-        throw new Error('Authentication required')
+        throw new Error('Authentication required');
       }
 
       // Simulate adding to cart
       return {
         success: true,
         message: `Added ${quantity} item(s) to cart`
-      }
+      };
     }
   },
 
   // Field Resolvers
   Product: {
     inventory: async (product: any, _: any, context: Context) => {
-      return context.loaders.inventoryLoader.load(product.id)
+      return context.loaders.inventoryLoader.load(product.id);
     },
 
     reviews: async (product: any, _: any, context: Context) => {
-      return context.loaders.reviewLoader.load(product.id)
+      return context.loaders.reviewLoader.load(product.id);
     },
 
     relatedProducts: async (product: any, _: any, context: Context) => {
       const allProducts = await Promise.all(
-        Array.from({ length: 20 }, (_, i) => 
+        Array.from({ length: 20 }, (_, i) =>
           context.loaders.productLoader.load((i + 1).toString())
         )
-      )
+      );
       return allProducts
         .filter(p => p.id !== product.id && p.category === product.category)
-        .slice(0, 5)
+        .slice(0, 5);
     },
 
     alternatives: async (product: any, _: any, context: Context) => {
       const allProducts = await Promise.all(
-        Array.from({ length: 20 }, (_, i) => 
+        Array.from({ length: 20 }, (_, i) =>
           context.loaders.productLoader.load((i + 1).toString())
         )
-      )
+      );
       return allProducts
         .filter(p => p.id !== product.id && p.manufacturer !== product.manufacturer && p.category === product.category)
-        .slice(0, 5)
+        .slice(0, 5);
     },
 
     accessories: async (product: any, _: any, context: Context) => {
       // Simulate accessories based on product type
       const allProducts = await Promise.all(
-        Array.from({ length: 10 }, (_, i) => 
+        Array.from({ length: 10 }, (_, i) =>
           context.loaders.productLoader.load((i + 20).toString())
         )
-      )
-      return allProducts.slice(0, 3)
+      );
+      return allProducts.slice(0, 3);
     },
 
     applications: async (product: any) => {
@@ -613,7 +613,7 @@ export const resolvers = {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         }
-      ]
+      ];
     },
 
     caseStudies: async (product: any) => {
@@ -640,26 +640,26 @@ export const resolvers = {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         }
-      ]
+      ];
     }
   },
 
   User: {
     inquiries: async (user: any) => {
-      return []
+      return [];
     },
 
     orders: async (user: any) => {
-      return []
+      return [];
     },
 
     reviews: async (user: any) => {
-      return []
+      return [];
     },
 
     favorites: async (user: any, _: any, context: Context) => {
-      const favoriteIds = ['1', '2', '3'] // Simulate user favorites
-      return Promise.all(favoriteIds.map(id => context.loaders.productLoader.load(id)))
+      const favoriteIds = ['1', '2', '3']; // Simulate user favorites
+      return Promise.all(favoriteIds.map(id => context.loaders.productLoader.load(id)));
     }
   },
 
@@ -673,7 +673,7 @@ export const resolvers = {
             mutation: 'UPDATED',
             node: { id, name: 'Updated Product', updatedAt: new Date().toISOString() }
           }
-        }
+        };
       }
     },
 
@@ -681,19 +681,19 @@ export const resolvers = {
       subscribe: async function* () {
         // Simulate new product notifications
         while (true) {
-          await new Promise(resolve => setTimeout(resolve, 10000))
+          await new Promise(resolve => setTimeout(resolve, 10000));
           yield {
             newProduct: {
               id: `new_${Date.now()}`,
               name: 'New Product',
               createdAt: new Date().toISOString()
             }
-          }
+          };
         }
       }
     }
   }
-}
+};
 
 // Create context with data loaders
 export const createContext = (user?: any): Context => {
@@ -708,5 +708,5 @@ export const createContext = (user?: any): Context => {
       inventoryLoader: createInventoryLoader(),
       reviewLoader: createReviewLoader()
     }
-  }
-}
+  };
+};

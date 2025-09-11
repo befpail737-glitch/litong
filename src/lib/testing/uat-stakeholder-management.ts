@@ -1,7 +1,7 @@
 /**
  * UAT Stakeholder Management System
  * Manages stakeholder participation, sign-offs, and communication during UAT
- * 
+ *
  * Features:
  * - Stakeholder registration and role management
  * - Sign-off workflow management
@@ -127,23 +127,23 @@ export interface CommunicationLog {
 }
 
 export class StakeholderManager {
-  private stakeholders: Map<string, Stakeholder> = new Map()
-  private signOffRequests: Map<string, SignOffRequest> = new Map()
-  private signOffResponses: Map<string, SignOffResponse[]> = new Map()
-  private feedback: Map<string, StakeholderFeedback> = new Map()
-  private communications: CommunicationLog[] = []
+  private stakeholders: Map<string, Stakeholder> = new Map();
+  private signOffRequests: Map<string, SignOffRequest> = new Map();
+  private signOffResponses: Map<string, SignOffResponse[]> = new Map();
+  private feedback: Map<string, StakeholderFeedback> = new Map();
+  private communications: CommunicationLog[] = [];
 
   // Stakeholder Registration and Management
   public registerStakeholder(stakeholder: Omit<Stakeholder, 'id'>): string {
-    const stakeholderId = `STAKEHOLDER-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`
-    
+    const stakeholderId = `STAKEHOLDER-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
+
     const fullStakeholder: Stakeholder = {
       id: stakeholderId,
       ...stakeholder
-    }
+    };
 
-    this.stakeholders.set(stakeholderId, fullStakeholder)
-    
+    this.stakeholders.set(stakeholderId, fullStakeholder);
+
     this.logCommunication({
       type: 'notification',
       subject: 'Stakeholder registered for UAT',
@@ -151,20 +151,20 @@ export class StakeholderManager {
       content: `Welcome to the UAT process. You have been registered as: ${stakeholder.role.name}`,
       timestamp: new Date(),
       followUpRequired: false
-    })
+    });
 
-    console.log(`Stakeholder registered: ${stakeholder.name} (${stakeholder.role.name})`)
-    return stakeholderId
+    console.log(`Stakeholder registered: ${stakeholder.name} (${stakeholder.role.name})`);
+    return stakeholderId;
   }
 
   public getStakeholdersByRole(roleType: string): Stakeholder[] {
     return Array.from(this.stakeholders.values())
-      .filter(s => s.role.type === roleType)
+      .filter(s => s.role.type === roleType);
   }
 
   public getStakeholdersByAuthority(authorityLevel: AuthorityLevel): Stakeholder[] {
     return Array.from(this.stakeholders.values())
-      .filter(s => s.authority === authorityLevel)
+      .filter(s => s.authority === authorityLevel);
   }
 
   // Initialize default stakeholders for electronics distributor UAT
@@ -308,35 +308,35 @@ export class StakeholderManager {
           }
         ]
       }
-    ]
+    ];
 
     defaultStakeholders.forEach(stakeholder => {
-      this.registerStakeholder(stakeholder)
-    })
+      this.registerStakeholder(stakeholder);
+    });
   }
 
   // Sign-off Request Management
   public createSignOffRequest(request: Omit<SignOffRequest, 'id' | 'status' | 'createdDate'>): string {
-    const requestId = `SIGNOFF-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`
-    
+    const requestId = `SIGNOFF-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
+
     const signOffRequest: SignOffRequest = {
       id: requestId,
       status: 'pending',
       createdDate: new Date(),
       ...request
-    }
+    };
 
-    this.signOffRequests.set(requestId, signOffRequest)
-    this.signOffResponses.set(requestId, [])
+    this.signOffRequests.set(requestId, signOffRequest);
+    this.signOffResponses.set(requestId, []);
 
     // Notify required stakeholders
     this.notifyStakeholders(request.requiredStakeholders, {
       subject: `Sign-off Required: ${request.title}`,
       content: `A new sign-off request requires your approval.\n\nTitle: ${request.title}\nDescription: ${request.description}\nDue Date: ${request.dueDate.toISOString()}`
-    })
+    });
 
-    console.log(`Sign-off request created: ${request.title}`)
-    return requestId
+    console.log(`Sign-off request created: ${request.title}`);
+    return requestId;
   }
 
   public createWeek17SignOffRequests(): string[] {
@@ -434,29 +434,29 @@ export class StakeholderManager {
         ],
         createdBy: 'Technical Lead'
       }
-    ]
+    ];
 
-    return signOffRequests.map(request => this.createSignOffRequest(request))
+    return signOffRequests.map(request => this.createSignOffRequest(request));
   }
 
   // Sign-off Response Management
   public submitSignOffResponse(response: Omit<SignOffResponse, 'id' | 'signOffDate'>): string {
-    const responseId = `RESPONSE-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`
-    
+    const responseId = `RESPONSE-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
+
     const signOffResponse: SignOffResponse = {
       id: responseId,
       signOffDate: new Date(),
       ...response
-    }
+    };
 
-    const existingResponses = this.signOffResponses.get(response.requestId) || []
-    existingResponses.push(signOffResponse)
-    this.signOffResponses.set(response.requestId, existingResponses)
+    const existingResponses = this.signOffResponses.get(response.requestId) || [];
+    existingResponses.push(signOffResponse);
+    this.signOffResponses.set(response.requestId, existingResponses);
 
     // Update request status if all required stakeholders have responded
-    this.updateSignOffRequestStatus(response.requestId)
+    this.updateSignOffRequestStatus(response.requestId);
 
-    const stakeholder = this.stakeholders.get(response.stakeholderId)
+    const stakeholder = this.stakeholders.get(response.stakeholderId);
     this.logCommunication({
       type: 'notification',
       subject: 'Sign-off response received',
@@ -464,98 +464,98 @@ export class StakeholderManager {
       content: `Sign-off response received: ${response.decision}`,
       timestamp: new Date(),
       followUpRequired: response.decision === 'conditional_approve' || response.decision === 'reject'
-    })
+    });
 
-    console.log(`Sign-off response submitted: ${response.decision} by ${stakeholder?.name}`)
-    return responseId
+    console.log(`Sign-off response submitted: ${response.decision} by ${stakeholder?.name}`);
+    return responseId;
   }
 
   private updateSignOffRequestStatus(requestId: string): void {
-    const request = this.signOffRequests.get(requestId)
-    const responses = this.signOffResponses.get(requestId) || []
-    
-    if (!request) return
+    const request = this.signOffRequests.get(requestId);
+    const responses = this.signOffResponses.get(requestId) || [];
 
-    const requiredStakeholders = new Set(request.requiredStakeholders)
-    const respondedStakeholders = new Set(responses.map(r => r.stakeholderId))
-    
+    if (!request) return;
+
+    const requiredStakeholders = new Set(request.requiredStakeholders);
+    const respondedStakeholders = new Set(responses.map(r => r.stakeholderId));
+
     // Check if all required stakeholders have responded
     const allRequiredResponded = Array.from(requiredStakeholders)
-      .every(stakeholderId => respondedStakeholders.has(stakeholderId))
+      .every(stakeholderId => respondedStakeholders.has(stakeholderId));
 
     if (allRequiredResponded) {
-      const hasRejection = responses.some(r => r.decision === 'reject')
-      const hasConditional = responses.some(r => r.decision === 'conditional_approve')
-      
+      const hasRejection = responses.some(r => r.decision === 'reject');
+      const hasConditional = responses.some(r => r.decision === 'conditional_approve');
+
       if (hasRejection) {
-        request.status = 'rejected'
+        request.status = 'rejected';
       } else if (hasConditional) {
-        request.status = 'in_review'
+        request.status = 'in_review';
       } else {
-        request.status = 'approved'
+        request.status = 'approved';
       }
 
-      this.signOffRequests.set(requestId, request)
+      this.signOffRequests.set(requestId, request);
     }
   }
 
   // Feedback Management
   public collectStakeholderFeedback(feedback: Omit<StakeholderFeedback, 'id' | 'submittedDate' | 'status'>): string {
-    const feedbackId = `FEEDBACK-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`
-    
+    const feedbackId = `FEEDBACK-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
+
     const stakeholderFeedback: StakeholderFeedback = {
       id: feedbackId,
       submittedDate: new Date(),
       status: 'open',
       ...feedback
-    }
+    };
 
-    this.feedback.set(feedbackId, stakeholderFeedback)
+    this.feedback.set(feedbackId, stakeholderFeedback);
 
-    const stakeholder = this.stakeholders.get(feedback.stakeholderId)
-    console.log(`Feedback collected from ${stakeholder?.name}: ${feedback.title}`)
-    
-    return feedbackId
+    const stakeholder = this.stakeholders.get(feedback.stakeholderId);
+    console.log(`Feedback collected from ${stakeholder?.name}: ${feedback.title}`);
+
+    return feedbackId;
   }
 
   public getFeedbackByCategory(): Record<string, StakeholderFeedback[]> {
-    const feedbackArray = Array.from(this.feedback.values())
-    const categorized: Record<string, StakeholderFeedback[]> = {}
+    const feedbackArray = Array.from(this.feedback.values());
+    const categorized: Record<string, StakeholderFeedback[]> = {};
 
     for (const feedback of feedbackArray) {
       if (!categorized[feedback.category]) {
-        categorized[feedback.category] = []
+        categorized[feedback.category] = [];
       }
-      categorized[feedback.category].push(feedback)
+      categorized[feedback.category].push(feedback);
     }
 
-    return categorized
+    return categorized;
   }
 
   public getFeedbackByPriority(): Record<string, StakeholderFeedback[]> {
-    const feedbackArray = Array.from(this.feedback.values())
-    const prioritized: Record<string, StakeholderFeedback[]> = {}
+    const feedbackArray = Array.from(this.feedback.values());
+    const prioritized: Record<string, StakeholderFeedback[]> = {};
 
     for (const feedback of feedbackArray) {
       if (!prioritized[feedback.priority]) {
-        prioritized[feedback.priority] = []
+        prioritized[feedback.priority] = [];
       }
-      prioritized[feedback.priority].push(feedback)
+      prioritized[feedback.priority].push(feedback);
     }
 
-    return prioritized
+    return prioritized;
   }
 
   // Communication Management
   private logCommunication(communication: Omit<CommunicationLog, 'id'>): void {
-    const communicationId = `COMM-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`
-    
+    const communicationId = `COMM-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
+
     const fullCommunication: CommunicationLog = {
       id: communicationId,
       ...communication
-    }
+    };
 
-    this.communications.push(fullCommunication)
+    this.communications.push(fullCommunication);
   }
 
   public notifyStakeholders(stakeholderIds: string[], message: {
@@ -566,14 +566,14 @@ export class StakeholderManager {
   }): void {
     const stakeholders = stakeholderIds
       .map(id => this.stakeholders.get(id))
-      .filter(Boolean) as Stakeholder[]
+      .filter(Boolean) as Stakeholder[];
 
     for (const stakeholder of stakeholders) {
-      const preferredMethod = stakeholder.contactPreferences[0]?.method || 'email'
-      
-      console.log(`Sending notification to ${stakeholder.name} via ${preferredMethod}`)
-      console.log(`Subject: ${message.subject}`)
-      console.log(`Content: ${message.content}`)
+      const preferredMethod = stakeholder.contactPreferences[0]?.method || 'email';
+
+      console.log(`Sending notification to ${stakeholder.name} via ${preferredMethod}`);
+      console.log(`Subject: ${message.subject}`);
+      console.log(`Content: ${message.content}`);
 
       this.logCommunication({
         type: preferredMethod as any,
@@ -582,15 +582,15 @@ export class StakeholderManager {
         content: message.content,
         timestamp: new Date(),
         followUpRequired: false
-      })
+      });
     }
   }
 
   // Reporting and Analytics
   public generateStakeholderReport(): any {
-    const stakeholderArray = Array.from(this.stakeholders.values())
-    const signOffRequestArray = Array.from(this.signOffRequests.values())
-    const feedbackArray = Array.from(this.feedback.values())
+    const stakeholderArray = Array.from(this.stakeholders.values());
+    const signOffRequestArray = Array.from(this.signOffRequests.values());
+    const feedbackArray = Array.from(this.feedback.values());
 
     return {
       stakeholderSummary: {
@@ -616,74 +616,74 @@ export class StakeholderManager {
         byType: this.countByField(this.communications, 'type'),
         followUpRequired: this.communications.filter(c => c.followUpRequired).length
       }
-    }
+    };
   }
 
   private countByField(array: any[], field: string): Record<string, number> {
     return array.reduce((acc, item) => {
-      const value = this.getNestedField(item, field)
-      acc[value] = (acc[value] || 0) + 1
-      return acc
-    }, {})
+      const value = this.getNestedField(item, field);
+      acc[value] = (acc[value] || 0) + 1;
+      return acc;
+    }, {});
   }
 
   private getNestedField(obj: any, path: string): any {
-    return path.split('.').reduce((current, key) => current?.[key], obj)
+    return path.split('.').reduce((current, key) => current?.[key], obj);
   }
 
   private calculateResponseRate(): number {
-    const totalRequests = this.signOffRequests.size
+    const totalRequests = this.signOffRequests.size;
     const requestsWithResponses = Array.from(this.signOffResponses.values())
-      .filter(responses => responses.length > 0).length
-    
-    return totalRequests > 0 ? requestsWithResponses / totalRequests : 0
+      .filter(responses => responses.length > 0).length;
+
+    return totalRequests > 0 ? requestsWithResponses / totalRequests : 0;
   }
 
   private calculateAverageResponseTime(): number {
-    let totalTime = 0
-    let responseCount = 0
+    let totalTime = 0;
+    let responseCount = 0;
 
     for (const [requestId, responses] of this.signOffResponses.entries()) {
-      const request = this.signOffRequests.get(requestId)
-      if (!request) continue
+      const request = this.signOffRequests.get(requestId);
+      if (!request) continue;
 
       for (const response of responses) {
-        const responseTime = response.signOffDate.getTime() - request.createdDate.getTime()
-        totalTime += responseTime
-        responseCount++
+        const responseTime = response.signOffDate.getTime() - request.createdDate.getTime();
+        totalTime += responseTime;
+        responseCount++;
       }
     }
 
-    return responseCount > 0 ? totalTime / responseCount / (24 * 60 * 60 * 1000) : 0 // Return in days
+    return responseCount > 0 ? totalTime / responseCount / (24 * 60 * 60 * 1000) : 0; // Return in days
   }
 
   // Utility Methods
   public getSignOffRequestStatus(requestId: string): SignOffRequest | null {
-    return this.signOffRequests.get(requestId) || null
+    return this.signOffRequests.get(requestId) || null;
   }
 
   public getStakeholderById(stakeholderId: string): Stakeholder | null {
-    return this.stakeholders.get(stakeholderId) || null
+    return this.stakeholders.get(stakeholderId) || null;
   }
 
   public getPendingSignOffs(stakeholderId: string): SignOffRequest[] {
     return Array.from(this.signOffRequests.values())
-      .filter(request => 
+      .filter(request =>
         request.requiredStakeholders.includes(stakeholderId) &&
         request.status === 'pending' &&
         !this.hasStakeholderResponded(request.id, stakeholderId)
-      )
+      );
   }
 
   private hasStakeholderResponded(requestId: string, stakeholderId: string): boolean {
-    const responses = this.signOffResponses.get(requestId) || []
-    return responses.some(response => response.stakeholderId === stakeholderId)
+    const responses = this.signOffResponses.get(requestId) || [];
+    return responses.some(response => response.stakeholderId === stakeholderId);
   }
 }
 
 // Export utility functions
 export function createSampleStakeholderManager(): StakeholderManager {
-  const manager = new StakeholderManager()
-  manager.initializeDefaultStakeholders()
-  return manager
+  const manager = new StakeholderManager();
+  manager.initializeDefaultStakeholders();
+  return manager;
 }

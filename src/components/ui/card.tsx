@@ -1,5 +1,6 @@
-import * as React from 'react'
-import { cn } from '@/lib/utils'
+import * as React from 'react';
+
+import { cn } from '@/lib/utils';
 
 const Card = React.forwardRef<
   HTMLDivElement,
@@ -10,8 +11,8 @@ const Card = React.forwardRef<
     className={cn('card', className)}
     {...props}
   />
-))
-Card.displayName = 'Card'
+));
+Card.displayName = 'Card';
 
 const CardHeader = React.forwardRef<
   HTMLDivElement,
@@ -22,8 +23,8 @@ const CardHeader = React.forwardRef<
     className={cn('card-header', className)}
     {...props}
   />
-))
-CardHeader.displayName = 'CardHeader'
+));
+CardHeader.displayName = 'CardHeader';
 
 const CardTitle = React.forwardRef<
   HTMLParagraphElement,
@@ -34,8 +35,8 @@ const CardTitle = React.forwardRef<
     className={cn('text-lg font-semibold leading-none tracking-tight', className)}
     {...props}
   />
-))
-CardTitle.displayName = 'CardTitle'
+));
+CardTitle.displayName = 'CardTitle';
 
 const CardDescription = React.forwardRef<
   HTMLParagraphElement,
@@ -46,8 +47,8 @@ const CardDescription = React.forwardRef<
     className={cn('text-sm text-gray-600', className)}
     {...props}
   />
-))
-CardDescription.displayName = 'CardDescription'
+));
+CardDescription.displayName = 'CardDescription';
 
 const CardContent = React.forwardRef<
   HTMLDivElement,
@@ -58,8 +59,8 @@ const CardContent = React.forwardRef<
     className={cn('card-body', className)}
     {...props}
   />
-))
-CardContent.displayName = 'CardContent'
+));
+CardContent.displayName = 'CardContent';
 
 const CardFooter = React.forwardRef<
   HTMLDivElement,
@@ -70,7 +71,7 @@ const CardFooter = React.forwardRef<
     className={cn('card-footer', className)}
     {...props}
   />
-))
-CardFooter.displayName = 'CardFooter'
+));
+CardFooter.displayName = 'CardFooter';
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
+export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent };

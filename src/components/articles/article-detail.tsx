@@ -1,30 +1,32 @@
-'use client'
+'use client';
 
-import { useTranslations } from 'next-intl'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
-import { 
-  CalendarDays, 
-  Clock, 
-  User, 
-  Tag, 
-  Star, 
+import Image from 'next/image';
+import Link from 'next/link';
+
+import { PortableText } from '@portabletext/react';
+import {
+  CalendarDays,
+  Clock,
+  User,
+  Tag,
+  Star,
   Share2,
   BookOpen,
   ArrowLeft,
   Eye,
   ThumbsUp,
   MessageCircle
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { useFormatters } from '@/hooks/use-formatters'
-import { getLocalizedValue, getLocalizedRichText } from '@/lib/sanity-i18n'
-import type { Locale } from '@/i18n'
-import Link from 'next/link'
-import Image from 'next/image'
-import { PortableText } from '@portabletext/react'
+} from 'lucide-react';
+import { useTranslations } from 'next-intl';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { useFormatters } from '@/hooks/use-formatters';
+import type { Locale } from '@/i18n';
+import { getLocalizedValue, getLocalizedRichText } from '@/lib/sanity-i18n';
+import { cn } from '@/lib/utils';
 
 // 文章详情类型定义
 interface ArticleDetail {
@@ -109,7 +111,7 @@ const portableTextComponents = {
   },
   marks: {
     link: ({ children, value }: any) => (
-      <Link 
+      <Link
         href={value.href}
         className="text-primary hover:underline"
         target={value.blank ? '_blank' : '_self'}
@@ -154,7 +156,7 @@ const portableTextComponents = {
       <ol className="list-decimal list-inside mb-4 space-y-1">{children}</ol>
     ),
   },
-}
+};
 
 export function ArticleDetail({
   article,
@@ -164,14 +166,14 @@ export function ArticleDetail({
   onLike,
   className
 }: ArticleDetailProps) {
-  const t = useTranslations('articles')
-  const { dateShort } = useFormatters()
-  
-  const title = getLocalizedValue(article.title, locale)
-  const excerpt = getLocalizedValue(article.excerpt, locale)
-  const content = getLocalizedRichText(article.content, locale)
-  const categoryTitle = getLocalizedValue(article.category.title, locale)
-  const authorBio = article.author.bio ? getLocalizedValue(article.author.bio, locale) : ''
+  const t = useTranslations('articles');
+  const { dateShort } = useFormatters();
+
+  const title = getLocalizedValue(article.title, locale);
+  const excerpt = getLocalizedValue(article.excerpt, locale);
+  const content = getLocalizedRichText(article.content, locale);
+  const categoryTitle = getLocalizedValue(article.category.title, locale);
+  const authorBio = article.author.bio ? getLocalizedValue(article.author.bio, locale) : '';
 
   // 难度级别映射
   const difficultyMap = {
@@ -179,7 +181,7 @@ export function ArticleDetail({
     intermediate: { label: t('difficulty.intermediate'), color: 'bg-blue-100 text-blue-800' },
     advanced: { label: t('difficulty.advanced'), color: 'bg-orange-100 text-orange-800' },
     expert: { label: t('difficulty.expert'), color: 'bg-red-100 text-red-800' }
-  }
+  };
 
   return (
     <div className={className}>
@@ -198,11 +200,11 @@ export function ArticleDetail({
         <CardHeader>
           {/* 分类和难度标签 */}
           <div className="flex flex-wrap items-center gap-2 mb-4">
-            <Badge 
-              variant="outline" 
-              style={{ 
+            <Badge
+              variant="outline"
+              style={{
                 borderColor: article.category.color,
-                color: article.category.color 
+                color: article.category.color
               }}
             >
               {categoryTitle}
@@ -226,7 +228,7 @@ export function ArticleDetail({
           <CardTitle className="text-3xl md:text-4xl font-bold leading-tight">
             {title}
           </CardTitle>
-          
+
           {excerpt && (
             <CardDescription className="text-lg mt-4">
               {excerpt}
@@ -248,7 +250,7 @@ export function ArticleDetail({
               <div>
                 <div className="flex items-center gap-2">
                   <User className="w-4 h-4" />
-                  <Link 
+                  <Link
                     href={`/authors/${article.author.slug.current}`}
                     className="font-medium hover:text-primary transition-colors"
                   >
@@ -271,9 +273,9 @@ export function ArticleDetail({
                 </div>
               )}
               {article.likes && (
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={onLike}
                   className="flex items-center gap-1"
                 >
@@ -404,7 +406,7 @@ export function ArticleDetail({
                         />
                       )}
                       <div>
-                        <Link 
+                        <Link
                           href={`/products/${product.slug.current}`}
                           className="text-sm font-medium hover:text-primary transition-colors"
                         >
@@ -489,5 +491,5 @@ export function ArticleDetail({
         </div>
       )}
     </div>
-  )
+  );
 }

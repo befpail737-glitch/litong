@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 // 搜索产品类型
 export interface SearchProduct {
@@ -47,7 +47,7 @@ export interface SearchFilters {
 }
 
 // 搜索排序选项
-export type SortOption = 
+export type SortOption =
   | 'relevance'      // 相关性（默认）
   | 'price_asc'      // 价格低到高
   | 'price_desc'     // 价格高到低
@@ -106,12 +106,12 @@ interface SearchContextType {
   sortBy: SortOption
   isLoading: boolean
   error: string | null
-  
+
   // 搜索历史和建议
   searchHistory: SearchHistoryItem[]
   suggestions: SearchSuggestion[]
   searchSuggestions: string[] // 用于Header搜索框的简单建议
-  
+
   // 搜索操作
   search: (query: string, filters?: SearchFilters, page?: number) => Promise<void>
   updateFilters: (filters: Partial<SearchFilters>) => void
@@ -119,23 +119,23 @@ interface SearchContextType {
   clearSearch: () => void
   clearFilters: () => void
   setSearchQuery: (query: string) => void
-  
+
   // 搜索建议
   getSuggestions: (query: string) => Promise<SearchSuggestion[]>
   updateSearchSuggestions: (query: string) => void
-  
+
   // 搜索历史管理
   addToHistory: (query: string, filters?: SearchFilters, resultCount?: number) => void
   clearHistory: () => void
   removeFromHistory: (id: string) => void
-  
+
   // 工具函数
   formatPrice: (price: number) => string
   formatStock: (stock: number) => string
   getSortText: (sort: SortOption) => string
 }
 
-const SearchContext = createContext<SearchContextType | undefined>(undefined)
+const SearchContext = createContext<SearchContextType | undefined>(undefined);
 
 // 模拟产品数据
 const mockProducts: SearchProduct[] = [
@@ -294,7 +294,7 @@ const mockProducts: SearchProduct[] = [
     createdAt: '2024-01-08T16:40:00Z',
     updatedAt: '2024-01-30T09:25:00Z'
   }
-]
+];
 
 // 排序选项文本映射
 const SORT_OPTION_MAP: Record<SortOption, string> = {
@@ -305,52 +305,52 @@ const SORT_OPTION_MAP: Record<SortOption, string> = {
   newest: '最新添加',
   name_asc: '名称：A-Z',
   name_desc: '名称：Z-A'
-}
+};
 
 export function SearchProvider({ children }: { children: ReactNode }) {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [searchResults, setSearchResults] = useState<SearchResult | null>(null)
-  const [currentFilters, setCurrentFilters] = useState<SearchFilters>({})
-  const [sortBy, setSortBy] = useState<SortOption>('relevance')
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([])
-  const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([])
-  const [searchSuggestions, setSearchSuggestions] = useState<string[]>([])
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<SearchResult | null>(null);
+  const [currentFilters, setCurrentFilters] = useState<SearchFilters>({});
+  const [sortBy, setSortBy] = useState<SortOption>('relevance');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
+  const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
+  const [searchSuggestions, setSearchSuggestions] = useState<string[]>([]);
 
   // 从本地存储加载搜索历史
   useEffect(() => {
-    const savedHistory = localStorage.getItem('litong_search_history')
+    const savedHistory = localStorage.getItem('litong_search_history');
     if (savedHistory) {
       try {
-        setSearchHistory(JSON.parse(savedHistory))
+        setSearchHistory(JSON.parse(savedHistory));
       } catch (error) {
-        console.error('Failed to load search history:', error)
+        console.error('Failed to load search history:', error);
       }
     }
-  }, [])
+  }, []);
 
   // 保存搜索历史到本地存储
   useEffect(() => {
-    localStorage.setItem('litong_search_history', JSON.stringify(searchHistory))
-  }, [searchHistory])
+    localStorage.setItem('litong_search_history', JSON.stringify(searchHistory));
+  }, [searchHistory]);
 
   // 模拟搜索功能
   const search = async (query: string, filters: SearchFilters = {}, page: number = 1) => {
-    setIsLoading(true)
-    setError(null)
-    setSearchQuery(query)
-    
+    setIsLoading(true);
+    setError(null);
+    setSearchQuery(query);
+
     try {
       // 模拟网络延迟
-      await new Promise(resolve => setTimeout(resolve, 300))
-      
+      await new Promise(resolve => setTimeout(resolve, 300));
+
       // 过滤产品
-      let filteredProducts = mockProducts
-      
+      let filteredProducts = mockProducts;
+
       // 文本搜索
       if (query.trim()) {
-        const searchTerms = query.toLowerCase().split(' ')
+        const searchTerms = query.toLowerCase().split(' ');
         filteredProducts = filteredProducts.filter(product => {
           const searchText = [
             product.name,
@@ -360,56 +360,56 @@ export function SearchProvider({ children }: { children: ReactNode }) {
             product.description,
             ...product.tags,
             ...Object.values(product.specifications)
-          ].join(' ').toLowerCase()
-          
-          return searchTerms.some(term => searchText.includes(term))
-        })
+          ].join(' ').toLowerCase();
+
+          return searchTerms.some(term => searchText.includes(term));
+        });
       }
-      
+
       // 应用过滤器
       if (filters.category) {
-        filteredProducts = filteredProducts.filter(p => p.category === filters.category)
+        filteredProducts = filteredProducts.filter(p => p.category === filters.category);
       }
-      
+
       if (filters.brand?.length) {
-        filteredProducts = filteredProducts.filter(p => filters.brand!.includes(p.brand))
+        filteredProducts = filteredProducts.filter(p => filters.brand!.includes(p.brand));
       }
-      
+
       if (filters.manufacturer?.length) {
-        filteredProducts = filteredProducts.filter(p => filters.manufacturer!.includes(p.manufacturer))
+        filteredProducts = filteredProducts.filter(p => filters.manufacturer!.includes(p.manufacturer));
       }
-      
+
       if (filters.priceRange) {
-        filteredProducts = filteredProducts.filter(p => 
+        filteredProducts = filteredProducts.filter(p =>
           p.price >= filters.priceRange!.min && p.price <= filters.priceRange!.max
-        )
+        );
       }
-      
+
       if (filters.stockStatus === 'inStock') {
-        filteredProducts = filteredProducts.filter(p => p.stock > 0)
+        filteredProducts = filteredProducts.filter(p => p.stock > 0);
       } else if (filters.stockStatus === 'outOfStock') {
-        filteredProducts = filteredProducts.filter(p => p.stock === 0)
+        filteredProducts = filteredProducts.filter(p => p.stock === 0);
       }
-      
+
       if (filters.lifecycle?.length) {
-        filteredProducts = filteredProducts.filter(p => filters.lifecycle!.includes(p.lifecycle || ''))
+        filteredProducts = filteredProducts.filter(p => filters.lifecycle!.includes(p.lifecycle || ''));
       }
-      
+
       if (filters.rohs !== undefined) {
-        filteredProducts = filteredProducts.filter(p => p.rohs === filters.rohs)
+        filteredProducts = filteredProducts.filter(p => p.rohs === filters.rohs);
       }
-      
+
       // 排序
-      filteredProducts = sortProducts(filteredProducts, sortBy)
-      
+      filteredProducts = sortProducts(filteredProducts, sortBy);
+
       // 分页
-      const pageSize = 20
-      const startIndex = (page - 1) * pageSize
-      const paginatedProducts = filteredProducts.slice(startIndex, startIndex + pageSize)
-      
+      const pageSize = 20;
+      const startIndex = (page - 1) * pageSize;
+      const paginatedProducts = filteredProducts.slice(startIndex, startIndex + pageSize);
+
       // 生成过滤器选项
-      const filterOptions = generateFilterOptions(mockProducts)
-      
+      const filterOptions = generateFilterOptions(mockProducts);
+
       const result: SearchResult = {
         products: paginatedProducts,
         total: filteredProducts.length,
@@ -419,173 +419,173 @@ export function SearchProvider({ children }: { children: ReactNode }) {
         filters: filterOptions,
         searchTime: Math.random() * 100 + 50, // 模拟搜索时间
         suggestions: query.trim() ? generateSuggestions(query) : undefined
-      }
-      
-      setSearchResults(result)
-      setCurrentFilters(filters)
-      
+      };
+
+      setSearchResults(result);
+      setCurrentFilters(filters);
+
       // 添加到搜索历史
       if (query.trim()) {
-        addToHistory(query, filters, result.total)
+        addToHistory(query, filters, result.total);
       }
-      
+
     } catch (err) {
-      setError('搜索失败，请重试')
+      setError('搜索失败，请重试');
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   // 排序产品
   const sortProducts = (products: SearchProduct[], sort: SortOption): SearchProduct[] => {
-    const sorted = [...products]
-    
+    const sorted = [...products];
+
     switch (sort) {
       case 'price_asc':
-        return sorted.sort((a, b) => a.price - b.price)
+        return sorted.sort((a, b) => a.price - b.price);
       case 'price_desc':
-        return sorted.sort((a, b) => b.price - a.price)
+        return sorted.sort((a, b) => b.price - a.price);
       case 'stock_desc':
-        return sorted.sort((a, b) => b.stock - a.stock)
+        return sorted.sort((a, b) => b.stock - a.stock);
       case 'stock_asc':
-        return sorted.sort((a, b) => a.stock - b.stock)
+        return sorted.sort((a, b) => a.stock - b.stock);
       case 'newest':
-        return sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        return sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       case 'oldest':
-        return sorted.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+        return sorted.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
       case 'name_asc':
-        return sorted.sort((a, b) => a.name.localeCompare(b.name))
+        return sorted.sort((a, b) => a.name.localeCompare(b.name));
       case 'name_desc':
-        return sorted.sort((a, b) => b.name.localeCompare(a.name))
+        return sorted.sort((a, b) => b.name.localeCompare(a.name));
       case 'popularity':
         // 基于浏览量和评分的热门度排序
-        return sorted.sort((a, b) => ((b.viewCount || 0) * 0.7 + (b.rating || 0) * 0.3) - ((a.viewCount || 0) * 0.7 + (a.rating || 0) * 0.3))
+        return sorted.sort((a, b) => ((b.viewCount || 0) * 0.7 + (b.rating || 0) * 0.3) - ((a.viewCount || 0) * 0.7 + (a.rating || 0) * 0.3));
       case 'rating_desc':
-        return sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0))
+        return sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
       case 'leadtime_asc':
-        return sorted.sort((a, b) => (a.leadTime || 999) - (b.leadTime || 999))
+        return sorted.sort((a, b) => (a.leadTime || 999) - (b.leadTime || 999));
       case 'moq_asc':
-        return sorted.sort((a, b) => (a.moq || 1) - (b.moq || 1))
+        return sorted.sort((a, b) => (a.moq || 1) - (b.moq || 1));
       case 'relevance':
       default:
         // 相关性排序 - 基于搜索词匹配程度和权重
         return sorted.sort((a, b) => {
-          const aScore = calculateRelevanceScore(a, searchQuery)
-          const bScore = calculateRelevanceScore(b, searchQuery)
-          return bScore - aScore
-        })
+          const aScore = calculateRelevanceScore(a, searchQuery);
+          const bScore = calculateRelevanceScore(b, searchQuery);
+          return bScore - aScore;
+        });
     }
-  }
+  };
 
   // 计算相关性得分
   const calculateRelevanceScore = (product: SearchProduct, query: string): number => {
-    if (!query) return 0
-    
-    const searchTerms = query.toLowerCase().split(' ')
-    let score = 0
-    
+    if (!query) return 0;
+
+    const searchTerms = query.toLowerCase().split(' ');
+    let score = 0;
+
     searchTerms.forEach(term => {
       // 产品名称匹配权重最高
-      if (product.name.toLowerCase().includes(term)) score += 10
+      if (product.name.toLowerCase().includes(term)) score += 10;
       // 型号匹配权重较高
-      if (product.model.toLowerCase().includes(term)) score += 8
+      if (product.model.toLowerCase().includes(term)) score += 8;
       // 品牌匹配权重中等
-      if (product.brand.toLowerCase().includes(term)) score += 6
+      if (product.brand.toLowerCase().includes(term)) score += 6;
       // 分类匹配权重较低
-      if (product.category.toLowerCase().includes(term)) score += 4
+      if (product.category.toLowerCase().includes(term)) score += 4;
       // 描述匹配权重最低
-      if (product.description?.toLowerCase().includes(term)) score += 2
-    })
-    
+      if (product.description?.toLowerCase().includes(term)) score += 2;
+    });
+
     // 添加其他因素的权重
-    score += (product.rating || 0) * 0.5 // 评分影响
-    score += Math.log(product.viewCount || 1) * 0.3 // 浏览量影响
-    score += product.stock > 0 ? 2 : -5 // 有库存加分，无库存扣分
-    
-    return score
-  }
+    score += (product.rating || 0) * 0.5; // 评分影响
+    score += Math.log(product.viewCount || 1) * 0.3; // 浏览量影响
+    score += product.stock > 0 ? 2 : -5; // 有库存加分，无库存扣分
+
+    return score;
+  };
 
   // 生成过滤器选项
   const generateFilterOptions = (products: SearchProduct[]) => {
-    const categories: Record<string, number> = {}
-    const brands: Record<string, number> = {}
-    const manufacturers: Record<string, number> = {}
-    let minPrice = Infinity
-    let maxPrice = 0
-    
+    const categories: Record<string, number> = {};
+    const brands: Record<string, number> = {};
+    const manufacturers: Record<string, number> = {};
+    let minPrice = Infinity;
+    let maxPrice = 0;
+
     products.forEach(product => {
-      categories[product.category] = (categories[product.category] || 0) + 1
-      brands[product.brand] = (brands[product.brand] || 0) + 1
-      manufacturers[product.manufacturer] = (manufacturers[product.manufacturer] || 0) + 1
-      minPrice = Math.min(minPrice, product.price)
-      maxPrice = Math.max(maxPrice, product.price)
-    })
-    
+      categories[product.category] = (categories[product.category] || 0) + 1;
+      brands[product.brand] = (brands[product.brand] || 0) + 1;
+      manufacturers[product.manufacturer] = (manufacturers[product.manufacturer] || 0) + 1;
+      minPrice = Math.min(minPrice, product.price);
+      maxPrice = Math.max(maxPrice, product.price);
+    });
+
     return {
       categories: Object.entries(categories).map(([name, count]) => ({ name, count })),
       brands: Object.entries(brands).map(([name, count]) => ({ name, count })),
       manufacturers: Object.entries(manufacturers).map(([name, count]) => ({ name, count })),
       priceRange: { min: minPrice, max: maxPrice },
       availableFilters: {}
-    }
-  }
+    };
+  };
 
   // 生成搜索建议
   const generateSuggestions = (query: string): string[] => {
-    const suggestions = new Set<string>()
-    const queryLower = query.toLowerCase()
-    
+    const suggestions = new Set<string>();
+    const queryLower = query.toLowerCase();
+
     mockProducts.forEach(product => {
       if (product.name.toLowerCase().includes(queryLower)) {
-        suggestions.add(product.name)
+        suggestions.add(product.name);
       }
       if (product.brand.toLowerCase().includes(queryLower)) {
-        suggestions.add(product.brand)
+        suggestions.add(product.brand);
       }
       if (product.category.toLowerCase().includes(queryLower)) {
-        suggestions.add(product.category)
+        suggestions.add(product.category);
       }
-    })
-    
-    return Array.from(suggestions).slice(0, 5)
-  }
+    });
+
+    return Array.from(suggestions).slice(0, 5);
+  };
 
   const updateFilters = (filters: Partial<SearchFilters>) => {
-    const newFilters = { ...currentFilters, ...filters }
-    setCurrentFilters(newFilters)
+    const newFilters = { ...currentFilters, ...filters };
+    setCurrentFilters(newFilters);
     if (searchQuery) {
-      search(searchQuery, newFilters, 1)
+      search(searchQuery, newFilters, 1);
     }
-  }
+  };
 
   const updateSort = (sort: SortOption) => {
-    setSortBy(sort)
+    setSortBy(sort);
     if (searchQuery) {
-      search(searchQuery, currentFilters, 1)
+      search(searchQuery, currentFilters, 1);
     }
-  }
+  };
 
   const clearSearch = () => {
-    setSearchQuery('')
-    setSearchResults(null)
-    setCurrentFilters({})
-    setError(null)
-  }
+    setSearchQuery('');
+    setSearchResults(null);
+    setCurrentFilters({});
+    setError(null);
+  };
 
   const clearFilters = () => {
-    setCurrentFilters({})
+    setCurrentFilters({});
     if (searchQuery) {
-      search(searchQuery, {}, 1)
+      search(searchQuery, {}, 1);
     }
-  }
+  };
 
   const getSuggestions = async (query: string): Promise<SearchSuggestion[]> => {
     // 模拟异步搜索建议
-    await new Promise(resolve => setTimeout(resolve, 100))
-    
-    const suggestions: SearchSuggestion[] = []
-    const queryLower = query.toLowerCase()
-    
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    const suggestions: SearchSuggestion[] = [];
+    const queryLower = query.toLowerCase();
+
     // 产品建议
     mockProducts.forEach(product => {
       if (product.name.toLowerCase().includes(queryLower)) {
@@ -593,34 +593,34 @@ export function SearchProvider({ children }: { children: ReactNode }) {
           type: 'product',
           text: product.name,
           category: product.category
-        })
+        });
       }
-    })
-    
+    });
+
     // 品牌建议
-    const brands = new Set(mockProducts.map(p => p.brand))
+    const brands = new Set(mockProducts.map(p => p.brand));
     brands.forEach(brand => {
       if (brand.toLowerCase().includes(queryLower)) {
         suggestions.push({
           type: 'brand',
           text: brand
-        })
+        });
       }
-    })
-    
+    });
+
     // 分类建议
-    const categories = new Set(mockProducts.map(p => p.category))
+    const categories = new Set(mockProducts.map(p => p.category));
     categories.forEach(category => {
       if (category.toLowerCase().includes(queryLower)) {
         suggestions.push({
           type: 'category',
           text: category
-        })
+        });
       }
-    })
-    
-    return suggestions.slice(0, 8)
-  }
+    });
+
+    return suggestions.slice(0, 8);
+  };
 
   const addToHistory = (query: string, filters?: SearchFilters, resultCount: number = 0) => {
     const historyItem: SearchHistoryItem = {
@@ -629,81 +629,81 @@ export function SearchProvider({ children }: { children: ReactNode }) {
       filters,
       timestamp: new Date().toISOString(),
       resultCount
-    }
-    
+    };
+
     setSearchHistory(prev => {
       // 移除重复的搜索
-      const filtered = prev.filter(item => 
+      const filtered = prev.filter(item =>
         item.query !== query || JSON.stringify(item.filters) !== JSON.stringify(filters)
-      )
+      );
       // 添加新搜索到开头，限制最多50条
-      return [historyItem, ...filtered].slice(0, 50)
-    })
-  }
+      return [historyItem, ...filtered].slice(0, 50);
+    });
+  };
 
   const clearHistory = () => {
-    setSearchHistory([])
-  }
+    setSearchHistory([]);
+  };
 
   const removeFromHistory = (id: string) => {
-    setSearchHistory(prev => prev.filter(item => item.id !== id))
-  }
+    setSearchHistory(prev => prev.filter(item => item.id !== id));
+  };
 
   // 工具函数
   const formatPrice = (price: number): string => {
-    return `¥${price.toFixed(2)}`
-  }
+    return `¥${price.toFixed(2)}`;
+  };
 
   const formatStock = (stock: number): string => {
-    if (stock === 0) return '无库存'
-    if (stock < 10) return `库存紧张 (${stock})`
-    if (stock < 100) return `少量库存 (${stock})`
-    return `现货 (${stock}+)`
-  }
+    if (stock === 0) return '无库存';
+    if (stock < 10) return `库存紧张 (${stock})`;
+    if (stock < 100) return `少量库存 (${stock})`;
+    return `现货 (${stock}+)`;
+  };
 
   const getSortText = (sort: SortOption): string => {
-    return SORT_OPTION_MAP[sort] || sort
-  }
+    return SORT_OPTION_MAP[sort] || sort;
+  };
 
   // 更新搜索建议（用于Header实时建议）
   const updateSearchSuggestions = (query: string) => {
     if (!query.trim()) {
-      setSearchSuggestions([])
-      return
+      setSearchSuggestions([]);
+      return;
     }
 
-    const queryLower = query.toLowerCase()
-    const suggestions: string[] = []
+    const queryLower = query.toLowerCase();
+    const suggestions: string[] = [];
 
     // 产品名称建议
     mockProducts.forEach(product => {
       if (product.name.toLowerCase().includes(queryLower)) {
-        suggestions.push(product.name)
+        suggestions.push(product.name);
       }
       if (product.model.toLowerCase().includes(queryLower)) {
-        suggestions.push(product.model)
+        suggestions.push(product.model);
       }
-    })
+    });
 
     // 品牌建议
-    const brands = new Set(mockProducts.map(p => p.brand))
+    const brands = new Set(mockProducts.map(p => p.brand));
     brands.forEach(brand => {
       if (brand.toLowerCase().includes(queryLower)) {
-        suggestions.push(brand)
+        suggestions.push(brand);
       }
-    })
+    });
 
     // 分类建议
-    const categories = new Set(mockProducts.map(p => p.category))
+    const categories = new Set(mockProducts.map(p => p.category));
     categories.forEach(category => {
       if (category.toLowerCase().includes(queryLower)) {
-        suggestions.push(category)
+        suggestions.push(category);
       }
-    })
+    });
 
     // 去重并限制数量
-    setSearchSuggestions([...new Set(suggestions)].slice(0, 8))
-  }
+    setSearchSuggestions([...new Set(suggestions)].slice(0, 8));
+  };
 
   const value: SearchContextType = {
     // 搜索状态
@@ -713,12 +713,12 @@ export function SearchProvider({ children }: { children: ReactNode }) {
     sortBy,
     isLoading,
     error,
-    
+
     // 搜索历史和建议
     searchHistory,
     suggestions,
     searchSuggestions,
-    
+
     // 搜索操作
     search,
     updateFilters,
@@ -726,33 +726,33 @@ export function SearchProvider({ children }: { children: ReactNode }) {
     clearSearch,
     clearFilters,
     setSearchQuery,
-    
+
     // 搜索建议
     getSuggestions,
     updateSearchSuggestions,
-    
+
     // 搜索历史管理
     addToHistory,
     clearHistory,
     removeFromHistory,
-    
+
     // 工具函数
     formatPrice,
     formatStock,
     getSortText
-  }
+  };
 
   return (
     <SearchContext.Provider value={value}>
       {children}
     </SearchContext.Provider>
-  )
+  );
 }
 
 export function useSearch() {
-  const context = useContext(SearchContext)
+  const context = useContext(SearchContext);
   if (context === undefined) {
-    throw new Error('useSearch must be used within a SearchProvider')
+    throw new Error('useSearch must be used within a SearchProvider');
   }
-  return context
+  return context;
 }

@@ -1,8 +1,10 @@
-'use client'
+'use client';
 
-import { useState, useRef, useEffect, forwardRef } from 'react'
-import Image from 'next/image'
-import { cn } from '@/lib/utils'
+import { useState, useRef, useEffect, forwardRef } from 'react';
+
+import Image from 'next/image';
+
+import { cn } from '@/lib/utils';
 
 export interface OptimizedImageProps {
   src: string
@@ -71,83 +73,83 @@ const OptimizedImage = forwardRef<HTMLDivElement, OptimizedImageProps>(
       isInView: priority,
       retryCount: 0,
       currentSrc: src
-    })
+    });
 
-    const containerRef = useRef<HTMLDivElement>(null)
-    const retryTimeoutRef = useRef<NodeJS.Timeout>()
+    const containerRef = useRef<HTMLDivElement>(null);
+    const retryTimeoutRef = useRef<NodeJS.Timeout>();
 
     // Generate optimized src URLs
     const generateOptimizedSrc = (originalSrc: string, format?: 'webp' | 'avif') => {
-      if (!format) return originalSrc
-      
+      if (!format) return originalSrc;
+
       // This would integrate with your image optimization service
       // For now, we'll assume a CDN that supports format conversion
-      const url = new URL(originalSrc, window.location.origin)
-      url.searchParams.set('format', format)
-      url.searchParams.set('quality', quality.toString())
-      
-      if (width) url.searchParams.set('w', width.toString())
-      if (height) url.searchParams.set('h', height.toString())
-      
-      return url.toString()
-    }
+      const url = new URL(originalSrc, window.location.origin);
+      url.searchParams.set('format', format);
+      url.searchParams.set('quality', quality.toString());
+
+      if (width) url.searchParams.set('w', width.toString());
+      if (height) url.searchParams.set('h', height.toString());
+
+      return url.toString();
+    };
 
     // Create srcset for responsive images
     const generateSrcSet = () => {
-      if (!width) return undefined
+      if (!width) return undefined;
 
-      const breakpoints = [640, 768, 1024, 1280, 1536]
-      const srcSet: string[] = []
+      const breakpoints = [640, 768, 1024, 1280, 1536];
+      const srcSet: string[] = [];
 
       breakpoints.forEach(bp => {
         if (bp <= width * 2) { // Don't generate larger than 2x original
-          const optimizedSrc = generateOptimizedSrc(src)
-          const url = new URL(optimizedSrc, window.location.origin)
-          url.searchParams.set('w', bp.toString())
-          srcSet.push(`${url.toString()} ${bp}w`)
+          const optimizedSrc = generateOptimizedSrc(src);
+          const url = new URL(optimizedSrc, window.location.origin);
+          url.searchParams.set('w', bp.toString());
+          srcSet.push(`${url.toString()} ${bp}w`);
         }
-      })
+      });
 
-      return srcSet.length > 0 ? srcSet.join(', ') : undefined
-    }
+      return srcSet.length > 0 ? srcSet.join(', ') : undefined;
+    };
 
     // Intersection Observer for lazy loading
     useEffect(() => {
-      if (priority || state.isInView) return
+      if (priority || state.isInView) return;
 
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach(entry => {
             if (entry.isIntersecting) {
-              setState(prev => ({ ...prev, isInView: true }))
-              observer.disconnect()
+              setState(prev => ({ ...prev, isInView: true }));
+              observer.disconnect();
             }
-          })
+          });
         },
         {
           rootMargin: `${lazyLoadOffset}px`,
           threshold: 0.01
         }
-      )
+      );
 
       if (containerRef.current) {
-        observer.observe(containerRef.current)
+        observer.observe(containerRef.current);
       }
 
-      return () => observer.disconnect()
-    }, [priority, state.isInView, lazyLoadOffset])
+      return () => observer.disconnect();
+    }, [priority, state.isInView, lazyLoadOffset]);
 
     // Handle image load success
     const handleLoadingComplete = () => {
-      setState(prev => ({ ...prev, isLoading: false }))
-      onLoadingComplete?.()
-    }
+      setState(prev => ({ ...prev, isLoading: false }));
+      onLoadingComplete?.();
+    };
 
     // Handle image load error with retry logic
     const handleError = () => {
       setState(prev => {
-        const newRetryCount = prev.retryCount + 1
-        
+        const newRetryCount = prev.retryCount + 1;
+
         if (newRetryCount <= retryAttempts) {
           // Retry after delay
           retryTimeoutRef.current = setTimeout(() => {
@@ -156,26 +158,26 @@ const OptimizedImage = forwardRef<HTMLDivElement, OptimizedImageProps>(
               currentSrc: `${src}?retry=${newRetryCount}`,
               retryCount: newRetryCount,
               hasError: false
-            }))
-          }, retryDelay * newRetryCount)
-          
-          return { ...prev, retryCount: newRetryCount, isLoading: true }
+            }));
+          }, retryDelay * newRetryCount);
+
+          return { ...prev, retryCount: newRetryCount, isLoading: true };
         } else {
           // Max retries reached
-          onError?.()
-          return { ...prev, hasError: true, isLoading: false }
+          onError?.();
+          return { ...prev, hasError: true, isLoading: false };
         }
-      })
-    }
+      });
+    };
 
     // Clean up retry timeout
     useEffect(() => {
       return () => {
         if (retryTimeoutRef.current) {
-          clearTimeout(retryTimeoutRef.current)
+          clearTimeout(retryTimeoutRef.current);
         }
-      }
-    }, [])
+      };
+    }, []);
 
     // Calculate container style
     const containerStyle: React.CSSProperties = {
@@ -183,7 +185,7 @@ const OptimizedImage = forwardRef<HTMLDivElement, OptimizedImageProps>(
       width: fill ? '100%' : width,
       height: fill ? '100%' : height,
       aspectRatio: aspectRatio ? aspectRatio.toString() : undefined
-    }
+    };
 
     // Show fallback if error and no more retries
     if (state.hasError && state.retryCount > retryAttempts) {
@@ -207,7 +209,7 @@ const OptimizedImage = forwardRef<HTMLDivElement, OptimizedImageProps>(
               style={{ objectFit }}
             />
           </div>
-        )
+        );
       }
 
       // Default error state
@@ -238,7 +240,7 @@ const OptimizedImage = forwardRef<HTMLDivElement, OptimizedImageProps>(
             <p className="mt-2 text-sm">Image failed to load</p>
           </div>
         </div>
-      )
+      );
     }
 
     // Don't render anything if not in view and not priority
@@ -256,7 +258,7 @@ const OptimizedImage = forwardRef<HTMLDivElement, OptimizedImageProps>(
             </div>
           )}
         </div>
-      )
+      );
     }
 
     return (
@@ -277,7 +279,7 @@ const OptimizedImage = forwardRef<HTMLDivElement, OptimizedImageProps>(
                 sizes={sizes}
               />
             )}
-            
+
             {/* WebP format for supported browsers */}
             {enableWebP && (
               <source
@@ -286,7 +288,7 @@ const OptimizedImage = forwardRef<HTMLDivElement, OptimizedImageProps>(
                 sizes={sizes}
               />
             )}
-            
+
             {/* Fallback to original format */}
             <Image
               src={state.currentSrc}
@@ -303,7 +305,7 @@ const OptimizedImage = forwardRef<HTMLDivElement, OptimizedImageProps>(
               onLoadingComplete={handleLoadingComplete}
               onError={handleError}
               className="transition-opacity duration-300"
-              style={{ 
+              style={{
                 objectFit,
                 opacity: state.isLoading ? 0.7 : 1
               }}
@@ -325,11 +327,11 @@ const OptimizedImage = forwardRef<HTMLDivElement, OptimizedImageProps>(
           </div>
         )}
       </div>
-    )
+    );
   }
-)
+);
 
-OptimizedImage.displayName = 'OptimizedImage'
+OptimizedImage.displayName = 'OptimizedImage';
 
 // Image gallery component with optimized loading
 export interface ImageGalleryProps {
@@ -357,11 +359,11 @@ export function ImageGallery({
   columns = 4,
   gap = 4
 }: ImageGalleryProps) {
-  const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set())
+  const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
 
   const handleImageLoad = (index: number) => {
-    setLoadedImages(prev => new Set(prev).add(index))
-  }
+    setLoadedImages(prev => new Set(prev).add(index));
+  };
 
   return (
     <div
@@ -386,7 +388,7 @@ export function ImageGallery({
             enableWebP
             enableAVIF
           />
-          
+
           {image.caption && (
             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-3">
               <p className="text-white text-sm font-medium">
@@ -394,13 +396,13 @@ export function ImageGallery({
               </p>
             </div>
           )}
-          
+
           {/* Hover overlay */}
           <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
         </div>
       ))}
     </div>
-  )
+  );
 }
 
 // Progressive image loader hook
@@ -409,23 +411,23 @@ export function useProgressiveImage(
   highQualitySrc: string,
   delayMs: number = 100
 ) {
-  const [currentSrc, setCurrentSrc] = useState(lowQualitySrc)
-  const [isLoading, setIsLoading] = useState(true)
+  const [currentSrc, setCurrentSrc] = useState(lowQualitySrc);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      const img = new window.Image()
+      const img = new window.Image();
       img.onload = () => {
-        setCurrentSrc(highQualitySrc)
-        setIsLoading(false)
-      }
-      img.src = highQualitySrc
-    }, delayMs)
+        setCurrentSrc(highQualitySrc);
+        setIsLoading(false);
+      };
+      img.src = highQualitySrc;
+    }, delayMs);
 
-    return () => clearTimeout(timer)
-  }, [highQualitySrc, delayMs])
+    return () => clearTimeout(timer);
+  }, [highQualitySrc, delayMs]);
 
-  return { src: currentSrc, isLoading }
+  return { src: currentSrc, isLoading };
 }
 
-export default OptimizedImage
+export default OptimizedImage;

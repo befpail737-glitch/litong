@@ -18,7 +18,7 @@ export default function HomePage() {
               专业的电子元器件供应链服务商，为全球客户提供高品质产品和专业技术支持，
               助力您的项目成功
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
               <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-600 text-white hover:bg-blue-700 h-10 px-6 py-2">
                 立即询价
@@ -177,7 +177,7 @@ export default function HomePage() {
                 <h3 className="font-semibold text-gray-900 mb-2">ISO认证</h3>
                 <p className="text-gray-600 text-sm">ISO9001质量管理体系认证</p>
               </div>
-              
+
               <div className="text-center">
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg className="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -187,7 +187,7 @@ export default function HomePage() {
                 <h3 className="font-semibold text-gray-900 mb-2">专业团队</h3>
                 <p className="text-gray-600 text-sm">资深技术和销售专家</p>
               </div>
-              
+
               <div className="text-center">
                 <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg className="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -197,7 +197,7 @@ export default function HomePage() {
                 <h3 className="font-semibold text-gray-900 mb-2">原装保证</h3>
                 <p className="text-gray-600 text-sm">100%原厂授权正品保证</p>
               </div>
-              
+
               <div className="text-center">
                 <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg className="h-8 w-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -232,5 +232,5 @@ export default function HomePage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

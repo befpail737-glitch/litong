@@ -1,10 +1,12 @@
-import { notFound } from 'next/navigation'
-import Link from 'next/link'
-import { getSolutions } from '@/lib/sanity/queries'
-import { client } from '@/lib/sanity/client'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Building2, ArrowLeft } from 'lucide-react'
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+
+import { Building2, ArrowLeft } from 'lucide-react';
+
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { client } from '@/lib/sanity/client';
+import { getSolutions } from '@/lib/sanity/queries';
 
 // 从Sanity获取品牌数据
 const getBrandData = async (slug: string) => {
@@ -17,14 +19,14 @@ const getBrandData = async (slug: string) => {
         description,
         isActive
       }
-    `, { slug })
-    
-    return brand
+    `, { slug });
+
+    return brand;
   } catch (error) {
-    console.error('Error fetching brand from Sanity:', error)
-    return null
+    console.error('Error fetching brand from Sanity:', error);
+    return null;
   }
-}
+};
 
 interface BrandSolutionsPageProps {
   params: {
@@ -34,52 +36,52 @@ interface BrandSolutionsPageProps {
 }
 
 // 禁用缓存，确保总是获取最新数据
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function BrandSolutionsPage({ params }: BrandSolutionsPageProps) {
   // 解码URL编码的slug（处理中文slug）
-  const decodedSlug = decodeURIComponent(params.slug)
-  console.log('BrandSolutionsPage called with slug:', params.slug, 'decoded:', decodedSlug)
-  
+  const decodedSlug = decodeURIComponent(params.slug);
+  console.log('BrandSolutionsPage called with slug:', params.slug, 'decoded:', decodedSlug);
+
   // 从Sanity获取品牌数据
-  const brand = await getBrandData(decodedSlug)
-  console.log('Brand from Sanity:', brand)
-  
+  const brand = await getBrandData(decodedSlug);
+  console.log('Brand from Sanity:', brand);
+
   if (!brand) {
-    console.log('Brand not found, calling notFound()')
-    notFound()
+    console.log('Brand not found, calling notFound()');
+    notFound();
   }
 
   // 获取该品牌相关的解决方案
-  let solutions: any[] = []
-  let total = 0
-  let error = null
-  
+  let solutions: any[] = [];
+  let total = 0;
+  let error = null;
+
   try {
     // 获取所有解决方案，然后筛选与品牌相关的
-    const result = await getSolutions({ limit: 100 })
-    const allSolutions = result.solutions
-    
+    const result = await getSolutions({ limit: 100 });
+    const allSolutions = result.solutions;
+
     // 筛选与当前品牌相关的解决方案
     solutions = allSolutions.filter((solution: any) => {
       // 检查主要品牌
       if (solution.primaryBrand && solution.primaryBrand.slug === decodedSlug) {
-        return true
+        return true;
       }
       // 检查相关品牌
       if (solution.relatedBrands && solution.relatedBrands.some((relatedBrand: any) => relatedBrand.slug === decodedSlug)) {
-        return true
+        return true;
       }
-      return false
-    })
-    
-    total = solutions.length
-    console.log(`Found ${total} solutions for brand ${brand.name}`)
-    
+      return false;
+    });
+
+    total = solutions.length;
+    console.log(`Found ${total} solutions for brand ${brand.name}`);
+
   } catch (err) {
-    error = err instanceof Error ? err.message : 'Failed to fetch solutions'
-    console.error('Error fetching solutions for brand:', err)
+    error = err instanceof Error ? err.message : 'Failed to fetch solutions';
+    console.error('Error fetching solutions for brand:', err);
   }
 
   const targetMarketLabels: Record<string, string> = {
@@ -91,14 +93,14 @@ export default async function BrandSolutionsPage({ params }: BrandSolutionsPageP
     'power-energy': '电力能源',
     'aerospace': '航空航天',
     'others': '其他'
-  }
+  };
 
   const complexityLabels: Record<string, string> = {
     'simple': '简单',
     'medium': '中等',
     'complex': '复杂',
     'high-complex': '高复杂'
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -107,14 +109,14 @@ export default async function BrandSolutionsPage({ params }: BrandSolutionsPageP
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
             {/* 返回品牌页面的链接 */}
-            <Link 
+            <Link
               href={`/${params.locale}/brands/${params.slug}`}
               className="inline-flex items-center gap-2 text-blue-100 hover:text-white mb-6 transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
               返回 {brand.name} 品牌页面
             </Link>
-            
+
             <div className="flex items-start gap-6 mb-8">
               <div className="flex-shrink-0">
                 <div className="w-16 h-16 bg-white rounded-lg flex items-center justify-center">
@@ -167,13 +169,13 @@ export default async function BrandSolutionsPage({ params }: BrandSolutionsPageP
               {brand.name} 相关的解决方案正在准备中，敬请期待
             </p>
             <div className="flex justify-center gap-4">
-              <Link 
+              <Link
                 href={`/${params.locale}/brands/${params.slug}/products`}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
               >
                 查看产品
               </Link>
-              <Link 
+              <Link
                 href={`/${params.locale}/brands/${params.slug}`}
                 className="bg-white hover:bg-gray-50 text-gray-900 border border-gray-300 px-6 py-2 rounded-lg transition-colors"
               >
@@ -207,7 +209,7 @@ export default async function BrandSolutionsPage({ params }: BrandSolutionsPageP
                       {complexityLabels[solution.complexity] || solution.complexity}
                     </Badge>
                   </div>
-                  
+
                   <CardTitle className="line-clamp-2">
                     {solution.title || '未命名解决方案'}
                   </CardTitle>
@@ -216,7 +218,7 @@ export default async function BrandSolutionsPage({ params }: BrandSolutionsPageP
                   <CardDescription className="line-clamp-3 mb-4">
                     {solution.summary || '暂无描述'}
                   </CardDescription>
-                  
+
                   {/* 其他相关品牌 */}
                   {solution.primaryBrand && solution.relatedBrands && solution.relatedBrands.length > 0 && (
                     <div className="mb-4">
@@ -237,10 +239,10 @@ export default async function BrandSolutionsPage({ params }: BrandSolutionsPageP
                       </div>
                     </div>
                   )}
-                  
+
                   <div className="flex justify-between items-center">
                     {solution.slug ? (
-                      <Link 
+                      <Link
                         href={`/${params.locale}/solutions/${solution.slug}`}
                         className="text-blue-600 hover:text-blue-800 font-medium"
                       >
@@ -262,23 +264,23 @@ export default async function BrandSolutionsPage({ params }: BrandSolutionsPageP
         )}
       </div>
     </div>
-  )
+  );
 }
 
 // SEO元数据
 export async function generateMetadata({ params }: BrandSolutionsPageProps) {
-  const decodedSlug = decodeURIComponent(params.slug)
-  const brand = await getBrandData(decodedSlug)
-  
+  const decodedSlug = decodeURIComponent(params.slug);
+  const brand = await getBrandData(decodedSlug);
+
   if (!brand) {
     return {
       title: '品牌未找到'
-    }
+    };
   }
 
   return {
     title: `${brand.name} 解决方案 | 力通电子`,
     description: `${brand.name} 专业电子元器件解决方案，为您的项目提供最优化的技术支持和产品配置。力通电子提供全面的${brand.name}解决方案服务。`,
     keywords: `${brand.name}解决方案,${brand.name}技术方案,电子元器件解决方案,${brand.name}应用方案`,
-  }
+  };
 }

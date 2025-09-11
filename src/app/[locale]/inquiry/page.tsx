@@ -1,18 +1,21 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { 
-  Send, 
-  Upload, 
-  FileSpreadsheet, 
-  MessageCircle, 
-  CheckCircle2, 
+import { useState } from 'react';
+
+import { useRouter } from 'next/navigation';
+
+import {
+  Send,
+  Upload,
+  FileSpreadsheet,
+  MessageCircle,
+  CheckCircle2,
   Building
-} from 'lucide-react'
+} from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface QuickInquiryForm {
   productName: string
@@ -27,10 +30,10 @@ interface QuickInquiryForm {
 }
 
 export default function InquiryPage() {
-  const [activeTab, setActiveTab] = useState('quick')
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitSuccess, setSubmitSuccess] = useState(false)
-  const router = useRouter()
+  const [activeTab, setActiveTab] = useState('quick');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const router = useRouter();
 
   // 快速询价表单状态
   const [quickForm, setQuickForm] = useState<QuickInquiryForm>({
@@ -43,22 +46,22 @@ export default function InquiryPage() {
     email: '',
     phone: '',
     message: ''
-  })
+  });
 
   // 快速询价提交
   const handleQuickSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+    e.preventDefault();
+    setIsSubmitting(true);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500)) // 模拟API调用
-      setSubmitSuccess(true)
+      await new Promise(resolve => setTimeout(resolve, 1500)); // 模拟API调用
+      setSubmitSuccess(true);
     } catch (error) {
-      console.error('提交失败:', error)
+      console.error('提交失败:', error);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   if (submitSuccess) {
     return (
@@ -81,7 +84,7 @@ export default function InquiryPage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -131,7 +134,7 @@ export default function InquiryPage() {
                   {/* 产品信息 */}
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-gray-900">产品信息</h3>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         产品型号 *
@@ -190,7 +193,7 @@ export default function InquiryPage() {
                   {/* 联系信息 */}
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-gray-900">联系信息</h3>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         联系人 *
@@ -261,8 +264,8 @@ export default function InquiryPage() {
 
                 {/* 提交按钮 */}
                 <div className="flex gap-4 pt-4">
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     disabled={isSubmitting}
                     className="flex-1"
                   >
@@ -451,5 +454,5 @@ export default function InquiryPage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

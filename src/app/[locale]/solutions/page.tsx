@@ -1,9 +1,10 @@
-import { getSolutions } from '@/lib/sanity/queries'
-import { urlFor } from '@/lib/sanity/client'
-import Link from 'next/link'
-import Image from 'next/image'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+import Image from 'next/image';
+import Link from 'next/link';
+
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { urlFor } from '@/lib/sanity/client';
+import { getSolutions } from '@/lib/sanity/queries';
 
 type Solution = {
   _id: string
@@ -36,29 +37,29 @@ interface SolutionsPageProps {
 }
 
 // 禁用缓存，确保总是获取最新数据
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function SolutionsPage({ params: { locale } }: SolutionsPageProps) {
-  
-  let solutions: Solution[] = []
-  let total = 0
-  let error = null
-  
+
+  let solutions: Solution[] = [];
+  let total = 0;
+  let error = null;
+
   try {
-    const result = await getSolutions({ limit: 50 }) // 获取更多解决方案
-    solutions = result.solutions
-    total = result.total
-    console.log('Successfully fetched solutions from Sanity:', solutions.length)
-    console.log('Solutions data:', solutions.map(s => ({ 
-      id: s._id, 
-      title: s.title, 
+    const result = await getSolutions({ limit: 50 }); // 获取更多解决方案
+    solutions = result.solutions;
+    total = result.total;
+    console.log('Successfully fetched solutions from Sanity:', solutions.length);
+    console.log('Solutions data:', solutions.map(s => ({
+      id: s._id,
+      title: s.title,
       primaryBrand: s.primaryBrand?.name,
       relatedBrands: s.relatedBrands?.map(b => b.name)
-    })))
+    })));
   } catch (err) {
-    error = err instanceof Error ? err.message : 'Failed to fetch solutions'
-    console.error('Error fetching solutions from Sanity:', err)
+    error = err instanceof Error ? err.message : 'Failed to fetch solutions';
+    console.error('Error fetching solutions from Sanity:', err);
   }
 
   const targetMarketLabels: Record<string, string> = {
@@ -70,14 +71,14 @@ export default async function SolutionsPage({ params: { locale } }: SolutionsPag
     'power-energy': '电力能源',
     'aerospace': '航空航天',
     'others': '其他'
-  }
+  };
 
   const complexityLabels: Record<string, string> = {
     'simple': '简单',
     'medium': '中等',
     'complex': '复杂',
     'high-complex': '高复杂'
-  }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -140,7 +141,7 @@ export default async function SolutionsPage({ params: { locale } }: SolutionsPag
                   </div>
                 </div>
               )}
-              
+
               <div className="flex items-center gap-2 mb-2">
                 {solution.isFeatured && (
                   <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
@@ -154,7 +155,7 @@ export default async function SolutionsPage({ params: { locale } }: SolutionsPag
                   {complexityLabels[solution.complexity] || solution.complexity}
                 </Badge>
               </div>
-              
+
               <CardTitle className="line-clamp-2">
                 {solution.title || '未命名解决方案'}
               </CardTitle>
@@ -165,7 +166,7 @@ export default async function SolutionsPage({ params: { locale } }: SolutionsPag
               </CardDescription>
               <div className="flex justify-between items-center">
                 {solution.slug ? (
-                  <Link 
+                  <Link
                     href={`/${locale}/solutions/${solution.slug}`}
                     className="text-blue-600 hover:text-blue-800 font-medium"
                   >
@@ -185,5 +186,5 @@ export default async function SolutionsPage({ params: { locale } }: SolutionsPag
         ))}
       </div>
     </div>
-  )
+  );
 }

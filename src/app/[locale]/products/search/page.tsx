@@ -1,4 +1,4 @@
-import { ProductSearch } from '@/components/search/ProductSearch'
+import { ProductSearch } from '@/components/search/ProductSearch';
 
 export default function ProductSearchPage() {
   return (
@@ -14,5 +14,5 @@ export default function ProductSearchPage() {
       {/* 搜索组件 */}
       <ProductSearch />
     </div>
-  )
+  );
 }

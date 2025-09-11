@@ -1,18 +1,8 @@
-'use client'
+'use client';
 
-import { useState, useEffect, useMemo } from 'react'
-import { useTranslations } from 'next-intl'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Separator } from '@/components/ui/separator'
-import { DatePicker } from '@/components/ui/date-picker'
-import { Slider } from '@/components/ui/slider'
-import { 
+import { useState, useEffect, useMemo } from 'react';
+
+import {
   Search,
   Filter,
   X,
@@ -29,10 +19,22 @@ import {
   Star,
   SlidersHorizontal,
   RefreshCw
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { getLocalizedValue } from '@/lib/sanity-i18n'
-import type { Locale } from '@/i18n'
+} from 'lucide-react';
+import { useTranslations } from 'next-intl';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { DatePicker } from '@/components/ui/date-picker';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import { Slider } from '@/components/ui/slider';
+import type { Locale } from '@/i18n';
+import { getLocalizedValue } from '@/lib/sanity-i18n';
+import { cn } from '@/lib/utils';
 
 // 搜索过滤器类型
 interface SearchFilters {
@@ -102,7 +104,7 @@ export function AdvancedSearch({
   locale,
   className
 }: AdvancedSearchProps) {
-  const t = useTranslations('search')
+  const t = useTranslations('search');
 
   const [filters, setFilters] = useState<SearchFilters>({
     query: '',
@@ -118,19 +120,19 @@ export function AdvancedSearch({
     sortOrder: 'desc',
     includeContent: true,
     fuzzySearch: true
-  })
+  });
 
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false)
-  const [searchSuggestions, setSearchSuggestions] = useState<SearchSuggestion[]>([])
-  const [showSuggestions, setShowSuggestions] = useState(false)
-  const [activeFilters, setActiveFilters] = useState<Array<{ key: string; value: string; label: string }>>([])
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [searchSuggestions, setSearchSuggestions] = useState<SearchSuggestion[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [activeFilters, setActiveFilters] = useState<Array<{ key: string; value: string; label: string }>>([]);
 
   // 内容类型选项
   const contentTypeOptions = [
     { value: 'article', label: t('contentTypes.article'), icon: FileText },
     { value: 'document', label: t('contentTypes.document'), icon: Download },
     { value: 'product', label: t('contentTypes.product'), icon: Star }
-  ]
+  ];
 
   // 难度级别选项
   const difficultyOptions = [
@@ -138,7 +140,7 @@ export function AdvancedSearch({
     { value: 'intermediate', label: t('difficulty.intermediate') },
     { value: 'advanced', label: t('difficulty.advanced') },
     { value: 'expert', label: t('difficulty.expert') }
-  ]
+  ];
 
   // 语言选项
   const languageOptions = [
@@ -146,7 +148,7 @@ export function AdvancedSearch({
     { value: 'en', label: 'English' },
     { value: 'ja', label: '日本語' },
     { value: 'ko', label: '한국어' }
-  ]
+  ];
 
   // 排序选项
   const sortOptions = [
@@ -155,15 +157,15 @@ export function AdvancedSearch({
     { value: 'popularity', label: t('sortBy.popularity') },
     { value: 'title', label: t('sortBy.title') },
     { value: 'readTime', label: t('sortBy.readTime') }
-  ]
+  ];
 
   // 更新过滤器
   const updateFilter = <K extends keyof SearchFilters>(
     key: K,
     value: SearchFilters[K]
   ) => {
-    setFilters(prev => ({ ...prev, [key]: value }))
-  }
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
 
   // 切换数组过滤器
   const toggleArrayFilter = <K extends keyof Pick<SearchFilters, 'contentTypes' | 'categories' | 'tags' | 'authors' | 'difficulty' | 'languages'>>(
@@ -175,17 +177,17 @@ export function AdvancedSearch({
       [key]: prev[key].includes(value)
         ? prev[key].filter(item => item !== value)
         : [...prev[key], value]
-    }))
-  }
+    }));
+  };
 
   // 处理搜索
   const handleSearch = () => {
-    onSearch(filters)
+    onSearch(filters);
     // 添加到搜索历史
     if (filters.query.trim()) {
       // 这里可以调用API保存搜索历史
     }
-  }
+  };
 
   // 清除过滤器
   const clearFilters = () => {
@@ -203,78 +205,78 @@ export function AdvancedSearch({
       sortOrder: 'desc',
       includeContent: true,
       fuzzySearch: true
-    })
-  }
+    });
+  };
 
   // 移除单个过滤器
   const removeFilter = (key: string, value?: string) => {
     if (value) {
-      toggleArrayFilter(key as any, value)
+      toggleArrayFilter(key as any, value);
     } else {
-      updateFilter(key as any, key === 'dateRange' ? {} : key === 'readTimeRange' ? [0, 60] : '')
+      updateFilter(key as any, key === 'dateRange' ? {} : key === 'readTimeRange' ? [0, 60] : '');
     }
-  }
+  };
 
   // 计算活跃过滤器
   useEffect(() => {
-    const active: Array<{ key: string; value: string; label: string }> = []
-    
+    const active: Array<{ key: string; value: string; label: string }> = [];
+
     if (filters.contentTypes.length > 0) {
       filters.contentTypes.forEach(type => {
-        const option = contentTypeOptions.find(opt => opt.value === type)
+        const option = contentTypeOptions.find(opt => opt.value === type);
         if (option) {
-          active.push({ key: 'contentTypes', value: type, label: option.label })
+          active.push({ key: 'contentTypes', value: type, label: option.label });
         }
-      })
+      });
     }
-    
+
     if (filters.difficulty.length > 0) {
       filters.difficulty.forEach(diff => {
-        const option = difficultyOptions.find(opt => opt.value === diff)
+        const option = difficultyOptions.find(opt => opt.value === diff);
         if (option) {
-          active.push({ key: 'difficulty', value: diff, label: option.label })
+          active.push({ key: 'difficulty', value: diff, label: option.label });
         }
-      })
+      });
     }
-    
+
     if (filters.languages.length > 0) {
       filters.languages.forEach(lang => {
-        const option = languageOptions.find(opt => opt.value === lang)
+        const option = languageOptions.find(opt => opt.value === lang);
         if (option) {
-          active.push({ key: 'languages', value: lang, label: option.label })
+          active.push({ key: 'languages', value: lang, label: option.label });
         }
-      })
+      });
     }
-    
+
     if (filters.dateRange.start || filters.dateRange.end) {
       active.push({
         key: 'dateRange',
         value: '',
         label: `${filters.dateRange.start?.toLocaleDateString()} - ${filters.dateRange.end?.toLocaleDateString()}`
-      })
+      });
     }
-    
+
     if (filters.readTimeRange[0] > 0 || filters.readTimeRange[1] < 60) {
       active.push({
         key: 'readTimeRange',
         value: '',
         label: `${t('readTime')}: ${filters.readTimeRange[0]}-${filters.readTimeRange[1]} min`
-      })
+      });
     }
 
-    setActiveFilters(active)
-  }, [filters, t])
+    setActiveFilters(active);
+  }, [filters, t]);
 
   // 搜索建议
   const filteredSuggestions = useMemo(() => {
-    if (!filters.query.trim()) return []
-    
+    if (!filters.query.trim()) return [];
+
     return suggestions
-      .filter(suggestion => 
+      .filter(suggestion =>
         suggestion.value.toLowerCase().includes(filters.query.toLowerCase())
       )
-      .slice(0, 8)
-  }, [suggestions, filters.query])
+      .slice(0, 8);
+  }, [suggestions, filters.query]);
 
   return (
     <div className={className}>
@@ -331,8 +333,8 @@ export function AdvancedSearch({
                         <button
                           key={index}
                           onClick={() => {
-                            updateFilter('query', suggestion.value)
-                            setShowSuggestions(false)
+                            updateFilter('query', suggestion.value);
+                            setShowSuggestions(false);
                           }}
                           className="block w-full text-left p-2 text-sm hover:bg-muted rounded"
                         >
@@ -359,8 +361,8 @@ export function AdvancedSearch({
                         <button
                           key={index}
                           onClick={() => {
-                            updateFilter('query', search)
-                            setShowSuggestions(false)
+                            updateFilter('query', search);
+                            setShowSuggestions(false);
                           }}
                           className="block w-full text-left p-2 text-sm hover:bg-muted rounded"
                         >
@@ -380,8 +382,8 @@ export function AdvancedSearch({
                         <button
                           key={index}
                           onClick={() => {
-                            updateFilter('query', search)
-                            setShowSuggestions(false)
+                            updateFilter('query', search);
+                            setShowSuggestions(false);
                           }}
                           className="block w-full text-left p-2 text-sm hover:bg-muted rounded"
                         >
@@ -563,7 +565,7 @@ export function AdvancedSearch({
                       {t('searchInContent')}
                     </Label>
                   </div>
-                  
+
                   <div className="flex items-center space-x-2">
                     <Checkbox
                       id="fuzzySearch"
@@ -619,5 +621,5 @@ export function AdvancedSearch({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

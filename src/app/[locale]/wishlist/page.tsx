@@ -1,13 +1,16 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { ProductCard } from '@/components/product/ProductCard'
-import { WishlistButton, wishlistUtils } from '@/components/wishlist/WishlistButton'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
-import { Heart, ShoppingCart, ArrowLeftRight, Trash2, ArrowLeft } from 'lucide-react'
+import { useState, useEffect } from 'react';
+
+import { useRouter } from 'next/navigation';
+
+import { Heart, ShoppingCart, ArrowLeftRight, Trash2, ArrowLeft } from 'lucide-react';
+
+import { ProductCard } from '@/components/product/ProductCard';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { WishlistButton, wishlistUtils } from '@/components/wishlist/WishlistButton';
 
 // 模拟产品数据（实际应用中应该从API获取）
 const mockProductsData = {
@@ -57,104 +60,104 @@ const mockProductsData = {
     isFeatured: true,
     isActive: true,
   }
-}
+};
 
 export default function WishlistPage() {
-  const router = useRouter()
-  const [wishlistIds, setWishlistIds] = useState<string[]>([])
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
-  const [compareIds, setCompareIds] = useState<Set<string>>(new Set())
+  const router = useRouter();
+  const [wishlistIds, setWishlistIds] = useState<string[]>([]);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [compareIds, setCompareIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     // 获取心愿单
-    const wishlist = wishlistUtils.getWishlist()
-    setWishlistIds(wishlist)
+    const wishlist = wishlistUtils.getWishlist();
+    setWishlistIds(wishlist);
 
     // 监听心愿单更新
     const handleWishlistUpdate = () => {
-      const updatedWishlist = wishlistUtils.getWishlist()
-      setWishlistIds(updatedWishlist)
-    }
+      const updatedWishlist = wishlistUtils.getWishlist();
+      setWishlistIds(updatedWishlist);
+    };
 
-    window.addEventListener('wishlistUpdated', handleWishlistUpdate)
+    window.addEventListener('wishlistUpdated', handleWishlistUpdate);
     return () => {
-      window.removeEventListener('wishlistUpdated', handleWishlistUpdate)
-    }
-  }, [])
+      window.removeEventListener('wishlistUpdated', handleWishlistUpdate);
+    };
+  }, []);
 
   const wishlistProducts = wishlistIds
     .map(id => mockProductsData[id as keyof typeof mockProductsData])
-    .filter(Boolean)
+    .filter(Boolean);
 
   const selectedProducts = Array.from(selectedIds)
     .map(id => mockProductsData[id as keyof typeof mockProductsData])
-    .filter(Boolean)
+    .filter(Boolean);
 
   const handleSelectProduct = (productId: string) => {
     setSelectedIds(prev => {
-      const newSet = new Set(prev)
+      const newSet = new Set(prev);
       if (newSet.has(productId)) {
-        newSet.delete(productId)
+        newSet.delete(productId);
       } else {
-        newSet.add(productId)
+        newSet.add(productId);
       }
-      return newSet
-    })
-  }
+      return newSet;
+    });
+  };
 
   const handleSelectAll = () => {
     if (selectedIds.size === wishlistProducts.length) {
-      setSelectedIds(new Set())
+      setSelectedIds(new Set());
     } else {
-      setSelectedIds(new Set(wishlistProducts.map(p => p.id)))
+      setSelectedIds(new Set(wishlistProducts.map(p => p.id)));
     }
-  }
+  };
 
   const handleRemoveSelected = () => {
     selectedIds.forEach(id => {
-      wishlistUtils.removeFromWishlist(id)
-    })
-    setSelectedIds(new Set())
-  }
+      wishlistUtils.removeFromWishlist(id);
+    });
+    setSelectedIds(new Set());
+  };
 
   const handleAddToCompare = (productId: string) => {
     setCompareIds(prev => {
-      const newSet = new Set(prev)
+      const newSet = new Set(prev);
       if (newSet.has(productId)) {
-        newSet.delete(productId)
+        newSet.delete(productId);
       } else if (newSet.size < 4) { // 限制比较数量
-        newSet.add(productId)
+        newSet.add(productId);
       }
-      return newSet
-    })
-  }
+      return newSet;
+    });
+  };
 
   const handleCompareProducts = () => {
     if (compareIds.size >= 2) {
-      const compareUrl = `/products/compare?ids=${Array.from(compareIds).join(',')}`
-      router.push(compareUrl)
+      const compareUrl = `/products/compare?ids=${Array.from(compareIds).join(',')}`;
+      router.push(compareUrl);
     }
-  }
+  };
 
   const handleBulkInquiry = () => {
     if (selectedIds.size > 0) {
       // 这里可以跳转到询价页面，并预填产品信息
-      const productParams = Array.from(selectedIds).map(id => `product=${id}`).join('&')
-      router.push(`/inquiry?${productParams}`)
+      const productParams = Array.from(selectedIds).map(id => `product=${id}`).join('&');
+      router.push(`/inquiry?${productParams}`);
     }
-  }
+  };
 
   const handleClearWishlist = () => {
     if (confirm('确定要清空心愿单吗？')) {
-      wishlistUtils.clearWishlist()
-      setSelectedIds(new Set())
-      setCompareIds(new Set())
+      wishlistUtils.clearWishlist();
+      setSelectedIds(new Set());
+      setCompareIds(new Set());
     }
-  }
+  };
 
   const totalValue = selectedProducts.reduce((sum, product) => {
-    return sum + (product.pricing?.tiers[0]?.price || 0)
-  }, 0)
+    return sum + (product.pricing?.tiers[0]?.price || 0);
+  }, 0);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -210,19 +213,19 @@ export default function WishlistPage() {
                   全选 ({selectedIds.size}/{wishlistProducts.length})
                 </span>
               </div>
-              
+
               {selectedIds.size > 0 && (
                 <>
                   <Button variant="outline" size="sm" onClick={handleRemoveSelected}>
                     <Trash2 className="h-4 w-4 mr-2" />
                     删除选中 ({selectedIds.size})
                   </Button>
-                  
+
                   <Button size="sm" onClick={handleBulkInquiry}>
                     <ShoppingCart className="h-4 w-4 mr-2" />
                     批量询价
                   </Button>
-                  
+
                   {selectedIds.size > 0 && (
                     <div className="text-sm text-gray-600">
                       选中商品总价: <span className="font-semibold text-blue-600">¥{totalValue.toFixed(2)}</span>
@@ -231,12 +234,12 @@ export default function WishlistPage() {
                 </>
               )}
             </div>
-            
+
             <div className="flex items-center gap-2">
               {compareIds.size > 0 && (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={handleCompareProducts}
                   disabled={compareIds.size < 2}
                 >
@@ -244,7 +247,7 @@ export default function WishlistPage() {
                   比较 ({compareIds.size}/4)
                 </Button>
               )}
-              
+
               <Button variant="ghost" size="sm" onClick={handleClearWishlist}>
                 清空心愿单
               </Button>
@@ -276,7 +279,7 @@ export default function WishlistPage() {
                         <ArrowLeftRight className="h-4 w-4" />
                       </Button>
                     </div>
-                    
+
                     {/* 产品信息 */}
                     <div className="flex-1 grid md:grid-cols-4 gap-4">
                       {/* 产品图片和基本信息 */}
@@ -292,7 +295,7 @@ export default function WishlistPage() {
                             <div className="text-2xl text-gray-300">📱</div>
                           )}
                         </div>
-                        
+
                         <div className="flex-1">
                           <div className="flex items-start justify-between">
                             <div>
@@ -314,7 +317,7 @@ export default function WishlistPage() {
                           </div>
                         </div>
                       </div>
-                      
+
                       {/* 价格 */}
                       <div className="flex items-center">
                         {product.pricing && (
@@ -326,7 +329,7 @@ export default function WishlistPage() {
                           </div>
                         )}
                       </div>
-                      
+
                       {/* 操作按钮 */}
                       <div className="flex items-center gap-2">
                         <Button size="sm" variant="outline" asChild>
@@ -347,5 +350,5 @@ export default function WishlistPage() {
         </>
       )}
     </div>
-  )
+  );
 }

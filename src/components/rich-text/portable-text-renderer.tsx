@@ -1,13 +1,10 @@
-'use client'
+'use client';
 
-import { PortableText } from '@portabletext/react'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
-import { 
+import Image from 'next/image';
+import Link from 'next/link';
+
+import { PortableText } from '@portabletext/react';
+import {
   Quote,
   ExternalLink,
   Download,
@@ -16,10 +13,15 @@ import {
   CheckCircle,
   Info,
   AlertTriangle
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
+} from 'lucide-react';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
 
 // Portable Text 组件类型
 interface PortableTextRendererProps {
@@ -38,16 +40,16 @@ interface CodeBlockProps {
 }
 
 const CodeBlock: React.FC<CodeBlockProps> = ({ value }) => {
-  const { language = 'javascript', code, filename, caption } = value
+  const { language = 'javascript', code, filename, caption } = value;
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(code)
+      await navigator.clipboard.writeText(code);
       // 这里可以添加复制成功的提示
     } catch (err) {
-      console.error('Failed to copy code:', err)
+      console.error('Failed to copy code:', err);
     }
-  }
+  };
 
   return (
     <Card className="my-6">
@@ -86,8 +88,8 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ value }) => {
         </div>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
 // 图片组件
 interface ImageBlockProps {
@@ -109,24 +111,24 @@ interface ImageBlockProps {
 }
 
 const ImageBlock: React.FC<ImageBlockProps> = ({ value }) => {
-  const { asset, alt, caption, alignment = 'center', size = 'full' } = value
-  
+  const { asset, alt, caption, alignment = 'center', size = 'full' } = value;
+
   const sizeClasses = {
     small: 'max-w-xs',
     medium: 'max-w-md',
     large: 'max-w-2xl',
     full: 'w-full'
-  }
+  };
 
   const alignmentClasses = {
     left: 'mr-auto',
     center: 'mx-auto',
     right: 'ml-auto'
-  }
+  };
 
   return (
-    <figure className={cn("my-8", alignmentClasses[alignment])}>
-      <div className={cn("relative rounded-lg overflow-hidden", sizeClasses[size])}>
+    <figure className={cn('my-8', alignmentClasses[alignment])}>
+      <div className={cn('relative rounded-lg overflow-hidden', sizeClasses[size])}>
         <Image
           src={asset.url}
           alt={alt || ''}
@@ -141,8 +143,8 @@ const ImageBlock: React.FC<ImageBlockProps> = ({ value }) => {
         </figcaption>
       )}
     </figure>
-  )
-}
+  );
+};
 
 // 视频组件
 interface VideoBlockProps {
@@ -155,19 +157,19 @@ interface VideoBlockProps {
 }
 
 const VideoBlock: React.FC<VideoBlockProps> = ({ value }) => {
-  const { url, title, caption, autoplay = false } = value
+  const { url, title, caption, autoplay = false } = value;
 
   // 检测视频类型
-  const isYouTube = url.includes('youtube.com') || url.includes('youtu.be')
-  const isVimeo = url.includes('vimeo.com')
+  const isYouTube = url.includes('youtube.com') || url.includes('youtu.be');
+  const isVimeo = url.includes('vimeo.com');
 
-  let embedUrl = url
+  let embedUrl = url;
   if (isYouTube) {
-    const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)?.[1]
-    embedUrl = `https://www.youtube.com/embed/${videoId}${autoplay ? '?autoplay=1' : ''}`
+    const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)?.[1];
+    embedUrl = `https://www.youtube.com/embed/${videoId}${autoplay ? '?autoplay=1' : ''}`;
   } else if (isVimeo) {
-    const videoId = url.match(/vimeo\.com\/(\d+)/)?.[1]
-    embedUrl = `https://player.vimeo.com/video/${videoId}${autoplay ? '?autoplay=1' : ''}`
+    const videoId = url.match(/vimeo\.com\/(\d+)/)?.[1];
+    embedUrl = `https://player.vimeo.com/video/${videoId}${autoplay ? '?autoplay=1' : ''}`;
   }
 
   return (
@@ -197,8 +199,8 @@ const VideoBlock: React.FC<VideoBlockProps> = ({ value }) => {
         )}
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
 // 提示框组件
 interface CalloutBlockProps {
@@ -210,7 +212,7 @@ interface CalloutBlockProps {
 }
 
 const CalloutBlock: React.FC<CalloutBlockProps> = ({ value }) => {
-  const { type, title, content } = value
+  const { type, title, content } = value;
 
   const typeConfig = {
     info: {
@@ -233,15 +235,15 @@ const CalloutBlock: React.FC<CalloutBlockProps> = ({ value }) => {
       color: 'border-green-200 bg-green-50 text-green-900',
       iconColor: 'text-green-600'
     }
-  }
+  };
 
-  const config = typeConfig[type]
-  const IconComponent = config.icon
+  const config = typeConfig[type];
+  const IconComponent = config.icon;
 
   return (
-    <div className={cn("border-l-4 p-4 my-6 rounded-r-lg", config.color)}>
+    <div className={cn('border-l-4 p-4 my-6 rounded-r-lg', config.color)}>
       <div className="flex items-start gap-3">
-        <IconComponent className={cn("w-5 h-5 flex-shrink-0 mt-0.5", config.iconColor)} />
+        <IconComponent className={cn('w-5 h-5 flex-shrink-0 mt-0.5', config.iconColor)} />
         <div className="flex-1">
           {title && (
             <h4 className="font-semibold mb-2">{title}</h4>
@@ -253,8 +255,8 @@ const CalloutBlock: React.FC<CalloutBlockProps> = ({ value }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 // 表格组件
 interface TableBlockProps {
@@ -268,9 +270,9 @@ interface TableBlockProps {
 }
 
 const TableBlock: React.FC<TableBlockProps> = ({ value }) => {
-  const { rows, caption, hasHeader = false } = value
+  const { rows, caption, hasHeader = false } = value;
 
-  if (!rows || rows.length === 0) return null
+  if (!rows || rows.length === 0) return null;
 
   return (
     <div className="my-8 overflow-x-auto">
@@ -307,8 +309,8 @@ const TableBlock: React.FC<TableBlockProps> = ({ value }) => {
         </p>
       )}
     </div>
-  )
-}
+  );
+};
 
 // 下载链接组件
 interface DownloadBlockProps {
@@ -326,7 +328,7 @@ interface DownloadBlockProps {
 }
 
 const DownloadBlock: React.FC<DownloadBlockProps> = ({ value }) => {
-  const { file, title, description, fileSize } = value
+  const { file, title, description, fileSize } = value;
 
   return (
     <Card className="my-6">
@@ -352,8 +354,8 @@ const DownloadBlock: React.FC<DownloadBlockProps> = ({ value }) => {
         </div>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
 // Portable Text 组件配置
 const portableTextComponents = {
@@ -365,15 +367,15 @@ const portableTextComponents = {
     table: TableBlock,
     download: DownloadBlock
   },
-  
+
   marks: {
     link: ({ children, value }: any) => {
-      const isExternal = value.href?.startsWith('http')
+      const isExternal = value.href?.startsWith('http');
       return (
         <Link
           href={value.href || '#'}
           className={cn(
-            "text-primary hover:underline inline-flex items-center gap-1",
+            'text-primary hover:underline inline-flex items-center gap-1',
             isExternal && "after:content-['_↗']"
           )}
           target={value.blank || isExternal ? '_blank' : '_self'}
@@ -382,123 +384,123 @@ const portableTextComponents = {
           {children}
           {isExternal && <ExternalLink className="w-3 h-3 ml-1" />}
         </Link>
-      )
+      );
     },
-    
+
     strong: ({ children }: any) => (
       <strong className="font-semibold">{children}</strong>
     ),
-    
+
     em: ({ children }: any) => (
       <em className="italic">{children}</em>
     ),
-    
+
     code: ({ children }: any) => (
       <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">
         {children}
       </code>
     ),
-    
+
     underline: ({ children }: any) => (
       <u className="underline">{children}</u>
     ),
-    
+
     'strike-through': ({ children }: any) => (
       <s className="line-through">{children}</s>
     ),
-    
+
     highlight: ({ children }: any) => (
       <mark className="bg-yellow-200 px-1 rounded">{children}</mark>
     )
   },
-  
+
   block: {
     h1: ({ children }: any) => (
       <h1 className="text-3xl font-bold mt-12 mb-6 first:mt-0 scroll-mt-20" id={`heading-${Date.now()}`}>
         {children}
       </h1>
     ),
-    
+
     h2: ({ children }: any) => (
       <h2 className="text-2xl font-semibold mt-10 mb-4 scroll-mt-20" id={`heading-${Date.now()}`}>
         {children}
       </h2>
     ),
-    
+
     h3: ({ children }: any) => (
       <h3 className="text-xl font-medium mt-8 mb-3 scroll-mt-20" id={`heading-${Date.now()}`}>
         {children}
       </h3>
     ),
-    
+
     h4: ({ children }: any) => (
       <h4 className="text-lg font-medium mt-6 mb-2 scroll-mt-20" id={`heading-${Date.now()}`}>
         {children}
       </h4>
     ),
-    
+
     h5: ({ children }: any) => (
       <h5 className="text-base font-medium mt-5 mb-2 scroll-mt-20" id={`heading-${Date.now()}`}>
         {children}
       </h5>
     ),
-    
+
     h6: ({ children }: any) => (
       <h6 className="text-sm font-medium mt-4 mb-2 scroll-mt-20" id={`heading-${Date.now()}`}>
         {children}
       </h6>
     ),
-    
+
     blockquote: ({ children }: any) => (
       <blockquote className="border-l-4 border-primary pl-4 py-2 my-6 italic bg-muted/30 rounded-r">
         <Quote className="w-4 h-4 text-primary mb-2" />
         <div className="space-y-4">{children}</div>
       </blockquote>
     ),
-    
+
     normal: ({ children }: any) => (
       <p className="mb-4 leading-7 text-foreground">{children}</p>
     ),
   },
-  
+
   list: {
     bullet: ({ children }: any) => (
       <ul className="list-disc list-inside mb-4 space-y-2 pl-4">
         {children}
       </ul>
     ),
-    
+
     number: ({ children }: any) => (
       <ol className="list-decimal list-inside mb-4 space-y-2 pl-4">
         {children}
       </ol>
     ),
   },
-  
+
   listItem: {
     bullet: ({ children }: any) => (
       <li className="leading-7">{children}</li>
     ),
-    
+
     number: ({ children }: any) => (
       <li className="leading-7">{children}</li>
     ),
   },
-}
+};
 
 export function PortableTextRenderer({ value, className }: PortableTextRendererProps) {
   if (!value || !Array.isArray(value)) {
-    return null
+    return null;
   }
 
   return (
-    <div className={cn("prose prose-slate max-w-none", className)}>
+    <div className={cn('prose prose-slate max-w-none', className)}>
       <PortableText
         value={value}
         components={portableTextComponents}
       />
     </div>
-  )
+  );
 }
 
-export { portableTextComponents }
+export { portableTextComponents };

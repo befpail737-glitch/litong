@@ -1,12 +1,14 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { FileText, Search, Eye, MessageCircle, Clock, CheckCircle, AlertCircle } from 'lucide-react'
+import { useState } from 'react';
+
+import { FileText, Search, Eye, MessageCircle, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface InquiryItem {
   id: string
@@ -75,42 +77,42 @@ const mockInquiries: InquiryItem[] = [
     totalItems: 2,
     notes: '教学项目采购，需要原装正品'
   }
-]
+];
 
 const statusConfig = {
   pending: { label: '待回复', color: 'secondary', icon: Clock },
   responded: { label: '已回复', color: 'default', icon: MessageCircle },
   quoted: { label: '已报价', color: 'default', icon: CheckCircle },
   closed: { label: '已关闭', color: 'secondary', icon: AlertCircle }
-}
+};
 
 export function InquiryHistory() {
-  const [inquiries] = useState<InquiryItem[]>(mockInquiries)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [statusFilter, setStatusFilter] = useState<string>('all')
-  const [selectedInquiry, setSelectedInquiry] = useState<InquiryItem | null>(null)
+  const [inquiries] = useState<InquiryItem[]>(mockInquiries);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [selectedInquiry, setSelectedInquiry] = useState<InquiryItem | null>(null);
 
   const filteredInquiries = inquiries.filter(inquiry => {
-    const matchesSearch = 
+    const matchesSearch =
       inquiry.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      inquiry.products.some(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    
-    const matchesStatus = statusFilter === 'all' || inquiry.status === statusFilter
+      inquiry.products.some(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    return matchesSearch && matchesStatus
-  })
+    const matchesStatus = statusFilter === 'all' || inquiry.status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
 
   const handleViewDetails = (inquiry: InquiryItem) => {
-    setSelectedInquiry(inquiry)
-  }
+    setSelectedInquiry(inquiry);
+  };
 
   if (selectedInquiry) {
     return (
-      <InquiryDetails 
-        inquiry={selectedInquiry} 
-        onBack={() => setSelectedInquiry(null)} 
+      <InquiryDetails
+        inquiry={selectedInquiry}
+        onBack={() => setSelectedInquiry(null)}
       />
-    )
+    );
   }
 
   return (
@@ -156,7 +158,7 @@ export function InquiryHistory() {
               </div>
             ) : (
               filteredInquiries.map((inquiry) => {
-                const StatusIcon = statusConfig[inquiry.status].icon
+                const StatusIcon = statusConfig[inquiry.status].icon;
                 return (
                   <div key={inquiry.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
                     <div className="flex items-start justify-between mb-3">
@@ -203,18 +205,18 @@ export function InquiryHistory() {
                       </p>
                     </div>
                   </div>
-                )
+                );
               })
             )}
           </div>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
 
 function InquiryDetails({ inquiry, onBack }: { inquiry: InquiryItem, onBack: () => void }) {
-  const StatusIcon = statusConfig[inquiry.status].icon
+  const StatusIcon = statusConfig[inquiry.status].icon;
 
   return (
     <div className="space-y-6">
@@ -355,5 +357,5 @@ function InquiryDetails({ inquiry, onBack }: { inquiry: InquiryItem, onBack: () 
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

@@ -116,12 +116,12 @@ export interface PerformanceReport {
 
 // Performance and load testing framework
 export class PerformanceTester {
-  private config: Required<PerformanceTestConfig>
-  private metrics: PerformanceMetrics[] = []
-  private results: PerformanceTestResult[] = []
-  private activeUsers = 0
-  private isRunning = false
-  private startTime = 0
+  private config: Required<PerformanceTestConfig>;
+  private metrics: PerformanceMetrics[] = [];
+  private results: PerformanceTestResult[] = [];
+  private activeUsers = 0;
+  private isRunning = false;
+  private startTime = 0;
 
   constructor(config: PerformanceTestConfig = {}) {
     this.config = {
@@ -148,9 +148,9 @@ export class PerformanceTester {
         resourceUtilization: { cpu: 0.8, memory: 0.8 },
         ...config.thresholds
       }
-    }
+    };
 
-    this.initializeDefaultScenarios()
+    this.initializeDefaultScenarios();
   }
 
   private initializeDefaultScenarios(): void {
@@ -253,176 +253,176 @@ export class PerformanceTester {
           ],
           thinkTime: 10000
         }
-      ]
+      ];
     }
   }
 
   // Main test execution
   public async runPerformanceTests(): Promise<PerformanceReport> {
-    console.log('🚀 Starting performance testing...')
-    console.log(`Configuration:`)
-    console.log(`  Duration: ${this.config.duration / 1000}s`)
-    console.log(`  Max Users: ${this.config.maxUsers}`)
-    console.log(`  Ramp-up Time: ${this.config.rampUpTime / 1000}s`)
-    console.log(`  Scenarios: ${this.config.scenarios.length}`)
+    console.log('🚀 Starting performance testing...');
+    console.log('Configuration:');
+    console.log(`  Duration: ${this.config.duration / 1000}s`);
+    console.log(`  Max Users: ${this.config.maxUsers}`);
+    console.log(`  Ramp-up Time: ${this.config.rampUpTime / 1000}s`);
+    console.log(`  Scenarios: ${this.config.scenarios.length}`);
 
-    this.startTime = Date.now()
-    this.isRunning = true
+    this.startTime = Date.now();
+    this.isRunning = true;
 
     // Start metrics collection
     if (this.config.enableMetrics) {
-      this.startMetricsCollection()
+      this.startMetricsCollection();
     }
 
     // Start user ramp-up
-    await this.rampUpUsers()
+    await this.rampUpUsers();
 
     // Run load test
-    await this.runLoadTest()
+    await this.runLoadTest();
 
     // Generate report
-    const report = this.generateReport()
-    
-    console.log('\n📊 Performance test completed!')
-    this.printSummary(report)
+    const report = this.generateReport();
 
-    return report
+    console.log('\n📊 Performance test completed!');
+    this.printSummary(report);
+
+    return report;
   }
 
   private async rampUpUsers(): Promise<void> {
-    const userIncrementInterval = this.config.rampUpTime / this.config.maxUsers
-    const usersToAdd = this.config.maxUsers
+    const userIncrementInterval = this.config.rampUpTime / this.config.maxUsers;
+    const usersToAdd = this.config.maxUsers;
 
-    console.log(`\n⬆️  Ramping up ${usersToAdd} users over ${this.config.rampUpTime / 1000}s...`)
+    console.log(`\n⬆️  Ramping up ${usersToAdd} users over ${this.config.rampUpTime / 1000}s...`);
 
     for (let i = 0; i < usersToAdd && this.isRunning; i++) {
-      this.activeUsers++
-      this.startUserSession()
-      
+      this.activeUsers++;
+      this.startUserSession();
+
       if (i < usersToAdd - 1) {
-        await this.sleep(userIncrementInterval)
+        await this.sleep(userIncrementInterval);
       }
 
       if (i % 10 === 0) {
-        console.log(`  Active users: ${this.activeUsers}`)
+        console.log(`  Active users: ${this.activeUsers}`);
       }
     }
 
-    console.log(`✅ Ramp-up completed. ${this.activeUsers} users active.`)
+    console.log(`✅ Ramp-up completed. ${this.activeUsers} users active.`);
   }
 
   private async runLoadTest(): Promise<void> {
-    const testEndTime = this.startTime + this.config.duration
-    
-    console.log(`\n🔄 Running load test for ${this.config.duration / 1000}s...`)
+    const testEndTime = this.startTime + this.config.duration;
+
+    console.log(`\n🔄 Running load test for ${this.config.duration / 1000}s...`);
 
     while (Date.now() < testEndTime && this.isRunning) {
-      await this.sleep(5000) // Report every 5 seconds
-      
-      const elapsed = Date.now() - this.startTime
-      const remaining = testEndTime - Date.now()
-      
+      await this.sleep(5000); // Report every 5 seconds
+
+      const elapsed = Date.now() - this.startTime;
+      const remaining = testEndTime - Date.now();
+
       console.log(`  Progress: ${(elapsed / this.config.duration * 100).toFixed(1)}% | ` +
                  `Active Users: ${this.activeUsers} | ` +
-                 `Remaining: ${Math.max(0, remaining / 1000).toFixed(0)}s`)
+                 `Remaining: ${Math.max(0, remaining / 1000).toFixed(0)}s`);
     }
 
-    this.isRunning = false
-    console.log('✅ Load test completed.')
+    this.isRunning = false;
+    console.log('✅ Load test completed.');
   }
 
   private startUserSession(): void {
     // Start an independent user session
     this.simulateUserSession().catch(error => {
-      console.warn('User session error:', error)
+      console.warn('User session error:', error);
     }).finally(() => {
-      this.activeUsers = Math.max(0, this.activeUsers - 1)
-    })
+      this.activeUsers = Math.max(0, this.activeUsers - 1);
+    });
   }
 
   private async simulateUserSession(): Promise<void> {
     while (this.isRunning) {
       // Select scenario based on weight
-      const scenario = this.selectScenario()
-      
+      const scenario = this.selectScenario();
+
       try {
-        await this.executeScenario(scenario)
+        await this.executeScenario(scenario);
       } catch (error) {
         // Log error and continue
-        console.warn(`Scenario execution error: ${error}`)
+        console.warn(`Scenario execution error: ${error}`);
       }
 
       // Think time between scenario iterations
       if (scenario.thinkTime) {
-        await this.sleep(scenario.thinkTime)
+        await this.sleep(scenario.thinkTime);
       }
     }
   }
 
   private selectScenario(): LoadTestScenario {
-    const totalWeight = this.config.scenarios.reduce((sum, s) => sum + s.weight, 0)
-    const random = Math.random() * totalWeight
-    
-    let currentWeight = 0
+    const totalWeight = this.config.scenarios.reduce((sum, s) => sum + s.weight, 0);
+    const random = Math.random() * totalWeight;
+
+    let currentWeight = 0;
     for (const scenario of this.config.scenarios) {
-      currentWeight += scenario.weight
+      currentWeight += scenario.weight;
       if (random <= currentWeight) {
-        return scenario
+        return scenario;
       }
     }
-    
-    return this.config.scenarios[0]
+
+    return this.config.scenarios[0];
   }
 
   private async executeScenario(scenario: LoadTestScenario): Promise<void> {
     for (const step of scenario.steps) {
-      const result = await this.executeStep(scenario.name, step)
-      this.results.push(result)
-      
+      const result = await this.executeStep(scenario.name, step);
+      this.results.push(result);
+
       // Small delay between steps
-      await this.sleep(100)
+      await this.sleep(100);
     }
   }
 
   private async executeStep(scenarioName: string, step: LoadTestStep): Promise<PerformanceTestResult> {
-    const startTime = Date.now()
-    
+    const startTime = Date.now();
+
     try {
       // Construct full URL
-      const fullUrl = step.url.startsWith('http') ? step.url : `${this.config.baseUrl}${step.url}`
-      
+      const fullUrl = step.url.startsWith('http') ? step.url : `${this.config.baseUrl}${step.url}`;
+
       // Make HTTP request (mock implementation)
       const response = await this.makeHttpRequest(step.method, fullUrl, {
         headers: step.headers,
         body: step.body,
         timeout: step.timeout || 10000
-      })
+      });
 
-      const responseTime = Date.now() - startTime
+      const responseTime = Date.now() - startTime;
 
       // Validate response
-      let success = true
-      let error: string | undefined
+      let success = true;
+      let error: string | undefined;
 
       if (step.expectedStatus && response.status !== step.expectedStatus) {
-        success = false
-        error = `Expected status ${step.expectedStatus}, got ${response.status}`
+        success = false;
+        error = `Expected status ${step.expectedStatus}, got ${response.status}`;
       }
 
       // Run custom checks
       if (step.checks && success) {
         for (const check of step.checks) {
           try {
-            const checkPassed = check.condition(response)
+            const checkPassed = check.condition(response);
             if (!checkPassed) {
-              success = false
-              error = `Check failed: ${check.name}`
-              break
+              success = false;
+              error = `Check failed: ${check.name}`;
+              break;
             }
           } catch (checkError) {
-            success = false
-            error = `Check error: ${check.name} - ${checkError}`
-            break
+            success = false;
+            error = `Check error: ${check.name} - ${checkError}`;
+            break;
           }
         }
       }
@@ -434,7 +434,7 @@ export class PerformanceTester {
         responseTime,
         statusCode: response.status,
         error
-      }
+      };
 
     } catch (requestError) {
       return {
@@ -443,7 +443,7 @@ export class PerformanceTester {
         success: false,
         responseTime: Date.now() - startTime,
         error: requestError instanceof Error ? requestError.message : String(requestError)
-      }
+      };
     }
   }
 
@@ -458,9 +458,9 @@ export class PerformanceTester {
   ): Promise<{ status: number; body: string; headers: Record<string, string> }> {
     // Mock HTTP request implementation
     // In a real implementation, this would use fetch or axios
-    
-    const delay = Math.random() * 1000 + 100 // Random delay between 100-1100ms
-    await this.sleep(delay)
+
+    const delay = Math.random() * 1000 + 100; // Random delay between 100-1100ms
+    await this.sleep(delay);
 
     // Mock response based on URL patterns
     if (url.includes('/api/')) {
@@ -470,25 +470,25 @@ export class PerformanceTester {
           status: 200,
           body: JSON.stringify({ success: true, token: 'mock-token' }),
           headers: { 'content-type': 'application/json' }
-        }
+        };
       } else if (url.includes('/products')) {
         return {
           status: 200,
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             results: [
               { id: 1, name: 'Product 1' },
               { id: 2, name: 'Product 2' }
             ],
-            total: 2 
+            total: 2
           }),
           headers: { 'content-type': 'application/json' }
-        }
+        };
       } else if (url.includes('/inquiries')) {
         return {
           status: 201,
           body: JSON.stringify({ success: true, id: Math.random() }),
           headers: { 'content-type': 'application/json' }
-        }
+        };
       }
     }
 
@@ -497,26 +497,26 @@ export class PerformanceTester {
       status: 200,
       body: `<html><head><title>Test Page</title></head><body>Mock content for ${url}</body></html>`,
       headers: { 'content-type': 'text/html' }
-    }
+    };
   }
 
   private startMetricsCollection(): void {
-    const metricsInterval = 5000 // Collect metrics every 5 seconds
+    const metricsInterval = 5000; // Collect metrics every 5 seconds
 
     const collectMetrics = () => {
-      if (!this.isRunning) return
+      if (!this.isRunning) return;
 
-      const currentTime = Date.now()
-      const recentResults = this.results.filter(r => currentTime - r.responseTime < metricsInterval)
-      
+      const currentTime = Date.now();
+      const recentResults = this.results.filter(r => currentTime - r.responseTime < metricsInterval);
+
       if (recentResults.length === 0) {
-        setTimeout(collectMetrics, metricsInterval)
-        return
+        setTimeout(collectMetrics, metricsInterval);
+        return;
       }
 
-      const responseTimes = recentResults.map(r => r.responseTime).sort((a, b) => a - b)
-      const successfulResults = recentResults.filter(r => r.success)
-      const failedResults = recentResults.filter(r => !r.success)
+      const responseTimes = recentResults.map(r => r.responseTime).sort((a, b) => a - b);
+      const successfulResults = recentResults.filter(r => r.success);
+      const failedResults = recentResults.filter(r => !r.success);
 
       const metrics: PerformanceMetrics = {
         timestamp: currentTime,
@@ -546,66 +546,66 @@ export class PerformanceTester {
           memoryUsage: Math.random() * 0.6, // Mock memory usage
           networkIO: recentResults.length * 1024 // Mock network I/O
         }
-      }
+      };
 
-      this.metrics.push(metrics)
-      setTimeout(collectMetrics, metricsInterval)
-    }
+      this.metrics.push(metrics);
+      setTimeout(collectMetrics, metricsInterval);
+    };
 
-    collectMetrics()
+    collectMetrics();
   }
 
   private percentile(values: number[], percentile: number): number {
-    if (values.length === 0) return 0
-    
-    const index = Math.ceil((percentile / 100) * values.length) - 1
-    return values[Math.min(index, values.length - 1)]
+    if (values.length === 0) return 0;
+
+    const index = Math.ceil((percentile / 100) * values.length) - 1;
+    return values[Math.min(index, values.length - 1)];
   }
 
   private categorizeErrors(failedResults: PerformanceTestResult[]): Record<string, number> {
-    const errorTypes: Record<string, number> = {}
-    
+    const errorTypes: Record<string, number> = {};
+
     failedResults.forEach(result => {
-      let category = 'unknown'
-      
+      let category = 'unknown';
+
       if (result.error) {
         if (result.error.includes('timeout')) {
-          category = 'timeout'
+          category = 'timeout';
         } else if (result.error.includes('status')) {
-          category = 'http_error'
+          category = 'http_error';
         } else if (result.error.includes('network')) {
-          category = 'network_error'
+          category = 'network_error';
         } else if (result.error.includes('Check failed')) {
-          category = 'validation_error'
+          category = 'validation_error';
         }
       }
-      
-      errorTypes[category] = (errorTypes[category] || 0) + 1
-    })
-    
-    return errorTypes
+
+      errorTypes[category] = (errorTypes[category] || 0) + 1;
+    });
+
+    return errorTypes;
   }
 
   // Report generation
   private generateReport(): PerformanceReport {
-    const totalRequests = this.results.length
-    const successfulRequests = this.results.filter(r => r.success).length
-    const failedRequests = totalRequests - successfulRequests
-    
-    const allResponseTimes = this.results.map(r => r.responseTime)
-    const averageResponseTime = allResponseTimes.reduce((a, b) => a + b, 0) / allResponseTimes.length
-    const maxResponseTime = Math.max(...allResponseTimes)
-    
-    const duration = Date.now() - this.startTime
-    const requestsPerSecond = totalRequests / (duration / 1000)
-    const errorRate = failedRequests / totalRequests
+    const totalRequests = this.results.length;
+    const successfulRequests = this.results.filter(r => r.success).length;
+    const failedRequests = totalRequests - successfulRequests;
+
+    const allResponseTimes = this.results.map(r => r.responseTime);
+    const averageResponseTime = allResponseTimes.reduce((a, b) => a + b, 0) / allResponseTimes.length;
+    const maxResponseTime = Math.max(...allResponseTimes);
+
+    const duration = Date.now() - this.startTime;
+    const requestsPerSecond = totalRequests / (duration / 1000);
+    const errorRate = failedRequests / totalRequests;
 
     // Group results by scenario
     const scenarioResults = this.config.scenarios.map(scenario => ({
       name: scenario.name,
       results: this.results.filter(r => r.scenario === scenario.name),
       metrics: this.calculateScenarioMetrics(scenario.name)
-    }))
+    }));
 
     // Check threshold violations
     const thresholdViolations = this.checkThresholdViolations({
@@ -613,7 +613,7 @@ export class PerformanceTester {
       maxResponseTime,
       requestsPerSecond,
       errorRate
-    })
+    });
 
     // Generate recommendations
     const recommendations = this.generateRecommendations({
@@ -622,7 +622,7 @@ export class PerformanceTester {
       requestsPerSecond,
       errorRate,
       thresholdViolations
-    })
+    });
 
     return {
       timestamp: Date.now(),
@@ -641,16 +641,16 @@ export class PerformanceTester {
       thresholdViolations,
       recommendations,
       scenarioResults
-    }
+    };
   }
 
   private calculateScenarioMetrics(scenarioName: string): PerformanceMetrics {
-    const scenarioResults = this.results.filter(r => r.scenario === scenarioName)
-    const responseTimes = scenarioResults.map(r => r.responseTime).sort((a, b) => a - b)
-    const successfulResults = scenarioResults.filter(r => r.success)
-    const failedResults = scenarioResults.filter(r => !r.success)
+    const scenarioResults = this.results.filter(r => r.scenario === scenarioName);
+    const responseTimes = scenarioResults.map(r => r.responseTime).sort((a, b) => a - b);
+    const successfulResults = scenarioResults.filter(r => r.success);
+    const failedResults = scenarioResults.filter(r => !r.success);
 
-    const duration = Date.now() - this.startTime
+    const duration = Date.now() - this.startTime;
 
     return {
       timestamp: Date.now(),
@@ -680,7 +680,7 @@ export class PerformanceTester {
         memoryUsage: 0.4, // Mock value
         networkIO: scenarioResults.length * 1024
       }
-    }
+    };
   }
 
   private checkThresholdViolations(summary: {
@@ -689,37 +689,37 @@ export class PerformanceTester {
     requestsPerSecond: number
     errorRate: number
   }): string[] {
-    const violations: string[] = []
-    const thresholds = this.config.thresholds
+    const violations: string[] = [];
+    const thresholds = this.config.thresholds;
 
     if (summary.maxResponseTime > thresholds.responseTime!.max) {
-      violations.push(`Maximum response time (${summary.maxResponseTime}ms) exceeds threshold (${thresholds.responseTime!.max}ms)`)
+      violations.push(`Maximum response time (${summary.maxResponseTime}ms) exceeds threshold (${thresholds.responseTime!.max}ms)`);
     }
 
-    const p95ResponseTime = this.metrics.length > 0 ? 
-      Math.max(...this.metrics.map(m => m.responseTime.p95)) : 0
-    
+    const p95ResponseTime = this.metrics.length > 0 ?
+      Math.max(...this.metrics.map(m => m.responseTime.p95)) : 0;
+
     if (p95ResponseTime > thresholds.responseTime!.p95) {
-      violations.push(`95th percentile response time (${p95ResponseTime}ms) exceeds threshold (${thresholds.responseTime!.p95}ms)`)
+      violations.push(`95th percentile response time (${p95ResponseTime}ms) exceeds threshold (${thresholds.responseTime!.p95}ms)`);
     }
 
     if (summary.requestsPerSecond < thresholds.throughput!.min) {
-      violations.push(`Throughput (${summary.requestsPerSecond.toFixed(2)} RPS) below minimum threshold (${thresholds.throughput!.min} RPS)`)
+      violations.push(`Throughput (${summary.requestsPerSecond.toFixed(2)} RPS) below minimum threshold (${thresholds.throughput!.min} RPS)`);
     }
 
     if (summary.errorRate > thresholds.errorRate!.max) {
-      violations.push(`Error rate (${(summary.errorRate * 100).toFixed(2)}%) exceeds threshold (${(thresholds.errorRate!.max * 100).toFixed(2)}%)`)
+      violations.push(`Error rate (${(summary.errorRate * 100).toFixed(2)}%) exceeds threshold (${(thresholds.errorRate!.max * 100).toFixed(2)}%)`);
     }
 
     // Check resource utilization
-    const maxCpuUsage = this.metrics.length > 0 ? 
-      Math.max(...this.metrics.map(m => m.resources.cpuUsage)) : 0
-    
+    const maxCpuUsage = this.metrics.length > 0 ?
+      Math.max(...this.metrics.map(m => m.resources.cpuUsage)) : 0;
+
     if (maxCpuUsage > thresholds.resourceUtilization!.cpu) {
-      violations.push(`CPU usage (${(maxCpuUsage * 100).toFixed(1)}%) exceeds threshold (${(thresholds.resourceUtilization!.cpu * 100).toFixed(1)}%)`)
+      violations.push(`CPU usage (${(maxCpuUsage * 100).toFixed(1)}%) exceeds threshold (${(thresholds.resourceUtilization!.cpu * 100).toFixed(1)}%)`);
     }
 
-    return violations
+    return violations;
   }
 
   private generateRecommendations(summary: {
@@ -729,122 +729,122 @@ export class PerformanceTester {
     errorRate: number
     thresholdViolations: string[]
   }): string[] {
-    const recommendations: string[] = []
+    const recommendations: string[] = [];
 
     // Performance recommendations
     if (summary.averageResponseTime > 2000) {
-      recommendations.push('Optimize slow endpoints - average response time is high')
-      recommendations.push('Consider implementing caching strategies')
-      recommendations.push('Review database query performance')
+      recommendations.push('Optimize slow endpoints - average response time is high');
+      recommendations.push('Consider implementing caching strategies');
+      recommendations.push('Review database query performance');
     }
 
     if (summary.maxResponseTime > 10000) {
-      recommendations.push('Investigate extremely slow responses - some requests are taking over 10 seconds')
+      recommendations.push('Investigate extremely slow responses - some requests are taking over 10 seconds');
     }
 
     if (summary.requestsPerSecond < 50) {
-      recommendations.push('Consider horizontal scaling to improve throughput')
-      recommendations.push('Optimize server configuration for higher concurrency')
+      recommendations.push('Consider horizontal scaling to improve throughput');
+      recommendations.push('Optimize server configuration for higher concurrency');
     }
 
     if (summary.errorRate > 0.01) {
-      recommendations.push('Investigate and fix errors to improve reliability')
-      recommendations.push('Implement better error handling and retry mechanisms')
+      recommendations.push('Investigate and fix errors to improve reliability');
+      recommendations.push('Implement better error handling and retry mechanisms');
     }
 
     // Scenario-specific recommendations
-    const failuresByScenario = new Map<string, number>()
+    const failuresByScenario = new Map<string, number>();
     this.results.filter(r => !r.success).forEach(r => {
-      failuresByScenario.set(r.scenario, (failuresByScenario.get(r.scenario) || 0) + 1)
-    })
+      failuresByScenario.set(r.scenario, (failuresByScenario.get(r.scenario) || 0) + 1);
+    });
 
     const worstScenario = Array.from(failuresByScenario.entries())
-      .sort(([,a], [,b]) => b - a)[0]
+      .sort(([,a], [,b]) => b - a)[0];
 
     if (worstScenario && worstScenario[1] > 10) {
-      recommendations.push(`Focus optimization efforts on "${worstScenario[0]}" scenario (${worstScenario[1]} failures)`)
+      recommendations.push(`Focus optimization efforts on "${worstScenario[0]}" scenario (${worstScenario[1]} failures)`);
     }
 
     // Resource recommendations
-    const avgCpuUsage = this.metrics.reduce((sum, m) => sum + m.resources.cpuUsage, 0) / this.metrics.length
+    const avgCpuUsage = this.metrics.reduce((sum, m) => sum + m.resources.cpuUsage, 0) / this.metrics.length;
     if (avgCpuUsage > 0.7) {
-      recommendations.push('High CPU usage detected - consider optimizing computational workloads')
+      recommendations.push('High CPU usage detected - consider optimizing computational workloads');
     }
 
-    const avgMemoryUsage = this.metrics.reduce((sum, m) => sum + m.resources.memoryUsage, 0) / this.metrics.length
+    const avgMemoryUsage = this.metrics.reduce((sum, m) => sum + m.resources.memoryUsage, 0) / this.metrics.length;
     if (avgMemoryUsage > 0.7) {
-      recommendations.push('High memory usage detected - investigate memory leaks and optimize memory allocation')
+      recommendations.push('High memory usage detected - investigate memory leaks and optimize memory allocation');
     }
 
     // General recommendations
     if (recommendations.length === 0) {
-      recommendations.push('Performance is within acceptable thresholds')
-      recommendations.push('Continue monitoring and establish baseline metrics')
+      recommendations.push('Performance is within acceptable thresholds');
+      recommendations.push('Continue monitoring and establish baseline metrics');
     } else {
-      recommendations.push('Set up continuous performance monitoring')
-      recommendations.push('Implement automated performance testing in CI/CD pipeline')
+      recommendations.push('Set up continuous performance monitoring');
+      recommendations.push('Implement automated performance testing in CI/CD pipeline');
     }
 
-    return recommendations
+    return recommendations;
   }
 
   private printSummary(report: PerformanceReport): void {
-    const summary = report.summary
+    const summary = report.summary;
 
-    console.log('\n📈 Performance Test Summary:')
-    console.log(`   Duration: ${(report.duration / 1000).toFixed(1)}s`)
-    console.log(`   Total Requests: ${summary.totalRequests}`)
-    console.log(`   Successful: ${summary.successfulRequests} (${((summary.successfulRequests / summary.totalRequests) * 100).toFixed(1)}%)`)
-    console.log(`   Failed: ${summary.failedRequests} (${((summary.failedRequests / summary.totalRequests) * 100).toFixed(1)}%)`)
-    console.log(`   Average Response Time: ${summary.averageResponseTime.toFixed(0)}ms`)
-    console.log(`   Max Response Time: ${summary.maxResponseTime.toFixed(0)}ms`)
-    console.log(`   Throughput: ${summary.requestsPerSecond.toFixed(1)} requests/second`)
+    console.log('\n📈 Performance Test Summary:');
+    console.log(`   Duration: ${(report.duration / 1000).toFixed(1)}s`);
+    console.log(`   Total Requests: ${summary.totalRequests}`);
+    console.log(`   Successful: ${summary.successfulRequests} (${((summary.successfulRequests / summary.totalRequests) * 100).toFixed(1)}%)`);
+    console.log(`   Failed: ${summary.failedRequests} (${((summary.failedRequests / summary.totalRequests) * 100).toFixed(1)}%)`);
+    console.log(`   Average Response Time: ${summary.averageResponseTime.toFixed(0)}ms`);
+    console.log(`   Max Response Time: ${summary.maxResponseTime.toFixed(0)}ms`);
+    console.log(`   Throughput: ${summary.requestsPerSecond.toFixed(1)} requests/second`);
 
     if (report.thresholdViolations.length > 0) {
-      console.log('\n⚠️  Threshold Violations:')
+      console.log('\n⚠️  Threshold Violations:');
       report.thresholdViolations.forEach(violation => {
-        console.log(`   • ${violation}`)
-      })
+        console.log(`   • ${violation}`);
+      });
     }
 
     if (report.recommendations.length > 0) {
-      console.log('\n💡 Recommendations:')
+      console.log('\n💡 Recommendations:');
       report.recommendations.forEach(recommendation => {
-        console.log(`   • ${recommendation}`)
-      })
+        console.log(`   • ${recommendation}`);
+      });
     }
 
-    console.log('\n📊 Scenario Performance:')
+    console.log('\n📊 Scenario Performance:');
     report.scenarioResults.forEach(scenario => {
       const scenarioSummary = {
         total: scenario.results.length,
         successful: scenario.results.filter(r => r.success).length,
         avgResponseTime: scenario.results.reduce((sum, r) => sum + r.responseTime, 0) / scenario.results.length
-      }
+      };
 
-      console.log(`   ${scenario.name}:`)
-      console.log(`     Requests: ${scenarioSummary.successful}/${scenarioSummary.total}`)
-      console.log(`     Avg Response Time: ${scenarioSummary.avgResponseTime.toFixed(0)}ms`)
-      console.log(`     Success Rate: ${((scenarioSummary.successful / scenarioSummary.total) * 100).toFixed(1)}%`)
-    })
+      console.log(`   ${scenario.name}:`);
+      console.log(`     Requests: ${scenarioSummary.successful}/${scenarioSummary.total}`);
+      console.log(`     Avg Response Time: ${scenarioSummary.avgResponseTime.toFixed(0)}ms`);
+      console.log(`     Success Rate: ${((scenarioSummary.successful / scenarioSummary.total) * 100).toFixed(1)}%`);
+    });
   }
 
   // Utility methods
   private sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms))
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   public stop(): void {
-    this.isRunning = false
-    console.log('🛑 Performance test stopped.')
+    this.isRunning = false;
+    console.log('🛑 Performance test stopped.');
   }
 
   public getResults(): PerformanceTestResult[] {
-    return [...this.results]
+    return [...this.results];
   }
 
   public getMetrics(): PerformanceMetrics[] {
-    return [...this.metrics]
+    return [...this.metrics];
   }
 }
 
@@ -856,7 +856,7 @@ export class StressTest extends PerformanceTester {
       maxUsers: config.maxUsers || 500,
       duration: config.duration || 600000, // 10 minutes
       rampUpTime: config.rampUpTime || 120000, // 2 minutes
-    })
+    });
   }
 }
 
@@ -867,7 +867,7 @@ export class SpikeTest extends PerformanceTester {
       maxUsers: config.maxUsers || 1000,
       duration: config.duration || 60000, // 1 minute
       rampUpTime: config.rampUpTime || 10000, // 10 seconds - very fast ramp-up
-    })
+    });
   }
 }
 
@@ -878,25 +878,25 @@ export class EnduranceTest extends PerformanceTester {
       maxUsers: config.maxUsers || 100,
       duration: config.duration || 3600000, // 1 hour
       rampUpTime: config.rampUpTime || 300000, // 5 minutes
-    })
+    });
   }
 }
 
 // Factory functions
 export function createLoadTest(config?: PerformanceTestConfig): PerformanceTester {
-  return new PerformanceTester(config)
+  return new PerformanceTester(config);
 }
 
 export function createStressTest(config?: PerformanceTestConfig): StressTest {
-  return new StressTest(config)
+  return new StressTest(config);
 }
 
 export function createSpikeTest(config?: PerformanceTestConfig): SpikeTest {
-  return new SpikeTest(config)
+  return new SpikeTest(config);
 }
 
 export function createEnduranceTest(config?: PerformanceTestConfig): EnduranceTest {
-  return new EnduranceTest(config)
+  return new EnduranceTest(config);
 }
 
-export default PerformanceTester
+export default PerformanceTester;

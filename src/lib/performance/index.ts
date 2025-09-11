@@ -10,7 +10,7 @@ export {
   optimizeFontLoading,
   type WebVitalsMetrics,
   type PerformanceConfig
-} from './web-vitals'
+} from './web-vitals';
 
 // Optimized Image Component
 export {
@@ -19,7 +19,7 @@ export {
   useProgressiveImage,
   type OptimizedImageProps,
   type ImageGalleryProps
-} from './optimized-image'
+} from './optimized-image';
 
 // Code Splitting
 export {
@@ -32,7 +32,7 @@ export {
   withRoutePreloading,
   type CodeSplittingConfig,
   type LazyComponentOptions
-} from './code-splitting'
+} from './code-splitting';
 
 // Resource Optimization
 export {
@@ -45,7 +45,7 @@ export {
   type ResourceOptimizationConfig,
   type ResourceMetrics,
   type FontLoadingOptions
-} from './resource-optimization'
+} from './resource-optimization';
 
 // Database Optimization
 export {
@@ -57,7 +57,7 @@ export {
   type DatabaseOptimizationConfig,
   type QueryAnalytics,
   type ConnectionPoolStats
-} from './database-optimization'
+} from './database-optimization';
 
 // Caching
 export {
@@ -73,7 +73,7 @@ export {
   type CacheEntry,
   type CacheStats,
   type CacheOptions
-} from './caching'
+} from './caching';
 
 // Performance Monitoring
 export {
@@ -85,7 +85,7 @@ export {
   type PerformanceAlert,
   type UserSession,
   type PerformanceReport
-} from './monitoring'
+} from './monitoring';
 
 // Utility functions for comprehensive performance initialization
 export function initializePerformanceStack(config: {
@@ -98,9 +98,9 @@ export function initializePerformanceStack(config: {
 } = {}) {
   if (typeof window === 'undefined') {
     // Server-side: only initialize database and caching
-    const { getQueryOptimizer } = require('./database-optimization')
-    const { getCache } = require('./caching')
-    
+    const { getQueryOptimizer } = require('./database-optimization');
+    const { getCache } = require('./caching');
+
     return {
       queryOptimizer: getQueryOptimizer(config.databaseOptimization),
       cache: getCache('default', config.caching),
@@ -108,23 +108,23 @@ export function initializePerformanceStack(config: {
       codeSplittingManager: null,
       resourceOptimizer: null,
       performanceMonitor: null
-    }
+    };
   }
 
   // Client-side: initialize all systems
-  const { initWebVitalsTracking } = require('./web-vitals')
-  const { getCodeSplittingManager } = require('./code-splitting')
-  const { initResourceOptimization } = require('./resource-optimization')
-  const { getQueryOptimizer } = require('./database-optimization')
-  const { getCache } = require('./caching')
-  const { initPerformanceMonitoring } = require('./monitoring')
+  const { initWebVitalsTracking } = require('./web-vitals');
+  const { getCodeSplittingManager } = require('./code-splitting');
+  const { initResourceOptimization } = require('./resource-optimization');
+  const { getQueryOptimizer } = require('./database-optimization');
+  const { getCache } = require('./caching');
+  const { initPerformanceMonitoring } = require('./monitoring');
 
-  const webVitalsTracker = initWebVitalsTracking(config.webVitals)
-  const codeSplittingManager = getCodeSplittingManager(config.codeSplitting)
-  const resourceOptimizer = initResourceOptimization(config.resourceOptimization)
-  const queryOptimizer = getQueryOptimizer(config.databaseOptimization)
-  const cache = getCache('default', config.caching)
-  const performanceMonitor = initPerformanceMonitoring(config.monitoring)
+  const webVitalsTracker = initWebVitalsTracking(config.webVitals);
+  const codeSplittingManager = getCodeSplittingManager(config.codeSplitting);
+  const resourceOptimizer = initResourceOptimization(config.resourceOptimization);
+  const queryOptimizer = getQueryOptimizer(config.databaseOptimization);
+  const cache = getCache('default', config.caching);
+  const performanceMonitor = initPerformanceMonitoring(config.monitoring);
 
   // Enable cross-system integrations
   setupCrossSystemIntegrations({
@@ -134,7 +134,7 @@ export function initializePerformanceStack(config: {
     queryOptimizer,
     cache,
     performanceMonitor
-  })
+  });
 
   return {
     webVitalsTracker,
@@ -143,7 +143,7 @@ export function initializePerformanceStack(config: {
     queryOptimizer,
     cache,
     performanceMonitor
-  }
+  };
 }
 
 function setupCrossSystemIntegrations(systems: {
@@ -156,9 +156,9 @@ function setupCrossSystemIntegrations(systems: {
 }) {
   // Integration logic could be added here
   // For example: sharing metrics between systems, coordinated optimization strategies, etc.
-  
+
   if (process.env.NODE_ENV === 'development') {
-    console.log('Performance stack initialized with all systems')
+    console.log('Performance stack initialized with all systems');
   }
 }
 
@@ -196,7 +196,7 @@ export const PERFORMANCE_BUDGETS = {
   // Memory budgets
   MAX_HEAP_SIZE: 50 * 1024 * 1024, // 50MB
   MAX_CACHE_SIZE: 10 * 1024 * 1024, // 10MB
-} as const
+} as const;
 
 // Performance scoring
 export function calculatePerformanceScore(metrics: {
@@ -210,52 +210,52 @@ export function calculatePerformanceScore(metrics: {
   scores: Record<string, number>
   grade: 'A' | 'B' | 'C' | 'D' | 'F'
 } {
-  const scores: Record<string, number> = {}
-  let totalScore = 0
-  let metricCount = 0
+  const scores: Record<string, number> = {};
+  let totalScore = 0;
+  let metricCount = 0;
 
   // Score each metric (0-100 scale)
   if (metrics.lcp !== undefined) {
-    scores.lcp = Math.max(0, Math.min(100, 100 - ((metrics.lcp - PERFORMANCE_BUDGETS.LCP_GOOD) / PERFORMANCE_BUDGETS.LCP_GOOD) * 100))
-    totalScore += scores.lcp
-    metricCount++
+    scores.lcp = Math.max(0, Math.min(100, 100 - ((metrics.lcp - PERFORMANCE_BUDGETS.LCP_GOOD) / PERFORMANCE_BUDGETS.LCP_GOOD) * 100));
+    totalScore += scores.lcp;
+    metricCount++;
   }
 
   if (metrics.fid !== undefined) {
-    scores.fid = Math.max(0, Math.min(100, 100 - ((metrics.fid - PERFORMANCE_BUDGETS.FID_GOOD) / PERFORMANCE_BUDGETS.FID_GOOD) * 100))
-    totalScore += scores.fid
-    metricCount++
+    scores.fid = Math.max(0, Math.min(100, 100 - ((metrics.fid - PERFORMANCE_BUDGETS.FID_GOOD) / PERFORMANCE_BUDGETS.FID_GOOD) * 100));
+    totalScore += scores.fid;
+    metricCount++;
   }
 
   if (metrics.cls !== undefined) {
-    scores.cls = Math.max(0, Math.min(100, 100 - ((metrics.cls - PERFORMANCE_BUDGETS.CLS_GOOD) / PERFORMANCE_BUDGETS.CLS_GOOD) * 100))
-    totalScore += scores.cls
-    metricCount++
+    scores.cls = Math.max(0, Math.min(100, 100 - ((metrics.cls - PERFORMANCE_BUDGETS.CLS_GOOD) / PERFORMANCE_BUDGETS.CLS_GOOD) * 100));
+    totalScore += scores.cls;
+    metricCount++;
   }
 
   if (metrics.fcp !== undefined) {
-    scores.fcp = Math.max(0, Math.min(100, 100 - ((metrics.fcp - PERFORMANCE_BUDGETS.FCP_GOOD) / PERFORMANCE_BUDGETS.FCP_GOOD) * 100))
-    totalScore += scores.fcp
-    metricCount++
+    scores.fcp = Math.max(0, Math.min(100, 100 - ((metrics.fcp - PERFORMANCE_BUDGETS.FCP_GOOD) / PERFORMANCE_BUDGETS.FCP_GOOD) * 100));
+    totalScore += scores.fcp;
+    metricCount++;
   }
 
   if (metrics.ttfb !== undefined) {
-    scores.ttfb = Math.max(0, Math.min(100, 100 - ((metrics.ttfb - PERFORMANCE_BUDGETS.TTFB_GOOD) / PERFORMANCE_BUDGETS.TTFB_GOOD) * 100))
-    totalScore += scores.ttfb
-    metricCount++
+    scores.ttfb = Math.max(0, Math.min(100, 100 - ((metrics.ttfb - PERFORMANCE_BUDGETS.TTFB_GOOD) / PERFORMANCE_BUDGETS.TTFB_GOOD) * 100));
+    totalScore += scores.ttfb;
+    metricCount++;
   }
 
-  const overall = metricCount > 0 ? totalScore / metricCount : 0
+  const overall = metricCount > 0 ? totalScore / metricCount : 0;
 
   // Assign grade
-  let grade: 'A' | 'B' | 'C' | 'D' | 'F'
-  if (overall >= 90) grade = 'A'
-  else if (overall >= 80) grade = 'B'
-  else if (overall >= 70) grade = 'C'
-  else if (overall >= 60) grade = 'D'
-  else grade = 'F'
+  let grade: 'A' | 'B' | 'C' | 'D' | 'F';
+  if (overall >= 90) grade = 'A';
+  else if (overall >= 80) grade = 'B';
+  else if (overall >= 70) grade = 'C';
+  else if (overall >= 60) grade = 'D';
+  else grade = 'F';
 
-  return { overall, scores, grade }
+  return { overall, scores, grade };
 }
 
 // Performance recommendations engine
@@ -273,61 +273,61 @@ export function generatePerformanceRecommendations(metrics: {
   important: string[]
   suggested: string[]
 } {
-  const critical: string[] = []
-  const important: string[] = []
-  const suggested: string[] = []
+  const critical: string[] = [];
+  const important: string[] = [];
+  const suggested: string[] = [];
 
   // Critical recommendations
   if (metrics.lcp && metrics.lcp > PERFORMANCE_BUDGETS.LCP_NEEDS_IMPROVEMENT) {
-    critical.push('LCP is critically slow - optimize largest contentful paint elements')
-    critical.push('Consider image optimization, lazy loading, and CDN implementation')
+    critical.push('LCP is critically slow - optimize largest contentful paint elements');
+    critical.push('Consider image optimization, lazy loading, and CDN implementation');
   }
 
   if (metrics.fid && metrics.fid > PERFORMANCE_BUDGETS.FID_NEEDS_IMPROVEMENT) {
-    critical.push('FID is critically slow - reduce JavaScript execution time')
-    critical.push('Implement code splitting and remove unused JavaScript')
+    critical.push('FID is critically slow - reduce JavaScript execution time');
+    critical.push('Implement code splitting and remove unused JavaScript');
   }
 
   if (metrics.cls && metrics.cls > PERFORMANCE_BUDGETS.CLS_NEEDS_IMPROVEMENT) {
-    critical.push('CLS is critically high - fix layout shifts')
-    critical.push('Set explicit dimensions for images and avoid dynamic content injection')
+    critical.push('CLS is critically high - fix layout shifts');
+    critical.push('Set explicit dimensions for images and avoid dynamic content injection');
   }
 
   // Important recommendations
   if (metrics.fcp && metrics.fcp > PERFORMANCE_BUDGETS.FCP_NEEDS_IMPROVEMENT) {
-    important.push('FCP is slow - optimize critical rendering path')
-    important.push('Inline critical CSS and optimize font loading')
+    important.push('FCP is slow - optimize critical rendering path');
+    important.push('Inline critical CSS and optimize font loading');
   }
 
   if (metrics.ttfb && metrics.ttfb > PERFORMANCE_BUDGETS.TTFB_NEEDS_IMPROVEMENT) {
-    important.push('TTFB is slow - optimize server response time')
-    important.push('Consider edge caching and server-side optimization')
+    important.push('TTFB is slow - optimize server response time');
+    important.push('Consider edge caching and server-side optimization');
   }
 
   if (metrics.bundleSize && metrics.bundleSize > PERFORMANCE_BUDGETS.JS_BUNDLE_SIZE) {
-    important.push('JavaScript bundle is too large - implement code splitting')
-    important.push('Remove unused dependencies and optimize imports')
+    important.push('JavaScript bundle is too large - implement code splitting');
+    important.push('Remove unused dependencies and optimize imports');
   }
 
   // Suggested improvements
   if (metrics.resourceCount && metrics.resourceCount > PERFORMANCE_BUDGETS.MAX_REQUESTS) {
-    suggested.push('Consider reducing the number of HTTP requests')
-    suggested.push('Combine CSS/JS files and use sprite sheets for images')
+    suggested.push('Consider reducing the number of HTTP requests');
+    suggested.push('Combine CSS/JS files and use sprite sheets for images');
   }
 
   if (metrics.cacheHitRatio && metrics.cacheHitRatio < PERFORMANCE_BUDGETS.CACHE_HIT_RATIO_MIN) {
-    suggested.push('Improve caching strategy for better performance')
-    suggested.push('Implement proper HTTP caching headers and service worker caching')
+    suggested.push('Improve caching strategy for better performance');
+    suggested.push('Implement proper HTTP caching headers and service worker caching');
   }
 
   // General suggestions
   if (suggested.length === 0 && important.length === 0 && critical.length === 0) {
-    suggested.push('Performance looks good - consider implementing advanced optimizations')
-    suggested.push('Monitor performance continuously and set up alerts for regressions')
+    suggested.push('Performance looks good - consider implementing advanced optimizations');
+    suggested.push('Monitor performance continuously and set up alerts for regressions');
   }
 
-  return { critical, important, suggested }
+  return { critical, important, suggested };
 }
 
 // Export default initialization function
-export default initializePerformanceStack
+export default initializePerformanceStack;

@@ -1,23 +1,13 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Progress } from '@/components/ui/progress'
-import { Switch } from '@/components/ui/switch'
-import { 
-  Search, 
-  TrendingUp, 
-  AlertCircle, 
-  CheckCircle, 
-  Eye, 
+import { useState, useEffect } from 'react';
+
+import {
+  Search,
+  TrendingUp,
+  AlertCircle,
+  CheckCircle,
+  Eye,
   Target,
   Lightbulb,
   RefreshCw,
@@ -33,8 +23,20 @@ import {
   Plus,
   Download,
   Upload
-} from 'lucide-react'
-import { useLocale } from 'next-intl'
+} from 'lucide-react';
+import { useLocale } from 'next-intl';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Progress } from '@/components/ui/progress';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 
 interface SEOScore {
   overall: number
@@ -169,7 +171,7 @@ const mockSEOData: SEOMetadata[] = [
       lastGenerated: '2025-01-15T09:00:00Z'
     }
   }
-]
+];
 
 const keywordSuggestions = [
   'STM32 microcontroller',
@@ -182,39 +184,39 @@ const keywordSuggestions = [
   'low power MCU',
   'high performance MCU',
   'STMicroelectronics'
-]
+];
 
 export function SEOOptimizer() {
-  const locale = useLocale()
-  const [seoData, setSEOData] = useState<SEOMetadata[]>(mockSEOData)
-  const [selectedItem, setSelectedItem] = useState<SEOMetadata | null>(null)
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [autoOptimizeEnabled, setAutoOptimizeEnabled] = useState(false)
-  const [filterType, setFilterType] = useState<string>('all')
-  const [searchQuery, setSearchQuery] = useState('')
-  
+  const locale = useLocale();
+  const [seoData, setSEOData] = useState<SEOMetadata[]>(mockSEOData);
+  const [selectedItem, setSelectedItem] = useState<SEOMetadata | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [autoOptimizeEnabled, setAutoOptimizeEnabled] = useState(false);
+  const [filterType, setFilterType] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+
   const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-600 bg-green-100'
-    if (score >= 60) return 'text-yellow-600 bg-yellow-100'
-    if (score >= 40) return 'text-orange-600 bg-orange-100'
-    return 'text-red-600 bg-red-100'
-  }
-  
+    if (score >= 80) return 'text-green-600 bg-green-100';
+    if (score >= 60) return 'text-yellow-600 bg-yellow-100';
+    if (score >= 40) return 'text-orange-600 bg-orange-100';
+    return 'text-red-600 bg-red-100';
+  };
+
   const getRecommendationIcon = (type: string) => {
     switch (type) {
-      case 'critical': return <AlertCircle className="h-4 w-4 text-red-500" />
-      case 'important': return <Eye className="h-4 w-4 text-orange-500" />
-      case 'suggestion': return <Lightbulb className="h-4 w-4 text-blue-500" />
-      default: return <CheckCircle className="h-4 w-4 text-gray-500" />
+      case 'critical': return <AlertCircle className="h-4 w-4 text-red-500" />;
+      case 'important': return <Eye className="h-4 w-4 text-orange-500" />;
+      case 'suggestion': return <Lightbulb className="h-4 w-4 text-blue-500" />;
+      default: return <CheckCircle className="h-4 w-4 text-gray-500" />;
     }
-  }
-  
+  };
+
   const analyzeContent = async (itemId: string) => {
-    setIsAnalyzing(true)
-    
+    setIsAnalyzing(true);
+
     // Simulate analysis
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
     setSEOData(data => data.map(item => {
       if (item.id === itemId) {
         return {
@@ -234,62 +236,62 @@ export function SEOOptimizer() {
               resolved: false
             }
           ]
-        }
+        };
       }
-      return item
-    }))
-    
-    setIsAnalyzing(false)
-  }
-  
+      return item;
+    }));
+
+    setIsAnalyzing(false);
+  };
+
   const generateMetadata = async (itemId: string, field: string) => {
-    setIsAnalyzing(true)
-    
+    setIsAnalyzing(true);
+
     // Simulate generation
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
     setSEOData(data => data.map(item => {
       if (item.id === itemId) {
-        let updates: any = {
+        const updates: any = {
           autoGenerated: {
             ...item.autoGenerated,
             [field]: true,
             lastGenerated: new Date().toISOString()
           }
-        }
-        
+        };
+
         if (field === 'title') {
-          updates.title = `${item.title} - 优化版标题`
+          updates.title = `${item.title} - 优化版标题`;
         } else if (field === 'description') {
-          updates.description = `${item.description} 自动生成的优化描述，包含更多相关关键词和吸引用户的内容。`
+          updates.description = `${item.description} 自动生成的优化描述，包含更多相关关键词和吸引用户的内容。`;
         } else if (field === 'keywords') {
-          updates.keywords = [...item.keywords, 'auto-generated', 'optimized']
+          updates.keywords = [...item.keywords, 'auto-generated', 'optimized'];
         }
-        
-        return { ...item, ...updates }
+
+        return { ...item, ...updates };
       }
-      return item
-    }))
-    
-    setIsAnalyzing(false)
-  }
-  
+      return item;
+    }));
+
+    setIsAnalyzing(false);
+  };
+
   const filteredData = seoData.filter(item => {
-    const matchesType = filterType === 'all' || item.contentReference.contentType === filterType
-    const matchesSearch = !searchQuery || 
+    const matchesType = filterType === 'all' || item.contentReference.contentType === filterType;
+    const matchesSearch = !searchQuery ||
       item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.keywords.some(k => k.toLowerCase().includes(searchQuery.toLowerCase()))
-    
-    return matchesType && matchesSearch
-  })
-  
+      item.keywords.some(k => k.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    return matchesType && matchesSearch;
+  });
+
   return (
     <div className="container mx-auto p-6">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">SEO自动化工具</h1>
         <p className="text-gray-600">自动分析和优化内容的SEO表现</p>
       </div>
-      
+
       <div className="mb-6 flex flex-wrap gap-4 items-center">
         <div className="flex-1 min-w-[200px]">
           <div className="relative">
@@ -302,7 +304,7 @@ export function SEOOptimizer() {
             />
           </div>
         </div>
-        
+
         <Select value={filterType} onValueChange={setFilterType}>
           <SelectTrigger className="w-[150px]">
             <SelectValue />
@@ -315,15 +317,15 @@ export function SEOOptimizer() {
             <SelectItem value="caseStudy">案例研究</SelectItem>
           </SelectContent>
         </Select>
-        
+
         <div className="flex items-center gap-2">
-          <Switch 
+          <Switch
             checked={autoOptimizeEnabled}
             onCheckedChange={setAutoOptimizeEnabled}
           />
           <Label>自动优化</Label>
         </div>
-        
+
         <Dialog>
           <DialogTrigger asChild>
             <Button>
@@ -339,7 +341,7 @@ export function SEOOptimizer() {
           </DialogContent>
         </Dialog>
       </div>
-      
+
       <div className="grid gap-6">
         {filteredData.map((item) => (
           <Card key={item.id} className="hover:shadow-md transition-shadow">
@@ -359,7 +361,7 @@ export function SEOOptimizer() {
                     )}
                   </CardDescription>
                 </div>
-                
+
                 <div className="flex items-center gap-4">
                   <div className="text-center">
                     <div className={`text-2xl font-bold px-3 py-1 rounded-full ${getScoreColor(item.seoScore.overall)}`}>
@@ -370,7 +372,7 @@ export function SEOOptimizer() {
                 </div>
               </div>
             </CardHeader>
-            
+
             <CardContent>
               <div className="space-y-4">
                 <div className="grid md:grid-cols-4 gap-4">
@@ -391,7 +393,7 @@ export function SEOOptimizer() {
                     <div className="text-sm text-gray-600">内容分数</div>
                   </div>
                 </div>
-                
+
                 <div className="border-t pt-4">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium">SEO进度</span>
@@ -399,12 +401,12 @@ export function SEOOptimizer() {
                       {item.recommendations.filter(r => r.resolved).length}/{item.recommendations.length} 项已优化
                     </span>
                   </div>
-                  <Progress 
-                    value={(item.recommendations.filter(r => r.resolved).length / item.recommendations.length) * 100} 
+                  <Progress
+                    value={(item.recommendations.filter(r => r.resolved).length / item.recommendations.length) * 100}
                     className="h-2"
                   />
                 </div>
-                
+
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <Target className="h-4 w-4" />
@@ -423,7 +425,7 @@ export function SEOOptimizer() {
                     )}
                   </div>
                 </div>
-                
+
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <AlertCircle className="h-4 w-4" />
@@ -445,7 +447,7 @@ export function SEOOptimizer() {
                     )}
                   </div>
                 </div>
-                
+
                 <div className="flex items-center justify-between pt-4 border-t">
                   <div className="flex gap-2">
                     <Button
@@ -456,7 +458,7 @@ export function SEOOptimizer() {
                       <Eye className="h-4 w-4 mr-1" />
                       详细分析
                     </Button>
-                    
+
                     <Button
                       variant="outline"
                       size="sm"
@@ -467,7 +469,7 @@ export function SEOOptimizer() {
                       重新分析
                     </Button>
                   </div>
-                  
+
                   <div className="text-xs text-gray-500">
                     最后更新: {new Date(item.seoScore.lastCalculated).toLocaleString()}
                   </div>
@@ -476,7 +478,7 @@ export function SEOOptimizer() {
             </CardContent>
           </Card>
         ))}
-        
+
         {filteredData.length === 0 && (
           <div className="text-center py-12">
             <Search className="h-12 w-12 mx-auto text-gray-300 mb-4" />
@@ -485,7 +487,7 @@ export function SEOOptimizer() {
           </div>
         )}
       </div>
-      
+
       {/* Detailed SEO Analysis Dialog */}
       {selectedItem && (
         <Dialog open={!!selectedItem} onOpenChange={() => setSelectedItem(null)}>
@@ -499,7 +501,7 @@ export function SEOOptimizer() {
                 </div>
               </DialogTitle>
             </DialogHeader>
-            
+
             <Tabs defaultValue="overview" className="mt-6">
               <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="overview">概览</TabsTrigger>
@@ -508,7 +510,7 @@ export function SEOOptimizer() {
                 <TabsTrigger value="social">社交媒体</TabsTrigger>
                 <TabsTrigger value="recommendations">建议</TabsTrigger>
               </TabsList>
-              
+
               <TabsContent value="overview" className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <Card>
@@ -548,13 +550,13 @@ export function SEOOptimizer() {
                       </div>
                     </CardContent>
                   </Card>
-                  
+
                   <Card>
                     <CardHeader>
                       <CardTitle>快速操作</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                      <Button 
+                      <Button
                         className="w-full justify-start"
                         variant="outline"
                         onClick={() => generateMetadata(selectedItem.id, 'title')}
@@ -566,8 +568,8 @@ export function SEOOptimizer() {
                           <Badge className="ml-auto bg-blue-100 text-blue-800 text-xs">已生成</Badge>
                         )}
                       </Button>
-                      
-                      <Button 
+
+                      <Button
                         className="w-full justify-start"
                         variant="outline"
                         onClick={() => generateMetadata(selectedItem.id, 'description')}
@@ -579,8 +581,8 @@ export function SEOOptimizer() {
                           <Badge className="ml-auto bg-blue-100 text-blue-800 text-xs">已生成</Badge>
                         )}
                       </Button>
-                      
-                      <Button 
+
+                      <Button
                         className="w-full justify-start"
                         variant="outline"
                         onClick={() => generateMetadata(selectedItem.id, 'keywords')}
@@ -592,12 +594,12 @@ export function SEOOptimizer() {
                           <Badge className="ml-auto bg-blue-100 text-blue-800 text-xs">已生成</Badge>
                         )}
                       </Button>
-                      
+
                       <Button className="w-full justify-start" variant="outline">
                         <BarChart3 className="h-4 w-4 mr-2" />
                         查看排名跟踪
                       </Button>
-                      
+
                       <Button className="w-full justify-start" variant="outline">
                         <Download className="h-4 w-4 mr-2" />
                         导出SEO报告
@@ -605,7 +607,7 @@ export function SEOOptimizer() {
                     </CardContent>
                   </Card>
                 </div>
-                
+
                 <Card>
                   <CardHeader>
                     <CardTitle>关键词分析</CardTitle>
@@ -618,7 +620,7 @@ export function SEOOptimizer() {
                           <span className="font-medium text-blue-800">{selectedItem.focusKeyword}</span>
                         </div>
                       </div>
-                      
+
                       <div>
                         <Label>相关关键词</Label>
                         <div className="flex flex-wrap gap-2 mt-2">
@@ -629,7 +631,7 @@ export function SEOOptimizer() {
                           ))}
                         </div>
                       </div>
-                      
+
                       <div>
                         <Label>推荐关键词</Label>
                         <div className="flex flex-wrap gap-2 mt-2">
@@ -644,7 +646,7 @@ export function SEOOptimizer() {
                   </CardContent>
                 </Card>
               </TabsContent>
-              
+
               <TabsContent value="metadata" className="space-y-6">
                 <div className="grid gap-6">
                   <Card>
@@ -654,7 +656,7 @@ export function SEOOptimizer() {
                     <CardContent className="space-y-4">
                       <div>
                         <Label>页面标题 ({selectedItem.title.length}/60)</Label>
-                        <Input 
+                        <Input
                           value={selectedItem.title}
                           className={selectedItem.title.length > 60 ? 'border-orange-300' : ''}
                         />
@@ -662,10 +664,10 @@ export function SEOOptimizer() {
                           <p className="text-sm text-orange-600 mt-1">标题可能在搜索结果中被截断</p>
                         )}
                       </div>
-                      
+
                       <div>
                         <Label>元描述 ({selectedItem.description.length}/160)</Label>
-                        <Textarea 
+                        <Textarea
                           value={selectedItem.description}
                           rows={3}
                           className={selectedItem.description.length > 160 ? 'border-orange-300' : ''}
@@ -674,12 +676,12 @@ export function SEOOptimizer() {
                           <p className="text-sm text-orange-600 mt-1">描述可能在搜索结果中被截断</p>
                         )}
                       </div>
-                      
+
                       <div>
                         <Label>规范URL</Label>
                         <Input value={selectedItem.canonicalUrl} />
                       </div>
-                      
+
                       <div>
                         <Label>Robots设置</Label>
                         <div className="flex gap-4 mt-2">
@@ -705,7 +707,7 @@ export function SEOOptimizer() {
                   </Card>
                 </div>
               </TabsContent>
-              
+
               <TabsContent value="structured" className="space-y-6">
                 <div className="grid gap-6">
                   <Card>
@@ -732,7 +734,7 @@ export function SEOOptimizer() {
                   </Card>
                 </div>
               </TabsContent>
-              
+
               <TabsContent value="social" className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <Card>
@@ -767,7 +769,7 @@ export function SEOOptimizer() {
                       </div>
                     </CardContent>
                   </Card>
-                  
+
                   <Card>
                     <CardHeader>
                       <CardTitle>Twitter Card</CardTitle>
@@ -801,7 +803,7 @@ export function SEOOptimizer() {
                     </CardContent>
                   </Card>
                 </div>
-                
+
                 <Card>
                   <CardHeader>
                     <CardTitle>社交媒体预览</CardTitle>
@@ -822,7 +824,7 @@ export function SEOOptimizer() {
                   </CardContent>
                 </Card>
               </TabsContent>
-              
+
               <TabsContent value="recommendations" className="space-y-6">
                 <div className="space-y-4">
                   {selectedItem.recommendations.map((rec) => (
@@ -832,7 +834,7 @@ export function SEOOptimizer() {
                           {getRecommendationIcon(rec.type)}
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
-                              <Badge 
+                              <Badge
                                 className={
                                   rec.type === 'critical' ? 'bg-red-100 text-red-800' :
                                   rec.type === 'important' ? 'bg-orange-100 text-orange-800' :
@@ -869,5 +871,5 @@ export function SEOOptimizer() {
         </Dialog>
       )}
     </div>
-  )
+  );
 }

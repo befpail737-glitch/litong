@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server'
+import { NextRequest } from 'next/server';
 
 export interface RateLimitConfig {
   limit: number // requests per window
@@ -37,35 +37,35 @@ export interface RateLimitEntry {
 
 // In-memory store for development
 class InMemoryRateLimitStore {
-  private store = new Map<string, RateLimitEntry>()
-  private cleanupInterval: NodeJS.Timeout
+  private store = new Map<string, RateLimitEntry>();
+  private cleanupInterval: NodeJS.Timeout;
 
   constructor() {
     // Cleanup expired entries every 5 minutes
     this.cleanupInterval = setInterval(() => {
-      this.cleanup()
-    }, 5 * 60 * 1000)
+      this.cleanup();
+    }, 5 * 60 * 1000);
   }
 
   async get(key: string): Promise<RateLimitEntry | null> {
-    return this.store.get(key) || null
+    return this.store.get(key) || null;
   }
 
   async set(key: string, entry: RateLimitEntry, ttl?: number): Promise<void> {
-    this.store.set(key, entry)
-    
+    this.store.set(key, entry);
+
     // Auto-expire entries if TTL is provided
     if (ttl) {
       setTimeout(() => {
-        this.store.delete(key)
-      }, ttl)
+        this.store.delete(key);
+      }, ttl);
     }
   }
 
   async increment(key: string, window: number): Promise<RateLimitEntry> {
-    const now = Date.now()
-    const windowStart = Math.floor(now / window) * window
-    const existing = this.store.get(key)
+    const now = Date.now();
+    const windowStart = Math.floor(now / window) * window;
+    const existing = this.store.get(key);
 
     if (!existing || existing.windowStart < windowStart) {
       // New window or expired window
@@ -77,57 +77,57 @@ class InMemoryRateLimitStore {
           path: '',
           method: ''
         }]
-      }
-      this.store.set(key, newEntry)
-      return newEntry
+      };
+      this.store.set(key, newEntry);
+      return newEntry;
     } else {
       // Same window - increment
-      existing.count++
+      existing.count++;
       existing.requests.push({
         timestamp: now,
         path: '',
         method: ''
-      })
-      this.store.set(key, existing)
-      return existing
+      });
+      this.store.set(key, existing);
+      return existing;
     }
   }
 
   async reset(key: string): Promise<void> {
-    this.store.delete(key)
+    this.store.delete(key);
   }
 
   private cleanup(): void {
-    const now = Date.now()
-    const expiredThreshold = now - (60 * 60 * 1000) // 1 hour ago
+    const now = Date.now();
+    const expiredThreshold = now - (60 * 60 * 1000); // 1 hour ago
 
     for (const [key, entry] of this.store.entries()) {
       if (entry.windowStart < expiredThreshold) {
-        this.store.delete(key)
+        this.store.delete(key);
       }
     }
   }
 
   destroy(): void {
     if (this.cleanupInterval) {
-      clearInterval(this.cleanupInterval)
+      clearInterval(this.cleanupInterval);
     }
-    this.store.clear()
+    this.store.clear();
   }
 }
 
 // Redis store for production (implementation would require redis client)
 class RedisRateLimitStore {
-  private redisClient: any // Would be actual Redis client
+  private redisClient: any; // Would be actual Redis client
 
   constructor(redisUrl: string) {
     // Initialize Redis client
-    console.log(`Redis rate limit store initialized with URL: ${redisUrl}`)
+    console.log(`Redis rate limit store initialized with URL: ${redisUrl}`);
   }
 
   async get(key: string): Promise<RateLimitEntry | null> {
     // Implement Redis get
-    return null
+    return null;
   }
 
   async set(key: string, entry: RateLimitEntry, ttl?: number): Promise<void> {
@@ -136,15 +136,15 @@ class RedisRateLimitStore {
 
   async increment(key: string, window: number): Promise<RateLimitEntry> {
     // Implement Redis increment using Lua script for atomicity
-    const now = Date.now()
-    const windowStart = Math.floor(now / window) * window
+    const now = Date.now();
+    const windowStart = Math.floor(now / window) * window;
 
     // This would be implemented with a Lua script in Redis
     return {
       count: 1,
       windowStart,
       requests: []
-    }
+    };
   }
 
   async reset(key: string): Promise<void> {
@@ -154,8 +154,8 @@ class RedisRateLimitStore {
 
 // Rate limiter class
 class RateLimiter {
-  private config: Required<RateLimitConfig>
-  private store: InMemoryRateLimitStore | RedisRateLimitStore
+  private config: Required<RateLimitConfig>;
+  private store: InMemoryRateLimitStore | RedisRateLimitStore;
 
   constructor(config: RateLimitConfig) {
     this.config = {
@@ -169,25 +169,25 @@ class RateLimiter {
       whitelist: [],
       blacklist: [],
       ...config
-    }
+    };
 
     // Initialize store
     if (this.config.enableRedisStore && this.config.redisUrl) {
-      this.store = new RedisRateLimitStore(this.config.redisUrl)
+      this.store = new RedisRateLimitStore(this.config.redisUrl);
     } else {
-      this.store = new InMemoryRateLimitStore()
+      this.store = new InMemoryRateLimitStore();
     }
   }
 
   private defaultKeyGenerator(request: NextRequest): string {
     // Try to get IP from various headers
-    const ip = this.getClientIP(request)
-    const userAgent = request.headers.get('user-agent') || ''
-    
+    const ip = this.getClientIP(request);
+    const userAgent = request.headers.get('user-agent') || '';
+
     // Create a composite key for better rate limiting
-    const baseKey = `${ip}:${userAgent.substring(0, 50)}`
-    
-    return `rate_limit:${Buffer.from(baseKey).toString('base64').substring(0, 32)}`
+    const baseKey = `${ip}:${userAgent.substring(0, 50)}`;
+
+    return `rate_limit:${Buffer.from(baseKey).toString('base64').substring(0, 32)}`;
   }
 
   private getClientIP(request: NextRequest): string {
@@ -200,23 +200,23 @@ class RateLimiter {
       'x-forwarded',
       'forwarded-for',
       'forwarded'
-    ]
+    ];
 
     for (const header of headers) {
-      const value = request.headers.get(header)
+      const value = request.headers.get(header);
       if (value) {
         // Handle comma-separated IPs (take the first one)
-        return value.split(',')[0].trim()
+        return value.split(',')[0].trim();
       }
     }
 
     // Fallback to request IP if available
-    return request.ip || '127.0.0.1'
+    return request.ip || '127.0.0.1';
   }
 
   async checkLimit(request: NextRequest): Promise<RateLimitResult> {
-    const key = this.config.keyGenerator(request)
-    const clientIP = this.getClientIP(request)
+    const key = this.config.keyGenerator(request);
+    const clientIP = this.getClientIP(request);
 
     // Check blacklist
     if (this.config.blacklist.includes(clientIP) || this.config.blacklist.includes(key)) {
@@ -227,7 +227,7 @@ class RateLimiter {
         reset: Date.now() + this.config.window,
         retryAfter: this.config.window,
         error: 'IP or client is blacklisted'
-      }
+      };
     }
 
     // Check whitelist
@@ -237,21 +237,21 @@ class RateLimiter {
         limit: this.config.limit,
         remaining: this.config.limit,
         reset: Date.now() + this.config.window
-      }
+      };
     }
 
     try {
-      const entry = await this.store.increment(key, this.config.window)
-      const now = Date.now()
-      const windowEnd = entry.windowStart + this.config.window
-      const remaining = Math.max(0, this.config.limit - entry.count)
+      const entry = await this.store.increment(key, this.config.window);
+      const now = Date.now();
+      const windowEnd = entry.windowStart + this.config.window;
+      const remaining = Math.max(0, this.config.limit - entry.count);
 
       if (entry.count > this.config.limit) {
         // Rate limit exceeded
-        const retryAfter = windowEnd - now
+        const retryAfter = windowEnd - now;
 
         // Call the limit reached callback
-        this.config.onLimitReached(key, request)
+        this.config.onLimitReached(key, request);
 
         return {
           success: false,
@@ -260,7 +260,7 @@ class RateLimiter {
           reset: windowEnd,
           retryAfter,
           error: 'Rate limit exceeded'
-        }
+        };
       }
 
       return {
@@ -268,23 +268,23 @@ class RateLimiter {
         limit: this.config.limit,
         remaining,
         reset: windowEnd
-      }
+      };
     } catch (error) {
       // If rate limiting fails, allow the request but log the error
-      console.error('Rate limiting error:', error)
+      console.error('Rate limiting error:', error);
       return {
         success: true,
         limit: this.config.limit,
         remaining: this.config.limit,
         reset: Date.now() + this.config.window,
         error: 'Rate limiting service unavailable'
-      }
+      };
     }
   }
 
   async resetLimit(request: NextRequest): Promise<void> {
-    const key = this.config.keyGenerator(request)
-    await this.store.reset(key)
+    const key = this.config.keyGenerator(request);
+    await this.store.reset(key);
   }
 
   async getStats(request: NextRequest): Promise<{
@@ -293,32 +293,32 @@ class RateLimiter {
     remaining: number
     resetTime: number
   }> {
-    const key = this.config.keyGenerator(request)
-    const entry = await this.store.get(key)
-    
+    const key = this.config.keyGenerator(request);
+    const entry = await this.store.get(key);
+
     if (!entry) {
       return {
         key,
         entry: null,
         remaining: this.config.limit,
         resetTime: Date.now() + this.config.window
-      }
+      };
     }
 
-    const remaining = Math.max(0, this.config.limit - entry.count)
-    const resetTime = entry.windowStart + this.config.window
+    const remaining = Math.max(0, this.config.limit - entry.count);
+    const resetTime = entry.windowStart + this.config.window;
 
     return {
       key,
       entry,
       remaining,
       resetTime
-    }
+    };
   }
 }
 
 // Global rate limiter instances
-const rateLimiters = new Map<string, RateLimiter>()
+const rateLimiters = new Map<string, RateLimiter>();
 
 // Main rate limit function
 export async function rateLimit(
@@ -326,14 +326,14 @@ export async function rateLimit(
   config: RateLimitConfig,
   identifier?: string
 ): Promise<RateLimitResult> {
-  const key = identifier || `${config.limit}:${config.window}`
-  
+  const key = identifier || `${config.limit}:${config.window}`;
+
   if (!rateLimiters.has(key)) {
-    rateLimiters.set(key, new RateLimiter(config))
+    rateLimiters.set(key, new RateLimiter(config));
   }
 
-  const limiter = rateLimiters.get(key)!
-  return await limiter.checkLimit(request)
+  const limiter = rateLimiters.get(key)!;
+  return await limiter.checkLimit(request);
 }
 
 // Predefined rate limit configurations
@@ -359,13 +359,13 @@ export const RateLimitPresets = {
   // Administrative
   ADMIN_ACTIONS: { limit: 200, window: 60000 }, // 200 admin actions per minute
   BULK_OPERATIONS: { limit: 10, window: 300000 } // 10 bulk operations per 5 minutes
-}
+};
 
 // Middleware helper
 export function createRateLimitMiddleware(config: RateLimitConfig) {
   return async (request: NextRequest) => {
-    const result = await rateLimit(request, config)
-    
+    const result = await rateLimit(request, config);
+
     if (!result.success) {
       return new Response(
         JSON.stringify({
@@ -384,7 +384,7 @@ export function createRateLimitMiddleware(config: RateLimitConfig) {
             ...config.customHeaders
           }
         }
-      )
+      );
     }
 
     // Add rate limit headers to successful responses
@@ -392,10 +392,10 @@ export function createRateLimitMiddleware(config: RateLimitConfig) {
       'X-RateLimit-Limit': result.limit.toString(),
       'X-RateLimit-Remaining': result.remaining.toString(),
       'X-RateLimit-Reset': result.reset.toString()
-    }
+    };
 
-    return { success: true, headers }
-  }
+    return { success: true, headers };
+  };
 }
 
 // IP-based rate limiting
@@ -406,7 +406,7 @@ export async function rateLimitByIP(
   return rateLimit(request, {
     ...config,
     keyGenerator: (req) => `ip:${req.ip || '127.0.0.1'}`
-  })
+  });
 }
 
 // User-based rate limiting
@@ -418,7 +418,7 @@ export async function rateLimitByUser(
   return rateLimit(request, {
     ...config,
     keyGenerator: () => `user:${userId}`
-  })
+  });
 }
 
 // API key-based rate limiting
@@ -430,7 +430,7 @@ export async function rateLimitByAPIKey(
   return rateLimit(request, {
     ...config,
     keyGenerator: () => `api_key:${apiKey}`
-  })
+  });
 }
 
 // Endpoint-specific rate limiting
@@ -439,11 +439,11 @@ export async function rateLimitByEndpoint(
   endpoint: string,
   config: Omit<RateLimitConfig, 'keyGenerator'>
 ): Promise<RateLimitResult> {
-  const ip = request.ip || '127.0.0.1'
+  const ip = request.ip || '127.0.0.1';
   return rateLimit(request, {
     ...config,
     keyGenerator: () => `endpoint:${endpoint}:${ip}`
-  })
+  });
 }
 
 // Geographic rate limiting (would require IP geolocation service)
@@ -455,15 +455,15 @@ export async function rateLimitByCountry(
   return rateLimit(request, {
     ...config,
     keyGenerator: () => `country:${country}`
-  })
+  });
 }
 
 // Cleanup function for graceful shutdown
 export function cleanupRateLimiters(): void {
   for (const [, limiter] of rateLimiters.entries()) {
     if (limiter['store'] instanceof InMemoryRateLimitStore) {
-      limiter['store'].destroy()
+      limiter['store'].destroy();
     }
   }
-  rateLimiters.clear()
+  rateLimiters.clear();
 }

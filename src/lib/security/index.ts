@@ -10,7 +10,7 @@ export {
   type ValidationConfig,
   type ValidationResult,
   type FileValidationResult
-} from './input-validation'
+} from './input-validation';
 
 // Security Headers Management
 export {
@@ -21,7 +21,7 @@ export {
   type SecurityHeadersConfig,
   type CSPDirectives,
   type SecurityAuditResult
-} from './security-headers'
+} from './security-headers';
 
 // CSRF Protection
 export {
@@ -34,7 +34,7 @@ export {
   type CSRFConfig,
   type CSRFTokenInfo,
   type CSRFValidationResult
-} from './csrf-protection'
+} from './csrf-protection';
 
 // Security Testing
 export {
@@ -47,7 +47,7 @@ export {
   type TestContext,
   type TestResult,
   type SecurityTestReport
-} from './security-testing'
+} from './security-testing';
 
 // Comprehensive security initialization
 export function initializeSecurity(config: {
@@ -58,29 +58,29 @@ export function initializeSecurity(config: {
 } = {}) {
   if (typeof window === 'undefined') {
     // Server-side initialization
-    const { getInputValidator } = require('./input-validation')
-    const { getSecurityHeadersManager } = require('./security-headers')
-    const { createCSRFProtection } = require('./csrf-protection')
-    const { createSecurityTester } = require('./security-testing')
+    const { getInputValidator } = require('./input-validation');
+    const { getSecurityHeadersManager } = require('./security-headers');
+    const { createCSRFProtection } = require('./csrf-protection');
+    const { createSecurityTester } = require('./security-testing');
 
     return {
       inputValidator: getInputValidator(config.inputValidation),
       securityHeadersManager: getSecurityHeadersManager(config.securityHeaders),
-      csrfProtection: config.csrfProtection?.secretKey ? 
+      csrfProtection: config.csrfProtection?.secretKey ?
         createCSRFProtection(config.csrfProtection) : null,
       securityTester: createSecurityTester(config.securityTesting)
-    }
+    };
   }
 
   // Client-side initialization (limited)
-  const { getInputValidator } = require('./input-validation')
-  
+  const { getInputValidator } = require('./input-validation');
+
   return {
     inputValidator: getInputValidator(config.inputValidation),
     securityHeadersManager: null,
     csrfProtection: null,
     securityTester: null
-  }
+  };
 }
 
 // Security middleware factory
@@ -92,33 +92,33 @@ export function createSecurityMiddlewareStack(config: {
   securityHeaders?: import('./security-headers').SecurityHeadersConfig
   inputValidation?: import('./input-validation').ValidationConfig
 } = {}) {
-  const middlewares: Array<(request: any) => Promise<Response | null>> = []
+  const middlewares: Array<(request: any) => Promise<Response | null>> = [];
 
   // CSRF Protection
   if (config.enableCSRF && config.csrfSecret) {
-    const { createCSRFMiddleware } = require('./csrf-protection')
+    const { createCSRFMiddleware } = require('./csrf-protection');
     middlewares.push(createCSRFMiddleware({
       secretKey: config.csrfSecret,
       debug: process.env.NODE_ENV === 'development'
-    }))
+    }));
   }
 
   // Security Headers
   if (config.enableSecurityHeaders) {
-    const { createSecurityMiddleware } = require('./security-headers')
-    middlewares.push(createSecurityMiddleware(config.securityHeaders))
+    const { createSecurityMiddleware } = require('./security-headers');
+    middlewares.push(createSecurityMiddleware(config.securityHeaders));
   }
 
   // Combined middleware
   return async (request: any) => {
     for (const middleware of middlewares) {
-      const result = await middleware(request)
+      const result = await middleware(request);
       if (result) {
-        return result // Middleware returned a response (likely an error)
+        return result; // Middleware returned a response (likely an error)
       }
     }
-    return null // All middleware passed
-  }
+    return null; // All middleware passed
+  };
 }
 
 // Security audit functionality
@@ -131,51 +131,51 @@ export async function performSecurityAudit(options: {
   includeDependencyCheck?: boolean
   includeConfigurationAudit?: boolean
 } = { url: '/' }) {
-  const { createSecurityTester } = require('./security-testing')
-  const { getSecurityHeadersManager } = require('./security-headers')
+  const { createSecurityTester } = require('./security-testing');
+  const { getSecurityHeadersManager } = require('./security-headers');
 
   const tester = createSecurityTester({
     enableVulnerabilityScanning: options.includeVulnerabilityScanning,
     enableDependencyChecking: options.includeDependencyCheck,
     enableConfigurationAudit: options.includeConfigurationAudit,
     debug: true
-  })
+  });
 
   const testContext = {
     url: options.url,
     method: options.method || 'GET',
     headers: options.headers || {},
     body: options.body
-  }
+  };
 
   // Run security tests
-  const securityReport = await tester.runSecurityTests(testContext)
+  const securityReport = await tester.runSecurityTests(testContext);
 
   // Audit security headers
-  const headersManager = getSecurityHeadersManager()
-  const mockHeaders = new Headers(options.headers || {})
-  const headerAudit = headersManager.auditSecurityHeaders(mockHeaders)
-  const headerReport = headersManager.generateSecurityReport(mockHeaders)
+  const headersManager = getSecurityHeadersManager();
+  const mockHeaders = new Headers(options.headers || {});
+  const headerAudit = headersManager.auditSecurityHeaders(mockHeaders);
+  const headerReport = headersManager.generateSecurityReport(mockHeaders);
 
   // Dependency scan
-  const dependencyReport = await tester.scanDependencies()
+  const dependencyReport = await tester.scanDependencies();
 
   return {
     securityTests: securityReport,
     securityHeaders: headerReport,
     dependencies: dependencyReport,
     overallScore: Math.round(
-      (securityReport.riskScore * 0.4 + 
-       headerReport.score * 0.3 + 
+      (securityReport.riskScore * 0.4 +
+       headerReport.score * 0.3 +
        (dependencyReport.vulnerablePackages === 0 ? 100 : 70) * 0.3)
     ),
     recommendations: [
       ...securityReport.recommendations,
       ...headerReport.recommendations,
-      ...(dependencyReport.vulnerablePackages > 0 ? 
+      ...(dependencyReport.vulnerablePackages > 0 ?
         ['Update vulnerable dependencies to latest versions'] : [])
     ]
-  }
+  };
 }
 
 // Security utilities
@@ -183,61 +183,61 @@ export const SecurityUtils = {
   // Generate secure random strings
   generateSecureToken: (length: number = 32): string => {
     if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
-      const array = new Uint8Array(length)
-      crypto.getRandomValues(array)
-      return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('')
+      const array = new Uint8Array(length);
+      crypto.getRandomValues(array);
+      return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
     } else {
       // Fallback for Node.js
-      const crypto = require('crypto')
-      return crypto.randomBytes(length).toString('hex')
+      const crypto = require('crypto');
+      return crypto.randomBytes(length).toString('hex');
     }
   },
 
   // Hash password securely
   hashPassword: async (password: string, salt?: string): Promise<{ hash: string; salt: string }> => {
-    const bcrypt = require('bcrypt')
-    const saltRounds = 12
-    const usedSalt = salt || await bcrypt.genSalt(saltRounds)
-    const hash = await bcrypt.hash(password, usedSalt)
-    return { hash, salt: usedSalt }
+    const bcrypt = require('bcrypt');
+    const saltRounds = 12;
+    const usedSalt = salt || await bcrypt.genSalt(saltRounds);
+    const hash = await bcrypt.hash(password, usedSalt);
+    return { hash, salt: usedSalt };
   },
 
   // Verify password
   verifyPassword: async (password: string, hash: string): Promise<boolean> => {
-    const bcrypt = require('bcrypt')
-    return await bcrypt.compare(password, hash)
+    const bcrypt = require('bcrypt');
+    return await bcrypt.compare(password, hash);
   },
 
   // Constant time string comparison
   constantTimeCompare: (a: string, b: string): boolean => {
     if (a.length !== b.length) {
-      return false
+      return false;
     }
 
-    let result = 0
+    let result = 0;
     for (let i = 0; i < a.length; i++) {
-      result |= a.charCodeAt(i) ^ b.charCodeAt(i)
+      result |= a.charCodeAt(i) ^ b.charCodeAt(i);
     }
 
-    return result === 0
+    return result === 0;
   },
 
   // Escape HTML to prevent XSS
   escapeHTML: (text: string): string => {
-    const div = document.createElement('div')
-    div.textContent = text
-    return div.innerHTML
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   },
 
   // Generate Content Security Policy nonce
   generateCSPNonce: (): string => {
-    return SecurityUtils.generateSecureToken(16)
+    return SecurityUtils.generateSecureToken(16);
   },
 
   // Validate email format
   isValidEmail: (email: string): boolean => {
-    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
-    return emailRegex.test(email)
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+    return emailRegex.test(email);
   },
 
   // Check password strength
@@ -246,55 +246,55 @@ export const SecurityUtils = {
     feedback: string[]
     isStrong: boolean
   } => {
-    const feedback: string[] = []
-    let score = 0
+    const feedback: string[] = [];
+    let score = 0;
 
     if (password.length >= 8) {
-      score += 2
+      score += 2;
     } else {
-      feedback.push('Password should be at least 8 characters long')
+      feedback.push('Password should be at least 8 characters long');
     }
 
     if (password.length >= 12) {
-      score += 1
+      score += 1;
     }
 
     if (/[a-z]/.test(password)) {
-      score += 1
+      score += 1;
     } else {
-      feedback.push('Include lowercase letters')
+      feedback.push('Include lowercase letters');
     }
 
     if (/[A-Z]/.test(password)) {
-      score += 1
+      score += 1;
     } else {
-      feedback.push('Include uppercase letters')
+      feedback.push('Include uppercase letters');
     }
 
     if (/[0-9]/.test(password)) {
-      score += 1
+      score += 1;
     } else {
-      feedback.push('Include numbers')
+      feedback.push('Include numbers');
     }
 
     if (/[^a-zA-Z0-9]/.test(password)) {
-      score += 1
+      score += 1;
     } else {
-      feedback.push('Include special characters')
+      feedback.push('Include special characters');
     }
 
     // Check for common passwords
-    const commonPasswords = ['password', '123456', 'admin', 'test', 'qwerty']
+    const commonPasswords = ['password', '123456', 'admin', 'test', 'qwerty'];
     if (commonPasswords.includes(password.toLowerCase())) {
-      score = 0
-      feedback.push('Avoid common passwords')
+      score = 0;
+      feedback.push('Avoid common passwords');
     }
 
-    const isStrong = score >= 5
+    const isStrong = score >= 5;
 
-    return { score, feedback, isStrong }
+    return { score, feedback, isStrong };
   }
-}
+};
 
 // Security constants
 export const SECURITY_CONSTANTS = {
@@ -343,7 +343,7 @@ export const SECURITY_CONSTANTS = {
     CSRF_TOKEN_LENGTH: 32,
     BCRYPT_ROUNDS: 12
   }
-} as const
+} as const;
 
 export default {
   initializeSecurity,
@@ -351,4 +351,4 @@ export default {
   performSecurityAudit,
   SecurityUtils,
   SECURITY_CONSTANTS
-}
+};
