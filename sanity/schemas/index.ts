@@ -14,6 +14,7 @@ import { industry } from './industry'
 import { application } from './application'
 import { inquiry } from './inquiry'
 import { quote } from './quote'
+import company from './company'
 
 // 导出所有schema类型
 export const schemaTypes = [
@@ -39,4 +40,7 @@ export const schemaTypes = [
   // 业务相关
   inquiry,
   quote,
+  
+  // 公司相关
+  company,
 ]
