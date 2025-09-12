@@ -13,7 +13,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/simple-build-static.js",
+    "build": "node scripts/build-static.js",
     "build:enhanced": "node scripts/build-static.js",
     "build:original": "next build",
     "build:force": "NEXT_IGNORE_EXPORT_ERRORS=true next build",
