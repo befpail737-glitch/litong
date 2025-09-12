@@ -1,5 +1,5 @@
-import { getProducts, getProductCategories, getSiteStats } from '../lib/sanity/queries';
-import { urlFor } from '../lib/sanity/client';
+import { getProducts, getProductCategories, getSiteStats } from '@/lib/sanity/queries';
+import { urlFor } from '@/lib/sanity/client';
 
 interface Product {
   _id: string;

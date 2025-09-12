@@ -1,5 +1,5 @@
-import { getCompanyInfo, getCompanyStats, getTeamMembers } from '../lib/sanity/company';
-import { urlFor } from '../lib/sanity/client';
+import { getCompanyInfo, getCompanyStats, getTeamMembers } from '@/lib/sanity/company';
+import { urlFor } from '@/lib/sanity/client';
 
 interface CompanyInfo {
   _id: string;

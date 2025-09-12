@@ -1,5 +1,5 @@
-import { getAllBrands, getFeaturedBrands, getBrandStats } from '../lib/sanity/brands';
-import { urlFor } from '../lib/sanity/client';
+import { getAllBrands, getFeaturedBrands, getBrandStats } from '@/lib/sanity/brands';
+import { urlFor } from '@/lib/sanity/client';
 
 interface Brand {
   _id: string;
