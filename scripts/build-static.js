@@ -4,11 +4,112 @@
  * 增强的自定义静态构建脚本
  * 用于绕过 Next.js 14 静态导出的 Server Actions 误报错误
  * 使用分步构建方法：编译 → 手动静态导出
+ * 集成Sanity CMS真实数据获取
  */
 
 const { spawn, exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+
+// Sanity Client 配置
+const { createClient } = require('@sanity/client');
+const imageUrlBuilder = require('@sanity/image-url');
+
+// 创建Sanity客户端
+const sanityClient = createClient({
+  projectId: 'oquvb2bs',
+  dataset: 'production',
+  apiVersion: '2023-05-03',
+  useCdn: false,
+  perspective: 'published',
+});
+
+const imageBuilder = imageUrlBuilder(sanityClient);
+
+// 生成图片URL的助手函数
+function urlFor(source) {
+  return imageBuilder.image(source);
+}
+
+// 从Sanity获取所有品牌数据
+async function getAllBrandsFromSanity() {
+  try {
+    const query = `*[_type == "brandBasic" && isActive == true && !(_id in path("drafts.**"))] | order(name asc) {
+      _id,
+      _type,
+      name,
+      description,
+      website,
+      country,
+      isActive,
+      isFeatured,
+      "slug": slug.current,
+      logo,
+      headquarters,
+      established
+    }`;
+
+    const brands = await sanityClient.fetch(query);
+    console.log(`✅ 从Sanity获取到 ${brands.length} 个品牌`);
+    return brands || [];
+  } catch (error) {
+    console.error('❌ 获取品牌数据失败:', error);
+    return [];
+  }
+}
+
+// 从Sanity获取特色品牌数据
+async function getFeaturedBrandsFromSanity() {
+  try {
+    const query = `*[_type == "brandBasic" && isActive == true && isFeatured == true && !(_id in path("drafts.**"))] | order(name asc) {
+      _id,
+      _type,
+      name,
+      description,
+      website,
+      country,
+      isActive,
+      isFeatured,
+      "slug": slug.current,
+      logo,
+      headquarters,
+      established
+    }`;
+
+    const brands = await sanityClient.fetch(query);
+    console.log(`✅ 从Sanity获取到 ${brands.length} 个特色品牌`);
+    return brands || [];
+  } catch (error) {
+    console.error('❌ 获取特色品牌数据失败:', error);
+    return [];
+  }
+}
+
+// 从Sanity获取品牌统计数据
+async function getBrandStatsFromSanity() {
+  try {
+    const query = `{
+      "total": count(*[_type == "brandBasic" && isActive == true && !(_id in path("drafts.**"))]),
+      "featured": count(*[_type == "brandBasic" && isActive == true && isFeatured == true && !(_id in path("drafts.**"))]),
+      "solutions": count(*[_type == "solution" && isPublished == true && !(_id in path("drafts.**"))])
+    }`;
+
+    const stats = await sanityClient.fetch(query);
+    console.log('✅ 获取品牌统计数据:', stats);
+    return {
+      total: stats?.total || 0,
+      authorized: stats?.featured || 0,
+      totalProducts: (stats?.solutions || 0) * 100, // 估算产品数量
+    };
+  } catch (error) {
+    console.error('❌ 获取品牌统计数据失败:', error);
+    return {
+      total: 0,
+      authorized: 0,
+      totalProducts: 0,
+    };
+  }
+}
 
 console.log('🚀 开始增强静态构建...');
 
@@ -170,6 +271,12 @@ async function manualStaticExport() {
     console.log('📋 找到根主文件:', rootMainFiles.length, '个');
     console.log('📋 找到共享JS文件:', sharedJsFiles.length, '个');
 
+    // 获取Sanity品牌数据（仅在需要时获取）
+    console.log('🔄 准备获取品牌数据...');
+    const allBrands = await getAllBrandsFromSanity();
+    const featuredBrands = await getFeaturedBrandsFromSanity();
+    const brandStats = await getBrandStatsFromSanity();
+
     // 定义页面路由映射
     const pages = [
       { route: 'index', manifestKey: '/page', title: '力通电子 - 专业电子元器件代理商' },
@@ -192,6 +299,15 @@ async function manualStaticExport() {
         ...sharedJsFiles,
         ...pageJsFiles
       ].filter((file, index, arr) => arr.indexOf(file) === index); // 去重
+      
+      // 为brands页面附加品牌数据
+      if (pageInfo.route === 'brands') {
+        pageInfo.brandsData = {
+          allBrands,
+          featuredBrands,
+          brandStats
+        };
+      }
       
       // 生成HTML内容
       const htmlContent = generatePageHTML(pageInfo.title, cssFiles, allJsFiles, pageInfo);
@@ -374,7 +490,292 @@ function generateHomePageContent() {
     </section>`;
 }
 
-// 生成完整的brands页面内容
+// 品牌智能分类函数
+function categorizeBrands(brands) {
+  const categories = {
+    '微控制器与处理器': [],
+    '模拟与电源管理': [],
+    '传感器与连接器': [],
+    '其他分类': []
+  };
+
+  // 预定义品牌分类规则
+  const categoryRules = {
+    '微控制器与处理器': ['STMicroelectronics', 'Texas Instruments', 'Microchip', 'NXP', 'Espressif', 'ARM', 'Intel', 'Infineon', 'Renesas', 'Nordic'],
+    '模拟与电源管理': ['Analog Devices', 'Linear Technology', 'Maxim', 'ON Semiconductor', 'TI', 'Vishay', 'Fairchild'],
+    '传感器与连接器': ['Bosch', 'Sensirion', 'TE Connectivity', 'Molex', 'JAE', 'Amphenol', 'Honeywell']
+  };
+
+  brands.forEach(brand => {
+    let categorized = false;
+    
+    for (const [categoryName, brandNames] of Object.entries(categoryRules)) {
+      if (brandNames.some(name => 
+        brand.name.toLowerCase().includes(name.toLowerCase()) || 
+        name.toLowerCase().includes(brand.name.toLowerCase())
+      )) {
+        categories[categoryName].push(brand);
+        categorized = true;
+        break;
+      }
+    }
+    
+    if (!categorized) {
+      categories['其他分类'].push(brand);
+    }
+  });
+
+  return categories;
+}
+
+// 生成动态的品牌页面内容
+function generateBrandsPageContentWithData(brandsData) {
+  const { allBrands = [], featuredBrands = [], brandStats = {} } = brandsData || {};
+  const brandCategories = categorizeBrands(allBrands);
+  
+  // 使用真实统计数据或回退到默认值
+  const stats = {
+    total: brandStats.total > 0 ? brandStats.total : 12,
+    authorized: brandStats.authorized > 0 ? brandStats.authorized : 8,
+    totalProducts: brandStats.totalProducts > 0 ? (brandStats.totalProducts > 1000 ? Math.floor(brandStats.totalProducts / 1000) + 'K' : brandStats.totalProducts) : '27K'
+  };
+
+  return `
+    <!-- Page Header -->
+    <section class="bg-gradient-to-r from-purple-600 to-blue-600 text-white py-16">
+      <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto text-center">
+          <h1 class="text-4xl font-bold mb-4">合作品牌</h1>
+          <p class="text-xl text-purple-100">
+            与全球顶尖品牌合作，为您提供优质的电子元器件产品
+          </p>
+          <div class="mt-6 flex justify-center space-x-8 text-sm">
+            <div class="text-center">
+              <div class="text-2xl font-bold">${stats.total}+</div>
+              <div class="text-purple-200">合作品牌</div>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold">${stats.authorized}+</div>
+              <div class="text-purple-200">授权代理</div>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold">${stats.totalProducts}+</div>
+              <div class="text-purple-200">产品型号</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Brand Categories -->
+    <section class="py-16 bg-white">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-gray-900 mb-4">品牌分类</h2>
+          <p class="text-lg text-gray-600">按产品类别浏览合作品牌</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8 mb-16">
+          ${Object.entries(brandCategories).slice(0, 3).map(([categoryName, brands], index) => {
+            const icons = [
+              `<svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+              </svg>`,
+              `<svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>`,
+              `<svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>`
+            ];
+
+            return `
+              <div class="bg-gray-50 p-6 rounded-lg">
+                <div class="text-purple-600 mb-4">
+                  ${icons[index] || icons[0]}
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">${categoryName}</h3>
+                <ul class="space-y-2">
+                  ${brands.length > 0 
+                    ? brands.slice(0, 4).map(brand => `
+                        <li class="text-gray-600 hover:text-purple-600 cursor-pointer transition-colors">• ${brand.name}</li>
+                      `).join('')
+                    : '<li class="text-gray-500 italic">暂无品牌数据</li>'
+                  }
+                  ${brands.length > 4 ? `<li class="text-purple-600 text-sm">还有 ${brands.length - 4} 个品牌...</li>` : ''}
+                </ul>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Brands -->
+    <section class="py-16 bg-gray-50">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-gray-900 mb-4">特色合作品牌</h2>
+          <p class="text-lg text-gray-600">深度合作的优质品牌伙伴</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          ${featuredBrands.length > 0 
+            ? featuredBrands.slice(0, 6).map(brand => `
+              <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                <div class="flex items-start justify-between mb-4">
+                  <div class="flex items-center space-x-4">
+                    ${brand.logo ? `
+                      <img 
+                        src="${urlFor(brand.logo).width(60).height(60).url()}"
+                        alt="${brand.name}"
+                        class="w-12 h-12 object-contain"
+                      />
+                    ` : ''}
+                    <div>
+                      <h3 class="text-xl font-semibold text-gray-900 mb-2">${brand.name}</h3>
+                      <p class="text-gray-600 text-sm">${brand.description || '专业的电子元器件供应商'}</p>
+                    </div>
+                  </div>
+                  <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
+                    授权代理
+                  </span>
+                </div>
+                
+                <div class="space-y-2 mb-4">
+                  ${brand.website ? `
+                    <p class="text-sm"><span class="font-medium text-gray-700">品牌官网:</span> 
+                      <a href="${brand.website}" target="_blank" rel="noopener noreferrer" class="text-purple-600 hover:underline ml-1">
+                        ${brand.website.replace(/^https?:\/\//, '')}
+                      </a>
+                    </p>
+                  ` : ''}
+                  ${brand.established ? `<p class="text-sm"><span class="font-medium text-gray-700">成立时间:</span> ${brand.established}</p>` : ''}
+                  ${brand.country ? `<p class="text-sm"><span class="font-medium text-gray-700">总部:</span> ${brand.country}</p>` : ''}
+                  ${brand.headquarters ? `<p class="text-sm"><span class="font-medium text-gray-700">地址:</span> ${brand.headquarters}</p>` : ''}
+                </div>
+                
+                <div class="flex justify-between items-center pt-4 border-t border-gray-100">
+                  <span class="text-purple-600 font-medium">查看产品</span>
+                  <button class="text-purple-600 hover:text-purple-700 text-sm font-medium">
+                    浏览产品 →
+                  </button>
+                </div>
+              </div>
+            `).join('')
+            : `
+            <!-- 回退品牌数据 -->
+            <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+              <div class="flex items-start justify-between mb-4">
+                <div>
+                  <h3 class="text-xl font-semibold text-gray-900 mb-2">STMicroelectronics</h3>
+                  <p class="text-gray-600 text-sm">全球领先的半导体供应商</p>
+                </div>
+                <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">授权代理</span>
+              </div>
+              <div class="space-y-2 mb-4">
+                <p class="text-sm"><span class="font-medium text-gray-700">主要产品:</span> 微控制器、传感器、功率器件</p>
+                <p class="text-sm"><span class="font-medium text-gray-700">成立时间:</span> 1987年</p>
+                <p class="text-sm"><span class="font-medium text-gray-700">总部:</span> 瑞士</p>
+              </div>
+              <div class="flex justify-between items-center pt-4 border-t border-gray-100">
+                <span class="text-purple-600 font-medium">15,000+ 产品</span>
+                <button class="text-purple-600 hover:text-purple-700 text-sm font-medium">查看产品 →</button>
+              </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+              <div class="flex items-start justify-between mb-4">
+                <div>
+                  <h3 class="text-xl font-semibold text-gray-900 mb-2">Texas Instruments</h3>
+                  <p class="text-gray-600 text-sm">模拟IC和嵌入式处理器制造商</p>
+                </div>
+                <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">授权代理</span>
+              </div>
+              <div class="space-y-2 mb-4">
+                <p class="text-sm"><span class="font-medium text-gray-700">主要产品:</span> 模拟IC、DSP、微控制器</p>
+                <p class="text-sm"><span class="font-medium text-gray-700">成立时间:</span> 1930年</p>
+                <p class="text-sm"><span class="font-medium text-gray-700">总部:</span> 美国</p>
+              </div>
+              <div class="flex justify-between items-center pt-4 border-t border-gray-100">
+                <span class="text-purple-600 font-medium">12,500+ 产品</span>
+                <button class="text-purple-600 hover:text-purple-700 text-sm font-medium">查看产品 →</button>
+              </div>
+            </div>
+            `
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Partnership Benefits -->
+    <section class="py-16 bg-white">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-gray-900 mb-4">合作优势</h2>
+          <p class="text-lg text-gray-600">作为授权代理商，我们为您提供的专业服务</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div class="text-center">
+            <div class="w-16 h-16 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">原厂授权</h3>
+            <p class="text-gray-600">100%原装正品保证</p>
+          </div>
+          <div class="text-center">
+            <div class="w-16 h-16 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 2.25a9.75 9.75 0 100 19.5 9.75 9.75 0 000-19.5z" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">技术支持</h3>
+            <p class="text-gray-600">原厂技术资源支持</p>
+          </div>
+          <div class="text-center">
+            <div class="w-16 h-16 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">供货稳定</h3>
+            <p class="text-gray-600">优先供货保障</p>
+          </div>
+          <div class="text-center">
+            <div class="w-16 h-16 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">价格优势</h3>
+            <p class="text-gray-600">一手货源价格</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact CTA -->
+    <section class="py-16 bg-gradient-to-r from-purple-600 to-blue-600">
+      <div class="container mx-auto px-4 text-center">
+        <h2 class="text-3xl font-bold text-white mb-4">成为我们的合作伙伴</h2>
+        <p class="text-xl text-purple-100 mb-8 max-w-2xl mx-auto">
+          我们期待与更多优秀品牌建立长期合作关系 | 现有 ${stats.total}+ 合作品牌
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <button class="bg-white text-purple-600 hover:bg-gray-100 px-8 py-3 rounded-lg font-medium transition-colors">
+            品牌合作
+          </button>
+          <button class="border-2 border-white text-white hover:bg-white hover:text-purple-600 px-8 py-3 rounded-lg font-medium transition-colors">
+            联系我们
+          </button>
+        </div>
+      </div>
+    </section>`;
+}
+
+// 生成完整的brands页面内容（原版本保留作为回退）
 function generateBrandsPageContent() {
   return `
     <!-- Page Header -->
@@ -629,7 +1030,12 @@ function generatePageContent(pageInfo) {
           </div>
         </section>`;
     case 'brands':
-      return generateBrandsPageContent();
+      // 如果有品牌数据，使用动态生成，否则使用静态版本
+      if (pageInfo.brandsData) {
+        return generateBrandsPageContentWithData(pageInfo.brandsData);
+      } else {
+        return generateBrandsPageContent();
+      }
     case 'products':
       return `
         <section class="py-16 bg-white">
