@@ -1,7 +1,4 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import { getAllBrands, getFeaturedBrands, getBrandStats } from '@/lib/sanity/brands';
+import { getAllBrands, getFeaturedBrands, getBrandStats, getBrandsByCategories } from '@/lib/sanity/brands';
 import { urlFor } from '@/lib/sanity/client';
 
 interface Brand {
@@ -24,48 +21,109 @@ interface BrandStats {
   totalProducts: number;
 }
 
-export default function BrandsPage() {
-  const [allBrands, setAllBrands] = useState<Brand[]>([]);
-  const [featuredBrands, setFeaturedBrands] = useState<Brand[]>([]);
-  const [brandStats, setBrandStats] = useState<any>({ totalBrands: 100, activeBrands: 95, newThisMonth: 5, averageProducts: 250 });
-  const [loading, setLoading] = useState(true);
+interface BrandCategory {
+  _id: string;
+  name: string;
+  slug?: string;
+  description?: string;
+  icon?: string;
+  brands: Brand[];
+}
 
-  useEffect(() => {
-    // Fetch data from Sanity CMS
-    Promise.all([
-      getAllBrands().catch(err => { console.error('Failed to fetch brands:', err); return []; }),
-      getFeaturedBrands().catch(err => { console.error('Failed to fetch featured brands:', err); return []; }),
-      getBrandStats().catch(err => { console.error('Failed to fetch brand stats:', err); return { total: 0, authorized: 0, totalProducts: 0 }; })
-    ]).then(([brands, featured, stats]) => {
-      setAllBrands(brands);
-      setFeaturedBrands(featured);
-      setBrandStats(stats);
-      setLoading(false);
-    });
-  }, []);
+export default async function BrandsPage() {
+  // 服务器端数据获取 - 在构建时执行
+  let allBrands: Brand[] = [];
+  let featuredBrands: Brand[] = [];
+  let brandCategories: BrandCategory[] = [];
+  let brandStats = { total: 0, authorized: 0, totalProducts: 0 };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">加载品牌信息...</p>
-        </div>
-      </div>
-    );
+  try {
+    // 并行获取数据，每个请求都有独立的错误处理
+    const [brandsData, featured, stats] = await Promise.allSettled([
+      getBrandsByCategories(),
+      getFeaturedBrands(),
+      getBrandStats()
+    ]);
+
+    // 处理品牌分类数据
+    if (brandsData.status === 'fulfilled' && brandsData.value) {
+      brandCategories = brandsData.value.brandCategories || [];
+      allBrands = brandsData.value.allBrands || [];
+    } else {
+      console.error('Failed to fetch brands by categories:', brandsData.status === 'rejected' ? brandsData.reason : 'Unknown error');
+      // 回退到获取所有品牌
+      try {
+        const fallbackBrands = await getAllBrands();
+        allBrands = fallbackBrands;
+      } catch (fallbackError) {
+        console.error('Fallback getAllBrands also failed:', fallbackError);
+        allBrands = [];
+      }
+      brandCategories = [];
+    }
+
+    // 处理特色品牌数据
+    if (featured.status === 'fulfilled') {
+      featuredBrands = featured.value || [];
+    } else {
+      console.error('Failed to fetch featured brands:', featured.reason);
+      featuredBrands = [];
+    }
+
+    // 处理统计数据
+    if (stats.status === 'fulfilled') {
+      brandStats = stats.value || { total: 0, authorized: 0, totalProducts: 0 };
+    } else {
+      console.error('Failed to fetch brand stats:', stats.reason);
+      brandStats = { total: 0, authorized: 0, totalProducts: 0 };
+    }
+
+  } catch (error) {
+    console.error('Unexpected error during data fetching:', error);
+    // 最终回退状态
+    brandCategories = [];
+    allBrands = [];
+    featuredBrands = [];
+    brandStats = { total: 0, authorized: 0, totalProducts: 0 };
   }
 
-  // Group brands by categories based on their names or descriptions
-  const brandCategories = {
-    '微控制器与处理器': allBrands.filter(brand => 
-      ['STMicroelectronics', 'Texas Instruments', 'Microchip', 'NXP', 'Espressif', 'ARM', 'Intel'].includes(brand.name)
-    ),
-    '模拟与电源管理': allBrands.filter(brand => 
-      ['Analog Devices', 'Linear Technology', 'Maxim', 'ON Semiconductor', 'Infineon'].includes(brand.name)
-    ),
-    '传感器与连接器': allBrands.filter(brand => 
-      ['Bosch', 'Sensirion', 'TE Connectivity', 'Molex', 'JAE', 'Vishay'].includes(brand.name)
-    )
+  // 动态图标映射 - 根据分类名称或图标字段选择合适的图标
+  const getIconForCategory = (categoryName: string, iconName?: string) => {
+    // 如果有指定的图标名称，使用对应的图标
+    if (iconName) {
+      const iconMap: { [key: string]: JSX.Element } = {
+        'Cpu': (<svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+        </svg>),
+        'Zap': (<svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>),
+        'Wifi': (<svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>)
+      };
+      return iconMap[iconName];
+    }
+    
+    // 根据分类名称返回默认图标
+    if (categoryName.includes('处理器') || categoryName.includes('微控制器') || categoryName.includes('MCU')) {
+      return (<svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+      </svg>);
+    } else if (categoryName.includes('电源') || categoryName.includes('模拟') || categoryName.includes('电力')) {
+      return (<svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>);
+    } else if (categoryName.includes('传感器') || categoryName.includes('连接器') || categoryName.includes('通信')) {
+      return (<svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>);
+    }
+    
+    // 默认图标
+    return (<svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+    </svg>);
   };
 
   return (
@@ -105,37 +163,45 @@ export default function BrandsPage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 mb-16">
-            {Object.entries(brandCategories).map(([categoryName, brands], index) => {
-              const icons = [
-                (<svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-                </svg>),
-                (<svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>),
-                (<svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>)
-              ];
-              
-              return (
-                <div key={categoryName} className="bg-gray-50 p-6 rounded-lg">
-                  <div className="text-purple-600 mb-4">
-                    {icons[index] || icons[0]}
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-4">{categoryName}</h3>
-                  <ul className="space-y-2">
-                    {brands.length > 0 ? brands.map((brand) => (
-                      <li key={brand._id} className="text-gray-600 hover:text-purple-600 cursor-pointer transition-colors">
-                        • {brand.name}
-                      </li>
-                    )) : (
-                      <li className="text-gray-500 italic">暂无品牌数据</li>
-                    )}
-                  </ul>
+            {brandCategories.length > 0 ? brandCategories.map((category, index) => (
+              <div key={category._id} className="bg-gray-50 p-6 rounded-lg">
+                <div className="text-purple-600 mb-4">
+                  {getIconForCategory(category.name, category.icon)}
                 </div>
-              );
-            })}
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">{category.name}</h3>
+                {category.description && (
+                  <p className="text-gray-600 text-sm mb-3">{category.description}</p>
+                )}
+                <ul className="space-y-2">
+                  {category.brands && category.brands.length > 0 ? category.brands.map((brand) => (
+                    <li key={brand._id} className="text-gray-600 hover:text-purple-600 cursor-pointer transition-colors">
+                      • {brand.name}
+                    </li>
+                  )) : (
+                    <li className="text-gray-500 italic">暂无品牌数据</li>
+                  )}
+                </ul>
+              </div>
+            )) : (
+              // 如果没有分类数据，显示所有品牌的简化版本
+              <div className="col-span-full">
+                <div className="bg-gray-50 p-6 rounded-lg text-center">
+                  <div className="text-purple-600 mb-4 flex justify-center">
+                    {getIconForCategory('默认')}
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-4">所有品牌</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {allBrands.length > 0 ? allBrands.map((brand) => (
+                      <div key={brand._id} className="text-gray-600 hover:text-purple-600 cursor-pointer transition-colors">
+                        {brand.name}
+                      </div>
+                    )) : (
+                      <div className="col-span-full text-gray-500 italic">暂无品牌数据</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </section>

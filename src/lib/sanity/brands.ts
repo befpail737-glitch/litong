@@ -118,6 +118,63 @@ export async function getBrandData(slug: string): Promise<Brand | null> {
   }
 }
 
+// 获取按分类分组的品牌数据
+export async function getBrandsByCategories() {
+  try {
+    const query = `{
+      "brandCategories": *[_type == "productCategory" && level == 1 && isVisible == true] | order(sortOrder asc, name asc) {
+        _id,
+        name,
+        "slug": slug.current,
+        description,
+        icon,
+        "brands": array::unique(*[_type == "product" && isActive == true && category._ref == ^._id].brand->)[defined(@) && isActive == true] | order(name asc) {
+          _id,
+          name,
+          "slug": slug.current,
+          description,
+          website,
+          country,
+          headquarters,
+          established,
+          logo,
+          isActive,
+          isFeatured
+        }
+      },
+      "allBrands": *[_type == "brandBasic" && isActive == true && !(_id in path("drafts.**"))] | order(name asc) {
+        _id,
+        name,
+        "slug": slug.current,
+        description,
+        website,
+        country,
+        headquarters,
+        established,
+        logo,
+        isActive,
+        isFeatured
+      }
+    }`;
+
+    const result = await client.fetch(query);
+    
+    // 过滤掉没有品牌的分类
+    const validCategories = result?.brandCategories?.filter(cat => cat.brands && cat.brands.length > 0) || [];
+    
+    return {
+      brandCategories: validCategories,
+      allBrands: result?.allBrands || []
+    };
+  } catch (error) {
+    console.error('Error fetching brands by categories:', error);
+    return {
+      brandCategories: [],
+      allBrands: []
+    };
+  }
+}
+
 // 获取品牌统计数据
 export async function getBrandStats() {
   try {
