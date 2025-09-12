@@ -111,6 +111,68 @@ async function getBrandStatsFromSanity() {
   }
 }
 
+// 从Sanity获取按分类分组的品牌数据（与React组件相同的查询逻辑）
+async function getBrandsByCategoriesFromSanity() {
+  try {
+    const query = `{
+      "brandCategories": *[_type == "productCategory" && level == 1 && isVisible == true] | order(sortOrder asc, name asc) {
+        _id,
+        name,
+        "slug": slug.current,
+        description,
+        icon,
+        "brands": array::unique(*[_type == "product" && isActive == true && category._ref == ^._id].brand->)[defined(@) && isActive == true] | order(name asc) {
+          _id,
+          name,
+          "slug": slug.current,
+          description,
+          website,
+          country,
+          headquarters,
+          established,
+          logo,
+          isActive,
+          isFeatured
+        }
+      },
+      "allBrands": *[_type == "brandBasic" && isActive == true && !(_id in path("drafts.**"))] | order(name asc) {
+        _id,
+        name,
+        "slug": slug.current,
+        description,
+        website,
+        country,
+        headquarters,
+        established,
+        logo,
+        isActive,
+        isFeatured
+      }
+    }`;
+
+    const result = await sanityClient.fetch(query);
+    
+    // 过滤掉没有品牌的分类
+    const validCategories = result?.brandCategories?.filter(cat => cat.brands && cat.brands.length > 0) || [];
+    
+    console.log(`✅ 从Sanity获取到 ${validCategories.length} 个有效品牌分类`);
+    validCategories.forEach(cat => {
+      console.log(`  - ${cat.name}: ${cat.brands.length} 个品牌`);
+    });
+    
+    return {
+      brandCategories: validCategories,
+      allBrands: result?.allBrands || []
+    };
+  } catch (error) {
+    console.error('❌ 获取品牌分类数据失败:', error);
+    return {
+      brandCategories: [],
+      allBrands: []
+    };
+  }
+}
+
 console.log('🚀 开始增强静态构建...');
 
 // 设置环境变量
@@ -276,6 +338,7 @@ async function manualStaticExport() {
     const allBrands = await getAllBrandsFromSanity();
     const featuredBrands = await getFeaturedBrandsFromSanity();
     const brandStats = await getBrandStatsFromSanity();
+    const brandCategoriesData = await getBrandsByCategoriesFromSanity();
 
     // 定义页面路由映射
     const pages = [
@@ -305,7 +368,8 @@ async function manualStaticExport() {
         pageInfo.brandsData = {
           allBrands,
           featuredBrands,
-          brandStats
+          brandStats,
+          brandCategoriesData
         };
       }
       
@@ -530,8 +594,12 @@ function categorizeBrands(brands) {
 
 // 生成动态的品牌页面内容
 function generateBrandsPageContentWithData(brandsData) {
-  const { allBrands = [], featuredBrands = [], brandStats = {} } = brandsData || {};
-  const brandCategories = categorizeBrands(allBrands);
+  const { allBrands = [], featuredBrands = [], brandStats = {}, brandCategoriesData = {} } = brandsData || {};
+  
+  // 优先使用动态分类数据，如果没有则回退到硬编码分类
+  const brandCategories = brandCategoriesData.brandCategories && brandCategoriesData.brandCategories.length > 0 
+    ? brandCategoriesData.brandCategories 
+    : Object.entries(categorizeBrands(allBrands)).map(([name, brands]) => ({ name, brands }));
   
   // 使用真实统计数据或回退到默认值
   const stats = {
@@ -576,7 +644,9 @@ function generateBrandsPageContentWithData(brandsData) {
         </div>
 
         <div class="grid md:grid-cols-3 gap-8 mb-16">
-          ${Object.entries(brandCategories).slice(0, 3).map(([categoryName, brands], index) => {
+          ${brandCategories.slice(0, 3).map((category, index) => {
+            const categoryName = category.name;
+            const brands = category.brands || [];
             const icons = [
               `<svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
