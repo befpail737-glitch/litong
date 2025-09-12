@@ -400,6 +400,60 @@ async function manualStaticExport() {
       console.log(`✅ 导出 ${filename} (${allJsFiles.length} JS文件, ${cssFiles.length} CSS文件)`);
     }
 
+    // 生成个人品牌页面
+    console.log('🔄 开始生成个人品牌页面...');
+    
+    // 获取品牌页面的资源文件
+    const brandPageAssets = appManifest.pages?.['/brands/[slug]/page'] || [];
+    const brandPageJsFiles = brandPageAssets.filter(asset => asset.endsWith('.js'));
+    
+    // 合并品牌页面所需的JS文件
+    const brandPageAllJsFiles = [
+      ...polyfillFiles,
+      ...rootMainFiles,
+      ...sharedJsFiles,
+      ...brandPageJsFiles
+    ].filter((file, index, arr) => arr.indexOf(file) === index); // 去重
+
+    console.log(`📋 品牌页面找到 ${brandPageJsFiles.length} 个特定JS文件`);
+    
+    // 为每个品牌生成HTML页面
+    let brandPageCount = 0;
+    for (const brand of allBrands) {
+      if (!brand.slug) {
+        console.warn(`⚠️ 品牌 ${brand.name} 没有slug，跳过生成页面`);
+        continue;
+      }
+
+      brandPageCount++;
+      const brandSlug = encodeURIComponent(brand.slug);
+      
+      // 创建品牌页面信息
+      const brandPageInfo = {
+        route: `brands/${brandSlug}`,
+        title: `${brand.name} - 力通电子合作品牌`,
+        brandData: brand
+      };
+      
+      // 生成品牌页面HTML
+      const brandHtmlContent = generateBrandPageHTML(brandPageInfo.title, cssFiles, brandPageAllJsFiles, brandPageInfo);
+      
+      // 创建品牌页面文件路径
+      const brandFilePath = path.join('out', 'brands', brandSlug, 'index.html');
+      const brandDir = path.dirname(brandFilePath);
+      
+      // 创建目录
+      if (!fs.existsSync(brandDir)) {
+        fs.mkdirSync(brandDir, { recursive: true });
+      }
+      
+      // 写入HTML文件
+      fs.writeFileSync(brandFilePath, brandHtmlContent);
+      console.log(`✅ 生成品牌页面: brands/${brandSlug}/index.html (${brand.name})`);
+    }
+    
+    console.log(`✅ 成功生成 ${brandPageCount} 个品牌页面`);
+
     // 复制必要的manifest文件到输出目录
     const manifestFiles = [
       '.next/build-manifest.json',
@@ -1174,6 +1228,131 @@ ${cssLinks}
 ${jsScripts}
 </body>
 </html>`;
+}
+
+// 生成品牌页面HTML内容
+function generateBrandPageHTML(title, cssFiles, jsFiles, brandPageInfo) {
+  const cssLinks = cssFiles.map(css => `  <link rel="stylesheet" href="/_next/${css}">`).join('\n');
+  const jsScripts = jsFiles.map(js => `  <script src="/_next/${js}" defer></script>`).join('\n');
+  
+  const headerHTML = generateHeaderHTML();
+  const footerHTML = generateFooterHTML();
+  const brandContentHTML = generateBrandPageContent(brandPageInfo);
+  
+  return `<!DOCTYPE html>
+<html lang="zh-CN" class="font-sans">
+<head>
+  <meta charset="utf-8">
+  <title>${title}</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="${brandPageInfo.brandData.description || `${brandPageInfo.brandData.name} 是力通电子的重要合作伙伴，提供优质的电子元器件产品。`}">
+  <meta name="keywords" content="${brandPageInfo.brandData.name}, 电子元器件, 力通电子, 代理商, ${brandPageInfo.brandData.country || ''}">
+  <meta name="next-head-count" content="5">
+${cssLinks}
+</head>
+<body class="font-sans antialiased bg-white text-gray-900">
+  <div id="__next">
+    <div class="relative flex min-h-screen flex-col">
+      ${headerHTML}
+      <main class="flex-1">
+        ${brandContentHTML}
+      </main>
+      ${footerHTML}
+    </div>
+  </div>
+  <script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{"brand":${JSON.stringify(brandPageInfo.brandData).replace(/"/g, '&quot;')}}},"page":"/brands/[slug]","query":{"slug":"${brandPageInfo.brandData.slug}"},"buildId":"${Date.now()}","nextExport":true,"autoExport":true,"isFallback":false,"scriptLoader":[]}</script>
+${jsScripts}
+</body>
+</html>`;
+}
+
+// 生成品牌页面内容
+function generateBrandPageContent(brandPageInfo) {
+  const brand = brandPageInfo.brandData;
+  const logoHTML = brand.logo ? `
+    <div class="w-24 h-24 md:w-32 md:h-32 flex-shrink-0">
+      <img src="${urlFor(brand.logo).width(200).height(200).url()}" alt="${brand.name}" class="w-full h-full object-contain border rounded-lg p-2">
+    </div>` : '';
+
+  const websiteHTML = brand.website ? `
+    <a href="${brand.website}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 underline">
+      🌐 官方网站
+    </a>` : '';
+
+  const brandInfoItems = [
+    brand.country && `<div class="flex justify-between"><span class="text-gray-500">所属国家:</span><span class="font-medium">${brand.country}</span></div>`,
+    brand.established && `<div class="flex justify-between"><span class="text-gray-500">成立时间:</span><span class="font-medium">${brand.established}</span></div>`,
+    brand.headquarters && `<div class="flex justify-between"><span class="text-gray-500">总部地址:</span><span class="font-medium text-right">${brand.headquarters}</span></div>`
+  ].filter(Boolean).join('');
+
+  return `
+    <div class="min-h-screen bg-gray-50">
+      <!-- 品牌头部 -->
+      <div class="bg-white border-b">
+        <div class="container mx-auto px-4 py-8">
+          <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
+            ${logoHTML}
+            <div class="flex-1">
+              <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">${brand.name}</h1>
+              ${brand.description ? `<p class="text-lg text-gray-600 mb-4">${brand.description}</p>` : ''}
+              <div class="flex flex-wrap gap-4 text-sm text-gray-500">
+                ${brand.country ? `<span>📍 ${brand.country}</span>` : ''}
+                ${brand.established ? `<span>📅 成立于 ${brand.established}</span>` : ''}
+                ${brand.headquarters ? `<span>🏢 ${brand.headquarters}</span>` : ''}
+                ${websiteHTML}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 品牌详情内容 -->
+      <div class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <!-- 主要内容区域 -->
+          <div class="lg:col-span-2">
+            <div class="bg-white rounded-lg shadow p-6 mb-6">
+              <h2 class="text-2xl font-bold text-gray-900 mb-4">品牌介绍</h2>
+              <div class="prose prose-gray max-w-none">
+                ${brand.description ? `<p class="text-gray-600 leading-relaxed">${brand.description}</p>` : '<p class="text-gray-500">暂无详细介绍。</p>'}
+              </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6">
+              <h2 class="text-2xl font-bold text-gray-900 mb-4">产品分类</h2>
+              <p class="text-gray-500">产品分类信息即将推出...</p>
+            </div>
+          </div>
+
+          <!-- 侧边栏 -->
+          <div class="lg:col-span-1">
+            <div class="bg-white rounded-lg shadow p-6 mb-6">
+              <h3 class="text-xl font-bold text-gray-900 mb-4">品牌信息</h3>
+              <div class="space-y-3">
+                <div class="flex justify-between">
+                  <span class="text-gray-500">品牌名称:</span>
+                  <span class="font-medium">${brand.name}</span>
+                </div>
+                ${brandInfoItems}
+                <div class="flex justify-between">
+                  <span class="text-gray-500">代理状态:</span>
+                  <span class="font-medium ${brand.isFeatured ? 'text-green-600' : 'text-blue-600'}">
+                    ${brand.isFeatured ? '重点品牌' : '合作品牌'}
+                  </span>
+                </div>
+              </div>
+            </div>
+            ${brand.website ? `
+            <div class="bg-white rounded-lg shadow p-6">
+              <h3 class="text-xl font-bold text-gray-900 mb-4">外部链接</h3>
+              <a href="${brand.website}" target="_blank" rel="noopener noreferrer" 
+                 class="block w-full bg-blue-600 text-white text-center py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                访问官方网站 →
+              </a>
+            </div>` : ''}
+          </div>
+        </div>
+      </div>
+    </div>`;
 }
 
 async function main() {
