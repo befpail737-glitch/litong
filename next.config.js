@@ -4,7 +4,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Static export for Cloudflare Pages compatibility
-  output: 'export',
+  output: 'export', // 重新启用静态导出
   distDir: 'out',
   trailingSlash: true,
   images: {
