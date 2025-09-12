@@ -730,7 +730,7 @@ function generateBrandsPageContentWithData(brandsData) {
                 <ul class="space-y-2">
                   ${brands.length > 0 
                     ? brands.slice(0, 4).map(brand => `
-                        <li class="text-gray-600 hover:text-purple-600 cursor-pointer transition-colors">• ${brand.name}</li>
+                        <li><a href="/brands/${encodeURIComponent(brand.slug || brand.name.toLowerCase())}" class="text-gray-600 hover:text-purple-600 transition-colors">• ${brand.name}</a></li>
                       `).join('')
                     : '<li class="text-gray-500 italic">暂无品牌数据</li>'
                   }
@@ -765,7 +765,7 @@ function generateBrandsPageContentWithData(brandsData) {
                       />
                     ` : ''}
                     <div>
-                      <h3 class="text-xl font-semibold text-gray-900 mb-2">${brand.name}</h3>
+                      <h3 class="text-xl font-semibold text-gray-900 mb-2"><a href="/brands/${encodeURIComponent(brand.slug || brand.name.toLowerCase())}" class="hover:text-purple-600 transition-colors">${brand.name}</a></h3>
                       <p class="text-gray-600 text-sm">${brand.description || '专业的电子元器件供应商'}</p>
                     </div>
                   </div>
@@ -789,9 +789,9 @@ function generateBrandsPageContentWithData(brandsData) {
                 
                 <div class="flex justify-between items-center pt-4 border-t border-gray-100">
                   <span class="text-purple-600 font-medium">查看产品</span>
-                  <button class="text-purple-600 hover:text-purple-700 text-sm font-medium">
+                  <a href="/brands/${encodeURIComponent(brand.slug || brand.name.toLowerCase())}" class="text-purple-600 hover:text-purple-700 text-sm font-medium">
                     浏览产品 →
-                  </button>
+                  </a>
                 </div>
               </div>
             `).join('')
