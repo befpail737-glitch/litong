@@ -13,7 +13,9 @@
   "license": "MIT",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/build-static.js",
+    "build:original": "next build",
+    "build:force": "NEXT_IGNORE_EXPORT_ERRORS=true next build",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",

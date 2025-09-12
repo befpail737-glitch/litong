@@ -5,6 +5,7 @@
 const nextConfig = {
   // Static export for Cloudflare Pages compatibility
   output: 'export',
+  distDir: 'out',
   trailingSlash: true,
   images: {
     unoptimized: true, // Required for static export

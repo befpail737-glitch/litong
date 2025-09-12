@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import { getProducts, getProductCategories, getSiteStats } from '@/lib/sanity/queries';
 import { urlFor } from '@/lib/sanity/client';
 
@@ -42,17 +45,36 @@ interface SiteStats {
   featuredProducts: number;
 }
 
-export default async function ProductsPage() {
-  // Fetch data from Sanity CMS
-  const [categoriesResult, productsResult, statsResult] = await Promise.all([
-    getProductCategories().catch(err => { console.error('Failed to fetch categories:', err); return []; }),
-    getProducts({ featured: true, limit: 6 }).catch(err => { console.error('Failed to fetch products:', err); return { products: [], total: 0 }; }),
-    getSiteStats().catch(err => { console.error('Failed to fetch stats:', err); return { totalProducts: 0, totalBrands: 0, totalCategories: 0, featuredProducts: 0 }; })
-  ]);
-  
-  const categories: Category[] = categoriesResult || [];
-  const { products, total }: { products: Product[], total: number } = productsResult || { products: [], total: 0 };
-  const stats: SiteStats = statsResult || { totalProducts: 0, totalBrands: 0, totalCategories: 0, featuredProducts: 0 };
+export default function ProductsPage() {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [stats, setStats] = useState<SiteStats>({ totalProducts: 0, totalBrands: 0, totalCategories: 0, featuredProducts: 0 });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Fetch data from Sanity CMS
+    Promise.all([
+      getProductCategories().catch(err => { console.error('Failed to fetch categories:', err); return []; }),
+      getProducts({ featured: true, limit: 6 }).catch(err => { console.error('Failed to fetch products:', err); return { products: [], total: 0 }; }),
+      getSiteStats().catch(err => { console.error('Failed to fetch stats:', err); return { totalProducts: 0, totalBrands: 0, totalCategories: 0, featuredProducts: 0 }; })
+    ]).then(([categoriesResult, productsResult, statsResult]) => {
+      setCategories(categoriesResult || []);
+      setProducts(productsResult?.products || []);
+      setStats(statsResult || { totalProducts: 0, totalBrands: 0, totalCategories: 0, featuredProducts: 0 });
+      setLoading(false);
+    });
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">加载产品信息...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

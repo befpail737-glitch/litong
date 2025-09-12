@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, Suspense } from 'react';
 
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -13,7 +13,8 @@ interface SearchInputProps {
   basePath: string
 }
 
-export default function SearchInput({ placeholder, defaultValue = '', locale, basePath }: SearchInputProps) {
+// 将 useSearchParams 包装在单独的组件中
+function SearchInputContent({ placeholder, defaultValue = '', locale, basePath }: SearchInputProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [searchValue, setSearchValue] = useState(defaultValue);
@@ -46,5 +47,22 @@ export default function SearchInput({ placeholder, defaultValue = '', locale, ba
         className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
       />
     </div>
+  );
+}
+
+// 主组件包装在 Suspense 中
+export default function SearchInput(props: SearchInputProps) {
+  return (
+    <Suspense fallback={<div className="relative">
+      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+      <input
+        type="text"
+        placeholder={props.placeholder}
+        disabled
+        className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full bg-gray-50"
+      />
+    </div>}>
+      <SearchInputContent {...props} />
+    </Suspense>
   );
 }

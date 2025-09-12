@@ -1,7 +1,3 @@
-import { notFound } from 'next/navigation';
-
-import { getRequestConfig } from 'next-intl/server';
-
 // 支持的语言列表
 export const locales = [
   'zh-CN', // 简体中文 (默认)
@@ -18,13 +14,18 @@ export const locales = [
 
 export type Locale = typeof locales[number];
 
-export default getRequestConfig(async ({ locale }) => {
+// 静态导出兼容的国际化配置
+export async function getMessages(locale: string) {
   // 验证传入的语言是否受支持
   if (!locales.includes(locale as Locale)) {
-    notFound();
+    // 对于静态导出，使用默认语言
+    locale = 'zh-CN';
   }
 
-  return {
-    messages: (await import(`../messages/${locale}.json`)).default
-  };
-});
+  try {
+    return (await import(`../messages/${locale}.json`)).default;
+  } catch (error) {
+    // 如果语言文件不存在，使用默认语言
+    return (await import(`../messages/zh-CN.json`)).default;
+  }
+}

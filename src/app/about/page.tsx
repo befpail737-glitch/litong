@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import { getCompanyInfo, getCompanyStats, getTeamMembers } from '@/lib/sanity/company';
 import { urlFor } from '@/lib/sanity/client';
 
@@ -48,16 +51,39 @@ interface CompanyInfo {
   isActive: boolean;
 }
 
-export default async function AboutPage() {
-  // Fetch data from Sanity CMS
-  const [companyInfo, companyStats, teamMembers] = await Promise.all([
-    getCompanyInfo().catch(err => { console.error('Failed to fetch company info:', err); return null; }),
-    getCompanyStats().catch(err => { console.error('Failed to fetch company stats:', err); return { yearsExperience: 15, employeeCount: 50, clientCount: 500, projectCount: 1000 }; }),
-    getTeamMembers().catch(err => { console.error('Failed to fetch team members:', err); return []; })
-  ]);
+export default function AboutPage() {
+  const [companyInfo, setCompanyInfo] = useState<any>(null);
+  const [companyStats, setCompanyStats] = useState<any>({ yearsExperience: 15, employeeCount: 50, clientCount: 500, projectCount: 1000 });
+  const [teamMembers, setTeamMembers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Fetch data from Sanity CMS
+    Promise.all([
+      getCompanyInfo().catch(err => { console.error('Failed to fetch company info:', err); return null; }),
+      getCompanyStats().catch(err => { console.error('Failed to fetch company stats:', err); return { yearsExperience: 15, employeeCount: 50, clientCount: 500, projectCount: 1000 }; }),
+      getTeamMembers().catch(err => { console.error('Failed to fetch team members:', err); return []; })
+    ]).then(([info, stats, members]) => {
+      setCompanyInfo(info);
+      setCompanyStats(stats);
+      setTeamMembers(members);
+      setLoading(false);
+    });
+  }, []);
 
   // Calculate years since founding
   const currentYear = new Date().getFullYear();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">加载中...</p>
+        </div>
+      </div>
+    );
+  }
   const foundedYear = companyInfo?.founded ? new Date(companyInfo.founded).getFullYear() : 2009;
   const yearsInBusiness = currentYear - foundedYear;
 

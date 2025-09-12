@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "es6"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "es6"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -19,15 +23,33 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@/components/*": ["./src/components/*"],
-      "@/lib/*": ["./src/lib/*"],
-      "@/types/*": ["./src/types/*"],
-      "@/hooks/*": ["./src/hooks/*"],
-      "@/utils/*": ["./src/utils/*"],
-      "@/styles/*": ["./src/styles/*"],
-      "@/constants/*": ["./src/constants/*"],
-      "@/config/*": ["./src/config/*"]
+      "@/*": [
+        "./src/*"
+      ],
+      "@/components/*": [
+        "./src/components/*"
+      ],
+      "@/lib/*": [
+        "./src/lib/*"
+      ],
+      "@/types/*": [
+        "./src/types/*"
+      ],
+      "@/hooks/*": [
+        "./src/hooks/*"
+      ],
+      "@/utils/*": [
+        "./src/utils/*"
+      ],
+      "@/styles/*": [
+        "./src/styles/*"
+      ],
+      "@/constants/*": [
+        "./src/constants/*"
+      ],
+      "@/config/*": [
+        "./src/config/*"
+      ]
     },
     "target": "es2017",
     "forceConsistentCasingInFileNames": true,
@@ -39,16 +61,17 @@
     "noUncheckedIndexedAccess": false
   },
   "include": [
-    "next-env.d.ts", 
-    "**/*.ts", 
-    "**/*.tsx", 
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/**/*"
+    "src/**/*",
+    "out/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules", 
-    ".next", 
-    "out", 
+    "node_modules",
+    ".next",
+    "out",
     "dist",
     "src/lib/deployment/ci-cd-pipeline.ts",
     "src/lib/performance/code-splitting.ts"

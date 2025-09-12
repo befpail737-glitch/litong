@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import { getAllBrands, getFeaturedBrands, getBrandStats } from '@/lib/sanity/brands';
 import { urlFor } from '@/lib/sanity/client';
 
@@ -21,13 +24,36 @@ interface BrandStats {
   totalProducts: number;
 }
 
-export default async function BrandsPage() {
-  // Fetch data from Sanity CMS
-  const [allBrands, featuredBrands, brandStats] = await Promise.all([
-    getAllBrands().catch(err => { console.error('Failed to fetch brands:', err); return []; }),
-    getFeaturedBrands().catch(err => { console.error('Failed to fetch featured brands:', err); return []; }),
-    getBrandStats().catch(err => { console.error('Failed to fetch brand stats:', err); return { total: 0, authorized: 0, totalProducts: 0 }; })
-  ]);
+export default function BrandsPage() {
+  const [allBrands, setAllBrands] = useState<Brand[]>([]);
+  const [featuredBrands, setFeaturedBrands] = useState<Brand[]>([]);
+  const [brandStats, setBrandStats] = useState<any>({ totalBrands: 100, activeBrands: 95, newThisMonth: 5, averageProducts: 250 });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Fetch data from Sanity CMS
+    Promise.all([
+      getAllBrands().catch(err => { console.error('Failed to fetch brands:', err); return []; }),
+      getFeaturedBrands().catch(err => { console.error('Failed to fetch featured brands:', err); return []; }),
+      getBrandStats().catch(err => { console.error('Failed to fetch brand stats:', err); return { total: 0, authorized: 0, totalProducts: 0 }; })
+    ]).then(([brands, featured, stats]) => {
+      setAllBrands(brands);
+      setFeaturedBrands(featured);
+      setBrandStats(stats);
+      setLoading(false);
+    });
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">加载品牌信息...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Group brands by categories based on their names or descriptions
   const brandCategories = {

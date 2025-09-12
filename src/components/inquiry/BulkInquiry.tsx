@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -56,7 +56,8 @@ const mockProductsData = {
   }
 };
 
-export function BulkInquiry({ initialProducts = [], onSubmit, onCancel }: BulkInquiryProps) {
+// 将 useSearchParams 包装在单独的组件中
+function BulkInquiryContent({ initialProducts = [], onSubmit, onCancel }: BulkInquiryProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -542,5 +543,14 @@ export function BulkInquiry({ initialProducts = [], onSubmit, onCancel }: BulkIn
         </div>
       </form>
     </div>
+  );
+}
+
+// 主组件包装在 Suspense 中
+export function BulkInquiry(props: BulkInquiryProps) {
+  return (
+    <Suspense fallback={<div className="p-4 text-center">加载中...</div>}>
+      <BulkInquiryContent {...props} />
+    </Suspense>
   );
 }
