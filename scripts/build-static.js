@@ -111,65 +111,77 @@ async function getBrandStatsFromSanity() {
   }
 }
 
-// 从Sanity获取按分类分组的品牌数据（与React组件相同的查询逻辑）
-async function getBrandsByCategoriesFromSanity() {
-  try {
-    const query = `{
-      "brandCategories": *[_type == "productCategory" && level == 1 && isVisible == true] | order(sortOrder asc, name asc) {
-        _id,
-        name,
-        "slug": slug.current,
-        description,
-        icon,
-        "brands": array::unique(*[_type == "product" && isActive == true && category._ref == ^._id].brand->)[defined(@) && isActive == true] | order(name asc) {
-          _id,
-          name,
-          "slug": slug.current,
-          description,
-          website,
-          country,
-          headquarters,
-          established,
-          logo,
-          isActive,
-          isFeatured
-        }
-      },
-      "allBrands": *[_type == "brandBasic" && isActive == true && !(_id in path("drafts.**"))] | order(name asc) {
-        _id,
-        name,
-        "slug": slug.current,
-        description,
-        website,
-        country,
-        headquarters,
-        established,
-        logo,
-        isActive,
-        isFeatured
+// 按首字母分组品牌（简化版本）
+function groupBrandsByFirstLetter(brands) {
+  const groups = {};
+  
+  brands.forEach(brand => {
+    const firstChar = brand.name.charAt(0).toUpperCase();
+    
+    // 判断首字符类型
+    let groupName;
+    if (/[A-Z]/.test(firstChar)) {
+      groupName = `${firstChar} 开头`;
+    } else if (/[\u4e00-\u9fa5]/.test(firstChar)) {
+      groupName = '中文品牌';
+    } else if (/[0-9]/.test(firstChar)) {
+      groupName = '数字开头';
+    } else {
+      groupName = '其他品牌';
+    }
+    
+    if (!groups[groupName]) {
+      groups[groupName] = [];
+    }
+    groups[groupName].push(brand);
+  });
+  
+  // 转换为数组格式并排序
+  return Object.entries(groups)
+    .map(([name, brands]) => ({ name, brands }))
+    .sort((a, b) => {
+      // 英文字母组排序在前，中文品牌次之，数字和其他在后
+      if (a.name.includes('开头') && b.name.includes('开头')) {
+        return a.name.localeCompare(b.name);
+      } else if (a.name.includes('开头')) {
+        return -1;
+      } else if (b.name.includes('开头')) {
+        return 1;
+      } else if (a.name === '中文品牌') {
+        return -1;
+      } else if (b.name === '中文品牌') {
+        return 1;
+      } else {
+        return a.name.localeCompare(b.name);
       }
+    });
+}
+
+// 从 Sanity 获取所有品牌数据（简化版本）
+async function getAllBrandsFromSanity() {
+  try {
+    const query = `*[_type == "brandBasic" && isActive == true && !(_id in path("drafts.**"))] | order(name asc) {
+      _id,
+      name,
+      "slug": slug.current,
+      description,
+      website,
+      country,
+      headquarters,
+      established,
+      logo,
+      isActive,
+      isFeatured
     }`;
 
-    const result = await sanityClient.fetch(query);
+    const brands = await sanityClient.fetch(query);
     
-    // 过滤掉没有品牌的分类
-    const validCategories = result?.brandCategories?.filter(cat => cat.brands && cat.brands.length > 0) || [];
+    console.log(`✅ 从Sanity获取到 ${brands?.length || 0} 个品牌`);
     
-    console.log(`✅ 从Sanity获取到 ${validCategories.length} 个有效品牌分类`);
-    validCategories.forEach(cat => {
-      console.log(`  - ${cat.name}: ${cat.brands.length} 个品牌`);
-    });
-    
-    return {
-      brandCategories: validCategories,
-      allBrands: result?.allBrands || []
-    };
+    return brands || [];
   } catch (error) {
-    console.error('❌ 获取品牌分类数据失败:', error);
-    return {
-      brandCategories: [],
-      allBrands: []
-    };
+    console.error('❌ 获取品牌数据失败:', error);
+    return [];
   }
 }
 
@@ -338,7 +350,6 @@ async function manualStaticExport() {
     const allBrands = await getAllBrandsFromSanity();
     const featuredBrands = await getFeaturedBrandsFromSanity();
     const brandStats = await getBrandStatsFromSanity();
-    const brandCategoriesData = await getBrandsByCategoriesFromSanity();
 
     // 定义页面路由映射
     const pages = [
@@ -368,8 +379,7 @@ async function manualStaticExport() {
         pageInfo.brandsData = {
           allBrands,
           featuredBrands,
-          brandStats,
-          brandCategoriesData
+          brandStats
         };
       }
       
@@ -594,12 +604,10 @@ function categorizeBrands(brands) {
 
 // 生成动态的品牌页面内容
 function generateBrandsPageContentWithData(brandsData) {
-  const { allBrands = [], featuredBrands = [], brandStats = {}, brandCategoriesData = {} } = brandsData || {};
+  const { allBrands = [], featuredBrands = [], brandStats = {} } = brandsData || {};
   
-  // 优先使用动态分类数据，如果没有则回退到硬编码分类
-  const brandCategories = brandCategoriesData.brandCategories && brandCategoriesData.brandCategories.length > 0 
-    ? brandCategoriesData.brandCategories 
-    : Object.entries(categorizeBrands(allBrands)).map(([name, brands]) => ({ name, brands }));
+  // 使用简化的品牌分组逻辑
+  const brandCategories = groupBrandsByFirstLetter(allBrands);
   
   // 使用真实统计数据或回退到默认值
   const stats = {
