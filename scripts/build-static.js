@@ -111,6 +111,146 @@ async function getBrandStatsFromSanity() {
   }
 }
 
+// 获取品牌相关产品数据
+async function getBrandProducts(brandSlug, limit = 8) {
+  try {
+    const query = `*[_type == "product" && brand->slug.current == "${brandSlug}" && isActive == true] | order(_createdAt desc) [0...${limit}] {
+      _id,
+      title,
+      partNumber,
+      shortDescription,
+      images,
+      "brand": brand-> {
+        name,
+        "slug": slug.current
+      }
+    }`;
+    
+    const products = await sanityClient.fetch(query);
+    return products || [];
+  } catch (error) {
+    console.error('Error fetching brand products:', error);
+    return [];
+  }
+}
+
+// 获取品牌相关解决方案
+async function getBrandSolutions(brandSlug, limit = 4) {
+  try {
+    const query = `*[_type == "solution" && isPublished == true && "${brandSlug}" in relatedBrands[]->slug.current] | order(publishedAt desc) [0...${limit}] {
+      _id,
+      title,
+      summary,
+      "slug": slug.current,
+      publishedAt,
+      targetMarket,
+      isFeatured,
+      heroImage,
+      "relatedBrands": relatedBrands[]-> {
+        name,
+        "slug": slug.current
+      }
+    }`;
+    
+    const solutions = await sanityClient.fetch(query);
+    return solutions || [];
+  } catch (error) {
+    console.error('Error fetching brand solutions:', error);
+    return [];
+  }
+}
+
+// 获取品牌相关文章
+async function getBrandArticles(brandSlug, limit = 4) {
+  try {
+    const query = `*[_type == "article" && isPublished == true && "${brandSlug}" in relatedBrands[]->slug.current] | order(publishedAt desc) [0...${limit}] {
+      _id,
+      title,
+      summary,
+      "slug": slug.current,
+      publishedAt,
+      readingTime,
+      "relatedBrands": relatedBrands[]-> {
+        name,
+        "slug": slug.current
+      }
+    }`;
+    
+    const articles = await sanityClient.fetch(query);
+    return articles || [];
+  } catch (error) {
+    console.error('Error fetching brand articles:', error);
+    return [];
+  }
+}
+
+// 获取品牌产品分类统计
+async function getBrandProductCategories(brandSlug) {
+  try {
+    const query = `*[_type == "product" && brand->slug.current == "${brandSlug}" && isActive == true] {
+      "category": category-> {
+        name,
+        "slug": slug.current,
+        description
+      }
+    } | order(category.name asc)`;
+    
+    const products = await sanityClient.fetch(query);
+    
+    // 统计每个分类的产品数量
+    const categoryStats = {};
+    products.forEach(product => {
+      if (product.category) {
+        const categoryName = product.category.name;
+        if (!categoryStats[categoryName]) {
+          categoryStats[categoryName] = {
+            ...product.category,
+            count: 0
+          };
+        }
+        categoryStats[categoryName].count++;
+      }
+    });
+    
+    return Object.values(categoryStats);
+  } catch (error) {
+    console.error('Error fetching brand product categories:', error);
+    return [];
+  }
+}
+
+// 获取品牌完整数据（包含相关内容）
+async function getBrandWithContent(brandSlug) {
+  try {
+    const [brand, products, solutions, articles, categories] = await Promise.all([
+      sanityClient.fetch(`*[_type == "brandBasic" && slug.current == "${brandSlug}" && isActive == true && !(_id in path("drafts.**"))][0] {
+        _id, name, description, website, country, isActive, isFeatured, "slug": slug.current, logo, headquarters, established
+      }`),
+      getBrandProducts(brandSlug, 8),
+      getBrandSolutions(brandSlug, 4),
+      getBrandArticles(brandSlug, 4),
+      getBrandProductCategories(brandSlug)
+    ]);
+
+    return {
+      brand: brand || null,
+      products: products || [],
+      solutions: solutions || [],
+      articles: articles || [],
+      categories: categories || []
+    };
+  } catch (error) {
+    console.error('Error fetching brand with content:', error);
+    return {
+      brand: null,
+      products: [],
+      solutions: [],
+      articles: [],
+      categories: []
+    };
+  }
+}
+
 // 按首字母分组品牌（简化版本）
 function groupBrandsByFirstLetter(brands) {
   const groups = {};
@@ -428,11 +568,20 @@ async function manualStaticExport() {
       brandPageCount++;
       const brandSlug = encodeURIComponent(brand.slug);
       
+      console.log(`📦 获取品牌 ${brand.name} 的完整数据...`);
+      
+      // 获取品牌完整数据（包含产品、解决方案、文章等）
+      const brandWithContent = await getBrandWithContent(brand.slug);
+      
       // 创建品牌页面信息
       const brandPageInfo = {
         route: `brands/${brandSlug}`,
         title: `${brand.name} - 力通电子合作品牌`,
-        brandData: brand
+        brandData: brandWithContent.brand || brand,
+        products: brandWithContent.products || [],
+        solutions: brandWithContent.solutions || [],
+        articles: brandWithContent.articles || [],
+        categories: brandWithContent.categories || []
       };
       
       // 生成品牌页面HTML
@@ -449,7 +598,7 @@ async function manualStaticExport() {
       
       // 写入HTML文件
       fs.writeFileSync(brandFilePath, brandHtmlContent);
-      console.log(`✅ 生成品牌页面: brands/${brandSlug}/index.html (${brand.name})`);
+      console.log(`✅ 生成品牌页面: brands/${brandSlug}/index.html (${brand.name}) - ${brandWithContent.products.length}个产品, ${brandWithContent.solutions.length}个解决方案`);
     }
     
     console.log(`✅ 成功生成 ${brandPageCount} 个品牌页面`);
@@ -1269,6 +1418,11 @@ ${jsScripts}
 // 生成品牌页面内容
 function generateBrandPageContent(brandPageInfo) {
   const brand = brandPageInfo.brandData;
+  const products = brandPageInfo.products || [];
+  const solutions = brandPageInfo.solutions || [];
+  const articles = brandPageInfo.articles || [];
+  const categories = brandPageInfo.categories || [];
+  
   const logoHTML = brand.logo ? `
     <div class="w-24 h-24 md:w-32 md:h-32 flex-shrink-0">
       <img src="${urlFor(brand.logo).width(200).height(200).url()}" alt="${brand.name}" class="w-full h-full object-contain border rounded-lg p-2">
@@ -1284,6 +1438,90 @@ function generateBrandPageContent(brandPageInfo) {
     brand.established && `<div class="flex justify-between"><span class="text-gray-500">成立时间:</span><span class="font-medium">${brand.established}</span></div>`,
     brand.headquarters && `<div class="flex justify-between"><span class="text-gray-500">总部地址:</span><span class="font-medium text-right">${brand.headquarters}</span></div>`
   ].filter(Boolean).join('');
+
+  // 生成产品分类HTML
+  const categoriesHTML = categories.length > 0 ? `
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      ${categories.map(category => `
+        <div class="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+          <h3 class="font-semibold text-gray-900 mb-2">${category.name}</h3>
+          ${category.description ? `<p class="text-gray-600 text-sm mb-2">${category.description}</p>` : ''}
+          <span class="text-blue-600 text-sm font-medium">${category.count} 个产品</span>
+        </div>
+      `).join('')}
+    </div>` : `<p class="text-gray-500">该品牌暂无产品分类信息。</p>`;
+
+  // 生成产品展示HTML
+  const productsHTML = products.length > 0 ? `
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      ${products.slice(0, 6).map(product => `
+        <div class="border rounded-lg p-4 hover:shadow-md transition-shadow">
+          ${product.images && product.images.length > 0 ? `
+            <div class="w-full h-32 mb-3 bg-gray-100 rounded overflow-hidden">
+              <img src="${urlFor(product.images[0]).width(200).height(120).url()}" 
+                   alt="${product.title}" class="w-full h-full object-contain">
+            </div>` : ''}
+          <h4 class="font-semibold text-gray-900 mb-2 line-clamp-2">${product.title}</h4>
+          ${product.partNumber ? `<p class="text-blue-600 text-sm font-mono mb-2">${product.partNumber}</p>` : ''}
+          ${product.shortDescription ? `<p class="text-gray-600 text-sm line-clamp-2">${product.shortDescription}</p>` : ''}
+        </div>
+      `).join('')}
+    </div>` : `<p class="text-gray-500">该品牌暂无产品信息。</p>`;
+
+  // 生成解决方案HTML
+  const solutionsHTML = solutions.length > 0 ? `
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      ${solutions.slice(0, 4).map(solution => `
+        <div class="border rounded-lg p-4 hover:shadow-md transition-shadow">
+          ${solution.heroImage ? `
+            <div class="w-full h-40 mb-3 bg-gray-100 rounded overflow-hidden">
+              <img src="${urlFor(solution.heroImage).width(300).height(160).url()}" 
+                   alt="${solution.title}" class="w-full h-full object-cover">
+            </div>` : ''}
+          <h4 class="font-semibold text-gray-900 mb-2">${solution.title}</h4>
+          ${solution.summary ? `<p class="text-gray-600 text-sm mb-3 line-clamp-2">${solution.summary}</p>` : ''}
+          <div class="flex justify-between items-center">
+            ${solution.targetMarket ? `
+              <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">${solution.targetMarket}</span>` : '<span></span>'}
+            ${solution.publishedAt ? `
+              <span class="text-gray-500 text-xs">${new Date(solution.publishedAt).toLocaleDateString('zh-CN')}</span>` : ''}
+          </div>
+        </div>
+      `).join('')}
+    </div>` : `<p class="text-gray-500">该品牌暂无解决方案信息。</p>`;
+
+  // 生成技术支持HTML
+  const articlesHTML = articles.length > 0 ? `
+    <div class="space-y-4">
+      ${articles.slice(0, 4).map(article => `
+        <div class="border-b last:border-b-0 pb-4 last:pb-0">
+          <h4 class="font-semibold text-gray-900 mb-2 hover:text-blue-600 cursor-pointer">${article.title}</h4>
+          ${article.summary ? `<p class="text-gray-600 text-sm mb-2 line-clamp-2">${article.summary}</p>` : ''}
+          <div class="flex justify-between items-center text-xs text-gray-500">
+            ${article.publishedAt ? `<span>${new Date(article.publishedAt).toLocaleDateString('zh-CN')}</span>` : '<span></span>'}
+            ${article.readingTime ? `<span>阅读时间: ${article.readingTime}分钟</span>` : ''}
+          </div>
+        </div>
+      `).join('')}
+    </div>` : `
+    <div class="space-y-4">
+      <div class="border-b pb-4">
+        <h4 class="font-semibold text-gray-900 mb-2">📖 产品资料下载</h4>
+        <p class="text-gray-600 text-sm">提供完整的产品规格书、应用指南和技术文档下载。</p>
+      </div>
+      <div class="border-b pb-4">
+        <h4 class="font-semibold text-gray-900 mb-2">🔧 技术支持服务</h4>
+        <p class="text-gray-600 text-sm">专业工程师提供选型建议、设计支持和技术咨询服务。</p>
+      </div>
+      <div class="border-b pb-4">
+        <h4 class="font-semibold text-gray-900 mb-2">📧 在线技术咨询</h4>
+        <p class="text-gray-600 text-sm">通过邮件或在线客服获得快速的技术问题解答。</p>
+      </div>
+      <div class="pb-4">
+        <h4 class="font-semibold text-gray-900 mb-2">🎓 技术培训</h4>
+        <p class="text-gray-600 text-sm">定期举办产品培训和技术研讨会，提升工程师技能。</p>
+      </div>
+    </div>`;
 
   return `
     <div class="min-h-screen bg-gray-50">
@@ -1311,15 +1549,45 @@ function generateBrandPageContent(brandPageInfo) {
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <!-- 主要内容区域 -->
           <div class="lg:col-span-2">
+            <!-- 品牌介绍 -->
             <div class="bg-white rounded-lg shadow p-6 mb-6">
               <h2 class="text-2xl font-bold text-gray-900 mb-4">品牌介绍</h2>
               <div class="prose prose-gray max-w-none">
                 ${brand.description ? `<p class="text-gray-600 leading-relaxed">${brand.description}</p>` : '<p class="text-gray-500">暂无详细介绍。</p>'}
               </div>
             </div>
-            <div class="bg-white rounded-lg shadow p-6">
+
+            <!-- 产品分类 -->
+            <div class="bg-white rounded-lg shadow p-6 mb-6">
               <h2 class="text-2xl font-bold text-gray-900 mb-4">产品分类</h2>
-              <p class="text-gray-500">产品分类信息即将推出...</p>
+              ${categoriesHTML}
+            </div>
+
+            <!-- 产品展示 -->
+            <div class="bg-white rounded-lg shadow p-6 mb-6">
+              <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-900">热门产品</h2>
+                ${products.length > 0 ? `<a href="/products?brand=${encodeURIComponent(brand.slug || brand.name)}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">查看全部 →</a>` : ''}
+              </div>
+              ${productsHTML}
+            </div>
+
+            <!-- 解决方案 -->
+            <div class="bg-white rounded-lg shadow p-6 mb-6">
+              <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-900">解决方案</h2>
+                ${solutions.length > 0 ? `<a href="/solutions?brand=${encodeURIComponent(brand.slug || brand.name)}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">查看全部 →</a>` : ''}
+              </div>
+              ${solutionsHTML}
+            </div>
+
+            <!-- 技术文章 -->
+            <div class="bg-white rounded-lg shadow p-6">
+              <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-900">技术支持</h2>
+                ${articles.length > 0 ? `<a href="/articles?brand=${encodeURIComponent(brand.slug || brand.name)}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">查看全部 →</a>` : ''}
+              </div>
+              ${articlesHTML}
             </div>
           </div>
 

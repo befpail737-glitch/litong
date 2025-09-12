@@ -1,4 +1,5 @@
 import { client, GROQ_FRAGMENTS } from './client';
+import { getProducts, getSolutions, getArticles } from './queries';
 
 export interface Brand {
   _id: string
@@ -196,6 +197,126 @@ export async function getBrandStats() {
       total: 0,
       authorized: 0,
       totalProducts: 0,
+    };
+  }
+}
+
+// 获取品牌相关产品
+export async function getBrandProducts(brandSlug: string, limit = 12) {
+  try {
+    const result = await getProducts({ brand: brandSlug, limit });
+    return result.products || [];
+  } catch (error) {
+    console.error('Error fetching brand products:', error);
+    return [];
+  }
+}
+
+// 获取品牌相关解决方案
+export async function getBrandSolutions(brandSlug: string, limit = 6) {
+  try {
+    // 由于解决方案查询函数不直接支持品牌筛选，我们需要自定义查询
+    const query = `*[_type == "solution" && isPublished == true && "${brandSlug}" in relatedBrands[]->slug.current] | order(publishedAt desc) [0...${limit}] {
+      _id,
+      title,
+      summary,
+      "slug": slug.current,
+      publishedAt,
+      targetMarket,
+      isFeatured,
+      heroImage,
+      "relatedBrands": relatedBrands[]-> {
+        name,
+        "slug": slug.current
+      }
+    }`;
+    
+    const solutions = await client.fetch(query);
+    return solutions || [];
+  } catch (error) {
+    console.error('Error fetching brand solutions:', error);
+    return [];
+  }
+}
+
+// 获取品牌相关技术文章
+export async function getBrandArticles(brandSlug: string, limit = 6) {
+  try {
+    const result = await getArticles({ brand: brandSlug, limit });
+    return result.articles || [];
+  } catch (error) {
+    console.error('Error fetching brand articles:', error);
+    return [];
+  }
+}
+
+// 获取品牌产品分类统计
+export async function getBrandProductCategories(brandSlug: string) {
+  try {
+    const query = `*[_type == "product" && brand->slug.current == "${brandSlug}" && isActive == true] {
+      "category": category-> {
+        name,
+        "slug": slug.current,
+        description
+      }
+    } | order(category.name asc)`;
+    
+    const products = await client.fetch(query);
+    
+    // 统计每个分类的产品数量
+    const categoryStats = {};
+    products.forEach(product => {
+      if (product.category) {
+        const categoryName = product.category.name;
+        if (!categoryStats[categoryName]) {
+          categoryStats[categoryName] = {
+            ...product.category,
+            count: 0
+          };
+        }
+        categoryStats[categoryName].count++;
+      }
+    });
+    
+    return Object.values(categoryStats);
+  } catch (error) {
+    console.error('Error fetching brand product categories:', error);
+    return [];
+  }
+}
+
+// 获取品牌完整数据（包含相关内容）
+export async function getBrandWithContent(brandSlug: string) {
+  try {
+    const [
+      brand,
+      products,
+      solutions,
+      articles,
+      categories
+    ] = await Promise.all([
+      getBrandData(brandSlug),
+      getBrandProducts(brandSlug, 8),
+      getBrandSolutions(brandSlug, 4),
+      getBrandArticles(brandSlug, 4),
+      getBrandProductCategories(brandSlug)
+    ]);
+
+    return {
+      brand,
+      products,
+      solutions,
+      articles,
+      categories
+    };
+  } catch (error) {
+    console.error('Error fetching brand with content:', error);
+    return {
+      brand: null,
+      products: [],
+      solutions: [],
+      articles: [],
+      categories: []
     };
   }
 }
