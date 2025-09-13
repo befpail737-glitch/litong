@@ -600,12 +600,18 @@ async function manualStaticExport() {
     ];
 
     for (const pageInfo of pages) {
+      // 跳过 studio 页面的静态生成，使用独立构建的 Sanity Studio
+      if (pageInfo.route === 'studio') {
+        console.log(`📄 跳过页面: ${pageInfo.route} (使用独立构建的 Sanity Studio)`);
+        continue;
+      }
+
       console.log(`📄 生成页面: ${pageInfo.route}`);
-      
+
       // 获取页面特定的资源
       const pageAssets = appManifest.pages?.[pageInfo.manifestKey] || [];
       const pageJsFiles = pageAssets.filter(asset => asset.endsWith('.js'));
-      
+
       // 按正确顺序合并所有JS文件
       const allJsFiles = [
         ...polyfillFiles,
@@ -613,7 +619,7 @@ async function manualStaticExport() {
         ...sharedJsFiles,
         ...pageJsFiles
       ].filter((file, index, arr) => arr.indexOf(file) === index); // 去重
-      
+
       // 为brands页面附加品牌数据
       if (pageInfo.route === 'brands') {
         pageInfo.brandsData = {
@@ -1663,7 +1669,8 @@ function generatePageContent(pageInfo) {
     case 'admin':
       return generateAdminPageContent();
     case 'studio':
-      return generateStudioPageContent();
+      // 跳过静态生成，使用独立构建的 Sanity Studio
+      return null;
     default:
       return `
         <section class="py-16 bg-white">
@@ -2568,24 +2575,36 @@ function copyDirectory(src, dest) {
 // 增强的主函数
 async function enhancedMain() {
   try {
-    // 先执行原有的构建流程
-    await main();
-
-    // 然后构建和部署 Sanity Studio
-    console.log('\n🎨 开始构建 Sanity Studio...');
+    // 第一步：先构建 Sanity Studio
+    console.log('\n🎨 步骤1: 构建 Sanity Studio...');
 
     try {
       await buildSanityStudio();
+      console.log('✅ Sanity Studio 构建完成');
+    } catch (error) {
+      console.error('❌ Sanity Studio 构建失败:', error);
+      console.log('⚠️  继续执行，但将使用 fallback Studio 页面');
+    }
+
+    // 第二步：执行 Next.js 构建流程（跳过 studio 页面）
+    console.log('\n🏗️  步骤2: 执行 Next.js 构建流程...');
+    await main();
+
+    // 第三步：复制 Sanity Studio 文件到输出目录
+    console.log('\n📁 步骤3: 集成 Sanity Studio 文件...');
+
+    try {
       const studioDeployed = await copySanityStudioFiles();
 
       if (studioDeployed) {
         console.log('✅ Sanity Studio 已成功集成到静态构建中');
+        console.log('🎯 生产环境将显示完整的 Sanity Studio 界面');
       } else {
-        console.log('⚠️  Sanity Studio 使用 fallback 页面');
+        console.log('⚠️  Sanity Studio 文件复制失败，使用 fallback 页面');
       }
     } catch (error) {
-      console.error('❌ Sanity Studio 构建失败:', error);
-      console.log('⚠️  继续使用 fallback Studio 页面');
+      console.error('❌ Sanity Studio 文件复制失败:', error);
+      console.log('⚠️  生产环境将显示开发环境提示');
     }
 
     console.log('\n🎉 完整构建流程已完成！');
