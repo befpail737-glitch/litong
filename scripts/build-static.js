@@ -595,7 +595,8 @@ async function manualStaticExport() {
       { route: 'about', manifestKey: '/about/page', title: '关于我们 - 力通电子' },
       { route: 'brands', manifestKey: '/brands/page', title: '合作品牌 - 力通电子' },
       { route: 'products', manifestKey: '/products/page', title: '产品中心 - 力通电子' },
-      { route: 'admin', manifestKey: '/admin/page', title: '管理后台 - 力通电子' }
+      { route: 'admin', manifestKey: '/admin/page', title: '管理后台 - 力通电子' },
+      { route: 'studio', manifestKey: '/studio/[[...tool]]/page', title: 'Sanity Studio - 力通电子' }
     ];
 
     for (const pageInfo of pages) {
@@ -1567,6 +1568,60 @@ function generateAdminPageContent() {
     </div>`;
 }
 
+// 生成Studio页面内容 - 重定向到独立Sanity Studio
+function generateStudioPageContent() {
+  return `
+    <div id="__next">
+      <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div class="max-w-md mx-auto bg-white rounded-2xl shadow-xl p-8 text-center">
+          <div class="w-16 h-16 bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          </div>
+
+          <h1 class="text-2xl font-bold text-gray-900 mb-4">Sanity Studio</h1>
+          <p class="text-gray-600 mb-6">内容管理系统正在启动中...</p>
+
+          <div class="space-y-4">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div class="flex items-center space-x-2">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p class="text-sm text-blue-800 font-medium">开发环境</p>
+              </div>
+              <p class="text-xs text-blue-700 mt-2">
+                请确保本地开发服务器正在运行，然后访问：
+                <br><strong>http://localhost:3333</strong>
+              </p>
+            </div>
+
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+              <div class="flex items-center space-x-2 mb-2">
+                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <p class="text-sm text-gray-700 font-medium">启动命令</p>
+              </div>
+              <code class="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded font-mono">npm run sanity:dev</code>
+            </div>
+          </div>
+
+          <div class="mt-6 pt-6 border-t border-gray-200">
+            <a href="/admin" class="inline-flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              <span class="text-sm font-medium">返回管理后台</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
 // 根据页面类型生成对应的内容
 function generatePageContent(pageInfo) {
   switch (pageInfo.route) {
@@ -1607,6 +1662,8 @@ function generatePageContent(pageInfo) {
         </section>`;
     case 'admin':
       return generateAdminPageContent();
+    case 'studio':
+      return generateStudioPageContent();
     default:
       return `
         <section class="py-16 bg-white">
@@ -1628,7 +1685,7 @@ function generatePageHTML(title, cssFiles, jsFiles, pageInfo) {
 
   const contentHTML = generatePageContent(pageInfo);
 
-  // Admin页面使用不同的HTML结构，不包含标准的header/footer
+  // Admin和Studio页面使用不同的HTML结构，不包含标准的header/footer
   if (pageInfo.route === 'admin') {
     return `<!DOCTYPE html>
 <html lang="zh-CN" class="font-sans">
@@ -1643,6 +1700,25 @@ ${cssLinks}
 <body class="font-sans antialiased bg-white text-gray-900">
   ${contentHTML}
   <script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{}},"page":"/admin","query":{},"buildId":"${Date.now()}","nextExport":true,"autoExport":true,"isFallback":false,"scriptLoader":[]}</script>
+${jsScripts}
+</body>
+</html>`;
+  }
+
+  if (pageInfo.route === 'studio') {
+    return `<!DOCTYPE html>
+<html lang="zh-CN" class="font-sans">
+<head>
+  <meta charset="utf-8">
+  <title>${title}</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="力通电子Sanity Studio内容管理系统">
+  <meta name="next-head-count" content="4">
+${cssLinks}
+</head>
+<body class="font-sans antialiased bg-white text-gray-900">
+  ${contentHTML}
+  <script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{}},"page":"/studio","query":{},"buildId":"${Date.now()}","nextExport":true,"autoExport":true,"isFallback":false,"scriptLoader":[]}</script>
 ${jsScripts}
 </body>
 </html>`;
