@@ -28,7 +28,7 @@
    - **Name**: `Cloudflare Pages Auto Deploy`
    - **URL**: 粘贴步骤1中的Webhook URL
    - **Trigger on**: `Create`, `Update`, `Delete`
-   - **Filter**: `_type == "brandBasic"` (只针对品牌变更)
+   - **Filter**: `_type in ["brandBasic", "product"]` (针对品牌和产品变更)
    - **HTTP method**: `POST`
    - **HTTP headers**: 
      ```
@@ -40,7 +40,7 @@
 如果需要更精细的控制，可以添加条件过滤:
 
 ```groq
-_type == "brandBasic" && (
+_type in ["brandBasic", "product", "solution", "article"] && (
   _rev != _originalRev || 
   defined(_originalRev) == false ||
   wasDeleted() == true
@@ -49,14 +49,14 @@ _type == "brandBasic" && (
 
 ### 4. 测试Webhook
 
-1. 在Sanity Studio中添加/修改一个品牌
+1. 在Sanity Studio中添加/修改品牌或产品
 2. 检查Cloudflare Pages是否自动开始构建
 3. 构建完成后验证生产环境是否反映变更
 
 ## 工作原理
 
 ```
-[Sanity CMS] ---(品牌数据变更)---> [Webhook触发] 
+[Sanity CMS] ---(品牌/产品数据变更)---> [Webhook触发] 
      ↓
 [Cloudflare Pages] ---(自动构建)---> [更新生产环境]
      ↓
@@ -65,7 +65,7 @@ _type == "brandBasic" && (
 
 ## 预期效果
 
-- ✅ 后台添加品牌后2-5分钟自动部署
+- ✅ 后台添加品牌/产品后2-5分钟自动部署
 - ✅ 保持静态站点高性能优势
 - ✅ 无需手动触发重新构建
 - ✅ SEO和缓存优化不受影响
