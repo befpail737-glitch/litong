@@ -638,6 +638,13 @@ async function manualStaticExport() {
       
       fs.writeFileSync(filePath, htmlContent);
       console.log(`✅ 导出 ${filename} (${allJsFiles.length} JS文件, ${cssFiles.length} CSS文件)`);
+
+      // 为 admin 页面创建直接文件以避免 Cloudflare 重定向循环检测
+      if (pageInfo.route === 'admin') {
+        const directAdminFile = path.join(outDir, 'admin.html');
+        fs.writeFileSync(directAdminFile, htmlContent);
+        console.log('✅ 创建直接 admin.html 文件以避免重定向循环');
+      }
     }
 
     // 生成个人品牌页面
@@ -2491,6 +2498,12 @@ async function copySanityStudioFiles() {
       const content = fs.readFileSync(indexFile, 'utf8');
       if (content.includes('Sanity Studio') && content.includes('<div id="sanity">')) {
         console.log('✅ Sanity Studio 文件复制完成且内容正确');
+
+        // 创建直接文件以避免 Cloudflare 重定向循环检测
+        const directStudioFile = path.join(process.cwd(), 'out', 'studio.html');
+        fs.copyFileSync(indexFile, directStudioFile);
+        console.log('✅ 创建直接 studio.html 文件以避免重定向循环');
+
         return true;
       } else {
         console.warn('⚠️  复制的文件内容不正确');
