@@ -181,7 +181,7 @@ async function getBrandProducts(brandSlug, limit = 8) {
 // 获取品牌相关解决方案
 async function getBrandSolutions(brandSlug, limit = 4) {
   try {
-    const query = `*[_type == "solution" && isPublished == true && "${brandSlug}" in relatedBrands[]->slug.current] | order(publishedAt desc) [0...${limit}] {
+    const query = `*[_type == "solution" && isPublished == true && ("${brandSlug}" in relatedBrands[]->slug.current || primaryBrand->slug.current == "${brandSlug}")] | order(publishedAt desc) [0...${limit}] {
       _id,
       title,
       summary,
