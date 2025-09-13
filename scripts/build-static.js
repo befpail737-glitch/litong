@@ -2478,4 +2478,122 @@ function getSubPageKeywords(pageType) {
   return '';
 }
 
-main();
+// 构建独立的Sanity Studio
+async function buildSanityStudio() {
+  console.log('🏗️  构建 Sanity Studio...');
+
+  return new Promise((resolve, reject) => {
+    const buildProcess = spawn('npm', ['run', 'sanity:build'], {
+      stdio: 'pipe',
+      shell: true,
+      cwd: process.cwd()
+    });
+
+    let output = '';
+    buildProcess.stdout.on('data', (data) => {
+      const text = data.toString();
+      output += text;
+      if (text.trim()) console.log(text.trim());
+    });
+
+    buildProcess.stderr.on('data', (data) => {
+      const text = data.toString();
+      if (text.trim()) console.error(text.trim());
+    });
+
+    buildProcess.on('close', (code) => {
+      if (code === 0) {
+        console.log('✅ Sanity Studio 构建完成');
+        resolve(output);
+      } else {
+        console.error(`❌ Sanity Studio 构建失败，退出码: ${code}`);
+        reject(new Error(`Sanity build failed with code ${code}`));
+      }
+    });
+  });
+}
+
+// 复制Sanity Studio构建文件到输出目录
+async function copySanityStudioFiles() {
+  console.log('📁 复制 Sanity Studio 文件...');
+
+  const studioSrcDir = path.join(process.cwd(), 'dist');
+  const studioDestDir = path.join(process.cwd(), 'out', 'studio');
+
+  try {
+    // 检查源目录是否存在
+    if (!fs.existsSync(studioSrcDir)) {
+      console.warn('⚠️  Sanity Studio 构建目录不存在，将生成 fallback 页面');
+      return false;
+    }
+
+    // 创建目标目录
+    if (!fs.existsSync(studioDestDir)) {
+      fs.mkdirSync(studioDestDir, { recursive: true });
+    }
+
+    // 复制文件
+    await copyDirectory(studioSrcDir, studioDestDir);
+
+    console.log('✅ Sanity Studio 文件复制完成');
+    return true;
+  } catch (error) {
+    console.error('❌ 复制 Sanity Studio 文件失败:', error);
+    return false;
+  }
+}
+
+// 递归复制目录的辅助函数
+function copyDirectory(src, dest) {
+  if (!fs.existsSync(dest)) {
+    fs.mkdirSync(dest, { recursive: true });
+  }
+
+  const items = fs.readdirSync(src);
+
+  for (const item of items) {
+    const srcPath = path.join(src, item);
+    const destPath = path.join(dest, item);
+
+    const stat = fs.statSync(srcPath);
+
+    if (stat.isDirectory()) {
+      copyDirectory(srcPath, destPath);
+    } else {
+      fs.copyFileSync(srcPath, destPath);
+    }
+  }
+}
+
+// 增强的主函数
+async function enhancedMain() {
+  try {
+    // 先执行原有的构建流程
+    await main();
+
+    // 然后构建和部署 Sanity Studio
+    console.log('\n🎨 开始构建 Sanity Studio...');
+
+    try {
+      await buildSanityStudio();
+      const studioDeployed = await copySanityStudioFiles();
+
+      if (studioDeployed) {
+        console.log('✅ Sanity Studio 已成功集成到静态构建中');
+      } else {
+        console.log('⚠️  Sanity Studio 使用 fallback 页面');
+      }
+    } catch (error) {
+      console.error('❌ Sanity Studio 构建失败:', error);
+      console.log('⚠️  继续使用 fallback Studio 页面');
+    }
+
+    console.log('\n🎉 完整构建流程已完成！');
+
+  } catch (error) {
+    console.error('❌ 构建过程中发生错误:', error);
+    process.exit(1);
+  }
+}
+
+enhancedMain();
