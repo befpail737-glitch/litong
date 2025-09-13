@@ -257,24 +257,8 @@ export async function getBrandProducts(brandSlug: string, limit = 12) {
 // 获取品牌相关解决方案
 export async function getBrandSolutions(brandSlug: string, limit = 6) {
   try {
-    // 由于解决方案查询函数不直接支持品牌筛选，我们需要自定义查询
-    const query = `*[_type == "solution" && isPublished == true && "${brandSlug}" in relatedBrands[]->slug.current] | order(publishedAt desc) [0...${limit}] {
-      _id,
-      title,
-      summary,
-      "slug": slug.current,
-      publishedAt,
-      targetMarket,
-      isFeatured,
-      heroImage,
-      "relatedBrands": relatedBrands[]-> {
-        name,
-        "slug": slug.current
-      }
-    }`;
-    
-    const solutions = await client.fetch(query);
-    return solutions || [];
+    const result = await getSolutions({ brand: brandSlug, limit });
+    return result.solutions || [];
   } catch (error) {
     console.error('Error fetching brand solutions:', error);
     return [];

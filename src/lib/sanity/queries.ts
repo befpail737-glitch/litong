@@ -237,6 +237,7 @@ export async function getSolutions(params: {
   limit?: number
   offset?: number
   targetMarket?: string
+  brand?: string
   featured?: boolean
   preview?: boolean
 } = {}) {
@@ -244,14 +245,19 @@ export async function getSolutions(params: {
     limit = 10,
     offset = 0,
     targetMarket,
+    brand,
     featured,
     preview = false
   } = params;
 
-  let filter = '_type == "solution" && isPublished == true && !(_id in path("drafts.**"))';
+  let filter = '_type == "solution" && isPublished == true';
 
   if (targetMarket) {
     filter += ` && targetMarket == "${targetMarket}"`;
+  }
+
+  if (brand) {
+    filter += ` && ("${brand}" in relatedBrands[]->slug.current || primaryBrand->slug.current == "${brand}")`;
   }
 
   if (featured) {
@@ -269,7 +275,7 @@ export async function getSolutions(params: {
 
   try {
     console.log('Fetching solutions with query:', query);
-    console.log('Query parameters:', { limit, offset, targetMarket, featured });
+    console.log('Query parameters:', { limit, offset, targetMarket, brand, featured });
     const result = await withRetry(() => client.fetch(query));
     console.log('Solutions fetch result:', {
       totalSolutions: result.total,
@@ -286,7 +292,7 @@ export async function getSolutions(params: {
 // 获取单个解决方案
 export async function getSolution(slug: string, preview = false) {
   const query = groq`
-    *[_type == "solution" && slug.current == $slug && isPublished == true && !(_id in path("drafts.**"))][0] {
+    *[_type == "solution" && slug.current == $slug && isPublished == true][0] {
       ${GROQ_FRAGMENTS.solution}
     }
   `;
