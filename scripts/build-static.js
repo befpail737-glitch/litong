@@ -353,10 +353,64 @@ async function copyDirectory(src, dest) {
   }
 }
 
-// 删除目录
-function removeDirectory(dirPath) {
-  if (fs.existsSync(dirPath)) {
-    fs.rmSync(dirPath, { recursive: true, force: true });
+// 安全删除目录，带重试机制
+async function removeDirectory(dirPath) {
+  if (!fs.existsSync(dirPath)) {
+    return;
+  }
+
+  const maxRetries = 5;
+  const delay = 1000; // 1秒
+
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      // 首先尝试删除目录
+      fs.rmSync(dirPath, { recursive: true, force: true });
+      return;
+    } catch (error) {
+      if (error.code === 'EBUSY' || error.code === 'ENOTEMPTY' || error.code === 'EPERM') {
+        console.log(`⚠️  目录 ${dirPath} 正在被占用，等待 ${delay}ms 后重试... (${i + 1}/${maxRetries})`);
+        
+        // 等待一段时间后重试
+        await new Promise(resolve => setTimeout(resolve, delay));
+        
+        // 如果是最后一次尝试，使用更激进的方法
+        if (i === maxRetries - 1) {
+          try {
+            // 尝试使用系统命令强制删除 (Windows)
+            if (process.platform === 'win32') {
+              await new Promise((resolve, reject) => {
+                exec(`rmdir /s /q "${path.resolve(dirPath)}"`, (error) => {
+                  if (error && !error.message.includes('cannot find')) {
+                    reject(error);
+                  } else {
+                    resolve();
+                  }
+                });
+              });
+            } else {
+              // Unix/Linux
+              await new Promise((resolve, reject) => {
+                exec(`rm -rf "${path.resolve(dirPath)}"`, (error) => {
+                  if (error) {
+                    reject(error);
+                  } else {
+                    resolve();
+                  }
+                });
+              });
+            }
+            return;
+          } catch (cmdError) {
+            console.log(`❌ 无法删除目录 ${dirPath}: ${cmdError.message}`);
+            console.log(`⚠️  继续构建，但可能需要手动清理此目录`);
+            return;
+          }
+        }
+      } else {
+        throw error;
+      }
+    }
   }
 }
 
@@ -599,6 +653,33 @@ async function manualStaticExport() {
       // 写入HTML文件
       fs.writeFileSync(brandFilePath, brandHtmlContent);
       console.log(`✅ 生成品牌页面: brands/${brandSlug}/index.html (${brand.name}) - ${brandWithContent.products.length}个产品, ${brandWithContent.solutions.length}个解决方案`);
+
+      // 生成品牌子页面
+      const subPages = ['products', 'solutions', 'support'];
+      for (const subPage of subPages) {
+        const subPageInfo = {
+          ...brandPageInfo,
+          route: `brands/${brandSlug}/${subPage}`,
+          title: `${brand.name} ${subPage === 'products' ? '产品分类' : subPage === 'solutions' ? '解决方案' : '技术支持'} - 力通电子`,
+          pageType: subPage
+        };
+
+        // 生成子页面HTML
+        const subPageHtmlContent = generateBrandSubPageHTML(subPageInfo.title, cssFiles, brandPageAllJsFiles, subPageInfo);
+        
+        // 创建子页面文件路径
+        const subPageFilePath = path.join('out', 'brands', brandSlug, subPage, 'index.html');
+        const subPageDir = path.dirname(subPageFilePath);
+        
+        // 创建子页面目录
+        if (!fs.existsSync(subPageDir)) {
+          fs.mkdirSync(subPageDir, { recursive: true });
+        }
+        
+        // 写入子页面HTML文件
+        fs.writeFileSync(subPageFilePath, subPageHtmlContent);
+        console.log(`  ✅ 生成子页面: brands/${brandSlug}/${subPage}/index.html`);
+      }
     }
     
     console.log(`✅ 成功生成 ${brandPageCount} 个品牌页面`);
@@ -1415,6 +1496,42 @@ ${jsScripts}
 </html>`;
 }
 
+// 生成品牌子页面HTML内容
+function generateBrandSubPageHTML(title, cssFiles, jsFiles, subPageInfo) {
+  const cssLinks = cssFiles.map(css => `  <link rel="stylesheet" href="/_next/${css}">`).join('\n');
+  const jsScripts = jsFiles.map(js => `  <script src="/_next/${js}" defer></script>`).join('\n');
+  
+  const brandNavigationHTML = generateBrandNavigationHTML(subPageInfo.brandData);
+  const footerHTML = generateFooterHTML();
+  const subPageContentHTML = generateBrandSubPageContent(subPageInfo);
+  
+  return `<!DOCTYPE html>
+<html lang="zh-CN" class="font-sans">
+<head>
+  <meta charset="utf-8">
+  <title>${title}</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="${getSubPageDescription(subPageInfo)}">
+  <meta name="keywords" content="${subPageInfo.brandData.name}, ${getSubPageKeywords(subPageInfo.pageType)}, 电子元器件, ${subPageInfo.brandData.country || ''}">
+  <meta name="next-head-count" content="5">
+${cssLinks}
+</head>
+<body class="font-sans antialiased bg-white text-gray-900">
+  <div id="__next">
+    <div class="min-h-screen bg-gray-50">
+      ${brandNavigationHTML}
+      <main>
+        ${subPageContentHTML}
+      </main>
+      ${footerHTML}
+    </div>
+  </div>
+  <script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{"brand":${JSON.stringify(subPageInfo.brandData).replace(/"/g, '&quot;')}}},"page":"/brands/[slug]/${subPageInfo.pageType}","query":{"slug":"${subPageInfo.brandData.slug}"},"buildId":"${Date.now()}","nextExport":true,"autoExport":true,"isFallback":false,"scriptLoader":[]}</script>
+${jsScripts}
+</body>
+</html>`;
+}
+
 // 生成品牌页面内容
 function generateBrandPageContent(brandPageInfo) {
   const brand = brandPageInfo.brandData;
@@ -1628,9 +1745,9 @@ async function main() {
     // 步骤1: 清理旧的构建文件
     console.log('🧹 清理旧的构建文件...');
     console.log('📝 清理 out 目录...');
-    removeDirectory('out');
+    await removeDirectory('out');
     console.log('📝 清理 .next 目录...');
-    removeDirectory('.next');
+    await removeDirectory('.next');
 
     // 步骤2: 尝试正常构建
     try {
@@ -1675,6 +1792,374 @@ async function main() {
     console.error('❌ 构建过程失败:', error);
     process.exit(1);
   }
+}
+
+// 生成品牌导航HTML
+function generateBrandNavigationHTML(brand) {
+  const baseUrl = `/brands/${encodeURIComponent(brand.slug || brand.name)}`;
+  const logoHTML = brand.logo ? `
+    <div class="w-12 h-12 flex-shrink-0">
+      <img src="${urlFor(brand.logo).width(60).height(60).url()}" alt="${brand.name}" class="w-full h-full object-contain rounded-lg border p-1">
+    </div>` : '';
+
+  return `
+    <header class="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+      <!-- Top Bar - Back to main site -->
+      <div class="bg-gray-100 border-b border-gray-200">
+        <div class="container mx-auto px-4">
+          <div class="flex items-center justify-between h-10 text-sm">
+            <a href="/" class="text-gray-600 hover:text-blue-600 transition-colors">← 返回力通电子主站</a>
+            <div class="text-gray-500">${brand.country ? `来自 ${brand.country}` : ''}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Brand Header -->
+      <div class="container mx-auto px-4">
+        <div class="flex items-center justify-between h-20">
+          <!-- Brand Logo & Info -->
+          <div class="flex items-center space-x-4">
+            ${logoHTML}
+            <div>
+              <h1 class="text-xl font-bold text-gray-900">${brand.name}</h1>
+              ${brand.description ? `<p class="text-sm text-gray-600 max-w-md truncate">${brand.description}</p>` : ''}
+            </div>
+          </div>
+
+          <!-- Desktop Navigation -->
+          <nav class="hidden md:flex items-center space-x-8">
+            <a href="${baseUrl}" class="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+              </svg>
+              <span>品牌首页</span>
+            </a>
+            <a href="${baseUrl}/products" class="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"></path>
+              </svg>
+              <span>产品分类</span>
+            </a>
+            <a href="${baseUrl}/solutions" class="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+              <span>解决方案</span>
+            </a>
+            <a href="${baseUrl}/support" class="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span>技术支持</span>
+            </a>
+          </nav>
+
+          <!-- Actions -->
+          <div class="hidden md:flex items-center space-x-4">
+            ${brand.website ? `
+              <a href="${brand.website}" target="_blank" rel="noopener noreferrer" 
+                 class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-50 transition-colors">
+                官方网站
+              </a>` : ''}
+            <a href="/inquiry" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition-colors">
+              立即询价
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>`;
+}
+
+// 生成品牌子页面内容
+function generateBrandSubPageContent(subPageInfo) {
+  const { brandData, pageType, products, solutions, articles, categories } = subPageInfo;
+  const baseUrl = `/brands/${encodeURIComponent(brandData.slug || brandData.name)}`;
+  
+  if (pageType === 'products') {
+    return generateProductsPageContent(brandData, products, categories, baseUrl);
+  } else if (pageType === 'solutions') {
+    return generateSolutionsPageContent(brandData, solutions, baseUrl);
+  } else if (pageType === 'support') {
+    return generateSupportPageContent(brandData, articles, baseUrl);
+  }
+  
+  return '<div class="container mx-auto px-4 py-8"><p>页面内容正在开发中...</p></div>';
+}
+
+// 生成产品页面内容
+function generateProductsPageContent(brand, products, categories, baseUrl) {
+  const categoriesHTML = categories.length > 0 ? `
+    <div class="space-y-2">
+      ${categories.map(category => `
+        <div class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+          <div>
+            <h4 class="font-medium text-gray-900">${category.name}</h4>
+            ${category.description ? `<p class="text-sm text-gray-500 mt-1">${category.description}</p>` : ''}
+          </div>
+          <span class="text-sm text-blue-600 font-medium">${category.count}</span>
+        </div>
+      `).join('')}
+    </div>` : `
+    <div class="text-center py-8">
+      <svg class="h-12 w-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"></path>
+      </svg>
+      <p class="text-gray-500">暂无分类信息</p>
+    </div>`;
+
+  const productsHTML = products.length > 0 ? `
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      ${products.map(product => `
+        <div class="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-6">
+          ${product.images && product.images.length > 0 ? `
+            <div class="w-full h-48 mb-4 bg-gray-50 rounded-lg overflow-hidden">
+              <img src="${urlFor(product.images[0]).width(300).height(200).url()}" 
+                   alt="${product.title}" class="w-full h-full object-contain">
+            </div>` : ''}
+          <div>
+            <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">${product.title}</h3>
+            ${product.partNumber ? `<p class="text-blue-600 text-sm font-mono mb-2">${product.partNumber}</p>` : ''}
+            ${product.shortDescription ? `<p class="text-gray-600 text-sm mb-4 line-clamp-2">${product.shortDescription}</p>` : ''}
+            <div class="flex space-x-2">
+              <a href="/products/${product.slug || product._id}" 
+                 class="flex-1 bg-blue-600 text-white text-center py-2 px-4 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors">
+                查看详情
+              </a>
+              <button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-50 transition-colors">
+                询价
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    </div>` : `
+    <div class="text-center py-16">
+      <svg class="h-16 w-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"></path>
+      </svg>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">暂无产品信息</h3>
+      <p class="text-gray-500 mb-6">该品牌的产品信息正在完善中，敬请期待</p>
+      <a href="/inquiry" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+        联系我们了解更多
+      </a>
+    </div>`;
+
+  return `
+    <div class="container mx-auto px-4 py-8">
+      <!-- Page Header -->
+      <div class="mb-8">
+        <div class="flex items-center space-x-2 text-sm text-gray-500 mb-4">
+          <a href="${baseUrl}" class="hover:text-blue-600">${brand.name}</a>
+          <span>/</span>
+          <span class="text-gray-900">产品分类</span>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">${brand.name} 产品分类</h1>
+        <p class="text-lg text-gray-600">浏览 ${brand.name} 的全部产品系列和分类</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <!-- 产品分类侧边栏 -->
+        <div class="lg:col-span-1">
+          <div class="bg-white rounded-lg shadow p-6 sticky top-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+              </svg>
+              产品分类
+            </h3>
+            ${categoriesHTML}
+          </div>
+        </div>
+
+        <!-- 产品列表 -->
+        <div class="lg:col-span-3">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 flex items-center">
+              <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"></path>
+              </svg>
+              全部产品 (${products.length})
+            </h2>
+          </div>
+          ${productsHTML}
+        </div>
+      </div>
+    </div>`;
+}
+
+// 生成解决方案页面内容
+function generateSolutionsPageContent(brand, solutions, baseUrl) {
+  const solutionsHTML = solutions.length > 0 ? `
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      ${solutions.map(solution => `
+        <div class="bg-white rounded-lg shadow hover:shadow-md transition-shadow overflow-hidden">
+          <div class="h-48 bg-gray-100 relative overflow-hidden">
+            ${solution.heroImage ? `
+              <img src="${urlFor(solution.heroImage).width(400).height(200).url()}" 
+                   alt="${solution.title}" class="w-full h-full object-cover">
+            ` : `
+              <div class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                <svg class="h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+              </div>
+            `}
+          </div>
+          <div class="p-6">
+            <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">${solution.title}</h3>
+            ${solution.summary ? `<p class="text-gray-600 text-sm mb-4 line-clamp-3">${solution.summary}</p>` : ''}
+            <div class="flex items-center justify-between">
+              ${solution.targetMarket ? `<span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">${solution.targetMarket}</span>` : '<span></span>'}
+              <a href="/solutions/${solution.slug}" class="text-blue-600 text-sm font-medium hover:text-blue-800 flex items-center space-x-1">
+                <span>查看详情</span>
+                <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    </div>` : `
+    <div class="text-center py-16">
+      <svg class="h-16 w-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+      </svg>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">解决方案正在完善中</h3>
+      <p class="text-gray-500 mb-6">${brand.name} 的解决方案正在整理中，敬请期待</p>
+      <a href="/inquiry" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+        联系我们了解更多
+      </a>
+    </div>`;
+
+  return `
+    <div class="container mx-auto px-4 py-8">
+      <!-- Page Header -->
+      <div class="mb-8">
+        <div class="flex items-center space-x-2 text-sm text-gray-500 mb-4">
+          <a href="${baseUrl}" class="hover:text-blue-600">${brand.name}</a>
+          <span>/</span>
+          <span class="text-gray-900">解决方案</span>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">${brand.name} 解决方案</h1>
+        <p class="text-lg text-gray-600">探索 ${brand.name} 提供的完整解决方案和技术应用</p>
+      </div>
+      ${solutionsHTML}
+    </div>`;
+}
+
+// 生成技术支持页面内容
+function generateSupportPageContent(brand, articles, baseUrl) {
+  const articlesHTML = articles.length > 0 ? `
+    <div class="space-y-6">
+      ${articles.map(article => `
+        <div class="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow">
+          <h3 class="font-semibold text-gray-900 text-lg hover:text-blue-600 cursor-pointer mb-2">${article.title}</h3>
+          ${article.summary ? `<p class="text-gray-600 mb-4 line-clamp-3">${article.summary}</p>` : ''}
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4 text-sm text-gray-500">
+              ${article.publishedAt ? `<span>${new Date(article.publishedAt).toLocaleDateString('zh-CN')}</span>` : ''}
+              ${article.readingTime ? `<span>阅读时间: ${article.readingTime}分钟</span>` : ''}
+            </div>
+            <button class="text-blue-600 text-sm font-medium hover:text-blue-800">阅读全文</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>` : `
+    <div class="bg-white rounded-lg shadow p-8 text-center">
+      <svg class="h-16 w-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+      </svg>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">技术文章正在完善中</h3>
+      <p class="text-gray-500 mb-6">${brand.name} 的技术文章和支持文档正在整理中，敬请期待</p>
+      <a href="/inquiry" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+        联系我们了解更多
+      </a>
+    </div>`;
+
+  return `
+    <div class="container mx-auto px-4 py-8">
+      <!-- Page Header -->
+      <div class="mb-8">
+        <div class="flex items-center space-x-2 text-sm text-gray-500 mb-4">
+          <a href="${baseUrl}" class="hover:text-blue-600">${brand.name}</a>
+          <span>/</span>
+          <span class="text-gray-900">技术支持</span>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">${brand.name} 技术支持</h1>
+        <p class="text-lg text-gray-600">获取专业的技术文档、支持服务和培训资源</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Technical Articles -->
+        <div class="lg:col-span-2">
+          <h2 class="text-2xl font-bold text-gray-900 mb-6">技术文章</h2>
+          ${articlesHTML}
+        </div>
+
+        <!-- Support Sidebar -->
+        <div class="lg:col-span-1">
+          <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">联系技术支持</h3>
+            <div class="space-y-4">
+              <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <svg class="h-4 w-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-gray-900">邮件咨询</p>
+                  <p class="text-sm text-gray-600">support@litongtech.com</p>
+                </div>
+              </div>
+              <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                  <svg class="h-4 w-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-gray-900">电话咨询</p>
+                  <p class="text-sm text-gray-600">+86-755-xxxxxxxx</p>
+                </div>
+              </div>
+            </div>
+            <a href="/inquiry" class="w-full mt-6 bg-blue-600 text-white text-center py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium block">
+              提交技术咨询
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// 获取子页面描述
+function getSubPageDescription(subPageInfo) {
+  const { brandData, pageType } = subPageInfo;
+  if (pageType === 'products') {
+    return `浏览 ${brandData.name} 的全部产品系列和分类，包含详细的技术规格和应用信息。`;
+  } else if (pageType === 'solutions') {
+    return `探索 ${brandData.name} 提供的完整解决方案和技术应用，为您的项目提供专业的技术支持。`;
+  } else if (pageType === 'support') {
+    return `获取 ${brandData.name} 的专业技术文档、支持服务和培训资源，专业工程师为您提供全方位技术支持。`;
+  }
+  return brandData.description || `${brandData.name} 相关页面`;
+}
+
+// 获取子页面关键词
+function getSubPageKeywords(pageType) {
+  if (pageType === 'products') {
+    return '产品分类, 技术规格';
+  } else if (pageType === 'solutions') {
+    return '解决方案, 技术应用';
+  } else if (pageType === 'support') {
+    return '技术支持, 产品资料, 技术咨询';
+  }
+  return '';
 }
 
 main();

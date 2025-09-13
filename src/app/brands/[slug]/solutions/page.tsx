@@ -254,6 +254,12 @@ export default async function BrandSolutionsPage({ params }: BrandSolutionsPageP
   );
 }
 
+// 生成静态参数
+export async function generateStaticParams() {
+  // 这个函数将被build脚本忽略，因为我们使用自定义静态生成
+  return [];
+}
+
 export async function generateMetadata({ params }: BrandSolutionsPageProps) {
   const decodedSlug = decodeURIComponent(params.slug);
   const brand = await getBrandData(decodedSlug);
