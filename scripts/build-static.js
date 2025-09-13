@@ -641,7 +641,7 @@ async function manualStaticExport() {
 
       // 为 admin 页面创建直接文件以避免 Cloudflare 重定向循环检测
       if (pageInfo.route === 'admin') {
-        const directAdminFile = path.join(outDir, 'admin.html');
+        const directAdminFile = path.join('out', 'admin.html');
         fs.writeFileSync(directAdminFile, htmlContent);
         console.log('✅ 创建直接 admin.html 文件以避免重定向循环');
       }
