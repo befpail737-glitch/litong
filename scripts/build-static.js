@@ -594,7 +594,8 @@ async function manualStaticExport() {
       { route: 'index', manifestKey: '/page', title: '力通电子 - 专业电子元器件代理商' },
       { route: 'about', manifestKey: '/about/page', title: '关于我们 - 力通电子' },
       { route: 'brands', manifestKey: '/brands/page', title: '合作品牌 - 力通电子' },
-      { route: 'products', manifestKey: '/products/page', title: '产品中心 - 力通电子' }
+      { route: 'products', manifestKey: '/products/page', title: '产品中心 - 力通电子' },
+      { route: 'admin', manifestKey: '/admin/page', title: '管理后台 - 力通电子' }
     ];
 
     for (const pageInfo of pages) {

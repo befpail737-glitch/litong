@@ -146,5 +146,6 @@ sanity token：skcH3gNsfBNrrk7DlrAqF7ocB0o4QagJoWWQGRhXvZYyh1ULE0ef96EBqZ2kRWCnH
 渲染策略: 优先采用 SSG (静态站点生成) 以获得最佳性能和 SEO 效果。对于需要用户交互的功能（如筛选），采用客户端渲染 (CSR) 辅助。
 Next.js 国际化 多语言包括英语，日语，韩语，俄语，越南语，法语，德语，意大利语，土耳其语，阿拉伯语
 github仓库：https://github.com/befpail737-glitch/litong.git
+webhook url：https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/a1f68f88-7ae9-4ff9-8ab4-88d9198cdd6c
 部署: Cloudflare Pages / Workers。
                   
