@@ -1723,30 +1723,6 @@ function generateBrandPageContent(brandPageInfo) {
         </div>
       </div>
 
-      <!-- 品牌导航栏 -->
-      <div class="bg-white border-b mb-8">
-        <div class="container mx-auto px-4">
-          <div class="flex flex-wrap items-center justify-center gap-1 py-4">
-            <a href="/brands/${brand.slug || encodeURIComponent(brand.name)}" 
-               class="px-6 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors font-medium border-r border-gray-200">
-              品牌首页
-            </a>
-            <a href="/brands/${brand.slug || encodeURIComponent(brand.name)}/products" 
-               class="px-6 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors font-medium border-r border-gray-200">
-              产品分类
-            </a>
-            <a href="/brands/${brand.slug || encodeURIComponent(brand.name)}/solutions" 
-               class="px-6 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors font-medium border-r border-gray-200">
-              解决方案
-            </a>
-            <a href="/brands/${brand.slug || encodeURIComponent(brand.name)}/support" 
-               class="px-6 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors font-medium">
-              技术支持
-            </a>
-          </div>
-        </div>
-      </div>
-
       <!-- 品牌详情内容 -->
       <div class="container mx-auto px-4 py-8">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">

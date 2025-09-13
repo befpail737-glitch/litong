@@ -165,38 +165,6 @@ export default async function BrandPage({ params }: BrandPageProps) {
         </div>
       </div>
 
-      {/* Brand Navigation Menu */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
-        <div className="px-6 py-4">
-          <div className="flex flex-wrap items-center justify-center gap-1">
-            <Link
-              href={baseUrl}
-              className="px-6 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors font-medium border-r border-gray-200 last:border-r-0"
-            >
-              品牌首页
-            </Link>
-            <Link
-              href={`${baseUrl}/products`}
-              className="px-6 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors font-medium border-r border-gray-200 last:border-r-0"
-            >
-              产品分类
-            </Link>
-            <Link
-              href={`${baseUrl}/solutions`}
-              className="px-6 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors font-medium border-r border-gray-200 last:border-r-0"
-            >
-              解决方案
-            </Link>
-            <Link
-              href={`${baseUrl}/support`}
-              className="px-6 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors font-medium"
-            >
-              技术支持
-            </Link>
-          </div>
-        </div>
-      </div>
-
       {/* Quick Access Sections */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Product Categories Preview */}
