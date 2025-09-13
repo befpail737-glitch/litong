@@ -1414,6 +1414,159 @@ function generateBrandsPageContent() {
     </section>`;
 }
 
+// 生成管理后台页面内容 - 专门针对admin路由
+function generateAdminPageContent() {
+  return `
+    <div id="__next">
+      <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex">
+        <!-- 侧边栏 -->
+        <div class="w-64 bg-white shadow-xl border-r border-gray-200 flex flex-col relative">
+          <div class="p-6 border-b border-gray-100">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
+              </div>
+              <div class="flex flex-col">
+                <span class="font-bold text-lg text-gray-900">力通后台</span>
+                <span class="text-xs text-gray-500">管理系统</span>
+              </div>
+            </div>
+          </div>
+
+          <nav class="flex-1 p-4 overflow-y-auto">
+            <div class="space-y-1">
+              <div class="flex items-center space-x-3 px-4 py-3 rounded-xl bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 border border-blue-200 shadow-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
+                <span class="font-medium">仪表盘</span>
+              </div>
+
+              <div class="pt-6">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-4">内容管理</p>
+                <div class="space-y-1">
+                  <a href="/studio" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span class="font-medium">Sanity Studio</span>
+                  </a>
+                  <div class="flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                    <span class="font-medium">产品管理</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pt-6">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-4">系统</p>
+                <div class="space-y-1">
+                  <div class="flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span class="font-medium">系统设置</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </nav>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+          <!-- 顶部导航 -->
+          <header class="bg-white shadow-sm border-b border-gray-200 px-8 py-6">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-4">
+                <div>
+                  <h1 class="text-3xl font-bold text-gray-900 tracking-tight">仪表盘</h1>
+                  <p class="text-gray-600 mt-1">欢迎回到力通电子后台管理系统</p>
+                </div>
+              </div>
+
+              <div class="flex items-center space-x-4">
+                <div class="relative">
+                  <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  <input type="text" placeholder="搜索功能..." class="pl-10 pr-4 py-3 w-64 border border-gray-300 rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                </div>
+                <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg">
+                  <span class="text-white text-sm font-bold">管</span>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <!-- 主内容 -->
+          <main class="flex-1 p-8 overflow-auto bg-gray-50">
+            <!-- 统计卡片 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-300">
+                <div class="flex items-start justify-between">
+                  <div class="flex-1">
+                    <p class="text-sm font-medium text-gray-600 mb-1">总访问量</p>
+                    <p class="text-3xl font-bold text-gray-900 tracking-tight">24,567</p>
+                    <div class="mt-3 flex items-center">
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">+12.5%</span>
+                      <span class="text-xs text-gray-500 ml-2">较上月</span>
+                    </div>
+                  </div>
+                  <div class="p-3 rounded-2xl bg-green-50">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-300">
+                <div class="flex items-start justify-between">
+                  <div class="flex-1">
+                    <p class="text-sm font-medium text-gray-600 mb-1">产品查询</p>
+                    <p class="text-3xl font-bold text-gray-900 tracking-tight">1,234</p>
+                    <div class="mt-3 flex items-center">
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">+8.2%</span>
+                      <span class="text-xs text-gray-500 ml-2">较上月</span>
+                    </div>
+                  </div>
+                  <div class="p-3 rounded-2xl bg-blue-50">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 快速操作 -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+              <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-gray-900">快速操作</h3>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <a href="/studio" class="flex items-center space-x-4 p-4 rounded-xl hover:bg-gray-50 transition-all duration-200 group border border-transparent hover:border-gray-200">
+                  <div class="p-3 rounded-xl bg-blue-500 group-hover:scale-110 transition-transform duration-200 shadow-sm">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <span class="font-medium text-gray-900 group-hover:text-gray-700">内容管理 (Sanity)</span>
+                </a>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>`;
+}
+
 // 根据页面类型生成对应的内容
 function generatePageContent(pageInfo) {
   switch (pageInfo.route) {
@@ -1452,6 +1605,8 @@ function generatePageContent(pageInfo) {
             </div>
           </div>
         </section>`;
+    case 'admin':
+      return generateAdminPageContent();
     default:
       return `
         <section class="py-16 bg-white">
@@ -1470,11 +1625,33 @@ function generatePageContent(pageInfo) {
 function generatePageHTML(title, cssFiles, jsFiles, pageInfo) {
   const cssLinks = cssFiles.map(css => `  <link rel="stylesheet" href="/_next/${css}">`).join('\n');
   const jsScripts = jsFiles.map(js => `  <script src="/_next/${js}" defer></script>`).join('\n');
-  
+
+  const contentHTML = generatePageContent(pageInfo);
+
+  // Admin页面使用不同的HTML结构，不包含标准的header/footer
+  if (pageInfo.route === 'admin') {
+    return `<!DOCTYPE html>
+<html lang="zh-CN" class="font-sans">
+<head>
+  <meta charset="utf-8">
+  <title>${title}</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="力通电子管理后台系统">
+  <meta name="next-head-count" content="4">
+${cssLinks}
+</head>
+<body class="font-sans antialiased bg-white text-gray-900">
+  ${contentHTML}
+  <script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{}},"page":"/admin","query":{},"buildId":"${Date.now()}","nextExport":true,"autoExport":true,"isFallback":false,"scriptLoader":[]}</script>
+${jsScripts}
+</body>
+</html>`;
+  }
+
+  // 普通页面使用标准布局
   const headerHTML = generateHeaderHTML();
   const footerHTML = generateFooterHTML();
-  const contentHTML = generatePageContent(pageInfo);
-  
+
   return `<!DOCTYPE html>
 <html lang="zh-CN" class="font-sans">
 <head>

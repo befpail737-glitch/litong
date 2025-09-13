@@ -134,6 +134,7 @@ SEO 健康度
 
 请在sanity创建后台管理，本人可以手动授权登陆sanity，
 项目名：litong 项目ID：oquvb2bs 数据集：production 
+配置webhook
 sanity token：skcH3gNsfBNrrk7DlrAqF7ocB0o4QagJoWWQGRhXvZYyh1ULE0ef96EBqZ2kRWCnH6YnRDTo7bUBJn0dpjjLuZIz8S4wkpo0Sb9AXLxfO1Y6gG4agwbw60hskt6aIW1arCcAeM44oS6iZdUQ9jNcWEnOaEIhSYQRynnwKoI5oSixuHwYy9gk
 域名：www.elec-distributor.com
 
