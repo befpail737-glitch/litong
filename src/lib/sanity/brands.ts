@@ -1,5 +1,12 @@
 import { client, GROQ_FRAGMENTS } from './client';
 import { getProducts, getSolutions, getArticles } from './queries';
+import { 
+  getAllFallbackBrands, 
+  getFeaturedFallbackBrands, 
+  getFallbackBrandStats,
+  getFallbackBrandBySlug,
+  type FallbackBrand 
+} from '../data/fallback-brands';
 
 export interface Brand {
   _id: string
@@ -15,10 +22,11 @@ export interface Brand {
   established?: string
 }
 
-// 获取所有品牌
+// 获取所有品牌 - 带fallback支持
 export async function getAllBrands(): Promise<Brand[]> {
   try {
-    const query = `*[_type == "brandBasic" && isActive == true && !(_id in path("drafts.**"))] | order(name asc) {
+    // 尝试更宽松的查询条件
+    const query = `*[_type == "brandBasic" && (isActive == true || !defined(isActive))] | order(name asc) {
       _id,
       _type,
       name,
@@ -34,17 +42,34 @@ export async function getAllBrands(): Promise<Brand[]> {
     }`;
 
     const brands = await client.fetch(query);
-    return brands || [];
+    
+    // 如果Sanity返回的品牌数量少于5个，使用fallback数据
+    if (!brands || brands.length < 5) {
+      console.warn('Sanity returned insufficient brands, using fallback data');
+      const fallbackBrands = getAllFallbackBrands();
+      
+      // 合并Sanity数据和fallback数据，避免重复
+      const combined = [...brands];
+      fallbackBrands.forEach(fallback => {
+        if (!combined.find(brand => brand.name === fallback.name)) {
+          combined.push(fallback as Brand);
+        }
+      });
+      
+      return combined;
+    }
+    
+    return brands;
   } catch (error) {
-    console.error('Error fetching brands:', error);
-    return [];
+    console.error('Error fetching brands, using fallback data:', error);
+    return getAllFallbackBrands() as Brand[];
   }
 }
 
-// 获取特色品牌
+// 获取特色品牌 - 带fallback支持
 export async function getFeaturedBrands(): Promise<Brand[]> {
   try {
-    const query = `*[_type == "brandBasic" && isActive == true && isFeatured == true && !(_id in path("drafts.**"))] | order(name asc) {
+    const query = `*[_type == "brandBasic" && (isActive == true || !defined(isActive)) && isFeatured == true] | order(name asc) {
       _id,
       _type,
       name,
@@ -60,10 +85,27 @@ export async function getFeaturedBrands(): Promise<Brand[]> {
     }`;
 
     const brands = await client.fetch(query);
-    return brands || [];
+    
+    // 如果Sanity返回的特色品牌数量少于3个，使用fallback数据
+    if (!brands || brands.length < 3) {
+      console.warn('Sanity returned insufficient featured brands, using fallback data');
+      const fallbackBrands = getFeaturedFallbackBrands();
+      
+      // 合并Sanity数据和fallback数据
+      const combined = [...brands];
+      fallbackBrands.forEach(fallback => {
+        if (!combined.find(brand => brand.name === fallback.name)) {
+          combined.push(fallback as Brand);
+        }
+      });
+      
+      return combined;
+    }
+    
+    return brands;
   } catch (error) {
-    console.error('Error fetching featured brands:', error);
-    return [];
+    console.error('Error fetching featured brands, using fallback data:', error);
+    return getFeaturedFallbackBrands() as Brand[];
   }
 }
 
@@ -176,28 +218,28 @@ export async function getBrandsByCategories() {
   }
 }
 
-// 获取品牌统计数据
+// 获取品牌统计数据 - 带fallback支持
 export async function getBrandStats() {
   try {
     const query = `{
-      "total": count(*[_type == "brandBasic" && isActive == true && !(_id in path("drafts.**"))]),
-      "featured": count(*[_type == "brandBasic" && isActive == true && isFeatured == true && !(_id in path("drafts.**"))]),
-      "solutions": count(*[_type == "solution" && isPublished == true && !(_id in path("drafts.**"))])
+      "total": count(*[_type == "brandBasic" && (isActive == true || !defined(isActive))]),
+      "featured": count(*[_type == "brandBasic" && (isActive == true || !defined(isActive)) && isFeatured == true]),
+      "solutions": count(*[_type == "solution" && (isPublished == true || !defined(isPublished))])
     }`;
 
     const stats = await client.fetch(query);
+    
+    // 如果Sanity返回的数据不足，使用fallback数据补充
+    const fallbackStats = getFallbackBrandStats();
+    
     return {
-      total: stats?.total || 0,
-      authorized: stats?.featured || 0,
-      totalProducts: stats?.solutions || 0 * 1000, // 估算产品数量
+      total: Math.max(stats?.total || 0, fallbackStats.total),
+      authorized: Math.max(stats?.featured || 0, fallbackStats.authorized),
+      totalProducts: Math.max(stats?.solutions * 1000 || 0, fallbackStats.totalProducts),
     };
   } catch (error) {
-    console.error('Error fetching brand stats:', error);
-    return {
-      total: 0,
-      authorized: 0,
-      totalProducts: 0,
-    };
+    console.error('Error fetching brand stats, using fallback data:', error);
+    return getFallbackBrandStats();
   }
 }
 
