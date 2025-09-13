@@ -148,12 +148,51 @@ export default async function BrandPage({ params }: BrandPageProps) {
                 <span>解决方案</span>
               </Link>
               <Link
+                href={`${baseUrl}/support`}
+                className="border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors font-medium flex items-center space-x-2"
+              >
+                <HelpCircle className="h-4 w-4" />
+                <span>技术支持</span>
+              </Link>
+              <Link
                 href="/inquiry"
                 className="border border-blue-600 text-blue-600 px-6 py-3 rounded-lg hover:bg-blue-50 transition-colors font-medium"
               >
                 立即询价
               </Link>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Brand Navigation Menu */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
+        <div className="px-6 py-4">
+          <div className="flex flex-wrap items-center justify-center gap-1">
+            <Link
+              href={baseUrl}
+              className="px-6 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors font-medium border-r border-gray-200 last:border-r-0"
+            >
+              品牌首页
+            </Link>
+            <Link
+              href={`${baseUrl}/products`}
+              className="px-6 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors font-medium border-r border-gray-200 last:border-r-0"
+            >
+              产品分类
+            </Link>
+            <Link
+              href={`${baseUrl}/solutions`}
+              className="px-6 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors font-medium border-r border-gray-200 last:border-r-0"
+            >
+              解决方案
+            </Link>
+            <Link
+              href={`${baseUrl}/support`}
+              className="px-6 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors font-medium"
+            >
+              技术支持
+            </Link>
           </div>
         </div>
       </div>
