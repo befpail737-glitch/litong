@@ -1690,13 +1690,59 @@ function generateBrandPageContent(brandPageInfo) {
             <div class="flex-1">
               <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">${brand.name}</h1>
               ${brand.description ? `<p class="text-lg text-gray-600 mb-4">${brand.description}</p>` : ''}
-              <div class="flex flex-wrap gap-4 text-sm text-gray-500">
+              <div class="flex flex-wrap gap-4 text-sm text-gray-500 mb-6">
                 ${brand.country ? `<span>📍 ${brand.country}</span>` : ''}
                 ${brand.established ? `<span>📅 成立于 ${brand.established}</span>` : ''}
                 ${brand.headquarters ? `<span>🏢 ${brand.headquarters}</span>` : ''}
                 ${websiteHTML}
               </div>
+              
+              <div class="flex flex-wrap gap-3">
+                <a href="/brands/${brand.slug || encodeURIComponent(brand.name)}/products" 
+                   class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center space-x-2">
+                  <span>📦</span>
+                  <span>浏览产品</span>
+                </a>
+                <a href="/brands/${brand.slug || encodeURIComponent(brand.name)}/solutions" 
+                   class="border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors font-medium flex items-center space-x-2">
+                  <span>⚙️</span>
+                  <span>解决方案</span>
+                </a>
+                <a href="/brands/${brand.slug || encodeURIComponent(brand.name)}/support" 
+                   class="border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors font-medium flex items-center space-x-2">
+                  <span>❓</span>
+                  <span>技术支持</span>
+                </a>
+                <a href="/inquiry" 
+                   class="border border-blue-600 text-blue-600 px-6 py-3 rounded-lg hover:bg-blue-50 transition-colors font-medium">
+                  立即询价
+                </a>
+              </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 品牌导航栏 -->
+      <div class="bg-white border-b mb-8">
+        <div class="container mx-auto px-4">
+          <div class="flex flex-wrap items-center justify-center gap-1 py-4">
+            <a href="/brands/${brand.slug || encodeURIComponent(brand.name)}" 
+               class="px-6 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors font-medium border-r border-gray-200">
+              品牌首页
+            </a>
+            <a href="/brands/${brand.slug || encodeURIComponent(brand.name)}/products" 
+               class="px-6 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors font-medium border-r border-gray-200">
+              产品分类
+            </a>
+            <a href="/brands/${brand.slug || encodeURIComponent(brand.name)}/solutions" 
+               class="px-6 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors font-medium border-r border-gray-200">
+              解决方案
+            </a>
+            <a href="/brands/${brand.slug || encodeURIComponent(brand.name)}/support" 
+               class="px-6 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors font-medium">
+              技术支持
+            </a>
           </div>
         </div>
       </div>
