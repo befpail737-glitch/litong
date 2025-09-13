@@ -2551,6 +2551,24 @@ async function enhancedMain() {
       console.log('⚠️  生产环境将显示开发环境提示');
     }
 
+    // 第四步：复制 _redirects 文件到输出根目录
+    console.log('\n🔄 步骤4: 复制 _redirects 文件...');
+
+    try {
+      const redirectsSrc = path.join('public', '_redirects');
+      const redirectsDest = path.join('out', '_redirects');
+
+      if (fs.existsSync(redirectsSrc)) {
+        fs.copyFileSync(redirectsSrc, redirectsDest);
+        console.log('✅ _redirects 文件已复制到输出目录');
+        console.log('🎯 Cloudflare Pages 将正确处理路由重定向');
+      } else {
+        console.warn('⚠️  public/_redirects 文件不存在');
+      }
+    } catch (error) {
+      console.error('❌ 复制 _redirects 文件失败:', error);
+    }
+
     console.log('\n🎉 完整构建流程已完成！');
 
   } catch (error) {
