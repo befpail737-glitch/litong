@@ -2472,16 +2472,34 @@ async function copySanityStudioFiles() {
       return false;
     }
 
-    // 创建目标目录
-    if (!fs.existsSync(studioDestDir)) {
-      fs.mkdirSync(studioDestDir, { recursive: true });
+    // 完全清理目标目录以确保没有残留文件
+    if (fs.existsSync(studioDestDir)) {
+      console.log('🧹 清理现有 studio 目录...');
+      fs.rmSync(studioDestDir, { recursive: true, force: true });
     }
 
-    // 复制文件
+    // 创建干净的目标目录
+    fs.mkdirSync(studioDestDir, { recursive: true });
+
+    // 直接复制所有文件（强制覆盖）
+    console.log('📋 强制复制 Sanity Studio 文件...');
     await copyDirectory(studioSrcDir, studioDestDir);
 
-    console.log('✅ Sanity Studio 文件复制完成');
-    return true;
+    // 验证复制结果
+    const indexFile = path.join(studioDestDir, 'index.html');
+    if (fs.existsSync(indexFile)) {
+      const content = fs.readFileSync(indexFile, 'utf8');
+      if (content.includes('Sanity Studio') && content.includes('<div id="sanity">')) {
+        console.log('✅ Sanity Studio 文件复制完成且内容正确');
+        return true;
+      } else {
+        console.warn('⚠️  复制的文件内容不正确');
+        return false;
+      }
+    } else {
+      console.warn('⚠️  index.html 文件未找到');
+      return false;
+    }
   } catch (error) {
     console.error('❌ 复制 Sanity Studio 文件失败:', error);
     return false;
@@ -2567,6 +2585,23 @@ async function enhancedMain() {
       }
     } catch (error) {
       console.error('❌ 复制 _redirects 文件失败:', error);
+    }
+
+    // 最终验证：确保 Studio 文件正确无误
+    console.log('\n🔍 最终验证: 检查 Sanity Studio 部署状态...');
+
+    const finalStudioIndex = path.join('out', 'studio', 'index.html');
+    if (fs.existsSync(finalStudioIndex)) {
+      const finalContent = fs.readFileSync(finalStudioIndex, 'utf8');
+      if (finalContent.includes('Sanity Studio') && finalContent.includes('<div id="sanity">')) {
+        console.log('✅ 最终验证通过：Sanity Studio 文件内容正确');
+        console.log('🎯 生产环境将显示真正的 Sanity Studio 界面');
+      } else {
+        console.error('❌ 最终验证失败：Studio 文件内容不正确');
+        console.warn('⚠️  可能需要手动检查构建流程');
+      }
+    } else {
+      console.error('❌ 最终验证失败：Studio index.html 文件不存在');
     }
 
     console.log('\n🎉 完整构建流程已完成！');
