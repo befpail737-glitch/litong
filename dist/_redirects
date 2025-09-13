@@ -2,20 +2,20 @@
 # https://developers.cloudflare.com/pages/configuration/redirects/
 
 # CRITICAL: Studio routes MUST be first to prevent wildcard conflicts
-# Studio routes - direct file approach to avoid infinite loop detection
-/studio /studio.html 200
-/studio/* /studio.html 200
+# Studio routes - use splat parameters to avoid redirect loops
+/studio /studio/index.html 200
+/studio/* /studio/index.html 200
 
-# Admin panel routes - direct file approach to avoid infinite loop detection
-/admin /admin.html 200
-/admin/* /admin.html 200
+# Admin panel routes - use splat parameters to avoid redirect loops
+/admin /admin/index.html 200
+/admin/* /admin/index.html 200
 
 # Brand routes with Chinese character support
-/brands/* /brands/:slug/index.html 200
+/brands/:slug /brands/:slug/index.html 200
 
 # API routes (if any)
 /api/* /api/:splat 200
 
 # Default SPA fallback - serve index.html for unmatched routes
 # IMPORTANT: This wildcard rule must be LAST to avoid conflicts
-/* /index.html 200
+/:path* /index.html 200
