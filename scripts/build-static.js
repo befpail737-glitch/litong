@@ -31,10 +31,14 @@ function urlFor(source) {
   return imageBuilder.image(source);
 }
 
-// 从Sanity获取所有品牌数据
+// 导入fallback品牌数据
+const { getAllFallbackBrands, getFeaturedFallbackBrands, getFallbackBrandStats } = require('./fallback-brands.js');
+
+// 从Sanity获取所有品牌数据（使用fallback系统）
 async function getAllBrandsFromSanity() {
   try {
-    const query = `*[_type == "brandBasic" && isActive == true && !(_id in path("drafts.**"))] | order(name asc) {
+    // 尝试从Sanity获取品牌数据
+    const query = `*[_type == "brandBasic" && (isActive == true || !defined(isActive))] | order(name asc) {
       _id,
       _type,
       name,
@@ -48,20 +52,39 @@ async function getAllBrandsFromSanity() {
       headquarters,
       established
     }`;
-
-    const brands = await sanityClient.fetch(query);
-    console.log(`✅ 从Sanity获取到 ${brands.length} 个品牌`);
-    return brands || [];
+    
+    const sanityBrands = await sanityClient.fetch(query);
+    
+    // 如果Sanity返回的品牌数量少于5个，使用fallback数据
+    if (!sanityBrands || sanityBrands.length < 5) {
+      console.warn('Sanity returned insufficient brands, using fallback data');
+      const fallbackBrands = getAllFallbackBrands();
+      
+      // 合并Sanity数据和fallback数据，避免重复
+      const combined = [...(sanityBrands || [])];
+      fallbackBrands.forEach(fallback => {
+        if (!combined.find(brand => brand.name === fallback.name)) {
+          combined.push(fallback);
+        }
+      });
+      
+      console.log(`✅ 获取到 ${combined.length} 个品牌（包含fallback数据）`);
+      return combined;
+    }
+    
+    console.log(`✅ 从Sanity获取到 ${sanityBrands.length} 个品牌`);
+    return sanityBrands;
   } catch (error) {
-    console.error('❌ 获取品牌数据失败:', error);
-    return [];
+    console.error('Error fetching brands, using fallback data:', error);
+    return getAllFallbackBrands();
   }
 }
 
-// 从Sanity获取特色品牌数据
+// 从Sanity获取特色品牌数据（使用fallback系统）
 async function getFeaturedBrandsFromSanity() {
   try {
-    const query = `*[_type == "brandBasic" && isActive == true && isFeatured == true && !(_id in path("drafts.**"))] | order(name asc) {
+    // 尝试从Sanity获取特色品牌数据
+    const query = `*[_type == "brandBasic" && (isActive == true || !defined(isActive)) && isFeatured == true] | order(name asc) {
       _id,
       _type,
       name,
@@ -76,40 +99,61 @@ async function getFeaturedBrandsFromSanity() {
       established
     }`;
 
-    const brands = await sanityClient.fetch(query);
-    console.log(`✅ 从Sanity获取到 ${brands.length} 个特色品牌`);
-    return brands || [];
+    const sanityBrands = await sanityClient.fetch(query);
+    
+    // 如果Sanity返回的特色品牌数量少于3个，使用fallback数据
+    if (!sanityBrands || sanityBrands.length < 3) {
+      console.warn('Sanity returned insufficient featured brands, using fallback data');
+      const fallbackBrands = getFeaturedFallbackBrands();
+      
+      // 合并Sanity数据和fallback数据
+      const combined = [...(sanityBrands || [])];
+      fallbackBrands.forEach(fallback => {
+        if (!combined.find(brand => brand.name === fallback.name)) {
+          combined.push(fallback);
+        }
+      });
+      
+      console.log(`✅ 获取到 ${combined.length} 个特色品牌（包含fallback数据）`);
+      return combined;
+    }
+    
+    console.log(`✅ 从Sanity获取到 ${sanityBrands.length} 个特色品牌`);
+    return sanityBrands;
   } catch (error) {
-    console.error('❌ 获取特色品牌数据失败:', error);
-    return [];
+    console.error('Error fetching featured brands, using fallback data:', error);
+    return getFeaturedFallbackBrands();
   }
 }
 
-// 从Sanity获取品牌统计数据
+// 从Sanity获取品牌统计数据（使用fallback系统）
 async function getBrandStatsFromSanity() {
   try {
     const query = `{
-      "total": count(*[_type == "brandBasic" && isActive == true && !(_id in path("drafts.**"))]),
-      "featured": count(*[_type == "brandBasic" && isActive == true && isFeatured == true && !(_id in path("drafts.**"))]),
-      "solutions": count(*[_type == "solution" && isPublished == true && !(_id in path("drafts.**"))])
+      "total": count(*[_type == "brandBasic" && (isActive == true || !defined(isActive))]),
+      "featured": count(*[_type == "brandBasic" && (isActive == true || !defined(isActive)) && isFeatured == true]),
+      "solutions": count(*[_type == "solution" && (isPublished == true || !defined(isPublished))])
     }`;
 
-    const stats = await sanityClient.fetch(query);
+    const sanityStats = await sanityClient.fetch(query);
+    
+    // 如果Sanity返回的数据不足，使用fallback数据补充
+    const fallbackStats = getFallbackBrandStats();
+    
+    const stats = {
+      total: Math.max(sanityStats?.total || 0, fallbackStats.total),
+      authorized: Math.max(sanityStats?.featured || 0, fallbackStats.authorized),
+      totalProducts: Math.max((sanityStats?.solutions || 0) * 1000, fallbackStats.totalProducts),
+    };
+    
     console.log('✅ 获取品牌统计数据:', stats);
-    return {
-      total: stats?.total || 0,
-      authorized: stats?.featured || 0,
-      totalProducts: (stats?.solutions || 0) * 100, // 估算产品数量
-    };
+    return stats;
   } catch (error) {
-    console.error('❌ 获取品牌统计数据失败:', error);
-    return {
-      total: 0,
-      authorized: 0,
-      totalProducts: 0,
-    };
+    console.error('Error fetching brand stats, using fallback data:', error);
+    return getFallbackBrandStats();
   }
 }
+
 
 // 获取品牌相关产品数据
 async function getBrandProducts(brandSlug, limit = 8) {
@@ -905,7 +949,7 @@ function generateBrandsPageContentWithData(brandsData) {
     <section class="bg-gradient-to-r from-purple-600 to-blue-600 text-white py-16">
       <div class="container mx-auto px-4">
         <div class="max-w-4xl mx-auto text-center">
-          <h1 class="text-4xl font-bold mb-4">合作品牌</h1>
+          <h1 class="text-4xl font-bold mb-4">合作品牌 (已更新)</h1>
           <p class="text-xl text-purple-100">
             与全球顶尖品牌合作，为您提供优质的电子元器件产品
           </p>
@@ -927,48 +971,44 @@ function generateBrandsPageContentWithData(brandsData) {
       </div>
     </section>
 
-    <!-- Brand Categories -->
+    <!-- All Brands -->
     <section class="py-16 bg-white">
       <div class="container mx-auto px-4">
         <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold text-gray-900 mb-4">品牌分类</h2>
-          <p class="text-lg text-gray-600">按产品类别浏览合作品牌</p>
+          <h2 class="text-3xl font-bold text-gray-900 mb-4">所有品牌</h2>
+          <p class="text-lg text-gray-600">浏览我们合作的所有品牌</p>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-8 mb-16">
-          ${brandCategories.slice(0, 3).map((category, index) => {
-            const categoryName = category.name;
-            const brands = category.brands || [];
-            const icons = [
-              `<svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-              </svg>`,
-              `<svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>`,
-              `<svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>`
-            ];
-
-            return `
-              <div class="bg-gray-50 p-6 rounded-lg">
-                <div class="text-purple-600 mb-4">
-                  ${icons[index] || icons[0]}
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
+          ${allBrands.length > 0 ? allBrands.map((brand) => `
+            <a href="/brands/${encodeURIComponent(brand.slug || brand.name)}"
+               class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md hover:border-purple-300 transition-all duration-200 flex flex-col items-center text-center group">
+              ${brand.logo ? `
+                <div class="w-16 h-16 mb-3 flex items-center justify-center">
+                  <img src="${brand.logo}" alt="${brand.name}" class="max-w-full max-h-full object-contain" />
                 </div>
-                <h3 class="text-xl font-semibold text-gray-900 mb-4">${categoryName}</h3>
-                <ul class="space-y-2">
-                  ${brands.length > 0 
-                    ? brands.slice(0, 4).map(brand => `
-                        <li><a href="/brands/${encodeURIComponent(brand.slug || brand.name.toLowerCase())}" class="text-gray-600 hover:text-purple-600 transition-colors">• ${brand.name}</a></li>
-                      `).join('')
-                    : '<li class="text-gray-500 italic">暂无品牌数据</li>'
-                  }
-                  ${brands.length > 4 ? `<li class="text-purple-600 text-sm">还有 ${brands.length - 4} 个品牌...</li>` : ''}
-                </ul>
+              ` : ''}
+              <h3 class="text-sm font-medium text-gray-900 group-hover:text-purple-600 transition-colors line-clamp-2">
+                ${brand.name}
+              </h3>
+              ${brand.country ? `<p class="text-xs text-gray-500 mt-1">${brand.country}</p>` : ''}
+              ${brand.isFeatured ? `
+                <span class="inline-block mt-2 px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">
+                  特色品牌
+                </span>
+              ` : ''}
+            </a>
+          `).join('') : `
+            <div class="col-span-full text-center py-16">
+              <div class="text-gray-400 mb-4">
+                <svg class="h-16 w-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
               </div>
-            `;
-          }).join('')}
+              <h3 class="text-lg font-medium text-gray-900 mb-2">暂无品牌数据</h3>
+              <p class="text-gray-500">品牌信息正在加载中，请稍后再试</p>
+            </div>
+          `}
         </div>
       </div>
     </section>
@@ -1144,7 +1184,7 @@ function generateBrandsPageContent() {
     <section class="bg-gradient-to-r from-purple-600 to-blue-600 text-white py-16">
       <div class="container mx-auto px-4">
         <div class="max-w-4xl mx-auto text-center">
-          <h1 class="text-4xl font-bold mb-4">合作品牌</h1>
+          <h1 class="text-4xl font-bold mb-4">合作品牌 (已更新)</h1>
           <p class="text-xl text-purple-100">
             与全球顶尖品牌合作，为您提供优质的电子元器件产品
           </p>
