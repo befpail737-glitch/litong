@@ -2535,8 +2535,14 @@ async function enhancedMain() {
       const studioDeployed = await copySanityStudioFiles();
 
       if (studioDeployed) {
+        // 添加构建时间戳以破坏缓存
+        const buildTimestamp = new Date().toISOString();
+        const timestampFile = path.join('out', 'studio', 'build-timestamp.txt');
+        fs.writeFileSync(timestampFile, `Studio build: ${buildTimestamp}\n`);
+
         console.log('✅ Sanity Studio 已成功集成到静态构建中');
         console.log('🎯 生产环境将显示完整的 Sanity Studio 界面');
+        console.log(`📅 构建时间戳: ${buildTimestamp}`);
       } else {
         console.log('⚠️  Sanity Studio 文件复制失败，使用 fallback 页面');
       }
