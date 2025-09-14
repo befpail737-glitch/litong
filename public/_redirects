@@ -10,6 +10,9 @@
 
 # Brand routes with Chinese character support
 /brands/:slug /brands/:slug/ 200
+/brands/:slug/products /brands/:slug/products/ 200
+/brands/:slug/solutions /brands/:slug/solutions/ 200
+/brands/:slug/support /brands/:slug/support/ 200
 
 # API routes (if any)
 /api/* /api/:splat 200

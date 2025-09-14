@@ -51,6 +51,26 @@ export function middleware(request: NextRequest) {
   // 品牌路由处理（支持中文字符）
   if (pathname.startsWith('/brands/')) {
     console.log(`🏢 Brand route: ${pathname}`)
+
+    // 检查是否为品牌子目录页面
+    const brandSubPaths = ['/products', '/solutions', '/support']
+    const isBrandSubPath = brandSubPaths.some(subPath => {
+      const pattern = new RegExp(`^/brands/[^/]+${subPath}/?$`)
+      return pattern.test(pathname)
+    })
+
+    if (isBrandSubPath) {
+      console.log(`📂 Brand subdirectory route: ${pathname}`)
+
+      // 确保品牌子目录路径有尾部斜杠（如果需要）
+      if (!pathname.endsWith('/') && !pathname.includes('?')) {
+        const url = request.nextUrl.clone()
+        url.pathname = pathname + '/'
+        console.log(`🔀 Adding trailing slash: ${pathname} -> ${url.pathname}`)
+        return NextResponse.redirect(url)
+      }
+    }
+
     return NextResponse.next()
   }
 
