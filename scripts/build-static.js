@@ -2562,7 +2562,7 @@ function createStudioAppShell(studioDestDir) {
     console.warn('⚠️  无法动态查找 Sanity JS 文件，使用默认文件名');
   }
 
-  // 创建 Next.js 应用壳 HTML，集成 Studio 内容
+  // 创建增强的 Next.js 应用壳 HTML，集成 Studio 内容
   const appShellHTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2574,35 +2574,139 @@ function createStudioAppShell(studioDestDir) {
   <link rel="icon" href="./favicon.svg" type="image/svg+xml"/>
   <title>Sanity Studio</title>
   <style>
-    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-    .studio-loading { display: flex; align-items: center; justify-content: center; height: 100vh; }
-    .studio-loading::after { content: 'Loading Sanity Studio...'; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f1f3f4;
+    }
+    .studio-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color: #333;
+    }
+    .studio-loading::after { content: 'Loading Sanity Studio...'; margin-top: 10px; }
+    .loading-spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #3498db;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .debug-info {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      font-family: monospace;
+      max-width: 300px;
+      display: none;
+    }
+    .error-message {
+      background: #ff6b6b;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      display: none;
+    }
   </style>
 </head>
 <body>
   <div id="__next">
-    <div class="studio-loading" id="studio-loader"></div>
+    <div class="studio-loading" id="studio-loader">
+      <div class="loading-spinner"></div>
+    </div>
     <div id="sanity" style="display: none;"></div>
+    <div class="error-message" id="error-message">
+      <h3>Studio Loading Error</h3>
+      <p>Unable to load Sanity Studio. Please check your connection and try again.</p>
+    </div>
   </div>
 
-  <!-- Studio initialization script -->
+  <div class="debug-info" id="debug-info">
+    <div>Studio Shell: Loaded</div>
+    <div>JS File: ${sanityJSFile}</div>
+    <div>Timestamp: ${new Date().toISOString()}</div>
+  </div>
+
+  <!-- Enhanced Studio initialization script -->
   <script>
-    // Show studio container once content loads
+    console.log('🎨 Studio Application Shell Loading...');
+
+    let loadTimeout;
+    let jsLoaded = false;
+
+    // Show debug info in development
+    if (window.location.hostname === 'localhost' || window.location.hostname.includes('pages.dev')) {
+      document.getElementById('debug-info').style.display = 'block';
+    }
+
+    // Enhanced loading handler
     document.addEventListener('DOMContentLoaded', function() {
       const loader = document.getElementById('studio-loader');
       const studio = document.getElementById('sanity');
+      const errorMsg = document.getElementById('error-message');
 
-      // Wait for studio scripts to load
-      setTimeout(() => {
+      console.log('🔧 DOM Content Loaded, initializing Studio...');
+
+      // Set loading timeout (30 seconds)
+      loadTimeout = setTimeout(() => {
+        console.error('❌ Studio loading timeout');
         if (loader) loader.style.display = 'none';
-        if (studio) studio.style.display = 'block';
-      }, 1000);
+        if (errorMsg) errorMsg.style.display = 'block';
+      }, 30000);
+
+      // Check if Sanity has loaded every 500ms
+      const checkSanity = setInterval(() => {
+        if (window.Sanity || document.querySelector('[data-sanity]') || jsLoaded) {
+          console.log('✅ Sanity Studio detected, switching containers...');
+          clearInterval(checkSanity);
+          clearTimeout(loadTimeout);
+
+          if (loader) loader.style.display = 'none';
+          if (studio) studio.style.display = 'block';
+
+          // Additional check for Sanity mounting
+          setTimeout(() => {
+            const sanityMounted = document.querySelector('#sanity > *');
+            if (sanityMounted) {
+              console.log('🎯 Sanity Studio fully mounted');
+            } else {
+              console.warn('⚠️ Sanity container empty, checking fallback...');
+            }
+          }, 2000);
+        }
+      }, 500);
+    });
+
+    // Track script loading
+    window.addEventListener('load', function() {
+      jsLoaded = true;
+      console.log('📦 All resources loaded');
+    });
+
+    // Error handling
+    window.addEventListener('error', function(e) {
+      console.error('❌ Script error:', e.error);
     });
   </script>
 
-  <!-- Load Studio assets -->
-  <script type="module" src="./studio/static/${sanityJSFile}"></script>
-  <script src="https://core.sanity-cdn.com/bridge.js" async type="module" data-sanity-core></script>
+  <!-- Load Studio assets with error handling -->
+  <script type="module" src="./studio/static/${sanityJSFile}"
+          onerror="console.error('Failed to load:', this.src)"></script>
+  <script src="https://core.sanity-cdn.com/bridge.js" async type="module" data-sanity-core
+          onerror="console.error('Failed to load Sanity bridge')"></script>
 </body>
 </html>`;
 

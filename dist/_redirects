@@ -1,8 +1,9 @@
-# Cloudflare Pages redirects - REMOVE INFINITE LOOP RULES
+# Cloudflare Pages redirects - EXPLICIT STUDIO ROUTING
 # https://developers.cloudflare.com/pages/configuration/redirects/
 
-# Exact path redirects (no infinite loops)
-/studio /studio/ 200
+# Studio routing - explicit mapping to application shell
+/studio /studio.html 200
+/studio/ /studio.html 200
 /admin /admin/ 200
 
 # Brand routes with Chinese character support
