@@ -1,4 +1,4 @@
-# Cloudflare Pages redirects - NO INFINITE LOOPS
+# Cloudflare Pages redirects - REMOVE INFINITE LOOP RULES
 # https://developers.cloudflare.com/pages/configuration/redirects/
 
 # Exact path redirects (no infinite loops)
@@ -11,5 +11,5 @@
 # API routes (if any)
 /api/* /api/:splat 200
 
-# Default fallback - catch-all for SPA routing
-/* /index.html 200
+# DO NOT USE CATCH-ALL REDIRECT - CAUSES INFINITE LOOPS
+# Cloudflare Pages handles SPA routing automatically
