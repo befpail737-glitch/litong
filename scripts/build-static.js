@@ -2484,9 +2484,9 @@ async function copySanityStudioFiles() {
     // 创建干净的目标目录
     fs.mkdirSync(studioDestDir, { recursive: true });
 
-    // 直接复制所有文件（强制覆盖）
-    console.log('📋 强制复制 Sanity Studio 文件...');
-    await copyDirectory(studioSrcDir, studioDestDir);
+    // 复制 Sanity Studio 文件（排除配置文件以避免冲突）
+    console.log('📋 复制 Sanity Studio 文件（过滤配置文件）...');
+    await copyStudioFiles(studioSrcDir, studioDestDir);
 
     // 验证复制结果并修复资源路径
     const indexFile = path.join(studioDestDir, 'index.html');
@@ -2709,6 +2709,40 @@ function createStudioAppShell(studioDestDir) {
   console.log('✅ 增强了 Studio index.html 文件: /studio/index.html');
 
   return true;
+}
+
+// 复制 Studio 文件的专用函数（过滤配置文件）
+async function copyStudioFiles(src, dest) {
+  if (!fs.existsSync(dest)) {
+    fs.mkdirSync(dest, { recursive: true });
+  }
+
+  const items = fs.readdirSync(src);
+
+  // 需要排除的文件列表（避免与 Cloudflare 配置冲突）
+  const excludedFiles = [
+    '_redirects',    // Cloudflare 重定向配置
+    'robots.txt',    // 搜索引擎配置（使用根目录版本）
+    'sitemap.xml'    // 站点地图（使用根目录版本）
+  ];
+
+  for (const item of items) {
+    // 跳过排除的文件
+    if (excludedFiles.includes(item)) {
+      console.log(`🚫 跳过配置文件: ${item}`);
+      continue;
+    }
+
+    const srcPath = path.join(src, item);
+    const destPath = path.join(dest, item);
+    const stat = fs.statSync(srcPath);
+
+    if (stat.isDirectory()) {
+      await copyStudioFiles(srcPath, destPath);
+    } else {
+      fs.copyFileSync(srcPath, destPath);
+    }
+  }
 }
 
 // 递归复制目录的辅助函数
