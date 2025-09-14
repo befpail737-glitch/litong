@@ -10,6 +10,15 @@ const nextConfig = {
   images: {
     unoptimized: true, // Required for static export
   },
+  // Rewrites for Studio routing (only works in dev mode, handled by middleware in production)
+  async rewrites() {
+    return [
+      {
+        source: '/studio/:path*',
+        destination: '/studio/:path*', // Ensure studio routes are handled correctly
+      },
+    ];
+  },
   // Worker pool configuration to prevent Jest worker errors
   experimental: {
     workerThreads: false,

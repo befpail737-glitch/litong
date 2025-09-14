@@ -1,6 +1,10 @@
 # Cloudflare Pages redirects
 # https://developers.cloudflare.com/pages/configuration/redirects/
 
+# Studio route handling - explicit rules to prevent homepage redirect
+/studio /studio/ 200
+/studio/* /studio/:splat 200
+
 # Admin redirect only
 /admin /admin/ 200
 
@@ -9,6 +13,3 @@
 
 # API routes (if any)
 /api/* /api/:splat 200
-
-# Studio uses default directory routing - /studio maps to /studio/index.html automatically
-# No explicit studio redirects to avoid infinite loops
