@@ -65,8 +65,28 @@ export const GROQ_FRAGMENTS = {
       name,
       "slug": slug.current
     },
-    pricing,
-    inventory,
+    pricing{
+      currency,
+      tiers[]{
+        quantity,
+        price,
+        unit
+      },
+      moq,
+      leadTime,
+      // 兼容字段：提取第一个价格作为默认价格
+      "price": tiers[0].price,
+      "currency": coalesce(currency, "CNY")
+    },
+    inventory{
+      quantity,
+      status,
+      warehouse,
+      lastUpdated,
+      // 兼容字段：转换状态为布尔值
+      "inStock": status == "in_stock",
+      "quantity": coalesce(quantity, 0)
+    },
     isActive,
     isFeatured,
     isNew,
@@ -99,8 +119,28 @@ export const GROQ_FRAGMENTS = {
       "slug": slug.current
     },
     specifications,
-    pricing,
-    inventory,
+    pricing{
+      currency,
+      tiers[]{
+        quantity,
+        price,
+        unit
+      },
+      moq,
+      leadTime,
+      // 兼容字段
+      "price": tiers[0].price,
+      "currency": coalesce(currency, "CNY")
+    },
+    inventory{
+      quantity,
+      status,
+      warehouse,
+      lastUpdated,
+      // 兼容字段
+      "inStock": status == "in_stock",
+      "quantity": coalesce(quantity, 0)
+    },
     documents,
     isActive,
     isFeatured,
@@ -308,6 +348,236 @@ export async function validateBrandProductAssociation(brandSlug: string, product
       productExists: false,
       productActive: false,
       associationValid: false
+    };
+  }
+}
+
+// 全面诊断产品发布状态
+export async function diagnoseProductPublishStatus(options: {
+  limit?: number,
+  includeInactive?: boolean,
+  includeDrafts?: boolean
+} = {}) {
+  const { limit = 10, includeInactive = false, includeDrafts = false } = options;
+
+  try {
+    console.log('🔍 开始产品发布状态诊断...');
+
+    // 查询1: 检查所有产品（包括草稿和非激活）
+    const allProductsQuery = `{
+      "publishedProducts": *[_type == "product" && !(_id in path("drafts.**"))][0...${limit}] {
+        _id,
+        _type,
+        partNumber,
+        title,
+        "slug": slug.current,
+        isActive,
+        isFeatured,
+        "brand": brand->name,
+        "brandSlug": brand->slug.current,
+        "brandActive": brand->isActive,
+        "category": category->name,
+        "categorySlug": category->slug.current,
+        pricing,
+        inventory,
+        _createdAt,
+        _updatedAt,
+        "hasDraft": defined(*[_id == path("drafts." + ^._id)][0])
+      },
+      "draftProducts": *[_id in path("drafts.**") && _type == "product"][0...${limit}] {
+        _id,
+        _type,
+        partNumber,
+        title,
+        "slug": slug.current,
+        isActive,
+        isFeatured,
+        "brand": brand->name,
+        "brandSlug": brand->slug.current,
+        "brandActive": brand->isActive,
+        "category": category->name,
+        "categorySlug": category->slug.current,
+        pricing,
+        inventory,
+        _createdAt,
+        _updatedAt
+      },
+      "stats": {
+        "totalProducts": count(*[_type == "product"]),
+        "publishedProducts": count(*[_type == "product" && !(_id in path("drafts.**"))]),
+        "draftProducts": count(*[_id in path("drafts.**") && _type == "product"]),
+        "activeProducts": count(*[_type == "product" && !(_id in path("drafts.**")) && isActive == true]),
+        "inactiveProducts": count(*[_type == "product" && !(_id in path("drafts.**")) && isActive != true]),
+        "featuredProducts": count(*[_type == "product" && !(_id in path("drafts.**")) && isFeatured == true]),
+        "productsWithBrands": count(*[_type == "product" && !(_id in path("drafts.**")) && defined(brand)]),
+        "productsWithoutBrands": count(*[_type == "product" && !(_id in path("drafts.**")) && !defined(brand)]),
+        "productsWithCategories": count(*[_type == "product" && !(_id in path("drafts.**")) && defined(category)]),
+        "productsWithoutCategories": count(*[_type == "product" && !(_id in path("drafts.**")) && !defined(category)])
+      }
+    }`;
+
+    const allData = await withRetry(() => client.fetch(allProductsQuery));
+
+    // 查询2: 检查品牌状态
+    const brandQuery = `*[_type == "brandBasic"][0...20] {
+      _id,
+      name,
+      "slug": slug.current,
+      isActive,
+      isFeatured,
+      "productCount": count(*[_type == "product" && brand._ref == ^._id && !(_id in path("drafts.**"))]),
+      "activeProductCount": count(*[_type == "product" && brand._ref == ^._id && !(_id in path("drafts.**")) && isActive == true])
+    }`;
+
+    const brands = await withRetry(() => client.fetch(brandQuery));
+
+    // 查询3: 检查分类状态
+    const categoryQuery = `*[_type == "productCategory"][0...20] {
+      _id,
+      name,
+      "slug": slug.current,
+      isVisible,
+      "productCount": count(*[_type == "product" && category._ref == ^._id && !(_id in path("drafts.**"))]),
+      "activeProductCount": count(*[_type == "product" && category._ref == ^._id && !(_id in path("drafts.**")) && isActive == true])
+    }`;
+
+    const categories = await withRetry(() => client.fetch(categoryQuery));
+
+    // 数据完整性检查
+    const dataIntegrityIssues = [];
+
+    // 检查产品无品牌的情况
+    allData.publishedProducts.forEach(product => {
+      if (!product.brand) {
+        dataIntegrityIssues.push({
+          type: 'missing_brand',
+          productId: product._id,
+          productName: product.title || product.partNumber,
+          issue: '产品缺少品牌关联'
+        });
+      }
+      if (!product.category) {
+        dataIntegrityIssues.push({
+          type: 'missing_category',
+          productId: product._id,
+          productName: product.title || product.partNumber,
+          issue: '产品缺少分类关联'
+        });
+      }
+      if (product.brand && !product.brandActive) {
+        dataIntegrityIssues.push({
+          type: 'inactive_brand',
+          productId: product._id,
+          productName: product.title || product.partNumber,
+          brandName: product.brand,
+          issue: '产品关联的品牌未激活'
+        });
+      }
+    });
+
+    const result = {
+      timestamp: new Date().toISOString(),
+      query: {
+        limit,
+        includeInactive,
+        includeDrafts
+      },
+      stats: allData.stats,
+      publishedProducts: allData.publishedProducts,
+      draftProducts: allData.draftProducts,
+      brands: brands,
+      categories: categories,
+      dataIntegrityIssues: dataIntegrityIssues,
+      summary: {
+        totalIssues: dataIntegrityIssues.length,
+        publishRatio: allData.stats.totalProducts > 0
+          ? (allData.stats.publishedProducts / allData.stats.totalProducts * 100).toFixed(1) + '%'
+          : '0%',
+        activeRatio: allData.stats.publishedProducts > 0
+          ? (allData.stats.activeProducts / allData.stats.publishedProducts * 100).toFixed(1) + '%'
+          : '0%',
+        mainIssues: [
+          ...new Set(dataIntegrityIssues.map(issue => issue.type))
+        ]
+      }
+    };
+
+    console.log('✅ 产品诊断完成:', {
+      总产品数: result.stats.totalProducts,
+      已发布: result.stats.publishedProducts,
+      草稿: result.stats.draftProducts,
+      激活: result.stats.activeProducts,
+      问题数量: result.dataIntegrityIssues.length
+    });
+
+    return result;
+
+  } catch (error) {
+    console.error('❌ 产品诊断失败:', error);
+    throw new SanityError('产品发布状态诊断失败', 'DIAGNOSE_PRODUCT_ERROR');
+  }
+}
+
+// 简化的产品查询测试（用于API连接验证）
+export async function testProductQuery(queryType: 'basic' | 'detailed' | 'raw' = 'basic') {
+  try {
+    console.log(`🧪 测试产品查询 (${queryType})...`);
+
+    const queries = {
+      basic: `*[_type == "product" && isActive == true && !(_id in path("drafts.**"))][0...5] {
+        _id,
+        partNumber,
+        title,
+        isActive
+      }`,
+
+      detailed: `*[_type == "product" && isActive == true && !(_id in path("drafts.**"))][0...3] {
+        ${GROQ_FRAGMENTS.productBase}
+      }`,
+
+      raw: `*[_type == "product"][0...10] {
+        _id,
+        _type,
+        partNumber,
+        title,
+        isActive,
+        "publishedVersion": !(_id in path("drafts.**")),
+        "brand": brand->name,
+        "category": category->name,
+        _createdAt,
+        _updatedAt
+      }`
+    };
+
+    const startTime = Date.now();
+    const result = await withRetry(() => client.fetch(queries[queryType]));
+    const duration = Date.now() - startTime;
+
+    console.log(`✅ 查询完成 (${duration}ms):`, {
+      查询类型: queryType,
+      返回数量: Array.isArray(result) ? result.length : 'N/A',
+      首个结果: Array.isArray(result) && result.length > 0 ? result[0] : result
+    });
+
+    return {
+      queryType,
+      duration,
+      resultCount: Array.isArray(result) ? result.length : 1,
+      results: result,
+      success: true,
+      timestamp: new Date().toISOString()
+    };
+
+  } catch (error) {
+    console.error(`❌ 查询测试失败 (${queryType}):`, error);
+    return {
+      queryType,
+      duration: 0,
+      resultCount: 0,
+      results: null,
+      success: false,
+      error: error.message,
+      timestamp: new Date().toISOString()
     };
   }
 }
