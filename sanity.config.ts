@@ -12,9 +12,9 @@ export default defineConfig({
 
   basePath: '/studio',
 
-  // 启用调试和监控
-  useCdn: false, // 生产环境中获取最新数据
-  perspective: 'published', // 只显示已发布的内容
+  // 权限优化配置
+  useCdn: true, // 使用 CDN 缓存以改善权限同步
+  // 移除 perspective 限制，允许完整权限检查
   
   // CORS配置，允许本地开发服务器和生产环境访问
   cors: {
@@ -38,7 +38,7 @@ export default defineConfig({
     types: schemaTypes,
   },
 
-  // Studio 工具配置
+  // Studio 工具配置 - 增强权限调试
   tools: (prev) => {
     // 在控制台显示项目信息和调试信息
     if (typeof window !== 'undefined') {
@@ -50,8 +50,20 @@ export default defineConfig({
         currentUser: 'befpail737@gmail.com (期望)',
         timestamp: new Date().toISOString(),
         correctURL: 'https://litong.pages.dev/studio',
-        wrongURL: '❌ 不要使用: sanity.io/@onLmQUoxi/...'
+        wrongURL: '❌ 不要使用: sanity.io/@onLmQUoxi/...',
+        configChanges: '✅ 已移除 perspective 限制，启用 CDN 缓存'
       });
+
+      // 权限状态检查
+      setTimeout(() => {
+        const sanityUser = (window as any).sanity?.currentUser;
+        console.log('🔐 权限检查:', {
+          sanityUserObject: sanityUser,
+          expectedEmail: 'befpail737@gmail.com',
+          userAgent: navigator.userAgent,
+          timestamp: new Date().toISOString()
+        });
+      }, 3000);
     }
     return prev;
   },
