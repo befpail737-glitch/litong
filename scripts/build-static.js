@@ -2502,14 +2502,8 @@ async function copySanityStudioFiles() {
         // 写回修复后的内容
         fs.writeFileSync(indexFile, content, 'utf8');
 
-        // 验证 Next.js 是否生成了 studio 路由
-        console.log('🔍 检查 Next.js Studio 路由生成情况...');
-        const nextjsStudioPath = path.join(process.cwd(), 'out', 'studio.html');
-        if (fs.existsSync(nextjsStudioPath)) {
-          console.log('✅ Next.js 已生成 Studio 静态路由文件');
-        } else {
-          console.warn('⚠️  Next.js 未生成 Studio 路由，依赖构建脚本复制');
-        }
+        // Studio 路由通过目录结构处理（/studio/index.html）
+        console.log('🔍 使用目录路由结构处理 Studio 访问');
 
         // 创建 Next.js 兼容的应用壳
         createStudioAppShell(studioDestDir);
@@ -2703,19 +2697,16 @@ function createStudioAppShell(studioDestDir) {
   </script>
 
   <!-- Load Studio assets with error handling -->
-  <script type="module" src="./studio/static/${sanityJSFile}"
+  <script type="module" src="./static/${sanityJSFile}"
           onerror="console.error('Failed to load:', this.src)"></script>
   <script src="https://core.sanity-cdn.com/bridge.js" async type="module" data-sanity-core
           onerror="console.error('Failed to load Sanity bridge')"></script>
 </body>
 </html>`;
 
-  // 如果 Next.js 没有生成 studio 路由，创建一个
-  const nextjsStudioPath = path.join(process.cwd(), 'out', 'studio.html');
-  if (!fs.existsSync(nextjsStudioPath)) {
-    fs.writeFileSync(nextjsStudioPath, appShellHTML, 'utf8');
-    console.log('✅ 创建了 Next.js Studio 应用壳: /studio.html');
-  }
+  // 增强现有的 /studio/index.html 文件，不创建 /studio.html
+  fs.writeFileSync(studioIndexPath, appShellHTML, 'utf8');
+  console.log('✅ 增强了 Studio index.html 文件: /studio/index.html');
 
   return true;
 }

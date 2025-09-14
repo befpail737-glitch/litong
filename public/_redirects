@@ -1,9 +1,7 @@
-# Cloudflare Pages redirects - EXPLICIT STUDIO ROUTING
+# Cloudflare Pages redirects
 # https://developers.cloudflare.com/pages/configuration/redirects/
 
-# Studio routing - explicit mapping to application shell
-/studio /studio.html 200
-/studio/ /studio.html 200
+# Admin redirect only
 /admin /admin/ 200
 
 # Brand routes with Chinese character support
@@ -12,5 +10,5 @@
 # API routes (if any)
 /api/* /api/:splat 200
 
-# DO NOT USE CATCH-ALL REDIRECT - CAUSES INFINITE LOOPS
-# Cloudflare Pages handles SPA routing automatically
+# Studio uses default directory routing - /studio maps to /studio/index.html automatically
+# No explicit studio redirects to avoid infinite loops
