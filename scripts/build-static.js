@@ -2502,6 +2502,18 @@ async function copySanityStudioFiles() {
         // 写回修复后的内容
         fs.writeFileSync(indexFile, content, 'utf8');
 
+        // 验证 Next.js 是否生成了 studio 路由
+        console.log('🔍 检查 Next.js Studio 路由生成情况...');
+        const nextjsStudioPath = path.join(process.cwd(), 'out', 'studio.html');
+        if (fs.existsSync(nextjsStudioPath)) {
+          console.log('✅ Next.js 已生成 Studio 静态路由文件');
+        } else {
+          console.warn('⚠️  Next.js 未生成 Studio 路由，依赖构建脚本复制');
+        }
+
+        // 创建 Next.js 兼容的应用壳
+        createStudioAppShell(studioDestDir);
+
         console.log('✅ Sanity Studio 文件复制完成且内容正确');
         console.log('✅ Studio 资源路径已修复为相对路径');
         console.log('✅ Studio 文件已正确放置在 /studio/ 目录中');
@@ -2519,6 +2531,89 @@ async function copySanityStudioFiles() {
     console.error('❌ 复制 Sanity Studio 文件失败:', error);
     return false;
   }
+}
+
+// 创建 Next.js 兼容的 Studio 应用壳
+function createStudioAppShell(studioDestDir) {
+  console.log('🛠️  创建 Next.js 兼容的 Studio 应用壳...');
+
+  // 读取当前 Studio HTML 文件作为基础
+  const studioIndexPath = path.join(studioDestDir, 'index.html');
+  if (!fs.existsSync(studioIndexPath)) {
+    console.error('❌ Studio index.html 不存在，无法创建应用壳');
+    return false;
+  }
+
+  let studioContent = fs.readFileSync(studioIndexPath, 'utf8');
+
+  // 动态查找 Sanity Studio JavaScript 文件
+  let sanityJSFile = 'sanity-CYTf8YUU.js'; // default fallback
+  try {
+    const staticDir = path.join(studioDestDir, 'static');
+    if (fs.existsSync(staticDir)) {
+      const files = fs.readdirSync(staticDir);
+      const sanityFile = files.find(file => file.startsWith('sanity-') && file.endsWith('.js'));
+      if (sanityFile) {
+        sanityJSFile = sanityFile;
+        console.log('🔍 找到 Sanity Studio JS 文件:', sanityFile);
+      }
+    }
+  } catch (error) {
+    console.warn('⚠️  无法动态查找 Sanity JS 文件，使用默认文件名');
+  }
+
+  // 创建 Next.js 应用壳 HTML，集成 Studio 内容
+  const appShellHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"/>
+  <meta name="robots" content="noindex"/>
+  <meta name="referrer" content="same-origin"/>
+  <link rel="icon" href="./favicon.ico" sizes="any"/>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml"/>
+  <title>Sanity Studio</title>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    .studio-loading { display: flex; align-items: center; justify-content: center; height: 100vh; }
+    .studio-loading::after { content: 'Loading Sanity Studio...'; }
+  </style>
+</head>
+<body>
+  <div id="__next">
+    <div class="studio-loading" id="studio-loader"></div>
+    <div id="sanity" style="display: none;"></div>
+  </div>
+
+  <!-- Studio initialization script -->
+  <script>
+    // Show studio container once content loads
+    document.addEventListener('DOMContentLoaded', function() {
+      const loader = document.getElementById('studio-loader');
+      const studio = document.getElementById('sanity');
+
+      // Wait for studio scripts to load
+      setTimeout(() => {
+        if (loader) loader.style.display = 'none';
+        if (studio) studio.style.display = 'block';
+      }, 1000);
+    });
+  </script>
+
+  <!-- Load Studio assets -->
+  <script type="module" src="./studio/static/${sanityJSFile}"></script>
+  <script src="https://core.sanity-cdn.com/bridge.js" async type="module" data-sanity-core></script>
+</body>
+</html>`;
+
+  // 如果 Next.js 没有生成 studio 路由，创建一个
+  const nextjsStudioPath = path.join(process.cwd(), 'out', 'studio.html');
+  if (!fs.existsSync(nextjsStudioPath)) {
+    fs.writeFileSync(nextjsStudioPath, appShellHTML, 'utf8');
+    console.log('✅ 创建了 Next.js Studio 应用壳: /studio.html');
+  }
+
+  return true;
 }
 
 // 递归复制目录的辅助函数
