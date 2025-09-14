@@ -11,6 +11,5 @@
 # API routes (if any)
 /api/* /api/:splat 200
 
-# Default fallback - only for non-existing paths
-# This avoids infinite loops by not catching existing directories
-/* /index.html 404
+# Default fallback - catch-all for SPA routing
+/* /index.html 200

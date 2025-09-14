@@ -1,32 +1,25 @@
 /**
  * This route is responsible for loading Sanity Studio in the browser.
- * Server component wrapper for client-side Studio
+ * Simplified version to ensure static generation works
  */
 
-import dynamic from 'next/dynamic'
-
-// Dynamically import the client component to avoid SSR issues
-const StudioClient = dynamic(() => import('./StudioClient'), {
-  ssr: false,
-  loading: () => (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-        <p className="text-gray-600">Loading Sanity Studio...</p>
-      </div>
-    </div>
-  )
-})
+import StudioClient from './StudioClient'
 
 export default function StudioPage() {
   return <StudioClient />
 }
 
-// Generate static params for studio routes
+// Generate static params for studio routes - ensure this works with static export
 export async function generateStaticParams() {
-  // Return basic studio routes for static generation
-  return [
+  console.log('🔧 Generating static params for Studio page')
+
+  // Return comprehensive studio routes for static generation
+  const params = [
     { tool: [] }, // /studio
-    { tool: ['desk'] }, // /studio/desk
+    { tool: ['desk'] }, // /studio/desk (main workspace)
+    { tool: ['vision'] }, // /studio/vision (GROQ playground)
   ]
+
+  console.log('🔧 Studio static params:', params)
+  return params
 }
