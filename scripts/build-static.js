@@ -52,14 +52,14 @@ async function getAllBrandsFromSanity() {
       headquarters,
       established
     }`;
-    
+
     const sanityBrands = await sanityClient.fetch(query);
-    
+
     // 如果Sanity返回的品牌数量少于5个，使用fallback数据
     if (!sanityBrands || sanityBrands.length < 5) {
       console.warn('Sanity returned insufficient brands, using fallback data');
       const fallbackBrands = getAllFallbackBrands();
-      
+
       // 合并Sanity数据和fallback数据，避免重复
       const combined = [...(sanityBrands || [])];
       fallbackBrands.forEach(fallback => {
@@ -67,16 +67,87 @@ async function getAllBrandsFromSanity() {
           combined.push(fallback);
         }
       });
-      
+
       console.log(`✅ 获取到 ${combined.length} 个品牌（包含fallback数据）`);
       return combined;
     }
-    
+
     console.log(`✅ 从Sanity获取到 ${sanityBrands.length} 个品牌`);
     return sanityBrands;
   } catch (error) {
     console.error('Error fetching brands, using fallback data:', error);
     return getAllFallbackBrands();
+  }
+}
+
+// 生成品牌子页面的静态文件
+async function generateBrandSubPages() {
+  try {
+    console.log('📂 生成品牌子页面静态文件...');
+
+    const brands = await getAllBrandsFromSanity();
+    const subPages = ['products', 'solutions', 'support'];
+
+    for (const brand of brands.slice(0, 10)) { // 限制前10个品牌避免过长构建时间
+      if (!brand.isActive) continue;
+
+      const brandSlug = encodeURIComponent(brand.slug || brand.name);
+
+      for (const subPage of subPages) {
+        const brandSubDir = path.join(__dirname, '../out/brands', brandSlug, subPage);
+        const indexFile = path.join(brandSubDir, 'index.html');
+
+        // 创建目录
+        if (!fs.existsSync(brandSubDir)) {
+          fs.mkdirSync(brandSubDir, { recursive: true });
+        }
+
+        // 检查是否已存在静态文件
+        if (!fs.existsSync(indexFile)) {
+          console.log(`🔧 创建缺失的品牌子页面: /brands/${brandSlug}/${subPage}/`);
+
+          // 创建基础HTML框架（将由客户端渲染）
+          const htmlContent = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>${brand.name} ${subPage === 'products' ? '产品' : subPage === 'solutions' ? '解决方案' : '技术支持'} - 力通电子</title>
+    <meta name="description" content="${brand.name} 的${subPage === 'products' ? '产品分类' : subPage === 'solutions' ? '解决方案' : '技术支持'}页面"/>
+    <link rel="icon" href="/favicon.ico"/>
+</head>
+<body>
+    <div id="__next">
+        <div style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: system-ui;">
+            <div style="text-align: center;">
+                <div style="width: 40px; height: 40px; border: 4px solid #e5e7eb; border-top: 4px solid #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px;"></div>
+                <p style="color: #6b7280; margin: 0;">正在加载 ${brand.name} ${subPage === 'products' ? '产品页面' : subPage === 'solutions' ? '解决方案页面' : '技术支持页面'}...</p>
+            </div>
+            <style>
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            </style>
+        </div>
+    </div>
+    <script>
+        // 客户端重定向到正确的页面
+        if (window.location.pathname !== '/brands/${brandSlug}/${subPage}/') {
+            window.location.replace('/brands/${brandSlug}/${subPage}/');
+        }
+    </script>
+</body>
+</html>`;
+
+          fs.writeFileSync(indexFile, htmlContent, 'utf-8');
+        }
+      }
+    }
+
+    console.log('✅ 品牌子页面静态文件生成完成');
+  } catch (error) {
+    console.error('❌ 品牌子页面生成失败:', error);
   }
 }
 
@@ -341,33 +412,6 @@ function groupBrandsByFirstLetter(brands) {
     });
 }
 
-// 从 Sanity 获取所有品牌数据（简化版本）
-async function getAllBrandsFromSanity() {
-  try {
-    const query = `*[_type == "brandBasic" && isActive == true && !(_id in path("drafts.**"))] | order(name asc) {
-      _id,
-      name,
-      "slug": slug.current,
-      description,
-      website,
-      country,
-      headquarters,
-      established,
-      logo,
-      isActive,
-      isFeatured
-    }`;
-
-    const brands = await sanityClient.fetch(query);
-    
-    console.log(`✅ 从Sanity获取到 ${brands?.length || 0} 个品牌`);
-    
-    return brands || [];
-  } catch (error) {
-    console.error('❌ 获取品牌数据失败:', error);
-    return [];
-  }
-}
 
 console.log('🚀 开始增强静态构建...');
 
@@ -2825,6 +2869,10 @@ async function enhancedMain() {
     } catch (error) {
       console.error('❌ 复制 _redirects 文件失败:', error);
     }
+
+    // 生成品牌子页面静态文件
+    console.log('\n📂 生成品牌子页面...');
+    await generateBrandSubPages();
 
     // 最终验证：确保 Studio 文件正确无误
     console.log('\n🔍 最终验证: 检查 Sanity Studio 部署状态...');
