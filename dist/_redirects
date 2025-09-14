@@ -8,8 +8,21 @@
 # Admin redirect only
 /admin /admin/ 200
 
-# Brand routes with Chinese character support
-/brands/:slug /brands/:slug/ 200
+# Brand routes - direct static file serving (highest priority)
+/brands/:slug/products/ /brands/:slug/products/index.html 200
+/brands/:slug/solutions/ /brands/:slug/solutions/index.html 200
+/brands/:slug/support/ /brands/:slug/support/index.html 200
+/brands/:slug/ /brands/:slug/index.html 200
+
+# Brand routes - trailing slash normalization
+/brands/:slug/products /brands/:slug/products/ 301
+/brands/:slug/solutions /brands/:slug/solutions/ 301
+/brands/:slug/support /brands/:slug/support/ 301
+/brands/:slug /brands/:slug/ 301
 
 # API routes (if any)
 /api/* /api/:splat 200
+
+# Note: Removed specific brand case mappings and catch-all redirect
+# Both uppercase and lowercase brand directories are now generated during build
+# This allows direct static file serving without complex redirects

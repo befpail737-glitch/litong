@@ -111,37 +111,53 @@ async function generateBrandSubPages() {
     for (const brand of brandsToGenerate.slice(0, 15)) { // 限制前15个品牌
       if (brand.isActive === false) continue;
 
-      const brandSlug = encodeURIComponent(brand.slug || brand.name);
+      const originalSlug = brand.slug || brand.name;
+      const brandSlugs = [];
 
-      // 生成品牌主页面
-      const brandMainDir = path.join(__dirname, '../out/brands', brandSlug);
-      const brandMainFile = path.join(brandMainDir, 'index.html');
-
-      if (!fs.existsSync(brandMainDir)) {
-        fs.mkdirSync(brandMainDir, { recursive: true });
+      // 生成多个版本的slug来处理大小写问题
+      if (/^[A-Z]/.test(originalSlug)) {
+        // 如果是英文品牌，生成原始大写版本和小写版本
+        brandSlugs.push(originalSlug); // 原始版本（如 MediaTek）
+        brandSlugs.push(originalSlug.toLowerCase()); // 小写版本（如 mediatek）
+      } else {
+        // 中文品牌或其他，只生成一个版本
+        brandSlugs.push(encodeURIComponent(originalSlug));
       }
 
-      if (!fs.existsSync(brandMainFile)) {
-        console.log(`🔧 创建品牌主页面: /brands/${brandSlug}/`);
+      // 为每个slug版本生成静态文件
+      for (const brandSlug of brandSlugs) {
+        const encodedSlug = /^[A-Za-z]/.test(brandSlug) ? brandSlug : encodeURIComponent(brandSlug);
 
-        const mainPageContent = createBrandPageHTML(brand, '主页');
-        fs.writeFileSync(brandMainFile, mainPageContent, 'utf-8');
-      }
+        // 生成品牌主页面
+        const brandMainDir = path.join(__dirname, '../out/brands', encodedSlug);
+        const brandMainFile = path.join(brandMainDir, 'index.html');
 
-      // 生成品牌子页面
-      for (const subPage of subPages) {
-        const brandSubDir = path.join(__dirname, '../out/brands', brandSlug, subPage);
-        const indexFile = path.join(brandSubDir, 'index.html');
-
-        if (!fs.existsSync(brandSubDir)) {
-          fs.mkdirSync(brandSubDir, { recursive: true });
+        if (!fs.existsSync(brandMainDir)) {
+          fs.mkdirSync(brandMainDir, { recursive: true });
         }
 
-        if (!fs.existsSync(indexFile)) {
-          console.log(`🔧 创建品牌子页面: /brands/${brandSlug}/${subPage}/`);
+        if (!fs.existsSync(brandMainFile)) {
+          console.log(`🔧 创建品牌主页面: /brands/${encodedSlug}/`);
 
-          const subPageContent = createBrandPageHTML(brand, subPage);
-          fs.writeFileSync(indexFile, subPageContent, 'utf-8');
+          const mainPageContent = createBrandPageHTML(brand, '主页');
+          fs.writeFileSync(brandMainFile, mainPageContent, 'utf-8');
+        }
+
+        // 生成品牌子页面
+        for (const subPage of subPages) {
+          const brandSubDir = path.join(__dirname, '../out/brands', encodedSlug, subPage);
+          const indexFile = path.join(brandSubDir, 'index.html');
+
+          if (!fs.existsSync(brandSubDir)) {
+            fs.mkdirSync(brandSubDir, { recursive: true });
+          }
+
+          if (!fs.existsSync(indexFile)) {
+            console.log(`🔧 创建品牌子页面: /brands/${encodedSlug}/${subPage}/`);
+
+            const subPageContent = createBrandPageHTML(brand, subPage);
+            fs.writeFileSync(indexFile, subPageContent, 'utf-8');
+          }
         }
       }
     }

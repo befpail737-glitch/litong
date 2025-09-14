@@ -8,30 +8,13 @@
 # Admin redirect only
 /admin /admin/ 200
 
-# Specific brand name mappings (case-sensitive)
-/brands/MediaTek/ /brands/mediatek/ 301
-/brands/MediaTek/products/ /brands/mediatek/products/ 301
-/brands/MediaTek/solutions/ /brands/mediatek/solutions/ 301
-/brands/MediaTek/support/ /brands/mediatek/support/ 301
-/brands/MediaTek/products /brands/mediatek/products/ 301
-/brands/MediaTek/solutions /brands/mediatek/solutions/ 301
-/brands/MediaTek/support /brands/mediatek/support/ 301
-/brands/MediaTek /brands/mediatek/ 301
-
-/brands/Qualcomm/ /brands/qualcomm/ 301
-/brands/Qualcomm/products/ /brands/qualcomm/products/ 301
-/brands/Qualcomm/solutions/ /brands/qualcomm/solutions/ 301
-/brands/Qualcomm/support/ /brands/qualcomm/support/ 301
-/brands/Qualcomm/products /brands/qualcomm/products/ 301
-/brands/Qualcomm/solutions /brands/qualcomm/solutions/ 301
-/brands/Qualcomm/support /brands/qualcomm/support/ 301
-/brands/Qualcomm /brands/qualcomm/ 301
-
-# Brand routes with Chinese character support - Updated for better matching
+# Brand routes - direct static file serving (highest priority)
 /brands/:slug/products/ /brands/:slug/products/index.html 200
 /brands/:slug/solutions/ /brands/:slug/solutions/index.html 200
 /brands/:slug/support/ /brands/:slug/support/index.html 200
 /brands/:slug/ /brands/:slug/index.html 200
+
+# Brand routes - trailing slash normalization
 /brands/:slug/products /brands/:slug/products/ 301
 /brands/:slug/solutions /brands/:slug/solutions/ 301
 /brands/:slug/support /brands/:slug/support/ 301
@@ -40,5 +23,6 @@
 # API routes (if any)
 /api/* /api/:splat 200
 
-# Note: Removed catch-all redirect that was causing all routes to show homepage
-# Dynamic routes must be properly pre-generated during build time
+# Note: Removed specific brand case mappings and catch-all redirect
+# Both uppercase and lowercase brand directories are now generated during build
+# This allows direct static file serving without complex redirects

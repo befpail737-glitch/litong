@@ -326,17 +326,45 @@ export async function generateStaticParams() {
         '英飞凌', 'Epcos'
       ];
 
-      return fallbackBrands.map(brandName => ({
-        slug: encodeURIComponent(brandName)
-      }));
+      const fallbackParams = [];
+      fallbackBrands.forEach(brandName => {
+        if (/^[A-Z]/.test(brandName)) {
+          // 英文品牌生成大写和小写版本
+          fallbackParams.push({ slug: encodeURIComponent(brandName) });
+          fallbackParams.push({ slug: encodeURIComponent(brandName.toLowerCase()) });
+        } else {
+          // 中文品牌只生成一个版本
+          fallbackParams.push({ slug: encodeURIComponent(brandName) });
+        }
+      });
+      return fallbackParams;
     }
 
-    const staticParams = brands
+    const staticParams = [];
+
+    brands
       .filter(brand => brand.isActive !== false && (brand.slug || brand.name))
-      .map(brand => {
-        const slug = encodeURIComponent(brand.slug || brand.name);
-        console.log(`🔧 [brands/[slug]/support] Creating static param for: ${brand.name} -> ${slug}`);
-        return { slug };
+      .forEach(brand => {
+        const originalSlug = brand.slug || brand.name;
+
+        // 为英文品牌生成大写和小写两个版本
+        if (/^[A-Z]/.test(originalSlug)) {
+          // 原始版本（如 MediaTek）
+          const originalEncoded = encodeURIComponent(originalSlug);
+          staticParams.push({ slug: originalEncoded });
+          console.log(`🔧 [brands/[slug]/support] Creating static param (original): ${brand.name} -> ${originalEncoded}`);
+
+          // 小写版本（如 mediatek）
+          const lowercaseSlug = originalSlug.toLowerCase();
+          const lowercaseEncoded = encodeURIComponent(lowercaseSlug);
+          staticParams.push({ slug: lowercaseEncoded });
+          console.log(`🔧 [brands/[slug]/support] Creating static param (lowercase): ${brand.name} -> ${lowercaseEncoded}`);
+        } else {
+          // 中文品牌或其他，只生成一个版本
+          const slug = encodeURIComponent(originalSlug);
+          staticParams.push({ slug });
+          console.log(`🔧 [brands/[slug]/support] Creating static param: ${brand.name} -> ${slug}`);
+        }
       });
 
     console.log(`🔧 [brands/[slug]/support] Generated ${staticParams.length} static params`);
@@ -351,9 +379,18 @@ export async function generateStaticParams() {
     ];
 
     console.log(`🔧 [brands/[slug]/support] Using fallback brands: ${fallbackBrands.length} brands`);
-    return fallbackBrands.map(brandName => ({
-      slug: encodeURIComponent(brandName)
-    }));
+    const fallbackParams = [];
+    fallbackBrands.forEach(brandName => {
+      if (/^[A-Z]/.test(brandName)) {
+        // 英文品牌生成大写和小写版本
+        fallbackParams.push({ slug: encodeURIComponent(brandName) });
+        fallbackParams.push({ slug: encodeURIComponent(brandName.toLowerCase()) });
+      } else {
+        // 中文品牌只生成一个版本
+        fallbackParams.push({ slug: encodeURIComponent(brandName) });
+      }
+    });
+    return fallbackParams;
   }
 }
 
