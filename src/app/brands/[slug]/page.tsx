@@ -347,17 +347,51 @@ export default async function BrandPage({ params }: BrandPageProps) {
 // 生成静态参数
 export async function generateStaticParams() {
   try {
+    console.log('🔧 [brands/[slug]] Generating static params for brand pages...');
+
     const { getAllBrands } = await import('@/lib/sanity/brands');
     const brands = await getAllBrands();
 
-    return brands
-      .filter(brand => brand.isActive && (brand.slug || brand.name))
-      .map(brand => ({
-        slug: encodeURIComponent(brand.slug || brand.name)
+    console.log(`🔧 [brands/[slug]] Fetched ${brands.length} brands from Sanity`);
+
+    if (brands.length === 0) {
+      console.warn('⚠️ [brands/[slug]] No brands found, using fallback brand list');
+      // 提供 fallback 品牌列表确保至少有一些静态页面生成
+      const fallbackBrands = [
+        'MediaTek', 'Qualcomm', 'Cree', 'Littelfuse', 'IXYS',
+        'LEM', 'PI', 'Semikron', 'Sanrex', 'NCC',
+        '英飞凌', 'Epcos'
+      ];
+
+      return fallbackBrands.map(brandName => ({
+        slug: encodeURIComponent(brandName)
       }));
+    }
+
+    const staticParams = brands
+      .filter(brand => brand.isActive !== false && (brand.slug || brand.name))
+      .map(brand => {
+        const slug = encodeURIComponent(brand.slug || brand.name);
+        console.log(`🔧 [brands/[slug]] Creating static param for: ${brand.name} -> ${slug}`);
+        return { slug };
+      });
+
+    console.log(`🔧 [brands/[slug]] Generated ${staticParams.length} static params`);
+    return staticParams;
   } catch (error) {
-    console.error('Error generating static params for brand page:', error);
-    return [];
+    console.error('❌ [brands/[slug]] Error generating static params:', error);
+
+    // 即使出错也要提供 fallback，确保基本的品牌页面能生成
+    const fallbackBrands = [
+      'MediaTek', 'Qualcomm', 'Cree', 'Littelfuse', 'IXYS',
+      'LEM', 'PI', 'Semikron', 'Sanrex', 'NCC',
+      '英飞凌', 'Epcos'
+    ];
+
+    console.log(`🔧 [brands/[slug]] Using fallback brands: ${fallbackBrands.length} brands`);
+    return fallbackBrands.map(brandName => ({
+      slug: encodeURIComponent(brandName)
+    }));
   }
 }
 

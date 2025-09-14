@@ -22,9 +22,11 @@ export interface Brand {
   established?: string
 }
 
-// 获取所有品牌 - 带fallback支持
+// 获取所有品牌 - 带fallback支持和增强调试
 export async function getAllBrands(): Promise<Brand[]> {
   try {
+    console.log('🔍 [getAllBrands] Starting brand data fetch from Sanity...');
+
     // 尝试更宽松的查询条件
     const query = `*[_type == "brandBasic" && (isActive == true || !defined(isActive))] | order(name asc) {
       _id,
@@ -41,7 +43,9 @@ export async function getAllBrands(): Promise<Brand[]> {
       established
     }`;
 
+    console.log('🔍 [getAllBrands] Executing Sanity query...');
     const brands = await client.fetch(query);
+    console.log(`🔍 [getAllBrands] Sanity query returned: ${brands?.length || 0} brands`);
     
     // 如果Sanity返回的品牌数量少于5个，使用fallback数据
     if (!brands || brands.length < 5) {

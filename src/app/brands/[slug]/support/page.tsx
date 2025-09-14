@@ -311,17 +311,49 @@ export default async function BrandSupportPage({ params }: BrandSupportPageProps
 // 生成静态参数
 export async function generateStaticParams() {
   try {
+    console.log('🔧 [brands/[slug]/support] Generating static params...');
+
     const { getAllBrands } = await import('@/lib/sanity/brands');
     const brands = await getAllBrands();
 
-    return brands
-      .filter(brand => brand.isActive && (brand.slug || brand.name))
-      .map(brand => ({
-        slug: encodeURIComponent(brand.slug || brand.name)
+    console.log(`🔧 [brands/[slug]/support] Fetched ${brands.length} brands from Sanity`);
+
+    if (brands.length === 0) {
+      console.warn('⚠️ [brands/[slug]/support] No brands found, using fallback brand list');
+      const fallbackBrands = [
+        'MediaTek', 'Qualcomm', 'Cree', 'Littelfuse', 'IXYS',
+        'LEM', 'PI', 'Semikron', 'Sanrex', 'NCC',
+        '英飞凌', 'Epcos'
+      ];
+
+      return fallbackBrands.map(brandName => ({
+        slug: encodeURIComponent(brandName)
       }));
+    }
+
+    const staticParams = brands
+      .filter(brand => brand.isActive !== false && (brand.slug || brand.name))
+      .map(brand => {
+        const slug = encodeURIComponent(brand.slug || brand.name);
+        console.log(`🔧 [brands/[slug]/support] Creating static param for: ${brand.name} -> ${slug}`);
+        return { slug };
+      });
+
+    console.log(`🔧 [brands/[slug]/support] Generated ${staticParams.length} static params`);
+    return staticParams;
   } catch (error) {
-    console.error('Error generating static params for brand support:', error);
-    return [];
+    console.error('❌ [brands/[slug]/support] Error generating static params:', error);
+
+    const fallbackBrands = [
+      'MediaTek', 'Qualcomm', 'Cree', 'Littelfuse', 'IXYS',
+      'LEM', 'PI', 'Semikron', 'Sanrex', 'NCC',
+      '英飞凌', 'Epcos'
+    ];
+
+    console.log(`🔧 [brands/[slug]/support] Using fallback brands: ${fallbackBrands.length} brands`);
+    return fallbackBrands.map(brandName => ({
+      slug: encodeURIComponent(brandName)
+    }));
   }
 }
 
