@@ -2488,13 +2488,22 @@ async function copySanityStudioFiles() {
     console.log('📋 强制复制 Sanity Studio 文件...');
     await copyDirectory(studioSrcDir, studioDestDir);
 
-    // 验证复制结果
+    // 验证复制结果并修复资源路径
     const indexFile = path.join(studioDestDir, 'index.html');
     if (fs.existsSync(indexFile)) {
-      const content = fs.readFileSync(indexFile, 'utf8');
+      let content = fs.readFileSync(indexFile, 'utf8');
       if (content.includes('Sanity Studio') && content.includes('<div id="sanity">')) {
-        console.log('✅ Sanity Studio 文件复制完成且内容正确');
 
+        // 修复资源路径引用 - 从绝对路径改为相对路径
+        console.log('🔧 修复 Studio 资源路径引用...');
+        content = content.replace(/src="\/static\//g, 'src="./static/');
+        content = content.replace(/href="\/static\//g, 'href="./static/');
+
+        // 写回修复后的内容
+        fs.writeFileSync(indexFile, content, 'utf8');
+
+        console.log('✅ Sanity Studio 文件复制完成且内容正确');
+        console.log('✅ Studio 资源路径已修复为相对路径');
         console.log('✅ Studio 文件已正确放置在 /studio/ 目录中');
 
         return true;

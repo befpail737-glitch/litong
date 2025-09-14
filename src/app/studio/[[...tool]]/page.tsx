@@ -5,6 +5,10 @@
 
 import StudioClient from './StudioClient'
 
+// Force static generation for this page
+export const dynamic = 'force-static'
+export const revalidate = false
+
 export default function StudioPage() {
   return <StudioClient />
 }
