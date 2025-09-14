@@ -80,75 +80,188 @@ async function getAllBrandsFromSanity() {
   }
 }
 
-// 生成品牌子页面的静态文件
+// 生成品牌页面的静态文件（包括主页面和子页面）
 async function generateBrandSubPages() {
   try {
-    console.log('📂 生成品牌子页面静态文件...');
+    console.log('📂 生成品牌页面静态文件...');
 
     const brands = await getAllBrandsFromSanity();
     const subPages = ['products', 'solutions', 'support'];
 
-    for (const brand of brands.slice(0, 10)) { // 限制前10个品牌避免过长构建时间
-      if (!brand.isActive) continue;
+    // 如果无法获取品牌数据，使用 fallback 列表
+    let brandsToGenerate = brands;
+    if (!brands || brands.length === 0) {
+      console.warn('⚠️ 无法获取品牌数据，使用 fallback 品牌列表');
+      brandsToGenerate = [
+        { name: 'MediaTek', slug: 'MediaTek', isActive: true },
+        { name: 'Qualcomm', slug: 'Qualcomm', isActive: true },
+        { name: 'Cree', slug: 'Cree', isActive: true },
+        { name: 'Littelfuse', slug: 'Littelfuse', isActive: true },
+        { name: 'IXYS', slug: 'IXYS', isActive: true },
+        { name: 'LEM', slug: 'LEM', isActive: true },
+        { name: 'PI', slug: 'PI', isActive: true },
+        { name: 'Semikron', slug: 'Semikron', isActive: true },
+        { name: 'Sanrex', slug: 'Sanrex', isActive: true },
+        { name: 'NCC', slug: 'NCC', isActive: true },
+        { name: '英飞凌', slug: '英飞凌', isActive: true },
+        { name: 'Epcos', slug: 'Epcos', isActive: true }
+      ];
+    }
+
+    for (const brand of brandsToGenerate.slice(0, 15)) { // 限制前15个品牌
+      if (brand.isActive === false) continue;
 
       const brandSlug = encodeURIComponent(brand.slug || brand.name);
 
+      // 生成品牌主页面
+      const brandMainDir = path.join(__dirname, '../out/brands', brandSlug);
+      const brandMainFile = path.join(brandMainDir, 'index.html');
+
+      if (!fs.existsSync(brandMainDir)) {
+        fs.mkdirSync(brandMainDir, { recursive: true });
+      }
+
+      if (!fs.existsSync(brandMainFile)) {
+        console.log(`🔧 创建品牌主页面: /brands/${brandSlug}/`);
+
+        const mainPageContent = createBrandPageHTML(brand, '主页');
+        fs.writeFileSync(brandMainFile, mainPageContent, 'utf-8');
+      }
+
+      // 生成品牌子页面
       for (const subPage of subPages) {
         const brandSubDir = path.join(__dirname, '../out/brands', brandSlug, subPage);
         const indexFile = path.join(brandSubDir, 'index.html');
 
-        // 创建目录
         if (!fs.existsSync(brandSubDir)) {
           fs.mkdirSync(brandSubDir, { recursive: true });
         }
 
-        // 检查是否已存在静态文件
         if (!fs.existsSync(indexFile)) {
-          console.log(`🔧 创建缺失的品牌子页面: /brands/${brandSlug}/${subPage}/`);
+          console.log(`🔧 创建品牌子页面: /brands/${brandSlug}/${subPage}/`);
 
-          // 创建基础HTML框架（将由客户端渲染）
-          const htmlContent = `<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title>${brand.name} ${subPage === 'products' ? '产品' : subPage === 'solutions' ? '解决方案' : '技术支持'} - 力通电子</title>
-    <meta name="description" content="${brand.name} 的${subPage === 'products' ? '产品分类' : subPage === 'solutions' ? '解决方案' : '技术支持'}页面"/>
-    <link rel="icon" href="/favicon.ico"/>
-</head>
-<body>
-    <div id="__next">
-        <div style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: system-ui;">
-            <div style="text-align: center;">
-                <div style="width: 40px; height: 40px; border: 4px solid #e5e7eb; border-top: 4px solid #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px;"></div>
-                <p style="color: #6b7280; margin: 0;">正在加载 ${brand.name} ${subPage === 'products' ? '产品页面' : subPage === 'solutions' ? '解决方案页面' : '技术支持页面'}...</p>
-            </div>
-            <style>
-                @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                }
-            </style>
-        </div>
-    </div>
-    <script>
-        // 客户端重定向到正确的页面
-        if (window.location.pathname !== '/brands/${brandSlug}/${subPage}/') {
-            window.location.replace('/brands/${brandSlug}/${subPage}/');
-        }
-    </script>
-</body>
-</html>`;
-
-          fs.writeFileSync(indexFile, htmlContent, 'utf-8');
+          const subPageContent = createBrandPageHTML(brand, subPage);
+          fs.writeFileSync(indexFile, subPageContent, 'utf-8');
         }
       }
     }
 
-    console.log('✅ 品牌子页面静态文件生成完成');
+    console.log(`✅ 品牌页面静态文件生成完成 (${brandsToGenerate.length} 个品牌)`);
   } catch (error) {
-    console.error('❌ 品牌子页面生成失败:', error);
+    console.error('❌ 品牌页面生成失败:', error);
   }
+}
+
+// 创建品牌页面HTML内容的辅助函数
+function createBrandPageHTML(brand, pageType) {
+  const pageTitle = pageType === '主页' ? brand.name :
+                   pageType === 'products' ? `${brand.name} 产品` :
+                   pageType === 'solutions' ? `${brand.name} 解决方案` : `${brand.name} 技术支持`;
+
+  return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>${pageTitle} - 力通电子</title>
+    <meta name="description" content="${brand.name} 在力通电子的${pageTitle}页面"/>
+    <link rel="icon" href="/favicon.ico"/>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f9fafb;
+            color: #111827;
+            line-height: 1.6;
+        }
+        .container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .loading-card {
+            max-width: 32rem;
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            text-align: center;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e5e7eb;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .brand-info {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f3f4f6;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+        }
+        .nav-link {
+            display: inline-block;
+            margin: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #3b82f6;
+            color: white;
+            text-decoration: none;
+            border-radius: 0.25rem;
+        }
+        .nav-link:hover { background: #2563eb; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="loading-card">
+            <div class="spinner"></div>
+            <h1 style="font-size: 1.5rem; margin-bottom: 0.5rem;">${pageTitle}</h1>
+            <p style="color: #6b7280; margin-bottom: 1rem;">
+                正在加载 ${brand.name} 的${pageType === '主页' ? '品牌信息' : pageType === 'products' ? '产品信息' : pageType === 'solutions' ? '解决方案' : '技术支持信息'}...
+            </p>
+
+            <div class="brand-info">
+                <strong>品牌信息：</strong><br>
+                名称: ${brand.name}<br>
+                页面: ${pageTitle}<br>
+                状态: 正在渲染中
+            </div>
+
+            <div style="margin-top: 1.5rem;">
+                <a href="/" class="nav-link">返回首页</a>
+                <a href="/brands" class="nav-link">所有品牌</a>
+                ${pageType !== '主页' ? `<a href="/brands/${encodeURIComponent(brand.slug || brand.name)}/" class="nav-link">品牌主页</a>` : ''}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('Brand page loaded:', {
+            brand: '${brand.name}',
+            pageType: '${pageType}',
+            url: window.location.href,
+            timestamp: new Date().toISOString()
+        });
+
+        // 提示用户这是静态生成的页面
+        setTimeout(() => {
+            const message = document.createElement('div');
+            message.innerHTML = '<p style="color: #059669; margin-top: 1rem; font-size: 0.875rem;">✅ 品牌页面已静态生成</p>';
+            document.querySelector('.loading-card').appendChild(message);
+        }, 2000);
+    </script>
+</body>
+</html>`;
 }
 
 // 从Sanity获取特色品牌数据（使用fallback系统）

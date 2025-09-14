@@ -8,11 +8,18 @@
 # Admin redirect only
 /admin /admin/ 200
 
-# Brand routes with Chinese character support
-/brands/:slug /brands/:slug/ 200
-/brands/:slug/products /brands/:slug/products/ 200
-/brands/:slug/solutions /brands/:slug/solutions/ 200
-/brands/:slug/support /brands/:slug/support/ 200
+# Brand routes with Chinese character support - Updated for better matching
+/brands/:slug/products/ /brands/:slug/products/index.html 200
+/brands/:slug/solutions/ /brands/:slug/solutions/index.html 200
+/brands/:slug/support/ /brands/:slug/support/index.html 200
+/brands/:slug/ /brands/:slug/index.html 200
+/brands/:slug/products /brands/:slug/products/ 301
+/brands/:slug/solutions /brands/:slug/solutions/ 301
+/brands/:slug/support /brands/:slug/support/ 301
+/brands/:slug /brands/:slug/ 301
 
 # API routes (if any)
 /api/* /api/:splat 200
+
+# Note: Removed catch-all redirect that was causing all routes to show homepage
+# Dynamic routes must be properly pre-generated during build time
