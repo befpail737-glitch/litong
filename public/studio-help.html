@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanity Studio 访问指南 - 力通电子</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            line-height: 1.6;
+            background-color: #f8f9fa;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        h1 {
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #718096;
+            font-size: 18px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .correct-url {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .wrong-url {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .url-text {
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 16px;
+            word-break: break-all;
+        }
+        .steps {
+            background: #e3f2fd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .step {
+            margin-bottom: 15px;
+            padding-left: 30px;
+            position: relative;
+        }
+        .step::before {
+            content: counter(step-counter);
+            counter-increment: step-counter;
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: #1976d2;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .steps {
+            counter-reset: step-counter;
+        }
+        .info-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .button {
+            display: inline-block;
+            background: #4caf50;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            text-align: center;
+            margin: 10px 10px 10px 0;
+            transition: background 0.3s;
+        }
+        .button:hover {
+            background: #45a049;
+        }
+        .button.secondary {
+            background: #2196f3;
+        }
+        .button.secondary:hover {
+            background: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">L</div>
+            <h1>Sanity Studio 访问指南</h1>
+            <div class="subtitle">力通电子内容管理系统</div>
+        </div>
+
+        <div class="section">
+            <h2>✅ 正确的访问地址</h2>
+            <div class="correct-url">
+                <strong>请使用此地址访问 Studio：</strong><br>
+                <div class="url-text">https://litong.pages.dev/studio</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>❌ 错误的访问地址</h2>
+            <div class="wrong-url">
+                <strong>请不要使用这个地址：</strong><br>
+                <div class="url-text">https://www.sanity.io/@onLmQUoxi/studio/...</div>
+                <small>这是一个不同的项目，您没有访问权限</small>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🔧 解决访问问题</h2>
+            <div class="steps">
+                <div class="step">清除浏览器缓存和 Cookies（特别是 litong.pages.dev 和 sanity.io 相关的）</div>
+                <div class="step">确保您使用 befpail737@gmail.com 账户登录 Google</div>
+                <div class="step">访问正确的 Studio 地址：https://litong.pages.dev/studio</div>
+                <div class="step">等待页面完全加载（可能需要几秒钟）</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="info-box">
+                <strong>📋 项目信息：</strong><br>
+                • 项目 ID: oquvb2bs<br>
+                • 数据集: production<br>
+                • 您的角色: Administrator<br>
+                • 您的邮箱: befpail737@gmail.com
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🚀 快速访问</h2>
+            <a href="https://litong.pages.dev/studio" class="button">打开 Studio</a>
+            <a href="https://www.sanity.io/manage/project/oquvb2bs" class="button secondary">项目管理控制台</a>
+        </div>
+
+        <div class="section">
+            <h2>🆘 仍有问题？</h2>
+            <p>如果按照上述步骤操作后仍然无法访问，请检查：</p>
+            <ul>
+                <li>网络连接是否正常</li>
+                <li>浏览器是否启用了 JavaScript</li>
+                <li>是否使用了 VPN 或代理服务</li>
+                <li>浏览器控制台是否有错误信息</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // 自动检测并显示当前环境信息
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📋 Studio 访问指南已加载');
+            console.log('🔧 当前访问地址:', window.location.href);
+            console.log('✅ 正确的 Studio 地址: https://litong.pages.dev/studio');
+        });
+    </script>
+</body>
+</html>
