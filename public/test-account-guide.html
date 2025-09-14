@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanity Studio 测试账户指南 - myya3370@gmail.com</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            border-radius: 20px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        h1 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            color: #718096;
+            font-size: 18px;
+        }
+        .test-box {
+            background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+            border: 3px solid #4caf50;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        .test-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        .steps {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+        .step {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #2196f3;
+            position: relative;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .step-number {
+            position: absolute;
+            left: -15px;
+            top: 15px;
+            background: #2196f3;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .step-title {
+            font-weight: bold;
+            color: #1976d2;
+            font-size: 18px;
+            margin-bottom: 10px;
+            margin-left: 25px;
+        }
+        .step-content {
+            margin-left: 25px;
+            color: #555;
+        }
+        .email-box {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border: 2px solid #2196f3;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .email-text {
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 20px;
+            color: #1976d2;
+            margin: 10px 0;
+        }
+        .comparison-box {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            border: 2px solid #ff9800;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            margin: 15px 15px 15px 0;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+        .button.secondary {
+            background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+        }
+        .button.secondary:hover {
+            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .info-card {
+            background: #f1f3f4;
+            padding: 20px;
+            border-radius: 12px;
+            border-top: 4px solid #4caf50;
+        }
+        .info-title {
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🧪</div>
+            <h1>Sanity Studio 测试账户指南</h1>
+            <div class="subtitle">myya3370@gmail.com 权限测试</div>
+        </div>
+
+        <div class="test-box">
+            <div class="test-icon">📧</div>
+            <strong>测试账户邀请已发送！</strong><br>
+            <div style="margin-top: 15px;">
+                <strong>发送时间: 2025-09-14 11:19</strong>
+            </div>
+        </div>
+
+        <div class="email-box">
+            <strong>请检查此测试邮箱：</strong><br>
+            <div class="email-text">📮 myya3370@gmail.com</div>
+            <small>查找来自 Sanity 的邀请邮件</small>
+        </div>
+
+        <div class="steps">
+            <h2 style="margin-bottom: 30px; color: #2d3748;">🧪 测试步骤</h2>
+
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-title">检查测试邮箱</div>
+                <div class="step-content">
+                    登录 <strong>myya3370@gmail.com</strong>，查找 Sanity 邀请邮件<br>
+                    邮件主题：\"You've been invited to join litong on Sanity\"
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-title">接受邀请</div>
+                <div class="step-content">
+                    点击邮件中的 <strong>\"Accept invitation\"</strong> 按钮<br>
+                    完成 Sanity 账户设置
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-title">测试访问</div>
+                <div class="step-content">
+                    访问：<strong>https://litong.pages.dev/studio</strong><br>
+                    使用 myya3370@gmail.com 账户登录
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-title">报告结果</div>
+                <div class="step-content">
+                    记录是否能正常访问 Studio，或者是否仍显示权限错误<br>
+                    这将帮助我们确定问题是账户特定的还是系统配置问题
+                </div>
+            </div>
+        </div>
+
+        <div class="comparison-box">
+            <h3>📊 测试对比</h3>
+            <p><strong>对比目标：</strong></p>
+            <ul>
+                <li><strong>befpail737@gmail.com</strong> - 显示 "pending approval"（问题账户）</li>
+                <li><strong>myya3370@gmail.com</strong> - 新测试账户</li>
+            </ul>
+            <p>如果新账户能正常访问，说明问题在于原账户的权限同步；如果新账户也有问题，则是系统配置问题。</p>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-card">
+                <div class="info-title">📋 项目信息</div>
+                • 项目名称: litong<br>
+                • 项目 ID: oquvb2bs<br>
+                • 测试角色: Administrator<br>
+                • 邀请时间: 2025-09-14 11:19
+            </div>
+            <div class="info-card">
+                <div class="info-title">✅ 测试地址</div>
+                <strong>https://litong.pages.dev/studio</strong><br>
+                <small style="color: #666;">接受邀请后使用此地址访问</small>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin: 40px 0;">
+            <h2>🚀 开始测试</h2>
+            <a href="https://litong.pages.dev/studio" class="button">打开 Sanity Studio</a>
+            <a href="https://www.sanity.io/manage/project/oquvb2bs" class="button secondary">项目管理控制台</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🧪 测试账户指南已加载');
+            console.log('📧 测试邮箱: myya3370@gmail.com');
+            console.log('⏰ 邀请发送时间: 2025-09-14 11:19:27 UTC');
+            console.log('🎯 项目 ID: oquvb2bs');
+            console.log('🔍 测试目标: 对比权限访问行为');
+        });
+    </script>
+</body>
+</html>
