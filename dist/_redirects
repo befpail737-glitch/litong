@@ -1,21 +1,16 @@
-# Cloudflare Pages redirects for SPA routing
+# Cloudflare Pages redirects - NO INFINITE LOOPS
 # https://developers.cloudflare.com/pages/configuration/redirects/
 
-# CRITICAL: Studio routes MUST be first to prevent wildcard conflicts
-# Studio routes - use splat parameters to avoid redirect loops
-/studio /studio/index.html 200
-/studio/* /studio/index.html 200
-
-# Admin panel routes - use splat parameters to avoid redirect loops
-/admin /admin/index.html 200
-/admin/* /admin/index.html 200
+# Exact path redirects (no infinite loops)
+/studio /studio/ 200
+/admin /admin/ 200
 
 # Brand routes with Chinese character support
-/brands/:slug /brands/:slug/index.html 200
+/brands/:slug /brands/:slug/ 200
 
 # API routes (if any)
 /api/* /api/:splat 200
 
-# Default SPA fallback - serve index.html for unmatched routes
-# IMPORTANT: This wildcard rule must be LAST to avoid conflicts
-/:path* /index.html 200
+# Default fallback - only for non-existing paths
+# This avoids infinite loops by not catching existing directories
+/* /index.html 404
