@@ -88,7 +88,10 @@ export default async function SolutionsPage() {
                       </div>
                     </div>
                     <Link
-                      href={`/solutions/${solutions[0].slug}`}
+                      href={solutions[0].primaryBrand?.slug
+                        ? `/brands/${encodeURIComponent(solutions[0].primaryBrand.slug)}/solutions/${solutions[0].slug}`
+                        : `/solutions/${solutions[0].slug}`
+                      }
                       className="inline-flex items-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
                     >
                       <span>了解详情</span>
@@ -191,7 +194,10 @@ export default async function SolutionsPage() {
                         )}
                       </div>
                       <Link
-                        href={`/solutions/${solution.slug}`}
+                        href={solution.primaryBrand?.slug
+                          ? `/brands/${encodeURIComponent(solution.primaryBrand.slug)}/solutions/${solution.slug}`
+                          : `/solutions/${solution.slug}`
+                        }
                         className="text-blue-600 text-sm font-medium hover:text-blue-800 flex items-center space-x-1"
                       >
                         <span>查看详情</span>
