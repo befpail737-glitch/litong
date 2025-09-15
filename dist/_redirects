@@ -8,7 +8,35 @@
 # Admin redirect only
 /admin /admin/ 200
 
-# Brand routes - direct static file serving (highest priority)
+# ========================================
+# DETAIL PAGE ROUTES (HIGHEST PRIORITY)
+# ========================================
+
+# Brand-specific detail pages (maintain brand context)
+/brands/:slug/products/:id/ /brands/:slug/products/:id/index.html 200
+/brands/:slug/solutions/:id/ /brands/:slug/solutions/:id/index.html 200
+/brands/:slug/support/:id/ /brands/:slug/support/:id/index.html 200
+
+# Brand-specific detail pages - trailing slash normalization
+/brands/:slug/products/:id /brands/:slug/products/:id/ 301
+/brands/:slug/solutions/:id /brands/:slug/solutions/:id/ 301
+/brands/:slug/support/:id /brands/:slug/support/:id/ 301
+
+# Global detail pages
+/products/:slug/ /products/:slug/index.html 200
+/solutions/:slug/ /solutions/:slug/index.html 200
+/articles/:slug/ /articles/:slug/index.html 200
+
+# Global detail pages - trailing slash normalization
+/products/:slug /products/:slug/ 301
+/solutions/:slug /solutions/:slug/ 301
+/articles/:slug /articles/:slug/ 301
+
+# ========================================
+# LIST PAGE ROUTES
+# ========================================
+
+# Brand routes - direct static file serving
 /brands/:slug/products/ /brands/:slug/products/index.html 200
 /brands/:slug/solutions/ /brands/:slug/solutions/index.html 200
 /brands/:slug/support/ /brands/:slug/support/index.html 200
@@ -20,9 +48,25 @@
 /brands/:slug/support /brands/:slug/support/ 301
 /brands/:slug /brands/:slug/ 301
 
+# Global list pages
+/products/ /products/index.html 200
+/solutions/ /solutions/index.html 200
+/articles/ /articles/index.html 200
+/brands/ /brands/index.html 200
+
+# Global list pages - trailing slash normalization
+/products /products/ 301
+/solutions /solutions/ 301
+/articles /articles/ 301
+/brands /brands/ 301
+
+# ========================================
+# API AND OTHER ROUTES
+# ========================================
+
 # API routes (if any)
 /api/* /api/:splat 200
 
-# Note: Removed specific brand case mappings and catch-all redirect
-# Both uppercase and lowercase brand directories are now generated during build
-# This allows direct static file serving without complex redirects
+# Note: Detail page routing rules added to fix production issues where
+# detail pages were showing homepage content due to missing static files
+# These rules ensure proper routing to brand-specific and global detail pages

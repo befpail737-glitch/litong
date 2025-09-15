@@ -443,6 +443,58 @@ async function generateBrandSupportDetailPages() {
   }
 }
 
+// 生成品牌产品详情页面静态文件
+async function generateBrandProductDetailPages() {
+  try {
+    console.log('🛍️ 生成品牌产品详情页面...');
+    const brands = await getAllBrandsFromSanity();
+    let brandsToGenerate = brands;
+    if (!brands || brands.length === 0) {
+      console.warn('⚠️ 无法获取品牌数据，使用 fallback 品牌列表');
+      brandsToGenerate = getAllFallbackBrands();
+    }
+
+    let totalProductPages = 0;
+
+    for (const brand of brandsToGenerate) {
+      const brandSlug = brand.slug || encodeURIComponent(brand.name);
+      console.log(`🔧 处理品牌: ${brand.name} (${brandSlug})`);
+
+      // 获取该品牌的所有产品
+      const brandProducts = await getBrandProducts(brandSlug, 50); // 获取更多产品
+
+      for (const product of brandProducts) {
+        const productSlug = product.slug || product._id;
+        if (!productSlug) continue;
+
+        // 获取产品详细信息
+        const productDetail = await getProductDetail(productSlug);
+        if (!productDetail) continue;
+
+        // 创建目录结构：/brands/{brandSlug}/products/{productSlug}/
+        const productDir = path.join(process.cwd(), 'out', 'brands', brandSlug, 'products', productSlug);
+        const productFilePath = path.join(productDir, 'index.html');
+
+        // 确保目录存在
+        if (!fs.existsSync(productDir)) {
+          fs.mkdirSync(productDir, { recursive: true });
+        }
+
+        console.log(`🛍️ 生成产品详情页: /brands/${brandSlug}/products/${productSlug}/`);
+
+        // 生成HTML内容
+        const productDetailHTML = createProductDetailHTML(productDetail, brand, brandSlug);
+        fs.writeFileSync(productFilePath, productDetailHTML, 'utf-8');
+        totalProductPages++;
+      }
+    }
+
+    console.log(`✅ 产品详情页面生成完成 (共生成 ${totalProductPages} 个详情页)`);
+  } catch (error) {
+    console.error('❌ 产品详情页面生成失败:', error);
+  }
+}
+
 // 创建品牌页面HTML内容的辅助函数
 function createBrandPageHTML(brand, pageType) {
   const pageTitle = pageType === '主页' ? brand.name :
@@ -650,6 +702,50 @@ async function getBrandProducts(brandSlug, limit = 8) {
   } catch (error) {
     console.error('Error fetching brand products:', error);
     return [];
+  }
+}
+
+// 获取单个产品详细信息
+async function getProductDetail(productSlug) {
+  try {
+    const query = `*[_type == "product" && (slug.current == "${productSlug}" || _id == "${productSlug}") && isActive == true][0] {
+      _id,
+      title,
+      partNumber,
+      "slug": slug.current,
+      shortDescription,
+      description,
+      images,
+      datasheet,
+      pricing,
+      inventory,
+      specifications,
+      applications,
+      isActive,
+      isFeatured,
+      isNew,
+      "brand": brand-> {
+        _id,
+        name,
+        "slug": slug.current,
+        logo,
+        website
+      },
+      "category": category-> {
+        _id,
+        name,
+        "slug": slug.current,
+        description
+      },
+      _createdAt,
+      _updatedAt
+    }`;
+
+    const product = await sanityClient.fetch(query);
+    return product;
+  } catch (error) {
+    console.error('Error fetching product detail:', error);
+    return null;
   }
 }
 
@@ -2730,7 +2826,7 @@ function generateProductsPageContent(brand, products, categories, baseUrl) {
             ${product.partNumber ? `<p class="text-blue-600 text-sm font-mono mb-2">${product.partNumber}</p>` : ''}
             ${product.shortDescription ? `<p class="text-gray-600 text-sm mb-4 line-clamp-2">${product.shortDescription}</p>` : ''}
             <div class="flex space-x-2">
-              <a href="/products/${product.slug || product._id}" 
+              <a href="${baseUrl}/products/${product.slug || product._id}"
                  class="flex-1 bg-blue-600 text-white text-center py-2 px-4 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors">
                 查看详情
               </a>
@@ -3705,6 +3801,267 @@ function copyDirectory(src, dest) {
   }
 }
 
+// 创建产品详情页面HTML
+function createProductDetailHTML(product, brand, brandSlug) {
+  const pageTitle = `${product.title} - ${brand.name} 产品详情`;
+  const baseUrl = `/brands/${encodeURIComponent(brandSlug)}`;
+
+  // 生成面包屑导航
+  const breadcrumbHTML = `
+    <nav class="bg-gray-100 py-3 mb-6">
+      <div class="container mx-auto px-4">
+        <div class="flex items-center space-x-2 text-sm text-gray-600">
+          <a href="/" class="hover:text-blue-600">首页</a>
+          <span>›</span>
+          <a href="/brands" class="hover:text-blue-600">品牌</a>
+          <span>›</span>
+          <a href="${baseUrl}" class="hover:text-blue-600">${brand.name}</a>
+          <span>›</span>
+          <a href="${baseUrl}/products" class="hover:text-blue-600">产品</a>
+          <span>›</span>
+          <span class="text-gray-900">${product.title}</span>
+        </div>
+      </div>
+    </nav>`;
+
+  // 生成产品头部区域
+  const heroHTML = `
+    <div class="bg-white border-b">
+      <div class="container mx-auto px-4 py-12">
+        <div class="max-w-6xl mx-auto">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <!-- 产品图片 -->
+            <div class="space-y-4">
+              ${product.images && product.images.length > 0 ? `
+                <div class="w-full h-96 bg-gray-100 rounded-lg overflow-hidden">
+                  <img src="${urlFor(product.images[0]).width(600).height(400).url()}"
+                       alt="${product.title}" class="w-full h-full object-contain">
+                </div>
+                ${product.images.length > 1 ? `
+                  <div class="grid grid-cols-4 gap-2">
+                    ${product.images.slice(1, 5).map(image => `
+                      <div class="w-full h-20 bg-gray-100 rounded overflow-hidden">
+                        <img src="${urlFor(image).width(150).height(100).url()}"
+                             alt="${product.title}" class="w-full h-full object-contain cursor-pointer hover:opacity-75">
+                      </div>
+                    `).join('')}
+                  </div>` : ''}
+              ` : `
+                <div class="w-full h-96 bg-gray-200 rounded-lg flex items-center justify-center">
+                  <svg class="w-24 h-24 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                </div>
+              `}
+            </div>
+
+            <!-- 产品信息 -->
+            <div class="space-y-6">
+              <div>
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">${product.title}</h1>
+                ${product.partNumber ? `<p class="text-xl text-blue-600 font-mono mb-4">${product.partNumber}</p>` : ''}
+                ${product.shortDescription ? `<p class="text-lg text-gray-600 mb-6">${product.shortDescription}</p>` : ''}
+              </div>
+
+              <div class="flex flex-wrap gap-3 mb-6">
+                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">产品详情</span>
+                ${product.category ? `<span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">${product.category.name}</span>` : ''}
+                ${product.isNew ? `<span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">新品</span>` : ''}
+                ${product.isFeatured ? `<span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">推荐</span>` : ''}
+              </div>
+
+              <!-- 价格信息 -->
+              ${product.pricing && product.pricing.tiers ? `
+                <div class="bg-gray-50 rounded-lg p-6">
+                  <h3 class="text-lg font-semibold text-gray-900 mb-4">价格信息</h3>
+                  <div class="space-y-2">
+                    ${product.pricing.tiers.map(tier => `
+                      <div class="flex justify-between items-center">
+                        <span class="text-gray-600">${tier.quantity}+ ${tier.unit || '片'}</span>
+                        <span class="font-semibold text-gray-900">￥${tier.price} ${product.pricing.currency || 'CNY'}</span>
+                      </div>
+                    `).join('')}
+                  </div>
+                  ${product.pricing.moq ? `<p class="text-sm text-gray-500 mt-4">最小订购量: ${product.pricing.moq}</p>` : ''}
+                  ${product.pricing.leadTime ? `<p class="text-sm text-gray-500">交货周期: ${product.pricing.leadTime}</p>` : ''}
+                </div>
+              ` : ''}
+
+              <!-- 库存信息 -->
+              ${product.inventory ? `
+                <div class="bg-gray-50 rounded-lg p-6">
+                  <h3 class="text-lg font-semibold text-gray-900 mb-4">库存状态</h3>
+                  <div class="flex items-center space-x-3">
+                    <div class="w-3 h-3 ${product.inventory.inStock ? 'bg-green-500' : 'bg-red-500'} rounded-full"></div>
+                    <span class="text-gray-700">${product.inventory.inStock ? '现货供应' : '需要询价'}</span>
+                    ${product.inventory.quantity ? `<span class="text-gray-500">(${product.inventory.quantity} 件可用)</span>` : ''}
+                  </div>
+                </div>
+              ` : ''}
+
+              <div class="flex flex-wrap gap-4">
+                <a href="${baseUrl}" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                  返回品牌主页
+                </a>
+                <a href="${baseUrl}/products" class="border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors">
+                  更多产品
+                </a>
+                <a href="/inquiry" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors">
+                  立即询价
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  // 生成产品详细内容区域
+  const contentHTML = `
+    <div class="container mx-auto px-4 py-12">
+      <div class="max-w-6xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          <!-- 主要内容 -->
+          <div class="lg:col-span-2 space-y-8">
+            <!-- 产品描述 -->
+            ${product.description ? `
+              <div class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">产品描述</h2>
+                <div class="prose max-w-none">
+                  <div class="text-gray-700 leading-relaxed">
+                    ${renderPortableTextToHTML(product.description)}
+                  </div>
+                </div>
+              </div>` : ''}
+
+            <!-- 技术规格 -->
+            ${product.specifications ? `
+              <div class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">技术规格</h2>
+                <div class="prose max-w-none">
+                  <div class="text-gray-700 leading-relaxed">
+                    ${renderPortableTextToHTML(product.specifications)}
+                  </div>
+                </div>
+              </div>` : ''}
+
+            <!-- 应用场景 -->
+            ${product.applications ? `
+              <div class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">应用场景</h2>
+                <div class="prose max-w-none">
+                  <div class="text-gray-700 leading-relaxed">
+                    ${renderPortableTextToHTML(product.applications)}
+                  </div>
+                </div>
+              </div>` : ''}
+
+            <!-- 产品资料 -->
+            ${product.datasheet ? `
+              <div class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">产品资料</h2>
+                <div class="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                  <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                      <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path>
+                      </svg>
+                    </div>
+                    <div class="flex-1">
+                      <h4 class="font-semibold text-gray-900">产品数据手册</h4>
+                      <p class="text-sm text-gray-600">PDF 格式技术文档</p>
+                    </div>
+                    <a href="${product.datasheet}" target="_blank" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm">
+                      下载
+                    </a>
+                  </div>
+                </div>
+              </div>` : ''}
+          </div>
+
+          <!-- 侧边栏 -->
+          <div class="lg:col-span-1 space-y-6">
+            <!-- 品牌信息 -->
+            <div class="bg-white rounded-lg shadow p-6">
+              <h3 class="text-lg font-bold text-gray-900 mb-4">产品品牌</h3>
+              ${brand.logo ? `
+                <div class="w-16 h-16 mb-4 bg-gray-100 rounded-lg overflow-hidden">
+                  <img src="${urlFor(brand.logo).width(64).height(64).url()}"
+                       alt="${brand.name}" class="w-full h-full object-contain">
+                </div>` : ''}
+              <h4 class="font-semibold text-gray-900 mb-2">${brand.name}</h4>
+              ${brand.description ? `<p class="text-gray-600 text-sm mb-4">${brand.description}</p>` : ''}
+              <div class="space-y-2 text-sm text-gray-500">
+                ${brand.country ? `<div>📍 ${brand.country}</div>` : ''}
+                ${brand.website ? `<div><a href="${brand.website}" target="_blank" class="text-blue-600 hover:text-blue-700">🌐 官方网站</a></div>` : ''}
+              </div>
+            </div>
+
+            <!-- 快速询价 -->
+            <div class="bg-blue-50 rounded-lg p-6">
+              <h3 class="text-lg font-bold text-gray-900 mb-4">需要报价？</h3>
+              <p class="text-gray-600 text-sm mb-4">我们的专业团队为您提供最优价格和服务</p>
+              <div class="space-y-3">
+                <a href="/inquiry" class="block bg-blue-600 text-white text-center px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                  立即询价
+                </a>
+                <a href="/contact" class="block border border-gray-300 text-gray-700 text-center px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors text-sm">
+                  联系我们
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>${pageTitle} - 力通电子</title>
+    <meta name="description" content="${product.shortDescription || `${product.title} - ${brand.name}优质产品，专业技术支持`}"/>
+    <meta name="keywords" content="${product.title}, ${brand.name}, ${product.partNumber || ''}, 电子元器件"/>
+    <link rel="icon" href="/favicon.ico"/>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f9fafb;
+            color: #111827;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+        }
+        .prose {
+            max-width: 65ch;
+        }
+        .prose h2 {
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        .prose p {
+            margin-bottom: 1rem;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+        }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    ${breadcrumbHTML}
+    ${heroHTML}
+    ${contentHTML}
+</body>
+</html>`;
+}
+
 // 增强的主函数
 async function enhancedMain() {
   try {
@@ -3775,6 +4132,10 @@ async function enhancedMain() {
     // 生成品牌技术支持详情页面静态文件
     console.log('\n📰 生成技术支持详情页面...');
     await generateBrandSupportDetailPages();
+
+    // 生成品牌产品详情页面静态文件
+    console.log('\n📦 生成产品详情页面...');
+    await generateBrandProductDetailPages();
 
     // 最终验证：确保 Studio 文件正确无误
     console.log('\n🔍 最终验证: 检查 Sanity Studio 部署状态...');
