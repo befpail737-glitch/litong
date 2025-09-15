@@ -2865,7 +2865,7 @@ function generateSupportPageContent(brand, articles, baseUrl) {
     <div class="space-y-6">
       ${articles.map(article => `
         <div class="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow">
-          <h3 class="font-semibold text-gray-900 text-lg hover:text-blue-600 cursor-pointer mb-2">${article.title}</h3>
+          <h3 class="mb-2"><a href="${baseUrl}/support/${article.slug}" class="font-semibold text-gray-900 text-lg hover:text-blue-600 cursor-pointer">${article.title}</a></h3>
           ${article.summary ? `<p class="text-gray-600 mb-4 line-clamp-3">${article.summary}</p>` : ''}
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-4 text-sm text-gray-500">
