@@ -1245,6 +1245,193 @@ async function manualStaticExport() {
     console.log('📋 找到根主文件:', rootMainFiles.length, '个');
     console.log('📋 找到共享JS文件:', sharedJsFiles.length, '个');
 
+    // CSS fallback: 如果没有找到CSS文件，尝试查找常见的CSS文件
+    if (cssFiles.length === 0) {
+      console.log('⚠️  未在manifest中找到CSS文件，尝试查找fallback CSS...');
+
+      // 检查.next/static/css目录
+      const nextCssDir = '.next/static/css';
+      if (fs.existsSync(nextCssDir)) {
+        const cssFiles_fallback = fs.readdirSync(nextCssDir).filter(file => file.endsWith('.css'));
+        if (cssFiles_fallback.length > 0) {
+          cssFiles.push(...cssFiles_fallback.map(file => `css/${file}`));
+          console.log('✅ 找到fallback CSS文件:', cssFiles_fallback);
+        }
+      }
+
+      // 如果还是没有CSS，尝试查找编译的CSS
+      if (cssFiles.length === 0) {
+        const compiledCssPath = 'src/app/compiled.css';
+        if (fs.existsSync(compiledCssPath)) {
+          // 复制编译的CSS到static目录
+          const targetCssDir = path.join('out', '_next', 'static', 'css');
+          if (!fs.existsSync(targetCssDir)) {
+            fs.mkdirSync(targetCssDir, { recursive: true });
+          }
+          const targetCssFile = path.join(targetCssDir, 'compiled.css');
+          fs.copyFileSync(compiledCssPath, targetCssFile);
+          cssFiles.push('css/compiled.css');
+          console.log('✅ 使用编译的Tailwind CSS文件');
+        }
+      }
+
+      // 最后的fallback：创建基本的Tailwind CSS
+      if (cssFiles.length === 0) {
+        console.log('⚠️  仍未找到CSS文件，创建基本Tailwind CSS...');
+        const basicTailwindCSS = `
+/* Tailwind CSS Fallback - Critical Styles Only */
+*,::before,::after{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}
+::before,::after{--tw-content:''}
+html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal}
+body{margin:0;line-height:inherit}
+hr{height:0;color:inherit;border-top-width:1px}
+abbr:where([title]){text-decoration:underline dotted}
+h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}
+a{color:inherit;text-decoration:inherit}
+b,strong{font-weight:bolder}
+code,kbd,samp,pre{font-family:ui-monospace, SFMono-Regular, "Consolas", "Liberation Mono", "Menlo", monospace;font-size:1em}
+small{font-size:80%}
+sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}
+sub{bottom:-.25em}
+sup{top:-.5em}
+table{text-indent:0;border-color:inherit;border-collapse:collapse}
+button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;color:inherit;margin:0;padding:0}
+button,select{text-transform:none}
+button,[type='button'],[type='reset'],[type='submit']{-webkit-appearance:button;background-color:transparent;background-image:none}
+:-moz-focusring{outline:auto}
+:-moz-ui-invalid{box-shadow:none}
+progress{vertical-align:baseline}
+::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}
+[type='search']{-webkit-appearance:textfield;outline-offset:-2px}
+::-webkit-search-decoration{-webkit-appearance:none}
+::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}
+summary{display:list-item}
+blockquote,dl,dd,h1,h2,h3,h4,h5,h6,hr,figure,p,pre{margin:0}
+fieldset{margin:0;padding:0}
+legend{padding:0}
+ol,ul,menu{list-style:none;margin:0;padding:0}
+dialog{padding:0}
+textarea{resize:vertical}
+input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}
+button,[role="button"]{cursor:pointer}
+:disabled{cursor:default}
+img,svg,video,canvas,audio,iframe,embed,object{display:block;vertical-align:middle}
+img,video{max-width:100%;height:auto}
+[hidden]{display:none}
+
+/* Layout */
+.container{width:100%;margin-left:auto;margin-right:auto;padding-left:1rem;padding-right:1rem}
+@media (min-width: 640px){.container{max-width:640px}}
+@media (min-width: 768px){.container{max-width:768px}}
+@media (min-width: 1024px){.container{max-width:1024px}}
+@media (min-width: 1280px){.container{max-width:1280px}}
+@media (min-width: 1536px){.container{max-width:1536px}}
+
+/* Colors */
+.bg-white{background-color:#fff}
+.bg-gray-50{background-color:#f9fafb}
+.bg-gray-100{background-color:#f3f4f6}
+.bg-blue-100{background-color:#dbeafe}
+.bg-blue-600{background-color:#2563eb}
+.bg-blue-700{background-color:#1d4ed8}
+.text-white{color:#fff}
+.text-gray-500{color:#6b7280}
+.text-gray-600{color:#4b5563}
+.text-gray-700{color:#374151}
+.text-gray-900{color:#111827}
+.text-blue-600{color:#2563eb}
+.text-blue-700{color:#1d4ed8}
+
+/* Spacing */
+.p-2{padding:0.5rem}
+.p-4{padding:1rem}
+.p-6{padding:1.5rem}
+.p-8{padding:2rem}
+.px-3{padding-left:0.75rem;padding-right:0.75rem}
+.px-4{padding-left:1rem;padding-right:1rem}
+.px-6{padding-left:1.5rem;padding-right:1.5rem}
+.py-2{padding-top:0.5rem;padding-bottom:0.5rem}
+.py-3{padding-top:0.75rem;padding-bottom:0.75rem}
+.m-0{margin:0}
+.mb-2{margin-bottom:0.5rem}
+.mb-4{margin-bottom:1rem}
+.mb-6{margin-bottom:1.5rem}
+.mb-8{margin-bottom:2rem}
+.mr-2{margin-right:0.5rem}
+
+/* Layout */
+.block{display:block}
+.inline-block{display:inline-block}
+.flex{display:flex}
+.grid{display:grid}
+.hidden{display:none}
+.items-center{align-items:center}
+.justify-center{justify-content:center}
+.justify-between{justify-content:space-between}
+.space-x-2 > :not([hidden]) ~ :not([hidden]){margin-left:0.5rem}
+.space-y-2 > :not([hidden]) ~ :not([hidden]){margin-top:0.5rem}
+.space-y-4 > :not([hidden]) ~ :not([hidden]){margin-top:1rem}
+
+/* Typography */
+.text-sm{font-size:0.875rem;line-height:1.25rem}
+.text-base{font-size:1rem;line-height:1.5rem}
+.text-lg{font-size:1.125rem;line-height:1.75rem}
+.text-xl{font-size:1.25rem;line-height:1.75rem}
+.text-2xl{font-size:1.5rem;line-height:2rem}
+.text-3xl{font-size:1.875rem;line-height:2.25rem}
+.font-medium{font-weight:500}
+.font-semibold{font-weight:600}
+.font-bold{font-weight:700}
+
+/* Borders & Shadows */
+.border{border-width:1px}
+.border-gray-200{border-color:#e5e7eb}
+.border-gray-300{border-color:#d1d5db}
+.rounded{border-radius:0.25rem}
+.rounded-md{border-radius:0.375rem}
+.rounded-lg{border-radius:0.5rem}
+.rounded-xl{border-radius:0.75rem}
+.shadow{box-shadow:0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)}
+.shadow-md{box-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)}
+.shadow-lg{box-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)}
+
+/* Interactive */
+.cursor-pointer{cursor:pointer}
+.transition-colors{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}
+.hover\\:bg-blue-700:hover{background-color:#1d4ed8}
+.hover\\:bg-gray-50:hover{background-color:#f9fafb}
+.hover\\:text-blue-800:hover{color:#1e40af}
+
+/* Grid */
+.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}
+.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}
+.grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}
+.gap-4{gap:1rem}
+.gap-6{gap:1.5rem}
+.gap-8{gap:2rem}
+
+/* Responsive */
+@media (min-width: 768px){
+  .md\\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}
+  .md\\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}
+}
+@media (min-width: 1024px){
+  .lg\\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}
+  .lg\\:grid-cols-4{grid-template-columns:repeat(4, minmax(0, 1fr))}
+}
+`;
+
+        const targetCssDir = path.join('out', '_next', 'static', 'css');
+        if (!fs.existsSync(targetCssDir)) {
+          fs.mkdirSync(targetCssDir, { recursive: true });
+        }
+        const fallbackCssFile = path.join(targetCssDir, 'fallback.css');
+        fs.writeFileSync(fallbackCssFile, basicTailwindCSS);
+        cssFiles.push('css/fallback.css');
+        console.log('✅ 创建fallback CSS文件');
+      }
+    }
+
     // 获取Sanity品牌数据（仅在需要时获取）
     console.log('🔄 准备获取品牌数据...');
     const allBrands = await getAllBrandsFromSanity();
@@ -2675,14 +2862,24 @@ async function main() {
     console.log('📝 清理 .next 目录...');
     await removeDirectory('.next');
 
-    // 步骤2: 尝试正常构建
+    // 步骤2: 确保CSS编译
+    console.log('🎨 确保Tailwind CSS正确编译...');
+    try {
+      // 先确保Tailwind CSS被编译
+      await runCommand('npx tailwindcss -i ./src/app/globals.css -o ./src/app/compiled.css --watch=false', 'Tailwind CSS 编译');
+      console.log('✅ Tailwind CSS 编译完成！');
+    } catch (cssError) {
+      console.log('⚠️  直接CSS编译失败，继续使用Next.js内置处理...');
+    }
+
+    // 步骤3: 尝试正常构建
     try {
       await runCommand('npx next build', 'Next.js 构建');
       console.log('✅ 正常构建完成！');
     } catch (error) {
       console.log('⚠️  正常构建失败，尝试强制构建...');
-      
-      // 步骤3: 强制构建（忽略错误）
+
+      // 步骤4: 强制构建（忽略错误）
       try {
         await runCommand('npx next build || true', '强制构建（忽略错误）');
       } catch (forceError) {
@@ -2690,7 +2887,7 @@ async function main() {
       }
     }
 
-    // 步骤4: 检查构建结果
+    // 步骤5: 检查构建结果
     let buildSuccess = false;
     if (fs.existsSync('out') && fs.readdirSync('out').length > 0) {
       console.log('✅ 检测到 out 目录有内容，构建成功！');
@@ -2700,7 +2897,7 @@ async function main() {
       buildSuccess = await manualStaticExport();
     }
 
-    // 步骤5: 验证结果
+    // 步骤6: 验证结果
     if (buildSuccess && fs.existsSync('out') && fs.readdirSync('out').length > 0) {
       console.log('🎉 静态构建成功完成！');
       console.log('📦 输出目录: out/');
