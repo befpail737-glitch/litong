@@ -292,7 +292,7 @@ export async function getSolutions(params: {
 // 获取单个解决方案
 export async function getSolution(slug: string, preview = false) {
   const query = groq`
-    *[_type == "solution" && slug.current == $slug && isPublished == true][0] {
+    *[_type == "solution" && slug.current == $slug && (isPublished == true || !defined(isPublished))][0] {
       ${GROQ_FRAGMENTS.solution}
     }
   `;
@@ -313,8 +313,8 @@ export async function getSolution(slug: string, preview = false) {
 export async function searchSolutions(searchTerm: string, limit = 10) {
   const query = groq`
     *[
-      _type == "solution" && 
-      isPublished == true && 
+      _type == "solution" &&
+      (isPublished == true || !defined(isPublished)) &&
       (
         title match $searchTerm + "*" ||
         summary match $searchTerm + "*"
