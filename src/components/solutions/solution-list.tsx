@@ -246,7 +246,10 @@ export function SolutionList({
             </div>
 
             <CardTitle className="line-clamp-2 group-hover:text-primary transition-colors">
-              <Link href={`/solutions/${solution.slug.current}`}>
+              <Link href={solution.primaryBrand?.slug
+                ? `/brands/${encodeURIComponent(solution.primaryBrand.slug)}/solutions/${solution.slug.current}`
+                : `/solutions/${solution.slug.current}`
+              }>
                 {title}
               </Link>
             </CardTitle>
@@ -319,7 +322,10 @@ export function SolutionList({
                   <Share2 className="w-4 h-4" />
                 </Button>
                 <Button size="sm" asChild>
-                  <Link href={`/solutions/${solution.slug.current}`}>
+                  <Link href={solution.primaryBrand?.slug
+                    ? `/brands/${encodeURIComponent(solution.primaryBrand.slug)}/solutions/${solution.slug.current}`
+                    : `/solutions/${solution.slug.current}`
+                  }>
                     {t('viewDetails')}
                   </Link>
                 </Button>

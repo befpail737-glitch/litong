@@ -741,7 +741,10 @@ export function SolutionDetail({
                       )}
                     </div>
                     <CardTitle className="line-clamp-2 group-hover:text-primary transition-colors">
-                      <Link href={`/solutions/${relatedSolution.slug.current}`}>
+                      <Link href={relatedSolution.primaryBrand?.slug
+                        ? `/brands/${encodeURIComponent(relatedSolution.primaryBrand.slug)}/solutions/${relatedSolution.slug.current}`
+                        : `/solutions/${relatedSolution.slug.current}`
+                      }>
                         {getLocalizedValue(relatedSolution.title, locale)}
                       </Link>
                     </CardTitle>

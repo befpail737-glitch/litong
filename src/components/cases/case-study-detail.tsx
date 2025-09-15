@@ -957,7 +957,10 @@ export function CaseStudyDetail({
                   {caseStudy.relatedSolutions.map((solution) => (
                     <Link
                       key={solution._id}
-                      href={`/solutions/${solution.slug.current}`}
+                      href={solution.primaryBrand?.slug
+                        ? `/brands/${encodeURIComponent(solution.primaryBrand.slug)}/solutions/${solution.slug.current}`
+                        : `/solutions/${solution.slug.current}`
+                      }
                       className="block p-3 border rounded-lg hover:bg-muted/50 transition-colors"
                     >
                       <p className="font-medium text-sm line-clamp-2">
