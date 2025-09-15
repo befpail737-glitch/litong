@@ -42,7 +42,7 @@ export default async function SolutionsPage() {
         </div>
         <div className="bg-white rounded-lg shadow p-6 text-center">
           <div className="text-3xl font-bold text-purple-600 mb-2">
-            {new Set(solutions.map(s => s.brand?.name).filter(Boolean)).size}
+            {new Set(solutions.map(s => s.primaryBrand?.name).filter(Boolean)).size}
           </div>
           <div className="text-sm text-gray-600">合作品牌</div>
         </div>
@@ -189,8 +189,8 @@ export default async function SolutionsPage() {
                             <span>{new Date(solution.publishedAt).toLocaleDateString('zh-CN')}</span>
                           </div>
                         )}
-                        {solution.brand && (
-                          <span className="text-blue-600">{solution.brand.name}</span>
+                        {solution.primaryBrand && (
+                          <span className="text-blue-600">{solution.primaryBrand.name}</span>
                         )}
                       </div>
                       <Link
