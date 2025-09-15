@@ -84,7 +84,7 @@ export default async function BrandSolutionsPage({ params }: BrandSolutionsPageP
                       </div>
                     </div>
                     <Link
-                      href={`/solutions/${solutions[0].slug}`}
+                      href={`/brands/${encodeURIComponent(brand.slug || brand.name)}/solutions/${solutions[0].slug}`}
                       className="inline-flex items-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
                     >
                       <span>了解详情</span>
@@ -171,7 +171,7 @@ export default async function BrandSolutionsPage({ params }: BrandSolutionsPageP
                         )}
                       </div>
                       <Link
-                        href={`/solutions/${solution.slug}`}
+                        href={`/brands/${encodeURIComponent(brand.slug || brand.name)}/solutions/${solution.slug}`}
                         className="text-blue-600 text-sm font-medium hover:text-blue-800 flex items-center space-x-1"
                       >
                         <span>查看详情</span>
