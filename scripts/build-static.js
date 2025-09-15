@@ -168,6 +168,60 @@ async function generateBrandSubPages() {
   }
 }
 
+// 生成品牌解决方案详情页面静态文件
+async function generateBrandSolutionDetailPages() {
+  try {
+    console.log('📄 生成品牌解决方案详情页面...');
+
+    const brands = await getAllBrandsFromSanity();
+    let brandsToGenerate = brands;
+    if (!brands || brands.length === 0) {
+      console.warn('⚠️ 无法获取品牌数据，使用 fallback 品牌列表');
+      brandsToGenerate = getAllFallbackBrands();
+    }
+
+    let totalSolutionPages = 0;
+
+    for (const brand of brandsToGenerate) {
+      const brandSlug = brand.slug || encodeURIComponent(brand.name);
+      console.log(`🔧 处理品牌: ${brand.name} (${brandSlug})`);
+
+      // 获取该品牌的所有解决方案
+      const brandSolutions = await getBrandSolutions(brandSlug, 50); // 获取更多解决方案
+
+      for (const solution of brandSolutions) {
+        const solutionSlug = solution.slug;
+        if (!solutionSlug) continue;
+
+        // 获取解决方案详细信息
+        const solutionDetail = await getSolutionDetail(solutionSlug);
+        if (!solutionDetail) continue;
+
+        // 创建目录结构：/brands/{brandSlug}/solutions/{solutionSlug}/
+        const solutionDir = path.join(process.cwd(), 'out', 'brands', brandSlug, 'solutions', solutionSlug);
+        const solutionFilePath = path.join(solutionDir, 'index.html');
+
+        // 确保目录存在
+        if (!fs.existsSync(solutionDir)) {
+          fs.mkdirSync(solutionDir, { recursive: true });
+        }
+
+        console.log(`📄 生成解决方案详情页: /brands/${brandSlug}/solutions/${solutionSlug}/`);
+
+        // 生成HTML内容
+        const solutionDetailHTML = createSolutionDetailHTML(solutionDetail, brand, brandSlug);
+        fs.writeFileSync(solutionFilePath, solutionDetailHTML, 'utf-8');
+
+        totalSolutionPages++;
+      }
+    }
+
+    console.log(`✅ 解决方案详情页面生成完成 (共生成 ${totalSolutionPages} 个详情页)`);
+  } catch (error) {
+    console.error('❌ 解决方案详情页面生成失败:', error);
+  }
+}
+
 // 创建品牌页面HTML内容的辅助函数
 function createBrandPageHTML(brand, pageType) {
   const pageTitle = pageType === '主页' ? brand.name :
@@ -401,6 +455,50 @@ async function getBrandSolutions(brandSlug, limit = 4) {
   } catch (error) {
     console.error('Error fetching brand solutions:', error);
     return [];
+  }
+}
+
+// 获取单个解决方案详细信息
+async function getSolutionDetail(solutionSlug) {
+  try {
+    const query = `*[_type == "solution" && slug.current == "${solutionSlug}" && (isPublished == true || !defined(isPublished))][0] {
+      _id,
+      title,
+      summary,
+      "slug": slug.current,
+      publishedAt,
+      targetMarket,
+      isFeatured,
+      heroImage,
+      content,
+      technologies,
+      benefits,
+      applications,
+      "primaryBrand": primaryBrand-> {
+        name,
+        "slug": slug.current,
+        description,
+        website,
+        logo
+      },
+      "relatedBrands": relatedBrands[]-> {
+        name,
+        "slug": slug.current
+      },
+      "relatedProducts": relatedProducts[]-> {
+        title,
+        "slug": slug.current,
+        partNumber,
+        shortDescription,
+        images
+      }
+    }`;
+
+    const solution = await sanityClient.fetch(query);
+    return solution;
+  } catch (error) {
+    console.error('Error fetching solution detail:', error);
+    return null;
   }
 }
 
@@ -2599,6 +2697,198 @@ function getSubPageKeywords(pageType) {
   return '';
 }
 
+// 创建解决方案详情页面HTML
+function createSolutionDetailHTML(solution, brand, brandSlug) {
+  const pageTitle = `${solution.title} - ${brand.name} 解决方案`;
+  const baseUrl = `/brands/${encodeURIComponent(brandSlug)}`;
+
+  // 生成面包屑导航
+  const breadcrumbHTML = `
+    <nav class="bg-gray-100 py-3 mb-6">
+      <div class="container mx-auto px-4">
+        <div class="flex items-center space-x-2 text-sm text-gray-600">
+          <a href="/" class="hover:text-blue-600">首页</a>
+          <span>›</span>
+          <a href="/brands" class="hover:text-blue-600">品牌</a>
+          <span>›</span>
+          <a href="${baseUrl}" class="hover:text-blue-600">${brand.name}</a>
+          <span>›</span>
+          <a href="${baseUrl}/solutions" class="hover:text-blue-600">解决方案</a>
+          <span>›</span>
+          <span class="text-gray-900">${solution.title}</span>
+        </div>
+      </div>
+    </nav>`;
+
+  // 生成英雄区域
+  const heroHTML = `
+    <div class="bg-white border-b">
+      <div class="container mx-auto px-4 py-12">
+        <div class="max-w-4xl mx-auto">
+          ${solution.heroImage ? `
+            <div class="w-full h-64 md:h-80 mb-8 bg-gray-100 rounded-lg overflow-hidden">
+              <img src="${urlFor(solution.heroImage).width(800).height(320).url()}"
+                   alt="${solution.title}" class="w-full h-full object-cover">
+            </div>` : ''}
+
+          <div class="text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">${solution.title}</h1>
+            ${solution.summary ? `<p class="text-xl text-gray-600 mb-6 max-w-3xl mx-auto">${solution.summary}</p>` : ''}
+
+            <div class="flex flex-wrap justify-center gap-4 mb-8">
+              ${solution.targetMarket ? `<span class="px-4 py-2 bg-blue-100 text-blue-800 rounded-full">${solution.targetMarket}</span>` : ''}
+              ${solution.publishedAt ? `<span class="px-4 py-2 bg-gray-100 text-gray-800 rounded-full">发布时间: ${new Date(solution.publishedAt).toLocaleDateString('zh-CN')}</span>` : ''}
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-4">
+              <a href="${baseUrl}" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                返回品牌主页
+              </a>
+              <a href="${baseUrl}/solutions" class="border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors">
+                更多解决方案
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  // 生成内容区域
+  const contentHTML = `
+    <div class="container mx-auto px-4 py-12">
+      <div class="max-w-4xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          <!-- 主要内容 -->
+          <div class="lg:col-span-2">
+            ${solution.content ? `
+              <div class="prose max-w-none mb-12">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">解决方案详情</h2>
+                <div class="text-gray-700 leading-relaxed">
+                  ${solution.content.replace(/\n/g, '<br>')}
+                </div>
+              </div>` : ''}
+
+            ${solution.applications && solution.applications.length > 0 ? `
+              <div class="mb-12">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">应用场景</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  ${solution.applications.map(app => `
+                    <div class="bg-gray-50 rounded-lg p-6">
+                      <h3 class="font-semibold text-gray-900 mb-2">${app}</h3>
+                      <p class="text-gray-600 text-sm">适用于${app}相关的技术应用场景</p>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>` : ''}
+
+            ${solution.benefits && solution.benefits.length > 0 ? `
+              <div class="mb-12">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">方案优势</h2>
+                <div class="space-y-4">
+                  ${solution.benefits.map(benefit => `
+                    <div class="flex items-start space-x-3">
+                      <div class="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mt-1">
+                        <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                      </div>
+                      <p class="text-gray-700">${benefit}</p>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>` : ''}
+
+            ${solution.technologies && solution.technologies.length > 0 ? `
+              <div class="mb-12">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">核心技术</h2>
+                <div class="flex flex-wrap gap-3">
+                  ${solution.technologies.map(tech => `
+                    <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">${tech}</span>
+                  `).join('')}
+                </div>
+              </div>` : ''}
+          </div>
+
+          <!-- 侧边栏 -->
+          <div class="lg:col-span-1">
+            <!-- 品牌信息 -->
+            <div class="bg-white rounded-lg shadow p-6 mb-8">
+              <h3 class="text-lg font-bold text-gray-900 mb-4">方案提供商</h3>
+              ${brand.logo ? `
+                <div class="w-16 h-16 mb-4 bg-gray-100 rounded-lg overflow-hidden">
+                  <img src="${urlFor(brand.logo).width(64).height(64).url()}"
+                       alt="${brand.name}" class="w-full h-full object-cover">
+                </div>` : ''}
+              <h4 class="font-semibold text-gray-900 mb-2">${brand.name}</h4>
+              ${brand.description ? `<p class="text-gray-600 text-sm mb-4">${brand.description}</p>` : ''}
+              <div class="space-y-2 text-sm text-gray-500">
+                ${brand.country ? `<div>📍 ${brand.country}</div>` : ''}
+                ${brand.website ? `<div><a href="${brand.website}" target="_blank" class="text-blue-600 hover:text-blue-700">🌐 官方网站</a></div>` : ''}
+              </div>
+            </div>
+
+            ${solution.relatedProducts && solution.relatedProducts.length > 0 ? `
+              <!-- 相关产品 -->
+              <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">相关产品</h3>
+                <div class="space-y-4">
+                  ${solution.relatedProducts.slice(0, 3).map(product => `
+                    <div class="border-b border-gray-200 pb-4 last:border-b-0 last:pb-0">
+                      <h4 class="font-medium text-gray-900 mb-1">${product.title}</h4>
+                      ${product.partNumber ? `<p class="text-sm text-gray-500 mb-1">型号: ${product.partNumber}</p>` : ''}
+                      ${product.shortDescription ? `<p class="text-sm text-gray-600">${product.shortDescription}</p>` : ''}
+                    </div>
+                  `).join('')}
+                </div>
+              </div>` : ''}
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>${pageTitle} - 力通电子</title>
+    <meta name="description" content="${solution.summary || `${solution.title} - ${brand.name}提供的专业解决方案`}"/>
+    <link rel="icon" href="/favicon.ico"/>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f9fafb;
+            color: #111827;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+        }
+        .prose {
+            max-width: 65ch;
+        }
+        .prose h2 {
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+        }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    ${breadcrumbHTML}
+    ${heroHTML}
+    ${contentHTML}
+</body>
+</html>`;
+}
+
 // 构建独立的Sanity Studio
 async function buildSanityStudio() {
   console.log('🏗️  构建 Sanity Studio...');
@@ -3002,6 +3292,10 @@ async function enhancedMain() {
     // 生成品牌子页面静态文件
     console.log('\n📂 生成品牌子页面...');
     await generateBrandSubPages();
+
+    // 生成品牌解决方案详情页面静态文件
+    console.log('\n📄 生成解决方案详情页面...');
+    await generateBrandSolutionDetailPages();
 
     // 最终验证：确保 Studio 文件正确无误
     console.log('\n🔍 最终验证: 检查 Sanity Studio 部署状态...');
