@@ -198,6 +198,27 @@ function renderPortableTextToHTML(content) {
   return '';
 }
 
+// 生成优化的产品URL slug
+function generateOptimizedProductSlug(product) {
+  // 优先级：1. slug 2. partNumber 3. _id
+  let slug = null;
+
+  if (product.slug && product.slug.trim()) {
+    slug = product.slug.trim();
+  } else if (product.partNumber && product.partNumber.trim()) {
+    slug = product.partNumber.trim();
+  } else {
+    slug = product._id;
+  }
+
+  // 对slug进行URL安全处理
+  return slug
+    .toLowerCase()
+    .replace(/[^a-z0-9\u4e00-\u9fa5]/g, '-') // 保留中文字符，其他特殊字符替换为-
+    .replace(/-+/g, '-') // 连续的-合并为单个-
+    .replace(/^-|-$/g, ''); // 去掉开头和结尾的-
+}
+
 // 导入fallback品牌数据
 const { getAllFallbackBrands, getFeaturedFallbackBrands, getFallbackBrandStats } = require('./fallback-brands.js');
 
@@ -464,11 +485,11 @@ async function generateBrandProductDetailPages() {
       const brandProducts = await getBrandProducts(brandSlug, 50); // 获取更多产品
 
       for (const product of brandProducts) {
-        const productSlug = product.slug || product._id;
+        const productSlug = generateOptimizedProductSlug(product);
         if (!productSlug) continue;
 
         // 获取产品详细信息
-        const productDetail = await getProductDetail(productSlug);
+        const productDetail = await getProductDetail(product.slug || product.partNumber || product._id);
         if (!productDetail) continue;
 
         // 创建目录结构：/brands/{brandSlug}/products/{productSlug}/
@@ -689,6 +710,7 @@ async function getBrandProducts(brandSlug, limit = 8) {
       _id,
       title,
       partNumber,
+      "slug": slug.current,
       shortDescription,
       images,
       "brand": brand-> {
@@ -2826,7 +2848,7 @@ function generateProductsPageContent(brand, products, categories, baseUrl) {
             ${product.partNumber ? `<p class="text-blue-600 text-sm font-mono mb-2">${product.partNumber}</p>` : ''}
             ${product.shortDescription ? `<p class="text-gray-600 text-sm mb-4 line-clamp-2">${product.shortDescription}</p>` : ''}
             <div class="flex space-x-2">
-              <a href="${baseUrl}/products/${product.slug || product._id}"
+              <a href="${baseUrl}/products/${generateOptimizedProductSlug(product)}"
                  class="flex-1 bg-blue-600 text-white text-center py-2 px-4 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors">
                 查看详情
               </a>
