@@ -250,7 +250,7 @@ export async function getSolutions(params: {
     preview = false
   } = params;
 
-  let filter = '_type == "solution" && isPublished == true';
+  let filter = '_type == "solution" && (isPublished == true || !defined(isPublished))';
 
   if (targetMarket) {
     filter += ` && targetMarket == "${targetMarket}"`;

@@ -379,6 +379,13 @@ export async function generateStaticParams() {
     const brands = await getAllBrands();
 
     console.log(`🔧 [brands/[slug]/solutions/[id]] Fetched ${brands.length} brands and ${allSolutions.length} solutions`);
+    console.log('🔧 [brands/[slug]/solutions/[id]] Sample solutions:', allSolutions.slice(0, 3).map(s => ({
+      title: s.title,
+      slug: s.slug,
+      id: s._id,
+      isPublished: s.isPublished,
+      primaryBrand: s.primaryBrand?.name
+    })));
 
     if (brands.length === 0 || allSolutions.length === 0) {
       console.warn('⚠️ [brands/[slug]/solutions/[id]] No brands or solutions found, using fallback');
@@ -401,12 +408,12 @@ export async function generateStaticParams() {
 
         // Filter solutions that are related to this brand
         const brandSolutions = allSolutions.filter(solution => {
-          if (!solution.isActive || (!solution.slug && !solution._id)) return false;
+          if (!solution.slug && !solution._id) return false;
 
-          // Check if solution is related to this brand
+          // Check if solution is related to this brand (using primaryBrand field)
           return (
-            solution.brand?.name === brand.name ||
-            solution.brand?.slug === brandSlug ||
+            solution.primaryBrand?.name === brand.name ||
+            solution.primaryBrand?.slug === brandSlug ||
             (solution.relatedBrands && solution.relatedBrands.some(b =>
               b.name === brand.name || b.slug === brandSlug
             ))
