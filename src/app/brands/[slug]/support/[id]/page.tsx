@@ -32,9 +32,15 @@ interface BrandSupportArticlePageProps {
 export default async function BrandSupportArticlePage({ params }: BrandSupportArticlePageProps) {
   const decodedSlug = decodeURIComponent(params.slug);
 
+  // Convert URL-friendly slug back to original slug for article lookup
+  const originalArticleSlug = params.id.replace(/-/g, ' ');
+
   const [brand, article] = await Promise.all([
     getBrandData(decodedSlug),
-    getArticleBySlug(params.id)
+    // Try both the original slug and the URL-friendly version
+    getArticleBySlug(originalArticleSlug).then(result =>
+      result || getArticleBySlug(params.id)
+    )
   ]);
 
   if (!brand || !article) {
@@ -391,15 +397,24 @@ export async function generateStaticParams() {
 
         // Get articles for this brand or general articles
         const brandArticles = articles.filter(article =>
-          !article.brand || // general articles
-          article.brand?.name === brand.name ||
-          article.brand?.slug === originalSlug
+          // Check if the article is associated with this brand through relatedBrands
+          (article.relatedBrands && article.relatedBrands.some(relatedBrand =>
+            relatedBrand.name === brand.name ||
+            relatedBrand.slug === originalSlug ||
+            relatedBrand.slug === originalSlug.toLowerCase()
+          )) ||
+          // Check if the article has a direct brand association
+          (article.brand && (
+            article.brand.name === brand.name ||
+            article.brand.slug === originalSlug ||
+            article.brand.slug === originalSlug.toLowerCase()
+          ))
         );
 
         console.log(`🔧 [brands/[slug]/support/[id]] Brand ${brand.name} has ${brandArticles.length} articles`);
 
         brandArticles.forEach(article => {
-          const articleId = article.slug || article._id;
+          const articleId = (article.slug || article._id).replace(/\s+/g, '-');
 
           // For English brands, generate both uppercase and lowercase versions
           if (/^[A-Z]/.test(originalSlug)) {

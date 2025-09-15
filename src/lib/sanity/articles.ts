@@ -31,7 +31,7 @@ const ARTICLE_BASE_FIELDS = groq`
 export async function getArticleBySlug(slug: string) {
   try {
     const query = groq`
-      *[_type == "article" && slug.current == $slug && isActive == true][0] {
+      *[_type == "article" && slug.current == $slug && (isPublished == true || isActive != false)][0] {
         ${ARTICLE_BASE_FIELDS}
       }
     `;
@@ -47,7 +47,7 @@ export async function getArticleBySlug(slug: string) {
 export async function getAllArticles() {
   try {
     const query = groq`
-      *[_type == "article" && isActive == true] | order(publishedAt desc) {
+      *[_type == "article" && (isPublished == true || isActive != false)] | order(publishedAt desc) {
         ${ARTICLE_BASE_FIELDS}
       }
     `;
@@ -75,14 +75,14 @@ export async function getArticles(params: {
     featured
   } = params;
 
-  let filter = '_type == "article" && isActive == true && !(_id in path("drafts.**"))';
+  let filter = '_type == "article" && (isPublished == true || isActive != false) && !(_id in path("drafts.**"))';
 
   if (category) {
     filter += ` && category->slug.current == "${category}"`;
   }
 
   if (brand) {
-    filter += ` && brand->slug.current == "${brand}"`;
+    filter += ` && (brand->slug.current == "${brand}" || references(*[_type == "brandBasic" && slug.current == "${brand}"]._id))`;
   }
 
   if (featured) {
@@ -111,8 +111,12 @@ export async function getBrandArticles(brandSlug: string, limit: number = 12) {
   try {
     const query = groq`
       *[_type == "article" &&
-        isActive == true &&
-        (brand->slug.current == $brandSlug || brand->name == $brandSlug)
+        (isPublished == true || isActive != false) &&
+        (
+          brand->slug.current == $brandSlug ||
+          brand->name == $brandSlug ||
+          references(*[_type == "brandBasic" && (slug.current == $brandSlug || name == $brandSlug)]._id)
+        )
       ] | order(publishedAt desc) [0...$limit] {
         ${ARTICLE_BASE_FIELDS}
       }
