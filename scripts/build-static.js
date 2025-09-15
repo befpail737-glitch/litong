@@ -222,6 +222,60 @@ async function generateBrandSolutionDetailPages() {
   }
 }
 
+// 生成品牌技术支持详情页面静态文件
+async function generateBrandSupportDetailPages() {
+  try {
+    console.log('📰 生成品牌技术支持详情页面...');
+
+    const brands = await getAllBrandsFromSanity();
+    let brandsToGenerate = brands;
+    if (!brands || brands.length === 0) {
+      console.warn('⚠️ 无法获取品牌数据，使用 fallback 品牌列表');
+      brandsToGenerate = getAllFallbackBrands();
+    }
+
+    let totalSupportPages = 0;
+
+    for (const brand of brandsToGenerate) {
+      const brandSlug = brand.slug || encodeURIComponent(brand.name);
+      console.log(`🔧 处理品牌: ${brand.name} (${brandSlug})`);
+
+      // 获取该品牌的所有技术支持文章
+      const brandArticles = await getBrandArticles(brandSlug, 50); // 获取更多文章
+
+      for (const article of brandArticles) {
+        const articleSlug = article.slug;
+        if (!articleSlug) continue;
+
+        // 获取文章详细信息
+        const articleDetail = await getArticleDetail(articleSlug);
+        if (!articleDetail) continue;
+
+        // 创建目录结构：/brands/{brandSlug}/support/{articleSlug}/
+        const supportDir = path.join(process.cwd(), 'out', 'brands', brandSlug, 'support', articleSlug);
+        const supportFilePath = path.join(supportDir, 'index.html');
+
+        // 确保目录存在
+        if (!fs.existsSync(supportDir)) {
+          fs.mkdirSync(supportDir, { recursive: true });
+        }
+
+        console.log(`📰 生成技术支持详情页: /brands/${brandSlug}/support/${articleSlug}/`);
+
+        // 生成HTML内容
+        const supportDetailHTML = createSupportDetailHTML(articleDetail, brand, brandSlug);
+        fs.writeFileSync(supportFilePath, supportDetailHTML, 'utf-8');
+
+        totalSupportPages++;
+      }
+    }
+
+    console.log(`✅ 技术支持详情页面生成完成 (共生成 ${totalSupportPages} 个详情页)`);
+  } catch (error) {
+    console.error('❌ 技术支持详情页面生成失败:', error);
+  }
+}
+
 // 创建品牌页面HTML内容的辅助函数
 function createBrandPageHTML(brand, pageType) {
   const pageTitle = pageType === '主页' ? brand.name :
@@ -523,6 +577,58 @@ async function getBrandArticles(brandSlug, limit = 4) {
   } catch (error) {
     console.error('Error fetching brand articles:', error);
     return [];
+  }
+}
+
+// 获取单篇文章详细信息
+async function getArticleDetail(articleSlug) {
+  try {
+    const query = `*[_type == "article" && slug.current == "${articleSlug}" && isPublished == true][0] {
+      _id,
+      title,
+      summary,
+      "slug": slug.current,
+      publishedAt,
+      readingTime,
+      content,
+      tags,
+      category->{
+        name,
+        "slug": slug.current,
+        description
+      },
+      "relatedBrands": relatedBrands[]-> {
+        name,
+        "slug": slug.current,
+        description,
+        website,
+        logo
+      },
+      author{
+        name,
+        bio,
+        avatar
+      },
+      seo{
+        title,
+        description,
+        keywords
+      },
+      featuredImage,
+      attachments[]{
+        title,
+        description,
+        file{
+          asset->
+        }
+      }
+    }`;
+
+    const article = await sanityClient.fetch(query);
+    return article;
+  } catch (error) {
+    console.error('Error fetching article detail:', error);
+    return null;
   }
 }
 
@@ -2889,6 +2995,203 @@ function createSolutionDetailHTML(solution, brand, brandSlug) {
 </html>`;
 }
 
+// 创建技术支持详情页面HTML
+function createSupportDetailHTML(article, brand, brandSlug) {
+  const pageTitle = `${article.title} - ${brand.name} 技术支持`;
+  const baseUrl = `/brands/${encodeURIComponent(brandSlug)}`;
+
+  // 生成面包屑导航
+  const breadcrumbHTML = `
+    <nav class="bg-gray-100 py-3 mb-6">
+      <div class="container mx-auto px-4">
+        <div class="flex items-center space-x-2 text-sm text-gray-600">
+          <a href="/" class="hover:text-blue-600">首页</a>
+          <span>›</span>
+          <a href="/brands" class="hover:text-blue-600">品牌</a>
+          <span>›</span>
+          <a href="${baseUrl}" class="hover:text-blue-600">${brand.name}</a>
+          <span>›</span>
+          <a href="${baseUrl}/support" class="hover:text-blue-600">技术支持</a>
+          <span>›</span>
+          <span class="text-gray-900">${article.title}</span>
+        </div>
+      </div>
+    </nav>`;
+
+  // 生成文章头部区域
+  const heroHTML = `
+    <div class="bg-white border-b">
+      <div class="container mx-auto px-4 py-12">
+        <div class="max-w-4xl mx-auto">
+          ${article.featuredImage ? `
+            <div class="w-full h-64 md:h-80 mb-8 bg-gray-100 rounded-lg overflow-hidden">
+              <img src="${urlFor(article.featuredImage).width(800).height(320).url()}"
+                   alt="${article.title}" class="w-full h-full object-cover">
+            </div>` : ''}
+
+          <div class="text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">${article.title}</h1>
+            ${article.summary ? `<p class="text-xl text-gray-600 mb-6 max-w-3xl mx-auto">${article.summary}</p>` : ''}
+
+            <div class="flex flex-wrap justify-center gap-4 mb-8">
+              ${article.category ? `<span class="px-4 py-2 bg-blue-100 text-blue-800 rounded-full">${article.category.name}</span>` : ''}
+              ${article.publishedAt ? `<span class="px-4 py-2 bg-gray-100 text-gray-800 rounded-full">发布时间: ${new Date(article.publishedAt).toLocaleDateString('zh-CN')}</span>` : ''}
+              ${article.readingTime ? `<span class="px-4 py-2 bg-gray-100 text-gray-800 rounded-full">阅读时间: ${article.readingTime}分钟</span>` : ''}
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-4">
+              <a href="${baseUrl}" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                返回品牌主页
+              </a>
+              <a href="${baseUrl}/support" class="border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors">
+                更多支持文档
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  // 生成文章内容区域
+  const contentHTML = `
+    <div class="container mx-auto px-4 py-12">
+      <div class="max-w-4xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          <!-- 主要内容 -->
+          <div class="lg:col-span-2">
+            ${article.content ? `
+              <div class="prose max-w-none mb-12">
+                <div class="text-gray-700 leading-relaxed text-base">
+                  ${typeof article.content === 'string' ? article.content.replace(/\n/g, '<br>') : ''}
+                </div>
+              </div>` : ''}
+
+            ${article.tags && article.tags.length > 0 ? `
+              <div class="mb-12">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">相关标签</h2>
+                <div class="flex flex-wrap gap-3">
+                  ${article.tags.map(tag => `
+                    <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">${tag}</span>
+                  `).join('')}
+                </div>
+              </div>` : ''}
+
+            ${article.attachments && article.attachments.length > 0 ? `
+              <div class="mb-12">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">相关附件</h2>
+                <div class="space-y-4">
+                  ${article.attachments.map(attachment => `
+                    <div class="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                      <h3 class="font-semibold text-gray-900 mb-2">${attachment.title}</h3>
+                      ${attachment.description ? `<p class="text-gray-600 text-sm mb-3">${attachment.description}</p>` : ''}
+                      <div class="flex items-center text-blue-600 hover:text-blue-700">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <span class="text-sm">下载文件</span>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>` : ''}
+          </div>
+
+          <!-- 侧边栏 -->
+          <div class="lg:col-span-1">
+            <!-- 品牌信息 -->
+            <div class="bg-white rounded-lg shadow p-6 mb-8">
+              <h3 class="text-lg font-bold text-gray-900 mb-4">技术支持提供商</h3>
+              ${brand.logo ? `
+                <div class="w-16 h-16 mb-4 bg-gray-100 rounded-lg overflow-hidden">
+                  <img src="${urlFor(brand.logo).width(64).height(64).url()}"
+                       alt="${brand.name}" class="w-full h-full object-cover">
+                </div>` : ''}
+              <h4 class="font-semibold text-gray-900 mb-2">${brand.name}</h4>
+              ${brand.description ? `<p class="text-gray-600 text-sm mb-4">${brand.description}</p>` : ''}
+              <div class="space-y-2 text-sm text-gray-500">
+                ${brand.country ? `<div>📍 ${brand.country}</div>` : ''}
+                ${brand.website ? `<div><a href="${brand.website}" target="_blank" class="text-blue-600 hover:text-blue-700">🌐 官方网站</a></div>` : ''}
+              </div>
+            </div>
+
+            <!-- 作者信息 -->
+            ${article.author ? `
+              <div class="bg-white rounded-lg shadow p-6 mb-8">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">作者信息</h3>
+                ${article.author.avatar ? `
+                  <div class="w-12 h-12 mb-3 bg-gray-100 rounded-full overflow-hidden">
+                    <img src="${urlFor(article.author.avatar).width(48).height(48).url()}"
+                         alt="${article.author.name}" class="w-full h-full object-cover">
+                  </div>` : ''}
+                <h4 class="font-semibold text-gray-900 mb-2">${article.author.name}</h4>
+                ${article.author.bio ? `<p class="text-gray-600 text-sm">${article.author.bio}</p>` : ''}
+              </div>` : ''}
+
+            <!-- 联系支持 -->
+            <div class="bg-blue-50 rounded-lg p-6">
+              <h3 class="text-lg font-bold text-gray-900 mb-4">需要技术支持？</h3>
+              <p class="text-gray-600 text-sm mb-4">我们的专业技术团队随时为您提供帮助</p>
+              <div class="space-y-3">
+                <a href="/inquiry" class="block bg-blue-600 text-white text-center px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                  联系技术支持
+                </a>
+                <a href="/products" class="block border border-gray-300 text-gray-700 text-center px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors text-sm">
+                  浏览相关产品
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>${pageTitle} - 力通电子</title>
+    <meta name="description" content="${article.summary || `${article.title} - ${brand.name}提供的专业技术支持文档`}"/>
+    ${article.seo && article.seo.keywords ? `<meta name="keywords" content="${article.seo.keywords}"/>` : ''}
+    <link rel="icon" href="/favicon.ico"/>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f9fafb;
+            color: #111827;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+        }
+        .prose {
+            max-width: 65ch;
+        }
+        .prose h2 {
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        .prose p {
+            margin-bottom: 1rem;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+        }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    ${breadcrumbHTML}
+    ${heroHTML}
+    ${contentHTML}
+</body>
+</html>`;
+}
+
 // 构建独立的Sanity Studio
 async function buildSanityStudio() {
   console.log('🏗️  构建 Sanity Studio...');
@@ -3296,6 +3599,10 @@ async function enhancedMain() {
     // 生成品牌解决方案详情页面静态文件
     console.log('\n📄 生成解决方案详情页面...');
     await generateBrandSolutionDetailPages();
+
+    // 生成品牌技术支持详情页面静态文件
+    console.log('\n📰 生成技术支持详情页面...');
+    await generateBrandSupportDetailPages();
 
     // 最终验证：确保 Studio 文件正确无误
     console.log('\n🔍 最终验证: 检查 Sanity Studio 部署状态...');
