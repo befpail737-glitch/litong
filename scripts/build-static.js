@@ -14,6 +14,7 @@ const path = require('path');
 // Sanity Client 配置
 const { createClient } = require('@sanity/client');
 const imageUrlBuilder = require('@sanity/image-url');
+const { toHTML } = require('@portabletext/to-html');
 
 // 创建Sanity客户端
 const sanityClient = createClient({
@@ -29,6 +30,172 @@ const imageBuilder = imageUrlBuilder(sanityClient);
 // 生成图片URL的助手函数
 function urlFor(source) {
   return imageBuilder.image(source);
+}
+
+// PortableText 转 HTML 的组件配置
+const portableTextComponents = {
+  block: {
+    // Normal text paragraphs
+    normal: ({children}) => `<p class="mb-4 text-gray-700 leading-relaxed">${children}</p>`,
+
+    // Headings
+    h1: ({children}) => `<h1 class="text-3xl font-bold text-gray-900 mb-6 mt-8">${children}</h1>`,
+    h2: ({children}) => `<h2 class="text-2xl font-bold text-gray-900 mb-4 mt-6">${children}</h2>`,
+    h3: ({children}) => `<h3 class="text-xl font-semibold text-gray-900 mb-3 mt-5">${children}</h3>`,
+    h4: ({children}) => `<h4 class="text-lg font-semibold text-gray-900 mb-2 mt-4">${children}</h4>`,
+
+    // Blockquote
+    blockquote: ({children}) => `<blockquote class="border-l-4 border-blue-500 pl-4 my-6 italic text-gray-600">${children}</blockquote>`,
+  },
+
+  list: {
+    // Bullet list
+    bullet: ({children}) => `<ul class="list-disc list-inside mb-4 space-y-2 text-gray-700">${children}</ul>`,
+
+    // Numbered list
+    number: ({children}) => `<ol class="list-decimal list-inside mb-4 space-y-2 text-gray-700">${children}</ol>`,
+  },
+
+  listItem: {
+    // List items
+    bullet: ({children}) => `<li class="ml-4">${children}</li>`,
+    number: ({children}) => `<li class="ml-4">${children}</li>`,
+  },
+
+  marks: {
+    // Bold text
+    strong: ({children}) => `<strong class="font-semibold">${children}</strong>`,
+
+    // Italic text
+    em: ({children}) => `<em class="italic">${children}</em>`,
+
+    // Underline
+    underline: ({children}) => `<u class="underline">${children}</u>`,
+
+    // Strike-through
+    'strike-through': ({children}) => `<s class="line-through">${children}</s>`,
+
+    // Code
+    code: ({children}) => `<code class="bg-gray-100 text-red-600 px-1 py-0.5 rounded text-sm font-mono">${children}</code>`,
+
+    // Links
+    link: ({value, children}) => {
+      const href = value?.href || '#';
+      const target = href.startsWith('http') ? ' target="_blank" rel="noopener noreferrer"' : '';
+      return `<a href="${href}" class="text-blue-600 hover:text-blue-800 underline"${target}>${children}</a>`;
+    },
+  },
+
+  types: {
+    // Images
+    image: ({value}) => {
+      if (!value?.asset) return '';
+      const imageUrl = urlFor(value.asset).width(800).url();
+      const alt = value.alt || '';
+      const caption = value.caption || '';
+
+      return `
+        <figure class="my-8">
+          <img src="${imageUrl}" alt="${alt}" class="w-full rounded-lg shadow-md" />
+          ${caption ? `<figcaption class="text-sm text-gray-600 text-center mt-2">${caption}</figcaption>` : ''}
+        </figure>
+      `;
+    },
+
+    // Code blocks
+    code: ({value}) => {
+      const language = value.language || 'text';
+      const code = value.code || '';
+      return `
+        <div class="my-6">
+          <pre class="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto">
+            <code class="language-${language}">${code}</code>
+          </pre>
+        </div>
+      `;
+    },
+
+    // Tables
+    table: ({value}) => {
+      if (!value?.rows) return '';
+
+      const headerRow = value.rows[0];
+      const bodyRows = value.rows.slice(1);
+
+      return `
+        <div class="my-8 overflow-x-auto">
+          <table class="min-w-full border border-gray-300">
+            ${headerRow ? `
+              <thead class="bg-gray-50">
+                <tr>
+                  ${headerRow.cells.map(cell => `<th class="border border-gray-300 px-4 py-2 text-left font-semibold">${cell}</th>`).join('')}
+                </tr>
+              </thead>
+            ` : ''}
+            <tbody>
+              ${bodyRows.map(row => `
+                <tr>
+                  ${row.cells.map(cell => `<td class="border border-gray-300 px-4 py-2">${cell}</td>`).join('')}
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    },
+
+    // PDF attachments
+    file: ({value}) => {
+      if (!value?.asset) return '';
+      const fileUrl = value.asset.url || '';
+      const fileName = value.originalFilename || 'Download';
+      const fileSize = value.asset.size ? `(${Math.round(value.asset.size / 1024)} KB)` : '';
+
+      return `
+        <div class="my-6 border border-gray-300 rounded-lg p-4 hover:bg-gray-50">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+            <div class="flex-1">
+              <h4 class="font-semibold text-gray-900">${fileName}</h4>
+              <p class="text-sm text-gray-600">${fileSize}</p>
+            </div>
+            <a href="${fileUrl}" target="_blank" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm">
+              下载
+            </a>
+          </div>
+        </div>
+      `;
+    },
+  },
+};
+
+// PortableText 转 HTML 的助手函数
+function renderPortableTextToHTML(content) {
+  if (!content) return '';
+
+  // 检查是否是 PortableText 数组格式
+  if (Array.isArray(content)) {
+    try {
+      return toHTML(content, {
+        components: portableTextComponents,
+        onMissingComponent: false, // 忽略未知组件类型
+      });
+    } catch (error) {
+      console.warn('PortableText rendering error:', error);
+      return '<p class="text-gray-500">内容渲染错误</p>';
+    }
+  }
+
+  // 如果是字符串内容，按原方式处理
+  if (typeof content === 'string') {
+    return content.replace(/\n/g, '<br>');
+  }
+
+  return '';
 }
 
 // 导入fallback品牌数据
@@ -2705,7 +2872,12 @@ function generateSupportPageContent(brand, articles, baseUrl) {
               ${article.publishedAt ? `<span>${new Date(article.publishedAt).toLocaleDateString('zh-CN')}</span>` : ''}
               ${article.readingTime ? `<span>阅读时间: ${article.readingTime}分钟</span>` : ''}
             </div>
-            <button class="text-blue-600 text-sm font-medium hover:text-blue-800">阅读全文</button>
+            <a href="${baseUrl}/support/${article.slug}" class="text-blue-600 text-sm font-medium hover:text-blue-800 flex items-center space-x-1">
+              <span>阅读全文</span>
+              <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </a>
           </div>
         </div>
       `).join('')}
@@ -3062,7 +3234,7 @@ function createSupportDetailHTML(article, brand, brandSlug) {
             ${article.content ? `
               <div class="prose max-w-none mb-12">
                 <div class="text-gray-700 leading-relaxed text-base">
-                  ${typeof article.content === 'string' ? article.content.replace(/\n/g, '<br>') : ''}
+                  ${renderPortableTextToHTML(article.content)}
                 </div>
               </div>` : ''}
 
