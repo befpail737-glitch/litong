@@ -2449,7 +2449,7 @@ function generateSolutionsPageContent(brand, solutions, baseUrl) {
             ${solution.summary ? `<p class="text-gray-600 text-sm mb-4 line-clamp-3">${solution.summary}</p>` : ''}
             <div class="flex items-center justify-between">
               ${solution.targetMarket ? `<span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">${solution.targetMarket}</span>` : '<span></span>'}
-              <a href="/solutions/${solution.slug}" class="text-blue-600 text-sm font-medium hover:text-blue-800 flex items-center space-x-1">
+              <a href="${baseUrl}/solutions/${solution.slug}" class="text-blue-600 text-sm font-medium hover:text-blue-800 flex items-center space-x-1">
                 <span>查看详情</span>
                 <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
