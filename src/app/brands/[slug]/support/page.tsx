@@ -114,9 +114,12 @@ export default async function BrandSupportPage({ params }: BrandSupportPageProps
               {articles.map((article: any) => (
                 <div key={article._id} className="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow">
                   <div className="flex items-start justify-between mb-3">
-                    <h3 className="font-semibold text-gray-900 text-lg hover:text-blue-600 cursor-pointer line-clamp-2">
+                    <Link
+                      href={`/brands/${encodeURIComponent(brand.slug || brand.name)}/support/${article.slug}`}
+                      className="font-semibold text-gray-900 text-lg hover:text-blue-600 cursor-pointer line-clamp-2 block"
+                    >
                       {article.title}
-                    </h3>
+                    </Link>
                   </div>
 
                   {article.summary && (
@@ -137,10 +140,13 @@ export default async function BrandSupportPage({ params }: BrandSupportPageProps
                         <span>阅读时间: {article.readingTime}分钟</span>
                       )}
                     </div>
-                    <button className="text-blue-600 text-sm font-medium hover:text-blue-800 flex items-center space-x-1">
+                    <Link
+                      href={`/brands/${encodeURIComponent(brand.slug || brand.name)}/support/${article.slug}`}
+                      className="text-blue-600 text-sm font-medium hover:text-blue-800 flex items-center space-x-1"
+                    >
                       <span>阅读全文</span>
                       <ExternalLink className="h-4 w-4" />
-                    </button>
+                    </Link>
                   </div>
                 </div>
               ))}
