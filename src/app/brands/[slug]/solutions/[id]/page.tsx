@@ -32,12 +32,19 @@ export default async function BrandSolutionDetailPage({ params }: BrandSolutionD
   const decodedSlug = decodeURIComponent(params.slug);
   const solutionId = params.id;
 
+  console.log(`🔧 [BrandSolutionDetailPage] Loading page for brand: ${decodedSlug}, solution: ${solutionId}`);
+
   const [brand, solution] = await Promise.all([
     getBrandData(decodedSlug),
     getSolutionBySlug(solutionId)
   ]);
 
+  console.log(`🔧 [BrandSolutionDetailPage] Brand found: ${!!brand}, Solution found: ${!!solution}`);
+  console.log(`🔧 [BrandSolutionDetailPage] Brand:`, brand ? { name: brand.name, slug: brand.slug } : null);
+  console.log(`🔧 [BrandSolutionDetailPage] Solution:`, solution ? { title: solution.title, slug: solution.slug } : null);
+
   if (!brand || !solution) {
+    console.warn(`🔧 [BrandSolutionDetailPage] NotFound triggered - brand: ${!!brand}, solution: ${!!solution}`);
     notFound();
   }
 
