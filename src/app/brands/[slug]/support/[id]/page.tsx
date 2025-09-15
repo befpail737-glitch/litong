@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { PortableText } from '@portabletext/react';
 
 import {
   FileText,
@@ -21,6 +22,144 @@ import {
 import { getBrandData } from '@/lib/sanity/brands';
 import { getArticleBySlug, getAllArticles } from '@/lib/sanity/articles';
 import { urlFor } from '@/lib/sanity/client';
+
+// PortableText 自定义组件配置
+const portableTextComponents = {
+  block: {
+    // 普通段落
+    normal: ({ children }: any) => <p className="mb-4 text-gray-700 leading-relaxed">{children}</p>,
+
+    // 标题
+    h1: ({ children }: any) => <h1 className="text-3xl font-bold text-gray-900 mb-6 mt-8">{children}</h1>,
+    h2: ({ children }: any) => <h2 className="text-2xl font-bold text-gray-900 mb-4 mt-6">{children}</h2>,
+    h3: ({ children }: any) => <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-5">{children}</h3>,
+    h4: ({ children }: any) => <h4 className="text-lg font-semibold text-gray-900 mb-2 mt-4">{children}</h4>,
+
+    // 引用
+    blockquote: ({ children }: any) => (
+      <blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-4 bg-gray-50 italic text-gray-700">
+        {children}
+      </blockquote>
+    ),
+  },
+
+  list: {
+    // 无序列表
+    bullet: ({ children }: any) => <ul className="list-disc list-inside mb-4 pl-4 text-gray-700">{children}</ul>,
+    // 有序列表
+    number: ({ children }: any) => <ol className="list-decimal list-inside mb-4 pl-4 text-gray-700">{children}</ol>,
+  },
+
+  listItem: {
+    // 列表项
+    bullet: ({ children }: any) => <li className="mb-1">{children}</li>,
+    number: ({ children }: any) => <li className="mb-1">{children}</li>,
+  },
+
+  marks: {
+    // 文本标记
+    strong: ({ children }: any) => <strong className="font-semibold text-gray-900">{children}</strong>,
+    em: ({ children }: any) => <em className="italic">{children}</em>,
+    underline: ({ children }: any) => <u className="underline">{children}</u>,
+    'strike-through': ({ children }: any) => <s className="line-through">{children}</s>,
+    code: ({ children }: any) => (
+      <code className="bg-gray-100 text-red-600 px-1 py-0.5 rounded text-sm font-mono">{children}</code>
+    ),
+
+    // 链接
+    link: ({ value, children }: any) => (
+      <a
+        href={value.href}
+        target={value.target || '_self'}
+        className="text-blue-600 hover:text-blue-800 underline"
+        rel={value.target === '_blank' ? 'noopener noreferrer' : undefined}
+      >
+        {children}
+      </a>
+    ),
+
+    // 颜色
+    color: ({ value, children }: any) => (
+      <span style={{ color: value.hex }}>{children}</span>
+    ),
+
+    // 字体大小
+    fontSize: ({ value, children }: any) => (
+      <span className={value.size}>{children}</span>
+    ),
+  },
+
+  types: {
+    // 图片
+    image: ({ value }: any) => (
+      <figure className="my-6">
+        <Image
+          src={urlFor(value).width(800).height(600).url()}
+          alt={value.alt || ''}
+          width={800}
+          height={600}
+          className="rounded-lg shadow-lg"
+        />
+        {value.caption && (
+          <figcaption className="text-center text-sm text-gray-600 mt-2">
+            {value.caption}
+          </figcaption>
+        )}
+      </figure>
+    ),
+
+    // PDF 文件
+    pdf: ({ value }: any) => (
+      <div className="my-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
+        <div className="flex items-center space-x-3">
+          <FileText className="h-8 w-8 text-red-600" />
+          <div>
+            <h4 className="font-medium text-gray-900">{value.title}</h4>
+            {value.description && (
+              <p className="text-sm text-gray-600">{value.description}</p>
+            )}
+          </div>
+          <a
+            href={value.asset.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-auto flex items-center space-x-1 text-blue-600 hover:text-blue-800"
+          >
+            <Download className="h-4 w-4" />
+            <span>下载</span>
+          </a>
+        </div>
+      </div>
+    ),
+
+    // 表格
+    table: ({ value }: any) => (
+      <div className="my-6 overflow-x-auto">
+        <table className="min-w-full border border-gray-200">
+          {value.title && (
+            <caption className="text-lg font-medium text-gray-900 mb-2">
+              {value.title}
+            </caption>
+          )}
+          <tbody>
+            {value.rows?.map((row: any, rowIndex: number) => (
+              <tr key={rowIndex} className={rowIndex === 0 ? 'bg-gray-50' : ''}>
+                {row.cells?.map((cell: string, cellIndex: number) => (
+                  <td
+                    key={cellIndex}
+                    className="border border-gray-200 px-4 py-2 text-gray-700"
+                  >
+                    {cell}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    ),
+  },
+};
 
 interface BrandSupportArticlePageProps {
   params: {
@@ -181,7 +320,9 @@ export default async function BrandSupportArticlePage({ params }: BrandSupportAr
           {/* Article Content */}
           <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
             <div className="prose max-w-none">
-              {article.content ? (
+              {article.content && Array.isArray(article.content) && article.content.length > 0 ? (
+                <PortableText value={article.content} components={portableTextComponents} />
+              ) : article.content && typeof article.content === 'string' ? (
                 <div dangerouslySetInnerHTML={{ __html: article.content }} />
               ) : (
                 <div className="text-center py-12">
@@ -414,7 +555,8 @@ export async function generateStaticParams() {
         console.log(`🔧 [brands/[slug]/support/[id]] Brand ${brand.name} has ${brandArticles.length} articles`);
 
         brandArticles.forEach(article => {
-          const articleId = (article.slug || article._id).replace(/\s+/g, '-');
+          const rawId = article.slug || article._id;
+          const articleId = typeof rawId === 'string' ? rawId.replace(/\s+/g, '-') : String(rawId).replace(/\s+/g, '-');
 
           // For English brands, generate both uppercase and lowercase versions
           if (/^[A-Z]/.test(originalSlug)) {

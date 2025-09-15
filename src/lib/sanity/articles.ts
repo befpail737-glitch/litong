@@ -7,7 +7,7 @@ const ARTICLE_BASE_FIELDS = groq`
   _createdAt,
   _updatedAt,
   title,
-  slug,
+  "slug": slug.current,
   summary,
   content,
   featuredImage,
@@ -18,13 +18,18 @@ const ARTICLE_BASE_FIELDS = groq`
   category->{
     _id,
     name,
-    slug
+    "slug": slug.current
   },
   tags,
   brand->{
     _id,
     name,
-    slug
+    "slug": slug.current
+  },
+  relatedBrands[]->{
+    _id,
+    name,
+    "slug": slug.current
   }
 `;
 
