@@ -1120,10 +1120,10 @@ async function removeDirectory(dirPath) {
   }
 }
 
-async function runCommand(command, description) {
+async function runCommand(command, description, timeoutMs = 300000) {
   return new Promise((resolve, reject) => {
     console.log(`📝 ${description}...`);
-    
+
     const child = exec(command, {
       cwd: process.cwd(),
       env: { ...process.env }
@@ -1131,21 +1131,40 @@ async function runCommand(command, description) {
 
     let output = '';
     let errorOutput = '';
+    let isResolved = false;
+
+    // 设置超时
+    const timeout = setTimeout(() => {
+      if (!isResolved) {
+        isResolved = true;
+        child.kill('SIGTERM');
+        console.log(`⏰ 命令超时 (${timeoutMs/1000}s): ${description}`);
+        reject(new Error(`命令超时: ${description}`));
+      }
+    }, timeoutMs);
 
     child.stdout.on('data', (data) => {
       const text = data.toString();
       output += text;
-      
+
       // 过滤掉 Server Actions 错误，显示其他输出
       if (!text.includes('Server Actions are not supported with static export')) {
         process.stdout.write(text);
+      }
+
+      // 添加进度日志
+      if (text.includes('Compiled successfully') ||
+          text.includes('Creating optimized production build') ||
+          text.includes('Collecting page data') ||
+          text.includes('Generating static pages')) {
+        console.log(`🔄 进度: ${text.trim()}`);
       }
     });
 
     child.stderr.on('data', (data) => {
       const text = data.toString();
       errorOutput += text;
-      
+
       // 过滤掉 Server Actions 错误，显示其他错误
       if (!text.includes('Server Actions are not supported with static export')) {
         process.stderr.write(text);
@@ -1153,21 +1172,32 @@ async function runCommand(command, description) {
     });
 
     child.on('close', (code) => {
-      if (code === 0) {
-        resolve({ output, errorOutput, code });
-      } else {
-        // 如果是 Server Actions 错误，继续执行
-        if (errorOutput.includes('Server Actions are not supported with static export') ||
-            output.includes('Server Actions are not supported with static export')) {
-          console.log('⚠️  忽略 Server Actions 误报错误，继续执行...');
-          resolve({ output, errorOutput, code: 0 });
+      if (!isResolved) {
+        isResolved = true;
+        clearTimeout(timeout);
+
+        if (code === 0) {
+          resolve({ output, errorOutput, code });
         } else {
-          reject(new Error(`命令失败，退出码: ${code}`));
+          // 如果是 Server Actions 错误，继续执行
+          if (errorOutput.includes('Server Actions are not supported with static export') ||
+              output.includes('Server Actions are not supported with static export')) {
+            console.log('⚠️  忽略 Server Actions 误报错误，继续执行...');
+            resolve({ output, errorOutput, code: 0 });
+          } else {
+            reject(new Error(`命令失败，退出码: ${code}`));
+          }
         }
       }
     });
 
-    child.on('error', reject);
+    child.on('error', (error) => {
+      if (!isResolved) {
+        isResolved = true;
+        clearTimeout(timeout);
+        reject(error);
+      }
+    });
   });
 }
 
@@ -2865,25 +2895,25 @@ async function main() {
     // 步骤2: 确保CSS编译
     console.log('🎨 确保Tailwind CSS正确编译...');
     try {
-      // 先确保Tailwind CSS被编译
-      await runCommand('npx tailwindcss -i ./src/app/globals.css -o ./src/app/compiled.css --watch=false', 'Tailwind CSS 编译');
+      // 先确保Tailwind CSS被编译，使用较短超时
+      await runCommand('npx tailwindcss -i ./src/app/globals.css -o ./src/app/compiled.css --watch=false', 'Tailwind CSS 编译', 60000);
       console.log('✅ Tailwind CSS 编译完成！');
     } catch (cssError) {
-      console.log('⚠️  直接CSS编译失败，继续使用Next.js内置处理...');
+      console.log('⚠️  直接CSS编译失败，继续使用Next.js内置处理...', cssError.message);
     }
 
     // 步骤3: 尝试正常构建
     try {
-      await runCommand('npx next build', 'Next.js 构建');
+      await runCommand('npx next build', 'Next.js 构建', 600000); // 10分钟超时
       console.log('✅ 正常构建完成！');
     } catch (error) {
-      console.log('⚠️  正常构建失败，尝试强制构建...');
+      console.log('⚠️  正常构建失败，尝试强制构建...', error.message);
 
       // 步骤4: 强制构建（忽略错误）
       try {
-        await runCommand('npx next build || true', '强制构建（忽略错误）');
+        await runCommand('npx next build || true', '强制构建（忽略错误）', 600000);
       } catch (forceError) {
-        console.log('⚠️  强制构建也失败，继续尝试手动导出...');
+        console.log('⚠️  强制构建也失败，继续尝试手动导出...', forceError.message);
       }
     }
 
