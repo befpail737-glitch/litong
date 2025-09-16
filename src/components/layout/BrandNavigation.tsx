@@ -7,39 +7,50 @@ import { usePathname } from 'next/navigation';
 import { urlFor } from '@/lib/sanity/client';
 import { Brand } from '@/lib/sanity/brands';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Home, Package, Settings, HelpCircle } from 'lucide-react';
+import { Menu, X, Home, Package, Settings, HelpCircle, ChevronRight } from 'lucide-react';
 
 interface BrandNavigationProps {
   brand: Brand;
+  locale?: string;
 }
 
-export function BrandNavigation({ brand }: BrandNavigationProps) {
+export function BrandNavigation({ brand, locale }: BrandNavigationProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
-  
-  const baseUrl = `/brands/${encodeURIComponent(brand.slug || brand.name)}`;
-  
+
+  // Extract locale from pathname if not provided
+  const getCurrentLocale = () => {
+    if (locale) return locale;
+    const segments = pathname.split('/');
+    const supportedLocales = ['zh-CN', 'zh-TW', 'en', 'ja', 'ko', 'de', 'fr', 'es', 'ru', 'ar'];
+    const localeFromPath = segments[1];
+    return supportedLocales.includes(localeFromPath) ? localeFromPath : 'zh-CN';
+  };
+
+  const currentLocale = getCurrentLocale();
+  const baseUrl = `/${currentLocale}/brands/${encodeURIComponent(brand.slug || brand.name)}`;
+
   const navigation = [
-    { 
-      name: '品牌首页', 
+    {
+      name: '品牌首页',
       href: baseUrl,
       icon: Home,
       isActive: pathname === baseUrl
     },
-    { 
-      name: '产品分类', 
+    {
+      name: '产品分类',
       href: `${baseUrl}/products`,
       icon: Package,
       isActive: pathname.startsWith(`${baseUrl}/products`)
     },
-    { 
-      name: '解决方案', 
+    {
+      name: '解决方案',
       href: `${baseUrl}/solutions`,
       icon: Settings,
       isActive: pathname.startsWith(`${baseUrl}/solutions`)
     },
-    { 
-      name: '技术支持', 
+    {
+      name: '技术支持',
       href: `${baseUrl}/support`,
       icon: HelpCircle,
       isActive: pathname.startsWith(`${baseUrl}/support`)
@@ -52,12 +63,23 @@ export function BrandNavigation({ brand }: BrandNavigationProps) {
       <div className="bg-gray-100 border-b border-gray-200">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-10 text-sm">
-            <Link 
-              href="/" 
-              className="text-gray-600 hover:text-blue-600 transition-colors"
-            >
-              ← 返回力通电子主站
-            </Link>
+            <div className="flex items-center space-x-2">
+              <Link
+                href={`/${currentLocale}`}
+                className="text-gray-600 hover:text-blue-600 transition-colors"
+              >
+                ← 返回力通电子主站
+              </Link>
+              <ChevronRight className="h-3 w-3 text-gray-400" />
+              <Link
+                href={`/${currentLocale}/brands`}
+                className="text-gray-600 hover:text-blue-600 transition-colors"
+              >
+                品牌中心
+              </Link>
+              <ChevronRight className="h-3 w-3 text-gray-400" />
+              <span className="text-gray-800 font-medium">{brand.name}</span>
+            </div>
             <div className="text-gray-500">
               {brand.country && <span>来自 {brand.country}</span>}
             </div>
@@ -126,7 +148,7 @@ export function BrandNavigation({ brand }: BrandNavigationProps) {
               </Button>
             )}
             <Button size="sm" asChild>
-              <Link href="/inquiry">
+              <Link href={`/${currentLocale}/inquiry`}>
                 立即询价
               </Link>
             </Button>
@@ -181,8 +203,8 @@ export function BrandNavigation({ brand }: BrandNavigationProps) {
                   </Button>
                 )}
                 <Button size="sm" className="w-full" asChild>
-                  <Link 
-                    href="/inquiry"
+                  <Link
+                    href={`/${currentLocale}/inquiry`}
                     onClick={() => setIsMenuOpen(false)}
                   >
                     立即询价

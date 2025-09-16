@@ -1,4 +1,4 @@
-import { MainLayout } from '@/components/layout/MainLayout';
+import { BrandNavigation } from '@/components/layout/BrandNavigation';
 import { getBrandWithContent, getAllBrands } from '@/lib/sanity/brands';
 import { urlFor } from '@/lib/sanity/client';
 import { notFound } from 'next/navigation';
@@ -61,7 +61,8 @@ export default async function BrandPage({ params }: BrandPageProps) {
     }
 
     return (
-      <MainLayout>
+      <div className="min-h-screen bg-gray-50">
+        <BrandNavigation brand={brand} locale={locale} />
         <div className="container mx-auto px-4 py-8">
           {/* Brand Header */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
@@ -261,7 +262,7 @@ export default async function BrandPage({ params }: BrandPageProps) {
             </Link>
           </div>
         </div>
-      </MainLayout>
+      </div>
     );
   } catch (error) {
     console.error('Error fetching brand data:', error);
