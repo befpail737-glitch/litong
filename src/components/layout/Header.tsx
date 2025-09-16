@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 import { Heart, User, LogOut, ShoppingCart } from 'lucide-react';
 
@@ -17,23 +17,35 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
   const { user, logout } = useAuth();
   const { cartCount } = useOrder();
   const { searchQuery, setSearchQuery, search, searchSuggestions, updateSearchSuggestions } = useSearch();
   const wishlistCount = 0; // 临时设置为0，后续会从Context获取
 
+  // 从当前路径中提取locale
+  const getCurrentLocale = () => {
+    const segments = pathname.split('/');
+    const supportedLocales = ['zh-CN', 'zh-TW', 'en', 'ja', 'ko', 'de', 'fr', 'es', 'ru', 'ar'];
+    const locale = segments[1];
+    return supportedLocales.includes(locale) ? locale : 'zh-CN';
+  };
+
+  const currentLocale = getCurrentLocale();
+
+  // 动态构建导航配置，包含locale前缀
   const navigation = [
-    { name: '首页', href: '/' },
-    { name: '品牌中心', href: '/brands' },
-    { name: '产品分类', href: '/categories' },
-    { name: '关于我们', href: '/about' },
+    { name: '首页', href: `/${currentLocale}` },
+    { name: '品牌中心', href: `/${currentLocale}/brands` },
+    { name: '产品分类', href: `/${currentLocale}/categories` },
+    { name: '关于我们', href: `/${currentLocale}/about` },
   ];
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       search(searchQuery.trim());
-      router.push('/search');
+      router.push(`/${currentLocale}/search`);
     }
   };
 
@@ -42,7 +54,7 @@ export function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
+          <Link href={`/${currentLocale}`} className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-green-500 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">力</span>
             </div>
@@ -98,7 +110,7 @@ export function Header() {
                       onClick={() => {
                         setSearchQuery(suggestion);
                         search(suggestion);
-                        router.push('/search');
+                        router.push(`/${currentLocale}/search`);
                         setShowSuggestions(false);
                       }}
                       className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm text-gray-700 border-b border-gray-100 last:border-b-0"
@@ -116,7 +128,7 @@ export function Header() {
             </div>
 
             <Button variant="ghost" size="sm" asChild className="relative">
-              <Link href="/cart">
+              <Link href={`/${currentLocale}/cart`}>
                 <ShoppingCart className="h-4 w-4" />
                 {cartCount > 0 && (
                   <Badge variant="default" className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs flex items-center justify-center">
@@ -127,7 +139,7 @@ export function Header() {
             </Button>
 
             <Button variant="ghost" size="sm" asChild className="relative">
-              <Link href="/wishlist">
+              <Link href={`/${currentLocale}/wishlist`}>
                 <Heart className="h-4 w-4" />
                 {wishlistCount > 0 && (
                   <Badge variant="default" className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs flex items-center justify-center">
@@ -138,7 +150,7 @@ export function Header() {
             </Button>
 
             <Button size="sm" asChild>
-              <Link href="/inquiry">
+              <Link href={`/${currentLocale}/inquiry`}>
                 获取报价
               </Link>
             </Button>
@@ -147,7 +159,7 @@ export function Header() {
             {user ? (
               <div className="flex items-center gap-2">
                 <Button variant="ghost" size="sm" asChild>
-                  <Link href="/profile" className="flex items-center gap-2">
+                  <Link href={`/${currentLocale}/profile`} className="flex items-center gap-2">
                     <User className="h-4 w-4" />
                     {user.name}
                   </Link>
@@ -164,10 +176,10 @@ export function Header() {
             ) : (
               <div className="flex items-center gap-2">
                 <Button variant="ghost" size="sm" asChild>
-                  <Link href="/auth/login">登录</Link>
+                  <Link href={`/${currentLocale}/auth/login`}>登录</Link>
                 </Button>
                 <Button size="sm" asChild>
-                  <Link href="/auth/register">注册</Link>
+                  <Link href={`/${currentLocale}/auth/register`}>注册</Link>
                 </Button>
               </div>
             )}
@@ -220,19 +232,19 @@ export function Header() {
               </div>
               <div className="px-3 space-y-3">
                 <Button variant="ghost" size="sm" asChild className="w-full justify-start">
-                  <Link href="/cart" className="flex items-center gap-2">
+                  <Link href={`/${currentLocale}/cart`} className="flex items-center gap-2">
                     <ShoppingCart className="h-4 w-4" />
                     购物车 ({cartCount})
                   </Link>
                 </Button>
                 <Button variant="ghost" size="sm" asChild className="w-full justify-start">
-                  <Link href="/wishlist" className="flex items-center gap-2">
+                  <Link href={`/${currentLocale}/wishlist`} className="flex items-center gap-2">
                     <Heart className="h-4 w-4" />
                     心愿单 ({wishlistCount})
                   </Link>
                 </Button>
                 <Button className="w-full" size="sm" asChild>
-                  <Link href="/inquiry">
+                  <Link href={`/${currentLocale}/inquiry`}>
                     获取报价
                   </Link>
                 </Button>
@@ -242,7 +254,7 @@ export function Header() {
                   {user ? (
                     <div className="space-y-2">
                       <Button variant="ghost" size="sm" asChild className="w-full justify-start">
-                        <Link href="/profile" className="flex items-center gap-2">
+                        <Link href={`/${currentLocale}/profile`} className="flex items-center gap-2">
                           <User className="h-4 w-4" />
                           {user.name}
                         </Link>
@@ -263,12 +275,12 @@ export function Header() {
                   ) : (
                     <div className="space-y-2">
                       <Button variant="ghost" size="sm" asChild className="w-full">
-                        <Link href="/auth/login" onClick={() => setIsMenuOpen(false)}>
+                        <Link href={`/${currentLocale}/auth/login`} onClick={() => setIsMenuOpen(false)}>
                           登录
                         </Link>
                       </Button>
                       <Button size="sm" asChild className="w-full">
-                        <Link href="/auth/register" onClick={() => setIsMenuOpen(false)}>
+                        <Link href={`/${currentLocale}/auth/register`} onClick={() => setIsMenuOpen(false)}>
                           注册
                         </Link>
                       </Button>
