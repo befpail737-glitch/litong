@@ -1,12 +1,22 @@
 # Cloudflare Pages configuration
 # This file is used to configure Cloudflare Pages deployment
-# Updated: 2025-09-11
+# Updated: 2025-09-16 - Added explicit build command to fix deployment issues
 
 # Project name (required for Pages)
 name = "litong-electronics-website"
 
+# Build configuration
+[build]
+command = "npm run build"
+cwd = ""
+
 # Build output directory
 pages_build_output_dir = "out"
+
+# Node.js version specification
+[build.environment_variables]
+NODE_VERSION = "18"
+NPM_VERSION = "9"
 
 # Compatibility settings
 compatibility_date = "2024-09-11"
@@ -15,3 +25,4 @@ compatibility_flags = ["nodejs_compat"]
 # Environment variables
 [env.production.vars]
 NODE_ENV = "production"
+NEXT_PUBLIC_SITE_URL = "https://litong.pages.dev"
