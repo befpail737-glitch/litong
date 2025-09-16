@@ -105,8 +105,8 @@ export default async function BrandProductsPage({ params }: BrandProductsPagePro
                         <Package className="h-6 w-6 text-blue-600" />
                       </div>
                     </div>
-                    <h3 className="font-semibold text-gray-900 mb-2">{category.name}</h3>
-                    <p className="text-sm text-gray-600 mb-4">{category.count} 个产品</p>
+                    <h3 className="font-semibold text-gray-900 mb-2">{category.name || 'Unknown Category'}</h3>
+                    <p className="text-sm text-gray-600 mb-4">{category.count || 0} 个产品</p>
                     <Button variant="outline" size="sm" className="w-full">
                       查看分类
                     </Button>
@@ -154,7 +154,7 @@ export default async function BrandProductsPage({ params }: BrandProductsPagePro
                       )}
                       {product.category && (
                         <span className="inline-block px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded mb-3">
-                          {product.category}
+                          {typeof product.category === 'string' ? product.category : product.category.name}
                         </span>
                       )}
                       <div className="flex gap-2">
