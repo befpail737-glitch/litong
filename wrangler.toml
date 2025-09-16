@@ -3,12 +3,3 @@ name = "litong-electronics-website"
 
 # Build output directory for static export
 pages_build_output_dir = "out"
-
-# Build configuration
-[build]
-command = "npm run build"
-
-# Environment variables for build
-[build.environment_variables]
-NODE_VERSION = "18"
-NODE_ENV = "production"
