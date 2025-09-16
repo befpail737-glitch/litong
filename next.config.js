@@ -3,8 +3,8 @@ const withNextIntl = createNextIntlPlugin('./src/i18n.ts');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Emergency mode: re-enable static export for Cloudflare Pages compatibility
-  output: 'export', // 重新启用静态导出，但使用简化的generateStaticParams
+  // Emergency mode: Re-enable static export, fix Server Actions differently
+  output: 'export', // 保持静态导出，通过其他方式解决Server Actions
   distDir: 'out',
   trailingSlash: true,
   images: {
@@ -16,7 +16,6 @@ const nextConfig = {
     workerThreads: false,
     cpus: 1,
     webpackBuildWorker: false, // Emergency模式：禁用webpack build worker避免hang
-    serverActions: false, // Emergency模式：禁用Server Actions以支持静态导出
   },
   // Emergency模式：极简webpack配置
   webpack: (config, { dev, isServer }) => {
