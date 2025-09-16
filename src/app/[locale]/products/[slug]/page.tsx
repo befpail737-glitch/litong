@@ -287,42 +287,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
   );
 }
 
+// Emergency模式：禁用复杂静态生成
 export async function generateStaticParams() {
-  try {
-    const products = await getAllProducts();
-
-    const dynamicParams = products
-      .filter(product => product.isActive && (product.slug || product._id))
-      .map(product => ({
-        slug: product.slug || product._id
-      }));
-
-    // Add fallback test IDs to ensure build succeeds even with no data
-    const fallbackParams = [
-      { slug: '11111' },
-      { slug: '22222' },
-      { slug: '33333' },
-      { slug: '44444' },
-      { slug: '55555' }
-    ];
-
-    const allParams = [...dynamicParams, ...fallbackParams];
-    console.log(`🔧 [products/[slug]] Generated ${allParams.length} static params (${dynamicParams.length} from data + ${fallbackParams.length} fallbacks)`);
-
-    return allParams;
-  } catch (error) {
-    console.error('Error generating static params for product detail:', error);
-    // Return fallback params even on error to ensure build succeeds
-    const fallbackParams = [
-      { slug: '11111' },
-      { slug: '22222' },
-      { slug: '33333' },
-      { slug: '44444' },
-      { slug: '55555' }
-    ];
-    console.log(`🔧 [products/[slug]] Using ${fallbackParams.length} fallback params due to error`);
-    return fallbackParams;
-  }
+  console.log('🚨 Emergency mode: skipping static generation for', __filename);
+  return []; // 让页面变为动态路由
 }
 
 export async function generateMetadata({ params }: ProductPageProps) {

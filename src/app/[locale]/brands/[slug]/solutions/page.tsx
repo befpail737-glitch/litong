@@ -255,91 +255,10 @@ export default async function BrandSolutionsPage({ params }: BrandSolutionsPageP
 }
 
 // 生成静态参数
+// Emergency模式：禁用复杂静态生成
 export async function generateStaticParams() {
-  try {
-    console.log('🔧 [brands/[slug]/solutions] Generating static params...');
-
-    const { getAllBrands } = await import('@/lib/sanity/brands');
-    const brands = await getAllBrands();
-
-    console.log(`🔧 [brands/[slug]/solutions] Fetched ${brands.length} brands from Sanity`);
-
-    // 扩展的 fallback 品牌列表，包含生产环境常见的品牌
-    const fallbackBrands = [
-      'MediaTek', 'mediatek', 'Qualcomm', 'qualcomm', 'Cree', 'cree',
-      'Littelfuse', 'littelfuse', 'IXYS', 'ixys', 'LEM', 'lem',
-      'PI', 'pi', 'Semikron', 'semikron', 'Sanrex', 'sanrex',
-      'NCC', 'ncc', 'Epcos', 'epcos', 'Infineon', 'infineon',
-      '英飞凌', 'STMicroelectronics', 'stmicroelectronics', 'ST', 'st',
-      'TI', 'ti', 'Texas Instruments', 'texas instruments',
-      'Analog Devices', 'analog devices', 'ADI', 'adi',
-      'Maxim', 'maxim', 'Linear Technology', 'linear technology',
-      'Vishay', 'vishay', 'Murata', 'murata', 'TDK', 'tdk',
-      'Panasonic', 'panasonic', 'Nichicon', 'nichicon'
-    ];
-
-    if (brands.length === 0) {
-      console.warn('⚠️ [brands/[slug]/solutions] No brands found, using extended fallback brand list');
-      return fallbackBrands.map(brandName => ({
-        slug: encodeURIComponent(brandName)
-      }));
-    }
-
-    const staticParams = new Set();
-
-    // 处理从 Sanity 获取的品牌
-    brands
-      .filter(brand => brand.isActive !== false && (brand.slug || brand.name))
-      .forEach(brand => {
-        const originalSlug = brand.slug || brand.name;
-
-        // 为英文品牌生成大写和小写两个版本
-        if (/^[A-Za-z]/.test(originalSlug)) {
-          // 原始版本
-          staticParams.add(encodeURIComponent(originalSlug));
-          console.log(`🔧 [brands/[slug]/solutions] Creating static param (original): ${brand.name} -> ${originalSlug}`);
-
-          // 小写版本
-          const lowercaseSlug = originalSlug.toLowerCase();
-          staticParams.add(encodeURIComponent(lowercaseSlug));
-          console.log(`🔧 [brands/[slug]/solutions] Creating static param (lowercase): ${brand.name} -> ${lowercaseSlug}`);
-
-          // 大写版本（如果原始不是大写）
-          const uppercaseSlug = originalSlug.toUpperCase();
-          staticParams.add(encodeURIComponent(uppercaseSlug));
-          console.log(`🔧 [brands/[slug]/solutions] Creating static param (uppercase): ${brand.name} -> ${uppercaseSlug}`);
-        } else {
-          // 中文品牌或其他特殊字符
-          staticParams.add(encodeURIComponent(originalSlug));
-          console.log(`🔧 [brands/[slug]/solutions] Creating static param: ${brand.name} -> ${originalSlug}`);
-        }
-      });
-
-    // 添加 fallback 品牌确保生产环境常见品牌都有对应页面
-    fallbackBrands.forEach(brandName => {
-      staticParams.add(encodeURIComponent(brandName));
-    });
-
-    const result = Array.from(staticParams).map(slug => ({ slug }));
-    console.log(`🔧 [brands/[slug]/solutions] Generated ${result.length} static params`);
-    return result;
-  } catch (error) {
-    console.error('❌ [brands/[slug]/solutions] Error generating static params:', error);
-
-    // 即使出错也要提供 fallback，确保基本的品牌页面能生成
-    const emergencyFallback = [
-      'MediaTek', 'mediatek', 'Qualcomm', 'qualcomm', 'Cree', 'cree',
-      'Littelfuse', 'littelfuse', 'IXYS', 'ixys', 'LEM', 'lem',
-      'PI', 'pi', 'Semikron', 'semikron', 'Sanrex', 'sanrex',
-      'NCC', 'ncc', 'Epcos', 'epcos', 'Infineon', 'infineon',
-      '英飞凌', 'STMicroelectronics', 'stmicroelectronics'
-    ];
-
-    console.log(`🔧 [brands/[slug]/solutions] Using emergency fallback: ${emergencyFallback.length} brands`);
-    return emergencyFallback.map(brandName => ({
-      slug: encodeURIComponent(brandName)
-    }));
-  }
+  console.log('🚨 Emergency mode: skipping static generation for', __filename);
+  return []; // 让页面变为动态路由
 }
 
 export async function generateMetadata({ params }: BrandSolutionsPageProps) {

@@ -345,74 +345,10 @@ export default async function BrandPage({ params }: BrandPageProps) {
   );
 }
 
-// 生成静态参数
+// Emergency模式：完全禁用静态生成
 export async function generateStaticParams() {
-  try {
-    console.log('🔧 [brands/[slug]] Generating static params for brand pages...');
-
-    const { locales } = await import('@/i18n');
-    const { getAllBrands } = await import('@/lib/sanity/brands');
-
-    // 简化品牌列表以加快构建速度
-    const fallbackBrands = [
-      'MediaTek', 'Qualcomm', 'Cree', 'Littelfuse', 'IXYS', 'LEM',
-      'PI', 'Semikron', 'Infineon', 'STMicroelectronics', 'TI',
-      'Analog Devices', 'Maxim', 'Vishay', 'Murata', 'TDK'
-    ];
-
-    let brands = [];
-    try {
-      brands = await getAllBrands();
-      console.log(`🔧 [brands/[slug]] Fetched ${brands.length} brands from Sanity`);
-    } catch (error) {
-      console.warn('⚠️ [brands/[slug]] Failed to fetch brands from Sanity, using fallback');
-      brands = [];
-    }
-
-    const brandSlugs = new Set();
-
-    // 处理从 Sanity 获取的品牌（限制数量以加快构建）
-    brands
-      .filter(brand => brand.isActive !== false && (brand.slug || brand.name))
-      .slice(0, 20) // 限制只处理前20个品牌以加快构建
-      .forEach(brand => {
-        const slug = brand.slug || brand.name;
-        brandSlugs.add(encodeURIComponent(slug));
-      });
-
-    // 添加 fallback 品牌
-    fallbackBrands.forEach(brandName => {
-      brandSlugs.add(encodeURIComponent(brandName));
-      brandSlugs.add(encodeURIComponent(brandName.toLowerCase()));
-    });
-
-    // 为每个语言和品牌组合生成参数
-    const result = [];
-    for (const locale of locales) {
-      for (const slug of brandSlugs) {
-        result.push({ locale, slug });
-      }
-    }
-
-    console.log(`🔧 [brands/[slug]] Generated ${result.length} static params for ${locales.length} locales`);
-    return result;
-  } catch (error) {
-    console.error('❌ [brands/[slug]] Error generating static params:', error);
-
-    // 极简的应急 fallback
-    const { locales } = await import('@/i18n');
-    const emergencyBrands = ['MediaTek', 'Infineon', 'STMicroelectronics'];
-    const result = [];
-
-    for (const locale of locales) {
-      for (const brand of emergencyBrands) {
-        result.push({ locale, slug: encodeURIComponent(brand) });
-      }
-    }
-
-    console.log(`🔧 [brands/[slug]] Using emergency fallback: ${result.length} params`);
-    return result;
-  }
+  console.log('🚨 Emergency mode: skipping static generation for', __filename);
+  return []; // 让页面变为动态路由
 }
 
 // 页面元数据
