@@ -45,7 +45,7 @@
     "@radix-ui/react-tabs": "^1.1.13",
     "@sanity/client": "^6.4.12",
     "@sanity/image-url": "^1.0.2",
-    "@sanity/vision": "^3.20.1",
+    "@sanity/vision": "^3.19.3",
     "@types/node": "^20.10.5",
     "@types/react": "^18.2.45",
     "@types/react-dom": "^18.2.18",
@@ -58,13 +58,13 @@
     "lucide-react": "^0.303.0",
     "next": "^14.2.32",
     "next-intl": "^4.3.6",
-    "next-sanity": "^8.5.2",
+    "next-sanity": "^7.1.4",
     "postcss": "^8.4.32",
     "prettier-plugin-tailwindcss": "^0.5.9",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-is": "^19.1.1",
-    "sanity": "^3.19.3",
+    "sanity": "^3.18.1",
     "sharp": "^0.33.1",
     "styled-components": "^6.1.19",
     "tailwind-merge": "^2.2.0",
@@ -81,5 +81,10 @@
     "eslint-config-next": "^14.0.4",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.1.1"
+  },
+  "overrides": {
+    "@sanity/client": "6.4.12",
+    "next-sanity": "7.1.4",
+    "sanity": "3.18.1"
   }
 }
