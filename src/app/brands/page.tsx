@@ -8,14 +8,37 @@ import { useEffect, useState } from 'react';
 export default function BrandsPage() {
   const [brands, setBrands] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [debugInfo, setDebugInfo] = useState(null);
 
   useEffect(() => {
     async function fetchBrands() {
       try {
+        console.log('🔍 开始获取品牌数据...');
+        setDebugInfo({ stage: 'fetching', message: '正在连接Sanity CMS...' });
+
         const brandsData = await getBrands();
-        setBrands(brandsData);
+
+        console.log('📊 品牌数据获取结果:', {
+          数量: brandsData?.length || 0,
+          数据: brandsData
+        });
+
+        setDebugInfo({
+          stage: 'success',
+          message: `成功获取 ${brandsData?.length || 0} 个品牌`
+        });
+
+        setBrands(brandsData || []);
+        setError(null);
       } catch (error) {
-        console.error('Failed to fetch brands:', error);
+        console.error('❌ 品牌数据获取失败:', error);
+        setError(error.message || '获取品牌数据失败');
+        setDebugInfo({
+          stage: 'error',
+          message: `错误: ${error.message}`,
+          details: error
+        });
         setBrands([]);
       } finally {
         setLoading(false);
@@ -77,6 +100,34 @@ export default function BrandsPage() {
         </div>
       </section>
 
+      {/* Debug Info Section (Development) */}
+      {process.env.NODE_ENV === 'development' && debugInfo && (
+        <section className="py-4 bg-yellow-50 border-b">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <div className="text-sm font-mono">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className={`w-3 h-3 rounded-full ${
+                    debugInfo.stage === 'success' ? 'bg-green-500' :
+                    debugInfo.stage === 'error' ? 'bg-red-500' : 'bg-yellow-500'
+                  }`}></span>
+                  <span className="font-semibold">调试信息:</span>
+                  <span>{debugInfo.message}</span>
+                </div>
+                {debugInfo.details && (
+                  <details className="mt-2">
+                    <summary className="cursor-pointer text-blue-600">详细信息</summary>
+                    <pre className="mt-2 p-2 bg-white rounded text-xs overflow-auto">
+                      {JSON.stringify(debugInfo.details, null, 2)}
+                    </pre>
+                  </details>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Brands Grid */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
@@ -89,8 +140,26 @@ export default function BrandsPage() {
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">加载中...</h3>
               <p className="text-gray-600 max-w-md mx-auto">
-                正在获取品牌信息，请稍候...
+                {debugInfo?.message || '正在获取品牌信息，请稍候...'}
               </p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-20">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">数据加载失败</h3>
+              <p className="text-gray-600 max-w-md mx-auto mb-4">
+                {error}
+              </p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+              >
+                重新加载
+              </button>
             </div>
           ) : brands.length === 0 ? (
             <div className="text-center py-20">
@@ -100,9 +169,15 @@ export default function BrandsPage() {
                 </svg>
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">暂无品牌数据</h3>
-              <p className="text-gray-600 max-w-md mx-auto">
+              <p className="text-gray-600 max-w-md mx-auto mb-4">
                 品牌信息正在维护中，请稍后再查看或联系我们获取更多信息。
               </p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+              >
+                重新加载
+              </button>
             </div>
           ) : (
             <div className="grid lg:grid-cols-2 gap-8">

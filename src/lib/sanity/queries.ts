@@ -117,9 +117,29 @@ export async function getBrands(featured = false) {
   `;
 
   try {
-    return await withRetry(() => client.fetch(query));
+    console.log('🔍 执行品牌查询:', {
+      查询条件: filter,
+      GROQ查询: query,
+      是否仅获取推荐: featured
+    });
+
+    const result = await withRetry(() => client.fetch(query));
+
+    console.log('📊 品牌查询结果:', {
+      数量: result?.length || 0,
+      品牌列表: result?.map(b => ({
+        id: b._id,
+        名称: b.name,
+        slug: b.slug,
+        是否激活: b.isActive,
+        是否推荐: b.isFeatured
+      })) || []
+    });
+
+    return result;
   } catch (error) {
-    throw new SanityError('Failed to fetch brands', 'FETCH_BRANDS_ERROR');
+    console.error('❌ 品牌查询失败:', error);
+    throw new SanityError(`Failed to fetch brands: ${error.message}`, 'FETCH_BRANDS_ERROR');
   }
 }
 
