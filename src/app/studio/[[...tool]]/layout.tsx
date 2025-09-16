@@ -20,8 +20,8 @@ export default function StudioLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="zh-CN">
-      <body style={{ margin: 0 }}>{children}</body>
-    </html>
+    <div style={{ margin: 0 }}>
+      {children}
+    </div>
   )
 }

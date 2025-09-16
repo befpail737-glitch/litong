@@ -84,5 +84,11 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  return children;
+  return (
+    <html lang="zh-CN" className={`${inter.variable} ${poppins.variable}`}>
+      <body className={`${inter.className} antialiased`}>
+        {children}
+      </body>
+    </html>
+  );
 }
