@@ -2,6 +2,11 @@ import type { Metadata } from 'next';
 import { Inter, Poppins } from 'next/font/google';
 import './globals.css';
 
+import { AuthProvider } from '@/contexts/AuthContext';
+import { OrderProvider } from '@/contexts/OrderContext';
+import { SearchProvider } from '@/contexts/SearchContext';
+import { InquiryProvider } from '@/contexts/InquiryContext';
+
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
@@ -87,7 +92,15 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" className={`${inter.variable} ${poppins.variable}`}>
       <body className={`${inter.className} antialiased`}>
-        {children}
+        <AuthProvider>
+          <SearchProvider>
+            <OrderProvider>
+              <InquiryProvider>
+                {children}
+              </InquiryProvider>
+            </OrderProvider>
+          </SearchProvider>
+        </AuthProvider>
       </body>
     </html>
   );
