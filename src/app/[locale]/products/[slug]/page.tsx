@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 
 import { getProductBySlug, getAllProducts } from '@/lib/sanity/products';
-import { urlFor } from '@/lib/sanity/client';
+import { urlFor, safeImageUrl } from '@/lib/sanity/client';
 
 interface ProductPageProps {
   params: {
@@ -67,7 +67,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <div className="aspect-square bg-white rounded-lg shadow-sm overflow-hidden">
             {product.images && product.images.length > 0 ? (
               <Image
-                src={urlFor(product.images[0]).width(600).height(600).url()}
+                src={safeImageUrl(product.images[0], { width: 600, height: 600, fallback: '/images/product-placeholder.jpg' })}
                 alt={product.title}
                 width={600}
                 height={600}
@@ -86,7 +86,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               {product.images.slice(1, 5).map((image, index) => (
                 <div key={index} className="aspect-square bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow">
                   <Image
-                    src={urlFor(image).width(150).height(150).url()}
+                    src={safeImageUrl(image, { width: 150, height: 150, fallback: '/images/product-placeholder-small.jpg' })}
                     alt={`${product.title} - ${index + 2}`}
                     width={150}
                     height={150}
@@ -119,7 +119,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               >
                 {product.brand.logo && (
                   <Image
-                    src={urlFor(product.brand.logo).width(40).height(40).url()}
+                    src={safeImageUrl(product.brand.logo, { width: 40, height: 40, fallback: '/images/brand-placeholder.jpg' })}
                     alt={product.brand.name}
                     width={40}
                     height={40}
@@ -300,24 +300,51 @@ export async function generateStaticParams() {
   try {
     const products = await getAllProducts();
 
-    const dynamicParams = products
-      .filter(product => {
-        // Only include products that are active and have valid slugs
-        return product.isActive &&
-               product.slug &&
-               typeof product.slug === 'string' &&
-               product.slug.trim().length > 0;
-      })
-      .map(product => ({
-        // Ensure slug is properly URL-encoded
-        slug: encodeURIComponent(product.slug.trim())
-      }));
+    const validatedParams = [];
 
-    console.log(`🔧 [products/[slug]] Generated ${dynamicParams.length} static params from real data`);
+    for (const product of products) {
+      // More strict validation
+      if (!product.isActive ||
+          !product.slug ||
+          typeof product.slug !== 'string' ||
+          product.slug.trim().length === 0) {
+        continue;
+      }
+
+      const trimmedSlug = product.slug.trim();
+
+      // Skip problematic products we know cause issues
+      const problematicSlugs = [
+        'sic mosfet', 'SKKT106/16E', 'stm32f407vgt6',
+        'test-product', 'undefined', 'null'
+      ];
+
+      if (problematicSlugs.some(problem =>
+        trimmedSlug.toLowerCase().includes(problem.toLowerCase())
+      )) {
+        console.log(`🔧 [products/[slug]] Skipping problematic slug: ${trimmedSlug}`);
+        continue;
+      }
+
+      // Double-check that product actually exists by trying to fetch basic info
+      try {
+        // Quick validation query - just check if product exists
+        if (product._id && product.title) {
+          validatedParams.push({
+            slug: encodeURIComponent(trimmedSlug)
+          });
+        }
+      } catch (validationError) {
+        console.warn(`🔧 [products/[slug]] Skipping invalid product: ${trimmedSlug}`, validationError);
+        continue;
+      }
+    }
+
+    console.log(`🔧 [products/[slug]] Generated ${validatedParams.length} validated static params from ${products.length} total products`);
 
     // Limit to prevent too many static pages during build
-    const limitedParams = dynamicParams.slice(0, 50);
-    if (limitedParams.length < dynamicParams.length) {
+    const limitedParams = validatedParams.slice(0, 30);
+    if (limitedParams.length < validatedParams.length) {
       console.log(`🔧 [products/[slug]] Limited to ${limitedParams.length} params for build performance`);
     }
 

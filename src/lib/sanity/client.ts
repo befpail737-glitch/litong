@@ -45,6 +45,84 @@ export function urlFor(source: SanityImageSource) {
   return builder.image(source);
 }
 
+// 安全的图片URL构建器，带有错误处理
+export function safeUrlFor(source: SanityImageSource | null | undefined): string | null {
+  try {
+    // 检查source是否有效
+    if (!source) {
+      return null;
+    }
+
+    // 检查是否为有效的图片对象
+    if (typeof source === 'object' && '_type' in source) {
+      if (source._type !== 'image') {
+        console.warn('Invalid image type:', source._type);
+        return null;
+      }
+
+      // 检查是否有资产引用
+      if (!('asset' in source) || !source.asset) {
+        console.warn('Image missing asset reference:', source);
+        return null;
+      }
+    }
+
+    // 尝试构建URL
+    const imageBuilder = builder.image(source);
+    if (!imageBuilder) {
+      return null;
+    }
+
+    // 返回URL字符串
+    return imageBuilder.url();
+  } catch (error) {
+    console.error('Error building image URL:', error, 'Source:', source);
+    return null;
+  }
+}
+
+// 带有尺寸和备用图片的安全图片URL构建器
+export function safeImageUrl(
+  source: SanityImageSource | null | undefined,
+  options: {
+    width?: number;
+    height?: number;
+    quality?: number;
+    format?: 'jpg' | 'png' | 'webp' | 'auto';
+    fallback?: string;
+  } = {}
+): string {
+  const { width, height, quality = 80, format = 'auto', fallback = '/images/placeholder.jpg' } = options;
+
+  try {
+    const safeUrl = safeUrlFor(source);
+    if (!safeUrl) {
+      return fallback;
+    }
+
+    let imageBuilder = builder.image(source);
+
+    if (width) {
+      imageBuilder = imageBuilder.width(width);
+    }
+    if (height) {
+      imageBuilder = imageBuilder.height(height);
+    }
+    if (quality) {
+      imageBuilder = imageBuilder.quality(quality);
+    }
+    if (format && format !== 'auto') {
+      imageBuilder = imageBuilder.format(format);
+    }
+
+    const finalUrl = imageBuilder.url();
+    return finalUrl || fallback;
+  } catch (error) {
+    console.error('Error building safe image URL:', error);
+    return fallback;
+  }
+}
+
 // 常用GROQ查询片段
 export const GROQ_FRAGMENTS = {
   // 产品基础信息

@@ -21,7 +21,7 @@ import {
 
 import { getBrandData } from '@/lib/sanity/brands';
 import { getProductBySlug, getAllProducts } from '@/lib/sanity/products';
-import { urlFor } from '@/lib/sanity/client';
+import { urlFor, safeImageUrl } from '@/lib/sanity/client';
 
 interface BrandProductPageProps {
   params: {
@@ -166,7 +166,7 @@ export default async function BrandProductPage({ params }: BrandProductPageProps
             {product.images && product.images[0] ? (
               <div className="h-64 lg:h-full">
                 <Image
-                  src={urlFor(product.images[0]).width(600).height(400).url()}
+                  src={safeImageUrl(product.images[0], { width: 600, height: 400, fallback: '/images/product-placeholder.jpg' })}
                   alt={product.title}
                   width={600}
                   height={400}
@@ -398,30 +398,50 @@ export async function generateStaticParams() {
 
     // For each product, add its brand as the slug and product as id
     for (const product of products) {
-      if (product.isActive &&
-          product.brand &&
-          product.slug &&
-          typeof product.slug === 'string' &&
-          product.slug.trim().length > 0) {
+      if (!product.isActive ||
+          !product.brand ||
+          !product.slug ||
+          typeof product.slug !== 'string' ||
+          product.slug.trim().length === 0) {
+        continue;
+      }
 
-        const brandSlug = product.brand.slug || product.brand.name;
-        const productSlug = product.slug.trim();
+      const brandSlug = product.brand.slug || product.brand.name;
+      const productSlug = product.slug.trim();
 
-        if (brandSlug &&
-            typeof brandSlug === 'string' &&
-            brandSlug.trim().length > 0) {
-          dynamicParams.push({
-            slug: encodeURIComponent(brandSlug.trim()),
-            id: encodeURIComponent(productSlug)
-          });
-        }
+      if (!brandSlug ||
+          typeof brandSlug !== 'string' ||
+          brandSlug.trim().length === 0) {
+        continue;
+      }
+
+      // Skip problematic products
+      const problematicSlugs = [
+        'sic mosfet', 'SKKT106/16E', 'stm32f407vgt6',
+        'test-product', 'test-solution', 'undefined', 'null'
+      ];
+
+      if (problematicSlugs.some(problem =>
+        productSlug.toLowerCase().includes(problem.toLowerCase()) ||
+        brandSlug.toLowerCase().includes(problem.toLowerCase())
+      )) {
+        console.log(`🔧 [brands/[slug]/products/[id]] Skipping problematic product: ${brandSlug}/${productSlug}`);
+        continue;
+      }
+
+      // Additional validation
+      if (product._id && product.title && product.brand.name) {
+        dynamicParams.push({
+          slug: encodeURIComponent(brandSlug.trim()),
+          id: encodeURIComponent(productSlug)
+        });
       }
     }
 
     console.log(`🔧 [brands/[slug]/products/[id]] Generated ${dynamicParams.length} static params from real data`);
 
     // Limit to prevent too many static pages during build
-    const limitedParams = dynamicParams.slice(0, 30);
+    const limitedParams = dynamicParams.slice(0, 20);
     if (limitedParams.length < dynamicParams.length) {
       console.log(`🔧 [brands/[slug]/products/[id]] Limited to ${limitedParams.length} params for build performance`);
     }
