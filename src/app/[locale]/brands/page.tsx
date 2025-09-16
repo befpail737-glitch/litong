@@ -18,7 +18,14 @@ export async function generateStaticParams() {
   ];
 }
 
-export default async function BrandsPage() {
+interface BrandsPageProps {
+  params: {
+    locale: string;
+  };
+}
+
+export default async function BrandsPage({ params }: BrandsPageProps) {
+  const { locale } = params;
   let brands = [];
   let error = null;
 
@@ -41,7 +48,7 @@ export default async function BrandsPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {brands.map((brand) => (
               <div key={brand._id} className="p-4 border border-gray-200 rounded hover:bg-gray-50 transition-colors">
-                <a href={`/brands/${brand.slug}`} className="text-gray-900 hover:text-blue-600 font-medium">
+                <a href={`/${locale}/brands/${brand.slug}`} className="text-gray-900 hover:text-blue-600 font-medium">
                   {brand.name}
                 </a>
               </div>
