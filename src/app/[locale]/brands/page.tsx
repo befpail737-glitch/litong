@@ -1,52 +1,22 @@
-'use client';
-
 import { MainLayout } from '@/components/layout/MainLayout';
 import { getBrands } from '@/lib/sanity/queries';
 import { urlFor } from '@/lib/sanity/client';
-import { useEffect, useState } from 'react';
 
-export default function BrandsPage() {
-  const [brands, setBrands] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [debugInfo, setDebugInfo] = useState(null);
+export default async function BrandsPage() {
+  let brands = [];
+  let error = null;
 
-  useEffect(() => {
-    async function fetchBrands() {
-      try {
-        console.log('🔍 开始获取品牌数据...');
-        setDebugInfo({ stage: 'fetching', message: '正在连接Sanity CMS...' });
-
-        const brandsData = await getBrands();
-
-        console.log('📊 品牌数据获取结果:', {
-          数量: brandsData?.length || 0,
-          数据: brandsData
-        });
-
-        setDebugInfo({
-          stage: 'success',
-          message: `成功获取 ${brandsData?.length || 0} 个品牌`
-        });
-
-        setBrands(brandsData || []);
-        setError(null);
-      } catch (error) {
-        console.error('❌ 品牌数据获取失败:', error);
-        setError(error.message || '获取品牌数据失败');
-        setDebugInfo({
-          stage: 'error',
-          message: `错误: ${error.message}`,
-          details: error
-        });
-        setBrands([]);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchBrands();
-  }, []);
+  try {
+    console.log('🔍 服务端获取品牌数据...');
+    brands = await getBrands();
+    console.log('📊 服务端品牌数据获取成功:', {
+      数量: brands?.length || 0,
+      品牌列表: brands?.map(b => b.name) || []
+    });
+  } catch (err) {
+    console.error('❌ 服务端品牌数据获取失败:', err);
+    error = err.message || '获取品牌数据失败';
+  }
 
   return (
     <MainLayout>
@@ -101,27 +71,16 @@ export default function BrandsPage() {
       </section>
 
       {/* Debug Info Section (Development) */}
-      {process.env.NODE_ENV === 'development' && debugInfo && (
-        <section className="py-4 bg-yellow-50 border-b">
+      {process.env.NODE_ENV === 'development' && (
+        <section className="py-4 bg-green-50 border-b">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <div className="text-sm font-mono">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className={`w-3 h-3 rounded-full ${
-                    debugInfo.stage === 'success' ? 'bg-green-500' :
-                    debugInfo.stage === 'error' ? 'bg-red-500' : 'bg-yellow-500'
-                  }`}></span>
-                  <span className="font-semibold">调试信息:</span>
-                  <span>{debugInfo.message}</span>
+                  <span className="w-3 h-3 rounded-full bg-green-500"></span>
+                  <span className="font-semibold">服务端渲染状态:</span>
+                  <span>成功获取 {brands?.length || 0} 个品牌 {error ? `(错误: ${error})` : ''}</span>
                 </div>
-                {debugInfo.details && (
-                  <details className="mt-2">
-                    <summary className="cursor-pointer text-blue-600">详细信息</summary>
-                    <pre className="mt-2 p-2 bg-white rounded text-xs overflow-auto">
-                      {JSON.stringify(debugInfo.details, null, 2)}
-                    </pre>
-                  </details>
-                )}
               </div>
             </div>
           </div>
@@ -131,19 +90,7 @@ export default function BrandsPage() {
       {/* Brands Grid */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
-          {loading ? (
-            <div className="text-center py-20">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">加载中...</h3>
-              <p className="text-gray-600 max-w-md mx-auto">
-                {debugInfo?.message || '正在获取品牌信息，请稍候...'}
-              </p>
-            </div>
-          ) : error ? (
+          {error ? (
             <div className="text-center py-20">
               <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -154,12 +101,6 @@ export default function BrandsPage() {
               <p className="text-gray-600 max-w-md mx-auto mb-4">
                 {error}
               </p>
-              <button
-                onClick={() => window.location.reload()}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-              >
-                重新加载
-              </button>
             </div>
           ) : brands.length === 0 ? (
             <div className="text-center py-20">
@@ -172,12 +113,6 @@ export default function BrandsPage() {
               <p className="text-gray-600 max-w-md mx-auto mb-4">
                 品牌信息正在维护中，请稍后再查看或联系我们获取更多信息。
               </p>
-              <button
-                onClick={() => window.location.reload()}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-              >
-                重新加载
-              </button>
             </div>
           ) : (
             <div className="grid lg:grid-cols-2 gap-8">
