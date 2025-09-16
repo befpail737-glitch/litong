@@ -58,6 +58,7 @@ export default async function BrandSolutionsPage({ params }: BrandSolutionsPageP
     const { brand, solutions } = await getBrandWithContent(decodedSlug);
 
     if (!brand) {
+      console.warn(`Brand not found for slug: ${decodedSlug}`);
       notFound();
     }
 

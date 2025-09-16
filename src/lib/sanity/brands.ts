@@ -142,7 +142,10 @@ export async function getBrandByName(name: string): Promise<Brand | null> {
 // 根据slug获取品牌数据
 export async function getBrandData(slug: string): Promise<Brand | null> {
   try {
-    const query = `*[_type == "brandBasic" && slug.current == $slug && isActive == true && !(_id in path("drafts.**"))][0] {
+    console.log(`🔍 [getBrandData] Searching for brand with slug: ${slug}`);
+
+    // Try exact match first
+    let query = `*[_type == "brandBasic" && slug.current == $slug && isActive == true && !(_id in path("drafts.**"))][0] {
       _id,
       _type,
       name,
@@ -157,7 +160,35 @@ export async function getBrandData(slug: string): Promise<Brand | null> {
       established
     }`;
 
-    const brand = await client.fetch(query, { slug });
+    let brand = await client.fetch(query, { slug });
+
+    // If no exact match found, try with more relaxed conditions
+    if (!brand) {
+      console.log(`🔍 [getBrandData] No exact match found, trying relaxed search for: ${slug}`);
+      query = `*[_type == "brandBasic" && (slug.current == $slug || name == $slug) && (isActive == true || !defined(isActive)) && !(_id in path("drafts.**"))][0] {
+        _id,
+        _type,
+        name,
+        description,
+        website,
+        country,
+        isActive,
+        isFeatured,
+        "slug": slug.current,
+        logo,
+        headquarters,
+        established
+      }`;
+
+      brand = await client.fetch(query, { slug });
+    }
+
+    if (brand) {
+      console.log(`✅ [getBrandData] Found brand: ${brand.name}`);
+    } else {
+      console.warn(`❌ [getBrandData] Brand not found for slug: ${slug}`);
+    }
+
     return brand || null;
   } catch (error) {
     console.error('Error fetching brand data:', error);

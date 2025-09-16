@@ -70,6 +70,7 @@ export default async function BrandSupportPage({ params }: BrandSupportPageProps
     const { brand, articles } = await getBrandWithContent(decodedSlug);
 
     if (!brand) {
+      console.warn(`Brand not found for slug: ${decodedSlug}`);
       notFound();
     }
 
