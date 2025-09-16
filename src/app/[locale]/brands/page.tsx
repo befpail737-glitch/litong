@@ -2,6 +2,22 @@ import { MainLayout } from '@/components/layout/MainLayout';
 import { getBrands } from '@/lib/sanity/queries';
 import { urlFor } from '@/lib/sanity/client';
 
+// Generate static params for supported locales
+export async function generateStaticParams() {
+  return [
+    { locale: 'zh-CN' },
+    { locale: 'zh-TW' },
+    { locale: 'en' },
+    { locale: 'ja' },
+    { locale: 'ko' },
+    { locale: 'de' },
+    { locale: 'fr' },
+    { locale: 'es' },
+    { locale: 'ru' },
+    { locale: 'ar' }
+  ];
+}
+
 export default async function BrandsPage() {
   let brands = [];
   let error = null;
