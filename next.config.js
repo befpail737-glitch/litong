@@ -16,6 +16,7 @@ const nextConfig = {
     workerThreads: false,
     cpus: 1,
     webpackBuildWorker: false, // Emergency模式：禁用webpack build worker避免hang
+    serverActions: false, // Emergency模式：禁用Server Actions以支持静态导出
   },
   // Emergency模式：极简webpack配置
   webpack: (config, { dev, isServer }) => {
