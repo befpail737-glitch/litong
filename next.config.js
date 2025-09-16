@@ -1,6 +1,3 @@
-const createNextIntlPlugin = require('next-intl/plugin');
-const withNextIntl = createNextIntlPlugin('./src/i18n.ts');
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Static export mode for Cloudflare Pages
@@ -38,4 +35,4 @@ const nextConfig = {
   generateEtags: true,
 };
 
-module.exports = withNextIntl(nextConfig);
+module.exports = nextConfig;
