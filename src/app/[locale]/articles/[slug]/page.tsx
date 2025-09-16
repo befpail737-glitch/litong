@@ -22,6 +22,7 @@ import { urlFor } from '@/lib/sanity/client';
 
 interface ArticlePageProps {
   params: {
+    locale: string;
     slug: string;
   };
 }
@@ -37,9 +38,9 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     <div className="container mx-auto px-4 py-8">
       {/* Breadcrumb */}
       <div className="flex items-center space-x-2 text-sm text-gray-500 mb-6">
-        <Link href="/" className="hover:text-blue-600">首页</Link>
+        <Link href={`/${params.locale}`} className="hover:text-blue-600">首页</Link>
         <ChevronRight className="h-4 w-4" />
-        <Link href="/articles" className="hover:text-blue-600">技术文章</Link>
+        <Link href={`/${params.locale}/articles`} className="hover:text-blue-600">技术文章</Link>
         <ChevronRight className="h-4 w-4" />
         <span className="text-gray-900">{article.title}</span>
       </div>
@@ -47,7 +48,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       {/* Back to Articles */}
       <div className="mb-6">
         <Link
-          href="/articles"
+          href={`/${params.locale}/articles`}
           className="inline-flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -65,10 +66,10 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                 {article.category.name}
               </span>
             )}
-            {article.tags && article.tags.length > 0 && (
+            {article.tags && Array.isArray(article.tags) && article.tags.length > 0 && (
               article.tags.slice(0, 3).map((tag, index) => (
                 <span key={index} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
-                  {tag}
+                  {typeof tag === 'string' ? tag : String(tag)}
                 </span>
               ))
             )}
@@ -109,7 +110,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               <span>分享文章</span>
             </button>
             <Link
-              href="/inquiry"
+              href={`/${params.locale}/inquiry`}
               className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
             >
               <MessageCircle className="h-4 w-4" />
@@ -138,8 +139,16 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           {/* Article Content */}
           <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
             <div className="prose max-w-none">
-              {article.content ? (
+              {article.content && typeof article.content === 'string' ? (
                 <div dangerouslySetInnerHTML={{ __html: article.content }} />
+              ) : article.content && Array.isArray(article.content) ? (
+                <div>
+                  {article.content.map((block: any, index: number) => (
+                    <div key={index}>
+                      {typeof block === 'string' ? block : JSON.stringify(block)}
+                    </div>
+                  ))}
+                </div>
               ) : (
                 <div className="text-center py-12">
                   <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
@@ -148,7 +157,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                     文章详细内容正在整理中，如需了解更多信息请联系我们
                   </p>
                   <Link
-                    href="/inquiry"
+                    href={`/${params.locale}/inquiry`}
                     className="inline-flex items-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
                   >
                     <MessageCircle className="h-4 w-4" />
@@ -183,13 +192,13 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               </h3>
               <div className="space-y-3">
                 <Link
-                  href="/inquiry"
+                  href={`/${params.locale}/inquiry`}
                   className="w-full bg-blue-600 text-white text-center py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium block"
                 >
                   技术咨询
                 </Link>
                 <Link
-                  href="/contact"
+                  href={`/${params.locale}/contact`}
                   className="w-full border border-gray-300 text-gray-700 text-center py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors font-medium block"
                 >
                   联系专家
@@ -230,14 +239,14 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                     </div>
                   </div>
                 )}
-                {article.tags && article.tags.length > 0 && (
+                {article.tags && Array.isArray(article.tags) && article.tags.length > 0 && (
                   <div>
                     <span className="text-sm text-gray-500">标签</span>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {article.tags.map((tag, index) => (
                         <span key={index} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
                           <Tag className="h-3 w-3 inline mr-1" />
-                          {tag}
+                          {typeof tag === 'string' ? tag : String(tag)}
                         </span>
                       ))}
                     </div>
@@ -251,25 +260,25 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               <h3 className="text-lg font-semibold text-gray-900 mb-4">相关链接</h3>
               <div className="space-y-2">
                 <Link
-                  href="/articles"
+                  href={`/${params.locale}/articles`}
                   className="block p-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
                 >
                   所有技术文章
                 </Link>
                 <Link
-                  href="/products"
+                  href={`/${params.locale}/products`}
                   className="block p-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
                 >
                   相关产品
                 </Link>
                 <Link
-                  href="/solutions"
+                  href={`/${params.locale}/solutions`}
                   className="block p-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
                 >
                   解决方案
                 </Link>
                 <Link
-                  href="/inquiry"
+                  href={`/${params.locale}/inquiry`}
                   className="block p-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
                 >
                   获取报价
@@ -317,31 +326,15 @@ export async function generateStaticParams() {
         slug: article.slug || article._id
       }));
 
-    // Add fallback test IDs to ensure build succeeds even with no data
-    const fallbackParams = [
-      { slug: '11111' },
-      { slug: '22222' },
-      { slug: '33333' },
-      { slug: '44444' },
-      { slug: '55555' }
-    ];
+    // Return only valid dynamic params to avoid build errors
+    console.log(`🔧 [articles/[slug]] Generated ${dynamicParams.length} static params from real data`);
 
-    const allParams = [...dynamicParams, ...fallbackParams];
-    console.log(`🔧 [articles/[slug]] Generated ${allParams.length} static params (${dynamicParams.length} from data + ${fallbackParams.length} fallbacks)`);
-
-    return allParams;
+    return dynamicParams;
   } catch (error) {
     console.error('Error generating static params for article detail:', error);
-    // Return fallback params even on error to ensure build succeeds
-    const fallbackParams = [
-      { slug: '11111' },
-      { slug: '22222' },
-      { slug: '33333' },
-      { slug: '44444' },
-      { slug: '55555' }
-    ];
-    console.log(`🔧 [articles/[slug]] Using ${fallbackParams.length} fallback params due to error`);
-    return fallbackParams;
+    // Return empty array on error to prevent build failures
+    console.log(`🔧 [articles/[slug]] Returning empty params due to error`);
+    return [];
   }
 }
 

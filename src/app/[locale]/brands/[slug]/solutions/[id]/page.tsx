@@ -374,9 +374,34 @@ export default async function BrandSolutionDetailPage({ params }: BrandSolutionD
   );
 }
 
-// Emergency模式：最小generateStaticParams，硬编码单个页面
 export async function generateStaticParams() {
-  return [{ slug: 'test-brand', id: 'test-solution' }];
+  try {
+    const solutions = await getAllSolutions();
+
+    const dynamicParams: Array<{ slug: string; id: string }> = [];
+
+    // For each solution, add its brand as the slug and solution as id
+    for (const solution of solutions) {
+      if (solution.isActive && solution.brand && (solution.slug || solution._id)) {
+        const brandSlug = solution.brand.slug || solution.brand.name;
+        const solutionId = solution.slug || solution._id;
+
+        if (brandSlug && solutionId) {
+          dynamicParams.push({
+            slug: brandSlug,
+            id: solutionId
+          });
+        }
+      }
+    }
+
+    console.log(`🔧 [brands/[slug]/solutions/[id]] Generated ${dynamicParams.length} static params from real data`);
+    return dynamicParams;
+  } catch (error) {
+    console.error('Error generating static params for brand solution detail:', error);
+    console.log(`🔧 [brands/[slug]/solutions/[id]] Returning empty params due to error`);
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: BrandSolutionDetailPageProps) {

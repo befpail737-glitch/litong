@@ -287,9 +287,23 @@ export default async function ProductPage({ params }: ProductPageProps) {
   );
 }
 
-// Emergency模式：最小generateStaticParams，硬编码单个页面
 export async function generateStaticParams() {
-  return [{ slug: 'test-product' }];
+  try {
+    const products = await getAllProducts();
+
+    const dynamicParams = products
+      .filter(product => product.isActive && (product.slug || product._id))
+      .map(product => ({
+        slug: product.slug || product._id
+      }));
+
+    console.log(`🔧 [products/[slug]] Generated ${dynamicParams.length} static params from real data`);
+    return dynamicParams;
+  } catch (error) {
+    console.error('Error generating static params for product detail:', error);
+    console.log(`🔧 [products/[slug]] Returning empty params due to error`);
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: ProductPageProps) {

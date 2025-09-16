@@ -383,9 +383,34 @@ export default async function BrandProductPage({ params }: BrandProductPageProps
   );
 }
 
-// Emergency模式：最小generateStaticParams，硬编码单个页面
 export async function generateStaticParams() {
-  return [{ slug: 'test-brand', id: 'test-product' }];
+  try {
+    const products = await getAllProducts();
+
+    const dynamicParams: Array<{ slug: string; id: string }> = [];
+
+    // For each product, add its brand as the slug and product as id
+    for (const product of products) {
+      if (product.isActive && product.brand && (product.slug || product._id)) {
+        const brandSlug = product.brand.slug || product.brand.name;
+        const productId = product.slug || product._id;
+
+        if (brandSlug && productId) {
+          dynamicParams.push({
+            slug: brandSlug,
+            id: productId
+          });
+        }
+      }
+    }
+
+    console.log(`🔧 [brands/[slug]/products/[id]] Generated ${dynamicParams.length} static params from real data`);
+    return dynamicParams;
+  } catch (error) {
+    console.error('Error generating static params for brand product detail:', error);
+    console.log(`🔧 [brands/[slug]/products/[id]] Returning empty params due to error`);
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: BrandProductPageProps) {
