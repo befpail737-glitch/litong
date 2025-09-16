@@ -15,30 +15,16 @@ const nextConfig = {
   experimental: {
     workerThreads: false,
     cpus: 1,
-    webpackBuildWorker: true, // Enable webpack build worker for better cache management
+    webpackBuildWorker: false, // Emergency模式：禁用webpack build worker避免hang
   },
-  // Webpack configuration for better worker handling and cache exclusion
+  // Emergency模式：极简webpack配置
   webpack: (config, { dev, isServer }) => {
-    if (dev && !isServer) {
-      // Limit worker pools in development
-      config.parallelism = 1;
-      config.infrastructureLogging = {
-        level: 'error',
-      };
-    }
-    
-    // Configure cache to be stored outside .next directory for production
-    if (!dev) {
-      const path = require('path');
-      config.cache = {
-        type: 'filesystem',
-        cacheDirectory: path.resolve(__dirname, '.webpack-cache'), // Absolute path for webpack cache
-        buildDependencies: {
-          config: [__filename],
-        },
-      };
-    }
-    
+    // 最小化配置，避免复杂的并行处理和缓存
+    config.parallelism = 1;
+    config.infrastructureLogging = {
+      level: 'error',
+    };
+    // 禁用复杂缓存配置
     return config;
   },
   typescript: {

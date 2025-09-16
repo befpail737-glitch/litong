@@ -255,11 +255,7 @@ export default async function BrandSolutionsPage({ params }: BrandSolutionsPageP
 }
 
 // 生成静态参数
-// Emergency模式：禁用复杂静态生成
-export async function generateStaticParams() {
-  console.log('🚨 Emergency mode: skipping static generation for', __filename);
-  return []; // 让页面变为动态路由
-}
+// Emergency模式：完全移除generateStaticParams
 
 export async function generateMetadata({ params }: BrandSolutionsPageProps) {
   const decodedSlug = decodeURIComponent(params.slug);

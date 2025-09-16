@@ -17,8 +17,10 @@ const poppins = Poppins({
   display: 'swap',
 });
 
+// Emergency模式：只生成单一核心语言以避免构建复杂性
 export function generateStaticParams() {
-  return locales.map((locale) => ({locale}));
+  // 只返回中文，避免多语言路由组合复杂性
+  return [{ locale: 'zh-CN' }];
 }
 
 export default async function LocaleLayout({

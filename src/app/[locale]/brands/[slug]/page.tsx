@@ -345,11 +345,7 @@ export default async function BrandPage({ params }: BrandPageProps) {
   );
 }
 
-// Emergency模式：完全禁用静态生成
-export async function generateStaticParams() {
-  console.log('🚨 Emergency mode: skipping static generation for', __filename);
-  return []; // 让页面变为动态路由
-}
+// Emergency模式：完全移除generateStaticParams，强制动态路由
 
 // 页面元数据
 export async function generateMetadata({ params }: BrandPageProps) {

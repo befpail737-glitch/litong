@@ -505,12 +505,7 @@ export default async function BrandSupportArticlePage({ params }: BrandSupportAr
   );
 }
 
-// Emergency模式：禁用复杂静态生成
-export async function generateStaticParams() {
-  // 返回空数组，让这些页面为动态路由
-  console.log('🚨 [brands/[slug]/support/[id]] Emergency mode: skipping static generation');
-  return [];
-}
+// Emergency模式：完全移除generateStaticParams
 
 export async function generateMetadata({ params }: BrandSupportArticlePageProps) {
   const decodedSlug = decodeURIComponent(params.slug);
