@@ -1,16 +1,29 @@
+'use client';
+
 import { MainLayout } from '@/components/layout/MainLayout';
 import { getBrands } from '@/lib/sanity/queries';
 import { urlFor } from '@/lib/sanity/client';
+import { useEffect, useState } from 'react';
 
-export default async function BrandsPage() {
-  // 从Sanity CMS获取品牌数据
-  let brands = [];
-  try {
-    brands = await getBrands();
-  } catch (error) {
-    console.error('Failed to fetch brands:', error);
-    // 如果获取失败，brands将保持为空数组
-  }
+export default function BrandsPage() {
+  const [brands, setBrands] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchBrands() {
+      try {
+        const brandsData = await getBrands();
+        setBrands(brandsData);
+      } catch (error) {
+        console.error('Failed to fetch brands:', error);
+        setBrands([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchBrands();
+  }, []);
 
   return (
     <MainLayout>
@@ -67,7 +80,19 @@ export default async function BrandsPage() {
       {/* Brands Grid */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
-          {brands.length === 0 ? (
+          {loading ? (
+            <div className="text-center py-20">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">加载中...</h3>
+              <p className="text-gray-600 max-w-md mx-auto">
+                正在获取品牌信息，请稍候...
+              </p>
+            </div>
+          ) : brands.length === 0 ? (
             <div className="text-center py-20">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

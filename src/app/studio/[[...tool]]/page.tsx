@@ -1,29 +1,29 @@
 /**
- * This route is responsible for loading Sanity Studio in the browser.
- * Simplified version to ensure static generation works
+ * Studio page temporarily disabled for static export
  */
 
-import StudioClient from './StudioClient'
-
-// Force static generation for this page
-export const dynamic = 'force-static'
-export const revalidate = false
-
-export default function StudioPage() {
-  return <StudioClient />
+export async function generateStaticParams() {
+  return [{ tool: [] }];
 }
 
-// Generate static params for studio routes - ensure this works with static export
-export async function generateStaticParams() {
-  console.log('🔧 Generating static params for Studio page')
-
-  // Return comprehensive studio routes for static generation
-  const params = [
-    { tool: [] }, // /studio
-    { tool: ['desk'] }, // /studio/desk (main workspace)
-    { tool: ['vision'] }, // /studio/vision (GROQ playground)
-  ]
-
-  console.log('🔧 Studio static params:', params)
-  return params
+export default function StudioPageDisabled() {
+  return (
+    <div className="p-8 text-center">
+      <h1 className="text-2xl font-bold mb-4">Sanity Studio</h1>
+      <p className="text-gray-600 mb-4">
+        Sanity Studio is temporarily disabled for static export compatibility.
+      </p>
+      <p className="text-sm text-gray-500">
+        To access the studio, please visit{' '}
+        <a
+          href="https://litong.sanity.studio"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 underline"
+        >
+          litong.sanity.studio
+        </a>
+      </p>
+    </div>
+  )
 }

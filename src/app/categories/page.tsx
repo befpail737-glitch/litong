@@ -1,15 +1,28 @@
+'use client';
+
 import { MainLayout } from '@/components/layout/MainLayout';
 import { getProductCategories } from '@/lib/sanity/queries';
+import { useEffect, useState } from 'react';
 
-export default async function CategoriesPage() {
-  // 从Sanity CMS获取产品分类数据
-  let categories = [];
-  try {
-    categories = await getProductCategories();
-  } catch (error) {
-    console.error('Failed to fetch categories:', error);
-    // 如果获取失败，categories将保持为空数组
-  }
+export default function CategoriesPage() {
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const categoriesData = await getProductCategories();
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
+        setCategories([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchCategories();
+  }, []);
 
   return (
     <MainLayout>
@@ -54,7 +67,19 @@ export default async function CategoriesPage() {
       {/* Categories Grid */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
-          {categories.length === 0 ? (
+          {loading ? (
+            <div className="text-center py-20">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">加载中...</h3>
+              <p className="text-gray-600 max-w-md mx-auto">
+                正在获取产品分类信息，请稍候...
+              </p>
+            </div>
+          ) : categories.length === 0 ? (
             <div className="text-center py-20">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

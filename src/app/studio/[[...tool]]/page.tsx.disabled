@@ -1,0 +1,27 @@
+/**
+ * This route is responsible for loading Sanity Studio in the browser.
+ * Temporarily disabled for static export compatibility
+ */
+
+import StudioClient from './StudioClient'
+
+// Force static generation for this page
+export const dynamic = 'force-static'
+export const revalidate = false
+
+export default function StudioPage() {
+  return <StudioClient />
+}
+
+// Generate static params for studio routes - ensure this works with static export
+export async function generateStaticParams() {
+  console.log('🔧 Generating static params for Studio page')
+
+  // Return minimal params for static export compatibility
+  const params = [
+    { tool: [] }, // /studio only
+  ]
+
+  console.log('🔧 Studio static params:', params)
+  return params
+}

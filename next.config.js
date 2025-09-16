@@ -1,8 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Static export mode for Cloudflare Pages
-  output: 'export',
-  distDir: 'out',
+  // output: 'export', // Temporarily comment out to use standard build
+  // distDir: 'out', // Use default .next directory for standard build
   trailingSlash: true,
   images: {
     unoptimized: true,
