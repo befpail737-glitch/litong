@@ -3,12 +3,12 @@ const withNextIntl = createNextIntlPlugin('./src/i18n.ts');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Emergency mode: disable static export for faster deployment
-  // output: 'export', // 紧急模式：禁用静态导出
-  // distDir: 'out',
+  // Emergency mode: re-enable static export for Cloudflare Pages compatibility
+  output: 'export', // 重新启用静态导出，但使用简化的generateStaticParams
+  distDir: 'out',
   trailingSlash: true,
   images: {
-    unoptimized: true, // Keep for compatibility
+    unoptimized: true, // Required for static export
   },
   // Static export doesn't support rewrites
   // Worker pool configuration to prevent Jest worker errors

@@ -5,12 +5,12 @@
 # Project name (required for Pages)
 name = "litong-electronics-website"
 
-# Build configuration
+# Build configuration - Emergency mode: simplified static export
 [build]
 command = "npm run build"
 cwd = ""
 
-# Build output directory
+# Build output directory - Back to "out" with re-enabled static export
 pages_build_output_dir = "out"
 
 # Node.js version specification
