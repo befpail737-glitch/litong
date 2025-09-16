@@ -31,7 +31,7 @@ const nextConfig = {
     ignoreDuringBuilds: true, // 暂时忽略构建时的ESLint错误以支持部署
   },
   env: {
-    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || 'https://litong.pages.dev',
+    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || 'https://elec-distributor.com',
   },
   poweredByHeader: false,
   compress: true,
