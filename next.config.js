@@ -3,12 +3,10 @@ const withNextIntl = createNextIntlPlugin('./src/i18n.ts');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Emergency mode: Re-enable static export, fix Server Actions differently
-  output: 'export', // 保持静态导出，通过其他方式解决Server Actions
-  distDir: 'out',
+  // SSR mode for Cloudflare Pages Node.js runtime - fixes Server Actions compatibility
   trailingSlash: true,
   images: {
-    unoptimized: true, // Required for static export
+    unoptimized: true, // Required for Cloudflare Pages compatibility
   },
   // Static export doesn't support rewrites
   // Worker pool configuration to prevent Jest worker errors

@@ -1,5 +1,9 @@
-# Cloudflare Pages configuration for Next.js static export
+# Cloudflare Pages configuration for Next.js SSR
 name = "litong-electronics-website"
 
-# Build output directory for static export
-pages_build_output_dir = "out"
+# Node.js compatibility for SSR
+compatibility_flags = ["nodejs_compat"]
+
+# Environment variables
+[env.production.vars]
+NODE_ENV = "production"
