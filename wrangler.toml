@@ -1,9 +1,0 @@
-# Cloudflare Pages configuration for Next.js
-name = "litong-electronics-website"
-
-# Build output directory (required for Pages)
-pages_build_output_dir = ".next"
-
-# Build command override
-[build]
-command = "npm run build"
