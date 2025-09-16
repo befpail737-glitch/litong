@@ -287,7 +287,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
   );
 }
 
-// Emergency模式：完全移除generateStaticParams
+// Emergency模式：最小generateStaticParams，硬编码单个页面
+export async function generateStaticParams() {
+  return [{ slug: 'test-product' }];
+}
 
 export async function generateMetadata({ params }: ProductPageProps) {
   const product = await getProductBySlug(params.slug);

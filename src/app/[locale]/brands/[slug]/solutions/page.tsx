@@ -255,7 +255,10 @@ export default async function BrandSolutionsPage({ params }: BrandSolutionsPageP
 }
 
 // 生成静态参数
-// Emergency模式：完全移除generateStaticParams
+// Emergency模式：最小generateStaticParams，硬编码单个页面
+export async function generateStaticParams() {
+  return [{ slug: 'test-brand' }];
+}
 
 export async function generateMetadata({ params }: BrandSolutionsPageProps) {
   const decodedSlug = decodeURIComponent(params.slug);

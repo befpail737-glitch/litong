@@ -505,7 +505,10 @@ export default async function BrandSupportArticlePage({ params }: BrandSupportAr
   );
 }
 
-// Emergency模式：完全移除generateStaticParams
+// Emergency模式：最小generateStaticParams，硬编码单个页面
+export async function generateStaticParams() {
+  return [{ slug: 'test-brand', id: 'test-article' }];
+}
 
 export async function generateMetadata({ params }: BrandSupportArticlePageProps) {
   const decodedSlug = decodeURIComponent(params.slug);

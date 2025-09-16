@@ -345,7 +345,10 @@ export default async function SolutionPage({ params }: SolutionPageProps) {
   );
 }
 
-// Emergency模式：完全移除generateStaticParams
+// Emergency模式：最小generateStaticParams，硬编码单个页面
+export async function generateStaticParams() {
+  return [{ slug: 'test-solution' }];
+}
 
 export async function generateMetadata({ params }: SolutionPageProps) {
   const solution = await getSolutionBySlug(params.slug);

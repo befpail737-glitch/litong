@@ -345,7 +345,13 @@ export default async function BrandPage({ params }: BrandPageProps) {
   );
 }
 
-// Emergency模式：完全移除generateStaticParams，强制动态路由
+// Emergency模式：最小generateStaticParams，硬编码单个页面
+export async function generateStaticParams() {
+  // 只返回一个硬编码的品牌页面，避免任何API调用
+  return [
+    { slug: 'test-brand' }
+  ];
+}
 
 // 页面元数据
 export async function generateMetadata({ params }: BrandPageProps) {
