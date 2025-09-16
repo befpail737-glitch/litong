@@ -32,11 +32,18 @@ interface BrandProductPageProps {
 
 export default async function BrandProductPage({ params }: BrandProductPageProps) {
   const decodedSlug = decodeURIComponent(params.slug);
+  const decodedId = decodeURIComponent(params.id);
 
-  const [brand, product] = await Promise.all([
-    getBrandData(decodedSlug),
-    getProductBySlug(params.id)
-  ]);
+  let brand, product;
+  try {
+    [brand, product] = await Promise.all([
+      getBrandData(decodedSlug),
+      getProductBySlug(decodedId)
+    ]);
+  } catch (error) {
+    console.error(`Error fetching brand "${decodedSlug}" or product "${decodedId}":`, error);
+    notFound();
+  }
 
   if (!brand || !product) {
     notFound();
@@ -391,21 +398,35 @@ export async function generateStaticParams() {
 
     // For each product, add its brand as the slug and product as id
     for (const product of products) {
-      if (product.isActive && product.brand && (product.slug || product._id)) {
-        const brandSlug = product.brand.slug || product.brand.name;
-        const productId = product.slug || product._id;
+      if (product.isActive &&
+          product.brand &&
+          product.slug &&
+          typeof product.slug === 'string' &&
+          product.slug.trim().length > 0) {
 
-        if (brandSlug && productId) {
+        const brandSlug = product.brand.slug || product.brand.name;
+        const productSlug = product.slug.trim();
+
+        if (brandSlug &&
+            typeof brandSlug === 'string' &&
+            brandSlug.trim().length > 0) {
           dynamicParams.push({
-            slug: brandSlug,
-            id: productId
+            slug: encodeURIComponent(brandSlug.trim()),
+            id: encodeURIComponent(productSlug)
           });
         }
       }
     }
 
     console.log(`🔧 [brands/[slug]/products/[id]] Generated ${dynamicParams.length} static params from real data`);
-    return dynamicParams;
+
+    // Limit to prevent too many static pages during build
+    const limitedParams = dynamicParams.slice(0, 30);
+    if (limitedParams.length < dynamicParams.length) {
+      console.log(`🔧 [brands/[slug]/products/[id]] Limited to ${limitedParams.length} params for build performance`);
+    }
+
+    return limitedParams;
   } catch (error) {
     console.error('Error generating static params for brand product detail:', error);
     console.log(`🔧 [brands/[slug]/products/[id]] Returning empty params due to error`);
@@ -415,10 +436,19 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: BrandProductPageProps) {
   const decodedSlug = decodeURIComponent(params.slug);
-  const [brand, product] = await Promise.all([
-    getBrandData(decodedSlug),
-    getProductBySlug(params.id)
-  ]);
+  const decodedId = decodeURIComponent(params.id);
+
+  let brand, product;
+  try {
+    [brand, product] = await Promise.all([
+      getBrandData(decodedSlug),
+      getProductBySlug(decodedId)
+    ]);
+  } catch (error) {
+    console.error(`Error fetching metadata for brand "${decodedSlug}" or product "${decodedId}":`, error);
+    brand = null;
+    product = null;
+  }
 
   if (!brand || !product) {
     return {

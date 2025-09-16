@@ -27,7 +27,16 @@ interface ProductPageProps {
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
-  const product = await getProductBySlug(params.slug);
+  // Decode URL-encoded slug to handle special characters
+  const decodedSlug = decodeURIComponent(params.slug);
+
+  let product;
+  try {
+    product = await getProductBySlug(decodedSlug);
+  } catch (error) {
+    console.error(`Error fetching product by slug "${decodedSlug}":`, error);
+    notFound();
+  }
 
   if (!product) {
     notFound();
@@ -292,13 +301,27 @@ export async function generateStaticParams() {
     const products = await getAllProducts();
 
     const dynamicParams = products
-      .filter(product => product.isActive && (product.slug || product._id))
+      .filter(product => {
+        // Only include products that are active and have valid slugs
+        return product.isActive &&
+               product.slug &&
+               typeof product.slug === 'string' &&
+               product.slug.trim().length > 0;
+      })
       .map(product => ({
-        slug: product.slug || product._id
+        // Ensure slug is properly URL-encoded
+        slug: encodeURIComponent(product.slug.trim())
       }));
 
     console.log(`🔧 [products/[slug]] Generated ${dynamicParams.length} static params from real data`);
-    return dynamicParams;
+
+    // Limit to prevent too many static pages during build
+    const limitedParams = dynamicParams.slice(0, 50);
+    if (limitedParams.length < dynamicParams.length) {
+      console.log(`🔧 [products/[slug]] Limited to ${limitedParams.length} params for build performance`);
+    }
+
+    return limitedParams;
   } catch (error) {
     console.error('Error generating static params for product detail:', error);
     console.log(`🔧 [products/[slug]] Returning empty params due to error`);
@@ -307,7 +330,15 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: ProductPageProps) {
-  const product = await getProductBySlug(params.slug);
+  const decodedSlug = decodeURIComponent(params.slug);
+
+  let product;
+  try {
+    product = await getProductBySlug(decodedSlug);
+  } catch (error) {
+    console.error(`Error fetching product metadata for slug "${decodedSlug}":`, error);
+    product = null;
+  }
 
   if (!product) {
     return {
