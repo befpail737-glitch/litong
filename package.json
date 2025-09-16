@@ -33,6 +33,7 @@
     "dev:fresh": "npm run clear-cache && npm run dev"
   },
   "dependencies": {
+    "@emotion/is-prop-valid": "1.4.0",
     "@jridgewell/sourcemap-codec": "^1.5.5",
     "@portabletext/react": "^3.0.11",
     "@portabletext/to-html": "^3.0.0",

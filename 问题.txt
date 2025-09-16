@@ -1,1156 +1,230 @@
-2025-09-16T04:50:59.727067Z	Cloning repository...
-2025-09-16T04:51:00.517685Z	From https://github.com/befpail737-glitch/litong
-2025-09-16T04:51:00.518089Z	 * branch            50a01bbebea88596bd9536d3590553a80cc6970f -> FETCH_HEAD
-2025-09-16T04:51:00.518181Z	
-2025-09-16T04:51:00.569961Z	HEAD is now at 50a01bb Fix Sanity image URL resolution and product data validation
-2025-09-16T04:51:00.570629Z	
-2025-09-16T04:51:00.644709Z	
-2025-09-16T04:51:00.645067Z	Using v2 root directory strategy
-2025-09-16T04:51:00.665207Z	Success: Finished cloning repository files
-2025-09-16T04:51:02.642867Z	Checking for configuration in a Wrangler configuration file (BETA)
-2025-09-16T04:51:02.643322Z	
-2025-09-16T04:51:03.744673Z	No wrangler.toml file found. Continuing.
-2025-09-16T04:51:03.821682Z	Detected the following tools from environment: nodejs@18.17.0, npm@10.9.2
-2025-09-16T04:51:03.8222Z	Installing nodejs 18.17.0
-2025-09-16T04:51:04.836957Z	Trying to update node-build... ok
-2025-09-16T04:51:04.928157Z	To follow progress, use 'tail -f /tmp/node-build.20250916045104.494.log' or pass --verbose
-2025-09-16T04:51:05.02315Z	Downloading node-v18.17.0-linux-x64.tar.gz...
-2025-09-16T04:51:05.239579Z	-> https://nodejs.org/dist/v18.17.0/node-v18.17.0-linux-x64.tar.gz
-2025-09-16T04:51:07.074097Z	
-2025-09-16T04:51:07.074426Z	WARNING: node-v18.17.0-linux-x64 is in LTS Maintenance mode and nearing its end of life.
-2025-09-16T04:51:07.074602Z	It only receives *critical* security updates, *critical* bug fixes and documentation updates.
-2025-09-16T04:51:07.074727Z	
-2025-09-16T04:51:07.07483Z	Installing node-v18.17.0-linux-x64...
-2025-09-16T04:51:07.468678Z	Installed node-v18.17.0-linux-x64 to /opt/buildhome/.asdf/installs/nodejs/18.17.0
-2025-09-16T04:51:07.469136Z	
-2025-09-16T04:51:08.76157Z	Installing project dependencies: npm install --progress=false
-2025-09-16T04:51:35.385693Z	npm WARN EBADENGINE Unsupported engine {
-2025-09-16T04:51:35.385927Z	npm WARN EBADENGINE   package: '@sanity/client@7.11.1',
-2025-09-16T04:51:35.386372Z	npm WARN EBADENGINE   required: { node: '>=20' },
-2025-09-16T04:51:35.386513Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
-2025-09-16T04:51:35.386592Z	npm WARN EBADENGINE }
-2025-09-16T04:51:35.386692Z	npm WARN EBADENGINE Unsupported engine {
-2025-09-16T04:51:35.386789Z	npm WARN EBADENGINE   package: '@sanity/diff-match-patch@3.2.0',
-2025-09-16T04:51:35.386906Z	npm WARN EBADENGINE   required: { node: '>=18.18' },
-2025-09-16T04:51:35.387002Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
-2025-09-16T04:51:35.387107Z	npm WARN EBADENGINE }
-2025-09-16T04:51:35.387322Z	npm WARN EBADENGINE Unsupported engine {
-2025-09-16T04:51:35.387608Z	npm WARN EBADENGINE   package: '@sanity/message-protocol@0.13.3',
-2025-09-16T04:51:35.387784Z	npm WARN EBADENGINE   required: { node: '>=20.0.0' },
-2025-09-16T04:51:35.388083Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
-2025-09-16T04:51:35.388199Z	npm WARN EBADENGINE }
-2025-09-16T04:51:35.388416Z	npm WARN EBADENGINE Unsupported engine {
-2025-09-16T04:51:35.38858Z	npm WARN EBADENGINE   package: '@sanity/sdk@0.0.0-alpha.25',
-2025-09-16T04:51:35.388843Z	npm WARN EBADENGINE   required: { node: '>=20.0.0' },
-2025-09-16T04:51:35.388955Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
-2025-09-16T04:51:35.389062Z	npm WARN EBADENGINE }
-2025-09-16T04:51:35.389192Z	npm WARN EBADENGINE Unsupported engine {
-2025-09-16T04:51:35.389396Z	npm WARN EBADENGINE   package: '@sanity/client@7.11.1',
-2025-09-16T04:51:35.389564Z	npm WARN EBADENGINE   required: { node: '>=20' },
-2025-09-16T04:51:35.389705Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
-2025-09-16T04:51:35.390009Z	npm WARN EBADENGINE }
-2025-09-16T04:51:35.390142Z	npm WARN EBADENGINE Unsupported engine {
-2025-09-16T04:51:35.3903Z	npm WARN EBADENGINE   package: '@sanity/runtime-cli@9.2.0',
-2025-09-16T04:51:35.390463Z	npm WARN EBADENGINE   required: { node: '>=20.11.0' },
-2025-09-16T04:51:35.390633Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
-2025-09-16T04:51:35.390779Z	npm WARN EBADENGINE }
-2025-09-16T04:51:35.390958Z	npm WARN EBADENGINE Unsupported engine {
-2025-09-16T04:51:35.391108Z	npm WARN EBADENGINE   package: 'rimraf@6.0.1',
-2025-09-16T04:51:35.391251Z	npm WARN EBADENGINE   required: { node: '20 || >=22' },
-2025-09-16T04:51:35.391465Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
-2025-09-16T04:51:35.391602Z	npm WARN EBADENGINE }
-2025-09-16T04:51:35.391702Z	npm WARN EBADENGINE Unsupported engine {
-2025-09-16T04:51:35.391819Z	npm WARN EBADENGINE   package: 'rimraf@6.0.1',
-2025-09-16T04:51:35.391953Z	npm WARN EBADENGINE   required: { node: '20 || >=22' },
-2025-09-16T04:51:35.392102Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
-2025-09-16T04:51:35.392251Z	npm WARN EBADENGINE }
-2025-09-16T04:51:35.392358Z	npm WARN EBADENGINE Unsupported engine {
-2025-09-16T04:51:35.392483Z	npm WARN EBADENGINE   package: '@sanity/client@7.11.1',
-2025-09-16T04:51:35.392615Z	npm WARN EBADENGINE   required: { node: '>=20' },
-2025-09-16T04:51:35.392718Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
-2025-09-16T04:51:35.392819Z	npm WARN EBADENGINE }
-2025-09-16T04:51:35.392989Z	npm WARN EBADENGINE Unsupported engine {
-2025-09-16T04:51:35.393167Z	npm WARN EBADENGINE   package: '@sanity/client@7.11.1',
-2025-09-16T04:51:35.393356Z	npm WARN EBADENGINE   required: { node: '>=20' },
-2025-09-16T04:51:35.393689Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
-2025-09-16T04:51:35.393783Z	npm WARN EBADENGINE }
-2025-09-16T04:51:35.393954Z	npm WARN EBADENGINE Unsupported engine {
-2025-09-16T04:51:35.394124Z	npm WARN EBADENGINE   package: '@sanity/client@7.11.1',
-2025-09-16T04:51:35.3943Z	npm WARN EBADENGINE   required: { node: '>=20' },
-2025-09-16T04:51:35.394459Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
-2025-09-16T04:51:35.394575Z	npm WARN EBADENGINE }
-2025-09-16T04:51:35.394691Z	npm WARN EBADENGINE Unsupported engine {
-2025-09-16T04:51:35.394819Z	npm WARN EBADENGINE   package: 'eventsource@4.0.0',
-2025-09-16T04:51:35.394925Z	npm WARN EBADENGINE   required: { node: '>=20.0.0' },
-2025-09-16T04:51:35.395018Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
-2025-09-16T04:51:35.39513Z	npm WARN EBADENGINE }
-2025-09-16T04:51:35.395304Z	npm WARN EBADENGINE Unsupported engine {
-2025-09-16T04:51:35.395463Z	npm WARN EBADENGINE   package: '@sanity/client@7.11.1',
-2025-09-16T04:51:35.395587Z	npm WARN EBADENGINE   required: { node: '>=20' },
-2025-09-16T04:51:35.395701Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
-2025-09-16T04:51:35.395806Z	npm WARN EBADENGINE }
-2025-09-16T04:51:35.395926Z	npm WARN EBADENGINE Unsupported engine {
-2025-09-16T04:51:35.396031Z	npm WARN EBADENGINE   package: '@sanity/client@7.11.1',
-2025-09-16T04:51:35.396175Z	npm WARN EBADENGINE   required: { node: '>=20' },
-2025-09-16T04:51:35.396289Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
-2025-09-16T04:51:35.396386Z	npm WARN EBADENGINE }
-2025-09-16T04:51:35.396514Z	npm WARN EBADENGINE Unsupported engine {
-2025-09-16T04:51:35.396627Z	npm WARN EBADENGINE   package: 'glob@11.0.3',
-2025-09-16T04:51:35.396761Z	npm WARN EBADENGINE   required: { node: '20 || >=22' },
-2025-09-16T04:51:35.39688Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
-2025-09-16T04:51:35.396982Z	npm WARN EBADENGINE }
-2025-09-16T04:51:35.397089Z	npm WARN EBADENGINE Unsupported engine {
-2025-09-16T04:51:35.397193Z	npm WARN EBADENGINE   package: 'jackspeak@4.1.1',
-2025-09-16T04:51:35.397312Z	npm WARN EBADENGINE   required: { node: '20 || >=22' },
-2025-09-16T04:51:35.397464Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
-2025-09-16T04:51:35.397575Z	npm WARN EBADENGINE }
-2025-09-16T04:51:35.397664Z	npm WARN EBADENGINE Unsupported engine {
-2025-09-16T04:51:35.39784Z	npm WARN EBADENGINE   package: 'minimatch@10.0.3',
-2025-09-16T04:51:35.397962Z	npm WARN EBADENGINE   required: { node: '20 || >=22' },
-2025-09-16T04:51:35.398111Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
-2025-09-16T04:51:35.398226Z	npm WARN EBADENGINE }
-2025-09-16T04:51:35.39838Z	npm WARN EBADENGINE Unsupported engine {
-2025-09-16T04:51:35.398511Z	npm WARN EBADENGINE   package: 'path-scurry@2.0.0',
-2025-09-16T04:51:35.398616Z	npm WARN EBADENGINE   required: { node: '20 || >=22' },
-2025-09-16T04:51:35.398725Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
-2025-09-16T04:51:35.398827Z	npm WARN EBADENGINE }
-2025-09-16T04:51:35.398936Z	npm WARN EBADENGINE Unsupported engine {
-2025-09-16T04:51:35.399055Z	npm WARN EBADENGINE   package: '@isaacs/brace-expansion@5.0.0',
-2025-09-16T04:51:35.399178Z	npm WARN EBADENGINE   required: { node: '20 || >=22' },
-2025-09-16T04:51:35.399468Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
-2025-09-16T04:51:35.399699Z	npm WARN EBADENGINE }
-2025-09-16T04:51:35.399796Z	npm WARN EBADENGINE Unsupported engine {
-2025-09-16T04:51:35.399918Z	npm WARN EBADENGINE   package: '@isaacs/balanced-match@4.0.1',
-2025-09-16T04:51:35.400013Z	npm WARN EBADENGINE   required: { node: '20 || >=22' },
-2025-09-16T04:51:35.400101Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
-2025-09-16T04:51:35.400207Z	npm WARN EBADENGINE }
-2025-09-16T04:51:35.400316Z	npm WARN EBADENGINE Unsupported engine {
-2025-09-16T04:51:35.400409Z	npm WARN EBADENGINE   package: 'lru-cache@11.2.1',
-2025-09-16T04:51:35.400536Z	npm WARN EBADENGINE   required: { node: '20 || >=22' },
-2025-09-16T04:51:35.400647Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
-2025-09-16T04:51:35.400799Z	npm WARN EBADENGINE }
-2025-09-16T04:51:35.400932Z	npm WARN EBADENGINE Unsupported engine {
-2025-09-16T04:51:35.401027Z	npm WARN EBADENGINE   package: 'glob@11.0.3',
-2025-09-16T04:51:35.401142Z	npm WARN EBADENGINE   required: { node: '20 || >=22' },
-2025-09-16T04:51:35.401252Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
-2025-09-16T04:51:35.401382Z	npm WARN EBADENGINE }
-2025-09-16T04:51:35.401523Z	npm WARN EBADENGINE Unsupported engine {
-2025-09-16T04:51:35.401629Z	npm WARN EBADENGINE   package: 'jackspeak@4.1.1',
-2025-09-16T04:51:35.401723Z	npm WARN EBADENGINE   required: { node: '20 || >=22' },
-2025-09-16T04:51:35.401814Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
-2025-09-16T04:51:35.401925Z	npm WARN EBADENGINE }
-2025-09-16T04:51:35.402025Z	npm WARN EBADENGINE Unsupported engine {
-2025-09-16T04:51:35.402133Z	npm WARN EBADENGINE   package: 'minimatch@10.0.3',
-2025-09-16T04:51:35.402271Z	npm WARN EBADENGINE   required: { node: '20 || >=22' },
-2025-09-16T04:51:35.402395Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
-2025-09-16T04:51:35.40252Z	npm WARN EBADENGINE }
-2025-09-16T04:51:35.402636Z	npm WARN EBADENGINE Unsupported engine {
-2025-09-16T04:51:35.402747Z	npm WARN EBADENGINE   package: 'path-scurry@2.0.0',
-2025-09-16T04:51:35.402847Z	npm WARN EBADENGINE   required: { node: '20 || >=22' },
-2025-09-16T04:51:35.402963Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
-2025-09-16T04:51:35.403071Z	npm WARN EBADENGINE }
-2025-09-16T04:51:35.403164Z	npm WARN EBADENGINE Unsupported engine {
-2025-09-16T04:51:35.403276Z	npm WARN EBADENGINE   package: 'lru-cache@11.2.1',
-2025-09-16T04:51:35.403365Z	npm WARN EBADENGINE   required: { node: '20 || >=22' },
-2025-09-16T04:51:35.403469Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
-2025-09-16T04:51:35.403584Z	npm WARN EBADENGINE }
-2025-09-16T04:51:37.250797Z	npm WARN deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
-2025-09-16T04:51:42.166988Z	npm WARN deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
-2025-09-16T04:51:43.028357Z	npm WARN deprecated @humanwhocodes/object-schema@2.0.3: Use @eslint/object-schema instead
-2025-09-16T04:51:43.196944Z	npm WARN deprecated @humanwhocodes/config-array@0.13.0: Use @eslint/config-array instead
-2025-09-16T04:51:45.719961Z	npm WARN deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
-2025-09-16T04:51:50.112717Z	npm WARN deprecated eslint@8.57.1: This version is no longer supported. Please see https://eslint.org/version-support for other options.
-2025-09-16T04:52:06.85124Z	
-2025-09-16T04:52:06.851548Z	added 1436 packages in 58s
-2025-09-16T04:52:06.886272Z	Executing user command: npm run build
-2025-09-16T04:52:07.382822Z	
-2025-09-16T04:52:07.383056Z	> litong-electronics-website@0.1.0 build
-2025-09-16T04:52:07.383359Z	> npm run clear-cache && next build
-2025-09-16T04:52:07.383515Z	
-2025-09-16T04:52:07.71353Z	
-2025-09-16T04:52:07.713758Z	> litong-electronics-website@0.1.0 clear-cache
-2025-09-16T04:52:07.714061Z	> node scripts/clear-cache.js
-2025-09-16T04:52:07.71428Z	
-2025-09-16T04:52:07.765786Z	🧹 Clearing Next.js caches...
-2025-09-16T04:52:07.766377Z	ℹ️  /opt/buildhome/repo/.next does not exist
-2025-09-16T04:52:07.766525Z	ℹ️  /opt/buildhome/repo/node_modules/.cache does not exist
-2025-09-16T04:52:07.76671Z	✅ Cache cleared! Please restart your development server.
-2025-09-16T04:52:07.766852Z	Run: npm run dev
-2025-09-16T04:52:08.393602Z	⚠ No build cache found. Please configure build caching for faster rebuilds. Read more: https://nextjs.org/docs/messages/no-cache
-2025-09-16T04:52:08.39801Z	Attention: Next.js now collects completely anonymous telemetry regarding usage.
-2025-09-16T04:52:08.398209Z	This information is used to shape Next.js' roadmap and prioritize features.
-2025-09-16T04:52:08.398414Z	You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
-2025-09-16T04:52:08.398568Z	https://nextjs.org/telemetry
-2025-09-16T04:52:08.39868Z	
-2025-09-16T04:52:08.481086Z	  ▲ Next.js 14.2.32
-2025-09-16T04:52:08.481719Z	
-2025-09-16T04:52:08.542784Z	   Creating an optimized production build ...
-2025-09-16T04:52:27.195324Z	 ✓ Compiled successfully
-2025-09-16T04:52:27.196755Z	   Skipping validation of types
-2025-09-16T04:52:27.197114Z	   Skipping linting
-2025-09-16T04:52:27.521701Z	   Collecting page data ...
-2025-09-16T04:52:28.771617Z	Fetching products with query: 
-2025-09-16T04:52:28.771894Z	    {
-2025-09-16T04:52:28.772004Z	      "products": *[_type == "product" && isActive == true && !(_id in path("drafts.**"))] | order(_createdAt desc) [0...1000] {
-2025-09-16T04:52:28.772099Z	        
-2025-09-16T04:52:28.772196Z	    _id,
-2025-09-16T04:52:28.772292Z	    _type,
-2025-09-16T04:52:28.772381Z	    partNumber,
-2025-09-16T04:52:28.772491Z	    "slug": slug.current,
-2025-09-16T04:52:28.772597Z	    title,
-2025-09-16T04:52:28.772687Z	    shortDescription,
-2025-09-16T04:52:28.77278Z	    image,
-2025-09-16T04:52:28.772926Z	    brand->{
-2025-09-16T04:52:28.773013Z	      name,
-2025-09-16T04:52:28.773133Z	      "slug": slug.current,
-2025-09-16T04:52:28.773309Z	      logo
-2025-09-16T04:52:28.773397Z	    },
-2025-09-16T04:52:28.773854Z	    category->{
-2025-09-16T04:52:28.774034Z	      name,
-2025-09-16T04:52:28.77417Z	      "slug": slug.current
-2025-09-16T04:52:28.774292Z	    },
-2025-09-16T04:52:28.774606Z	    pricing{
-2025-09-16T04:52:28.774726Z	      currency,
-2025-09-16T04:52:28.774841Z	      tiers[]{
-2025-09-16T04:52:28.774948Z	        quantity,
-2025-09-16T04:52:28.775052Z	        price,
-2025-09-16T04:52:28.77516Z	        unit
-2025-09-16T04:52:28.77526Z	      },
-2025-09-16T04:52:28.775359Z	      moq,
-2025-09-16T04:52:28.775502Z	      leadTime,
-2025-09-16T04:52:28.775617Z	      // 兼容字段：提取第一个价格作为默认价格
-2025-09-16T04:52:28.775759Z	      "price": tiers[0].price,
-2025-09-16T04:52:28.775873Z	      "currency": coalesce(currency, "CNY")
-2025-09-16T04:52:28.775984Z	    },
-2025-09-16T04:52:28.77609Z	    inventory{
-2025-09-16T04:52:28.776212Z	      quantity,
-2025-09-16T04:52:28.776333Z	      status,
-2025-09-16T04:52:28.776453Z	      warehouse,
-2025-09-16T04:52:28.781055Z	      lastUpdated,
-2025-09-16T04:52:28.7815Z	      // 兼容字段：转换状态为布尔值
-2025-09-16T04:52:28.782143Z	      "inStock": status == "in_stock",
-2025-09-16T04:52:28.782293Z	      "quantity": coalesce(quantity, 0)
-2025-09-16T04:52:28.782426Z	    },
-2025-09-16T04:52:28.783477Z	    isActive,
-2025-09-16T04:52:28.783844Z	    isFeatured,
-2025-09-16T04:52:28.783984Z	    isNew,
-2025-09-16T04:52:28.784102Z	    _createdAt,
-2025-09-16T04:52:28.784212Z	    _updatedAt
-2025-09-16T04:52:28.784329Z	  
-2025-09-16T04:52:28.784589Z	      },
-2025-09-16T04:52:28.786208Z	      "total": count(*[_type == "product" && isActive == true && !(_id in path("drafts.**"))])
-2025-09-16T04:52:28.786549Z	    }
-2025-09-16T04:52:28.786709Z	  
-2025-09-16T04:52:28.786867Z	Query parameters: {
-2025-09-16T04:52:28.786994Z	  limit: 1000,
-2025-09-16T04:52:28.7871Z	  offset: 0,
-2025-09-16T04:52:28.787198Z	  category: undefined,
-2025-09-16T04:52:28.787313Z	  brand: undefined,
-2025-09-16T04:52:28.787421Z	  featured: undefined
-2025-09-16T04:52:28.787551Z	}
-2025-09-16T04:52:28.78766Z	Fetching products with query: 
-2025-09-16T04:52:28.787761Z	    {
-2025-09-16T04:52:28.787862Z	      "products": *[_type == "product" && isActive == true && !(_id in path("drafts.**"))] | order(_createdAt desc) [0...1000] {
-2025-09-16T04:52:28.787968Z	        
-2025-09-16T04:52:28.788069Z	    _id,
-2025-09-16T04:52:28.788174Z	    _type,
-2025-09-16T04:52:28.78828Z	    partNumber,
-2025-09-16T04:52:28.788371Z	    "slug": slug.current,
-2025-09-16T04:52:28.7885Z	    title,
-2025-09-16T04:52:28.788606Z	    shortDescription,
-2025-09-16T04:52:28.788708Z	    image,
-2025-09-16T04:52:28.788808Z	    brand->{
-2025-09-16T04:52:28.788913Z	      name,
-2025-09-16T04:52:28.789023Z	      "slug": slug.current,
-2025-09-16T04:52:28.789127Z	      logo
-2025-09-16T04:52:28.789245Z	    },
-2025-09-16T04:52:28.789352Z	    category->{
-2025-09-16T04:52:28.789861Z	      name,
-2025-09-16T04:52:28.789994Z	      "slug": slug.current
-2025-09-16T04:52:28.790108Z	    },
-2025-09-16T04:52:28.790281Z	    pricing{
-2025-09-16T04:52:28.790412Z	      currency,
-2025-09-16T04:52:28.790551Z	      tiers[]{
-2025-09-16T04:52:28.790659Z	        quantity,
-2025-09-16T04:52:28.790774Z	        price,
-2025-09-16T04:52:28.79088Z	        unit
-2025-09-16T04:52:28.790981Z	      },
-2025-09-16T04:52:28.791091Z	      moq,
-2025-09-16T04:52:28.791228Z	      leadTime,
-2025-09-16T04:52:28.791345Z	      // 兼容字段：提取第一个价格作为默认价格
-2025-09-16T04:52:28.838528Z	      "price": tiers[0].price,
-2025-09-16T04:52:28.838684Z	      "currency": coalesce(currency, "CNY")
-2025-09-16T04:52:28.8388Z	    },
-2025-09-16T04:52:28.838915Z	    inventory{
-2025-09-16T04:52:28.839017Z	      quantity,
-2025-09-16T04:52:28.839113Z	      status,
-2025-09-16T04:52:28.839228Z	      warehouse,
-2025-09-16T04:52:28.839337Z	      lastUpdated,
-2025-09-16T04:52:28.839476Z	      // 兼容字段：转换状态为布尔值
-2025-09-16T04:52:28.83961Z	      "inStock": status == "in_stock",
-2025-09-16T04:52:28.839713Z	      "quantity": coalesce(quantity, 0)
-2025-09-16T04:52:28.839815Z	    },
-2025-09-16T04:52:28.839925Z	    isActive,
-2025-09-16T04:52:28.840031Z	    isFeatured,
-2025-09-16T04:52:28.840128Z	    isNew,
-2025-09-16T04:52:28.840315Z	    _createdAt,
-2025-09-16T04:52:28.840494Z	    _updatedAt
-2025-09-16T04:52:28.840624Z	  
-2025-09-16T04:52:28.840741Z	      },
-2025-09-16T04:52:28.840847Z	      "total": count(*[_type == "product" && isActive == true && !(_id in path("drafts.**"))])
-2025-09-16T04:52:28.840957Z	    }
-2025-09-16T04:52:28.84106Z	  
-2025-09-16T04:52:28.84117Z	Fetching solutions with query: 
-2025-09-16T04:52:28.841293Z	    {
-2025-09-16T04:52:28.841481Z	      "solutions": *[_type == "solution" && (isPublished == true || !defined(isPublished))] | order(publishedAt desc) [0...1000] {
-2025-09-16T04:52:28.841596Z	        
-2025-09-16T04:52:28.841695Z	    _id,
-2025-09-16T04:52:28.841798Z	    title,
-2025-09-16T04:52:28.841906Z	    "slug": slug.current,
-2025-09-16T04:52:28.84201Z	    summary,
-2025-09-16T04:52:28.842116Z	    description,
-2025-09-16T04:52:28.842235Z	    coverImage,
-2025-09-16T04:52:28.842335Z	    primaryBrand->{
-2025-09-16T04:52:28.843165Z	      _id,
-2025-09-16T04:52:28.843304Z	      name,
-2025-09-16T04:52:28.843419Z	      "slug": slug.current,
-2025-09-16T04:52:28.846032Z	      logo
-2025-09-16T04:52:28.846167Z	    },
-2025-09-16T04:52:28.846281Z	    relatedBrands[]->{
-2025-09-16T04:52:28.846435Z	      _id,
-2025-09-16T04:52:28.846836Z	      name,
-2025-09-16T04:52:28.846949Z	      "slug": slug.current,
-2025-09-16T04:52:28.847054Z	      logo
-2025-09-16T04:52:28.847153Z	    },
-2025-09-16T04:52:28.847258Z	    targetMarket,
-2025-09-16T04:52:28.847358Z	    complexity,
-2025-09-16T04:52:28.847478Z	    publishedAt,
-2025-09-16T04:52:28.847593Z	    isPublished,
-2025-09-16T04:52:28.847868Z	    isFeatured,
-2025-09-16T04:52:28.848102Z	    viewCount,
-2025-09-16T04:52:28.848225Z	    _createdAt,
-2025-09-16T04:52:28.848336Z	    _updatedAt
-2025-09-16T04:52:28.848438Z	  
-2025-09-16T04:52:28.848575Z	      },
-2025-09-16T04:52:28.848695Z	      "total": count(*[_type == "solution" && (isPublished == true || !defined(isPublished))])
-2025-09-16T04:52:28.848828Z	    }
-2025-09-16T04:52:28.848934Z	  
-2025-09-16T04:52:28.849042Z	Query parameters: {
-2025-09-16T04:52:28.849151Z	  limit: 1000,
-2025-09-16T04:52:28.850671Z	  offset: 0,
-2025-09-16T04:52:28.851008Z	  category: undefined,
-2025-09-16T04:52:28.851358Z	  brand: undefined,
-2025-09-16T04:52:28.851692Z	  featured: undefined
-2025-09-16T04:52:28.852025Z	}
-2025-09-16T04:52:28.852473Z	Query parameters: {
-2025-09-16T04:52:28.852796Z	  limit: 1000,
-2025-09-16T04:52:28.853135Z	  offset: 0,
-2025-09-16T04:52:28.853494Z	  targetMarket: undefined,
-2025-09-16T04:52:28.853766Z	  brand: undefined,
-2025-09-16T04:52:28.854113Z	  featured: undefined
-2025-09-16T04:52:28.854508Z	}
-2025-09-16T04:52:28.854839Z	Fetching solutions with query: 
-2025-09-16T04:52:28.855173Z	    {
-2025-09-16T04:52:28.855597Z	      "solutions": *[_type == "solution" && (isPublished == true || !defined(isPublished))] | order(publishedAt desc) [0...1000] {
-2025-09-16T04:52:28.855936Z	        
-2025-09-16T04:52:28.856377Z	    _id,
-2025-09-16T04:52:28.856627Z	    title,
-2025-09-16T04:52:28.856929Z	    "slug": slug.current,
-2025-09-16T04:52:28.85722Z	    summary,
-2025-09-16T04:52:28.857437Z	    description,
-2025-09-16T04:52:28.857759Z	    coverImage,
-2025-09-16T04:52:28.858065Z	    primaryBrand->{
-2025-09-16T04:52:28.85837Z	      _id,
-2025-09-16T04:52:28.858605Z	      name,
-2025-09-16T04:52:28.858916Z	      "slug": slug.current,
-2025-09-16T04:52:28.859286Z	      logo
-2025-09-16T04:52:28.859617Z	    },
-2025-09-16T04:52:28.859927Z	    relatedBrands[]->{
-2025-09-16T04:52:28.860154Z	      _id,
-2025-09-16T04:52:28.86046Z	      name,
-2025-09-16T04:52:28.860674Z	      "slug": slug.current,
-2025-09-16T04:52:28.860969Z	      logo
-2025-09-16T04:52:28.861166Z	    },
-2025-09-16T04:52:28.861381Z	    targetMarket,
-2025-09-16T04:52:28.861513Z	    complexity,
-2025-09-16T04:52:28.861629Z	    publishedAt,
-2025-09-16T04:52:28.861736Z	    isPublished,
-2025-09-16T04:52:28.861849Z	    isFeatured,
-2025-09-16T04:52:28.861961Z	    viewCount,
-2025-09-16T04:52:28.862072Z	    _createdAt,
-2025-09-16T04:52:28.862184Z	    _updatedAt
-2025-09-16T04:52:28.862306Z	  
-2025-09-16T04:52:28.86242Z	      },
-2025-09-16T04:52:28.862552Z	      "total": count(*[_type == "solution" && (isPublished == true || !defined(isPublished))])
-2025-09-16T04:52:28.862666Z	    }
-2025-09-16T04:52:28.862775Z	  
-2025-09-16T04:52:28.862883Z	Query parameters: {
-2025-09-16T04:52:28.862984Z	  limit: 1000,
-2025-09-16T04:52:28.863089Z	  offset: 0,
-2025-09-16T04:52:28.863208Z	  targetMarket: undefined,
-2025-09-16T04:52:28.863319Z	  brand: undefined,
-2025-09-16T04:52:28.863432Z	  featured: undefined
-2025-09-16T04:52:28.863588Z	}
-2025-09-16T04:52:28.886177Z	🔧 Generating static params for Studio page
-2025-09-16T04:52:28.886518Z	🔧 Studio static params: [ { tool: [] }, { tool: [ 'desk' ] }, { tool: [ 'vision' ] } ]
-2025-09-16T04:52:29.051276Z	Products fetch result: {
-2025-09-16T04:52:29.051586Z	  totalProducts: 12,
-2025-09-16T04:52:29.051719Z	  fetchedProducts: 12,
-2025-09-16T04:52:29.051826Z	  firstProduct: {
-2025-09-16T04:52:29.051931Z	    _createdAt: '2025-09-14T13:03:01Z',
-2025-09-16T04:52:29.052027Z	    _id: 'eac33791-573d-4a1a-aae2-73b4cd447abc',
-2025-09-16T04:52:29.052126Z	    _type: 'product',
-2025-09-16T04:52:29.052238Z	    _updatedAt: '2025-09-14T13:04:16Z',
-2025-09-16T04:52:29.052334Z	    brand: { logo: null, name: 'CREE', slug: 'cree' },
-2025-09-16T04:52:29.052433Z	    category: { name: '功率半导体', slug: 'Power Semiconductor' },
-2025-09-16T04:52:29.052562Z	    image: null,
-2025-09-16T04:52:29.052681Z	    inventory: {
-2025-09-16T04:52:29.052771Z	      inStock: true,
-2025-09-16T04:52:29.052863Z	      lastUpdated: '2025-09-14T13:02:58.264Z',
-2025-09-16T04:52:29.052948Z	      quantity: 0,
-2025-09-16T04:52:29.053029Z	      status: 'in_stock',
-2025-09-16T04:52:29.053118Z	      warehouse: null
-2025-09-16T04:52:29.053219Z	    },
-2025-09-16T04:52:29.053319Z	    isActive: true,
-2025-09-16T04:52:29.053422Z	    isFeatured: false,
-2025-09-16T04:52:29.053539Z	    isNew: false,
-2025-09-16T04:52:29.053639Z	    partNumber: '11111',
-2025-09-16T04:52:29.053738Z	    pricing: {
-2025-09-16T04:52:29.053836Z	      currency: 'CNY',
-2025-09-16T04:52:29.053933Z	      leadTime: null,
-2025-09-16T04:52:29.054035Z	      moq: null,
-2025-09-16T04:52:29.054132Z	      price: null,
-2025-09-16T04:52:29.054245Z	      tiers: null
-2025-09-16T04:52:29.054348Z	    },
-2025-09-16T04:52:29.054458Z	    shortDescription: '11111',
-2025-09-16T04:52:29.054562Z	    slug: 'sic mosfet',
-2025-09-16T04:52:29.054662Z	    title: '111111'
-2025-09-16T04:52:29.054757Z	  }
-2025-09-16T04:52:29.054851Z	}
-2025-09-16T04:52:29.054959Z	🔧 [brands/[slug]/products/[id]] Skipping problematic product: cree/sic mosfet
-2025-09-16T04:52:29.055064Z	🔧 [brands/[slug]/products/[id]] Skipping problematic product: semikron/SKKT106/16E
-2025-09-16T04:52:29.055162Z	🔧 [brands/[slug]/products/[id]] Skipping problematic product: stmicroelectronics/stm32f407vgt6
-2025-09-16T04:52:29.055279Z	🔧 [brands/[slug]/products/[id]] Generated 6 static params from real data
-2025-09-16T04:52:29.063941Z	Solutions fetch result: {
-2025-09-16T04:52:29.064161Z	  totalSolutions: 12,
-2025-09-16T04:52:29.064314Z	  fetchedSolutions: 12,
-2025-09-16T04:52:29.064462Z	  firstSolution: {
-2025-09-16T04:52:29.064584Z	    _createdAt: '2025-09-15T10:06:14Z',
-2025-09-16T04:52:29.064688Z	    _id: 'e4682cee-1cd1-4018-97ce-0650c7f700c9',
-2025-09-16T04:52:29.064789Z	    _updatedAt: '2025-09-15T10:07:20Z',
-2025-09-16T04:52:29.064888Z	    complexity: 'medium',
-2025-09-16T04:52:29.064986Z	    coverImage: null,
-2025-09-16T04:52:29.065093Z	    description: [ [Object] ],
-2025-09-16T04:52:29.065199Z	    isFeatured: false,
-2025-09-16T04:52:29.065332Z	    isPublished: true,
-2025-09-16T04:52:29.065454Z	    primaryBrand: {
-2025-09-16T04:52:29.065567Z	      _id: '41db78b7-772e-4324-8263-4897a6ae684f',
-2025-09-16T04:52:29.065684Z	      logo: null,
-2025-09-16T04:52:29.065796Z	      name: 'IXYS',
-2025-09-16T04:52:29.065904Z	      slug: 'ixys'
-2025-09-16T04:52:29.066002Z	    },
-2025-09-16T04:52:29.066118Z	    publishedAt: '2025-09-15T10:05:59.500Z',
-2025-09-16T04:52:29.066237Z	    relatedBrands: null,
-2025-09-16T04:52:29.066352Z	    slug: '99999',
-2025-09-16T04:52:29.066467Z	    summary: '99999',
-2025-09-16T04:52:29.066581Z	    targetMarket: 'industrial-automation',
-2025-09-16T04:52:29.06669Z	    title: '99999',
-2025-09-16T04:52:29.06681Z	    viewCount: 0
-2025-09-16T04:52:29.066916Z	  }
-2025-09-16T04:52:29.067017Z	}
-2025-09-16T04:52:29.067122Z	🔧 [brands/[slug]/solutions/[id]] Generated 0 static params from real data
-2025-09-16T04:52:29.069482Z	🔧 [articles/[slug]] Generated 0 static params from real data
-2025-09-16T04:52:29.221527Z	Products fetch result: {
-2025-09-16T04:52:29.221811Z	  totalProducts: 12,
-2025-09-16T04:52:29.221966Z	  fetchedProducts: 12,
-2025-09-16T04:52:29.222098Z	  firstProduct: {
-2025-09-16T04:52:29.222208Z	    _createdAt: '2025-09-14T13:03:01Z',
-2025-09-16T04:52:29.222306Z	    _id: 'eac33791-573d-4a1a-aae2-73b4cd447abc',
-2025-09-16T04:52:29.222395Z	    _type: 'product',
-2025-09-16T04:52:29.222517Z	    _updatedAt: '2025-09-14T13:04:16Z',
-2025-09-16T04:52:29.222621Z	    brand: { logo: null, name: 'CREE', slug: 'cree' },
-2025-09-16T04:52:29.222721Z	    category: { name: '功率半导体', slug: 'Power Semiconductor' },
-2025-09-16T04:52:29.222826Z	    image: null,
-2025-09-16T04:52:29.222921Z	    inventory: {
-2025-09-16T04:52:29.223018Z	      inStock: true,
-2025-09-16T04:52:29.223122Z	      lastUpdated: '2025-09-14T13:02:58.264Z',
-2025-09-16T04:52:29.223228Z	      quantity: 0,
-2025-09-16T04:52:29.223329Z	      status: 'in_stock',
-2025-09-16T04:52:29.223427Z	      warehouse: null
-2025-09-16T04:52:29.223556Z	    },
-2025-09-16T04:52:29.22366Z	    isActive: true,
-2025-09-16T04:52:29.223762Z	    isFeatured: false,
-2025-09-16T04:52:29.223858Z	    isNew: false,
-2025-09-16T04:52:29.223959Z	    partNumber: '11111',
-2025-09-16T04:52:29.224058Z	    pricing: {
-2025-09-16T04:52:29.224156Z	      currency: 'CNY',
-2025-09-16T04:52:29.224267Z	      leadTime: null,
-2025-09-16T04:52:29.224371Z	      moq: null,
-2025-09-16T04:52:29.224499Z	      price: null,
-2025-09-16T04:52:29.224616Z	      tiers: null
-2025-09-16T04:52:29.224736Z	    },
-2025-09-16T04:52:29.224841Z	    shortDescription: '11111',
-2025-09-16T04:52:29.224975Z	    slug: 'sic mosfet',
-2025-09-16T04:52:29.225093Z	    title: '111111'
-2025-09-16T04:52:29.225193Z	  }
-2025-09-16T04:52:29.225292Z	}
-2025-09-16T04:52:29.2254Z	🔧 [products/[slug]] Skipping problematic slug: sic mosfet
-2025-09-16T04:52:29.225535Z	🔧 [products/[slug]] Skipping problematic slug: SKKT106/16E
-2025-09-16T04:52:29.225661Z	🔧 [products/[slug]] Skipping problematic slug: stm32f407vgt6
-2025-09-16T04:52:29.22578Z	🔧 [products/[slug]] Generated 6 validated static params from 12 total products
-2025-09-16T04:52:29.249227Z	Solutions fetch result: {
-2025-09-16T04:52:29.249412Z	  totalSolutions: 12,
-2025-09-16T04:52:29.249542Z	  fetchedSolutions: 12,
-2025-09-16T04:52:29.24963Z	  firstSolution: {
-2025-09-16T04:52:29.249718Z	    _createdAt: '2025-09-15T10:06:14Z',
-2025-09-16T04:52:29.249822Z	    _id: 'e4682cee-1cd1-4018-97ce-0650c7f700c9',
-2025-09-16T04:52:29.249926Z	    _updatedAt: '2025-09-15T10:07:20Z',
-2025-09-16T04:52:29.250051Z	    complexity: 'medium',
-2025-09-16T04:52:29.250177Z	    coverImage: null,
-2025-09-16T04:52:29.250287Z	    description: [ [Object] ],
-2025-09-16T04:52:29.25039Z	    isFeatured: false,
-2025-09-16T04:52:29.250646Z	    isPublished: true,
-2025-09-16T04:52:29.250803Z	    primaryBrand: {
-2025-09-16T04:52:29.25102Z	      _id: '41db78b7-772e-4324-8263-4897a6ae684f',
-2025-09-16T04:52:29.251163Z	      logo: null,
-2025-09-16T04:52:29.251277Z	      name: 'IXYS',
-2025-09-16T04:52:29.25139Z	      slug: 'ixys'
-2025-09-16T04:52:29.251512Z	    },
-2025-09-16T04:52:29.251612Z	    publishedAt: '2025-09-15T10:05:59.500Z',
-2025-09-16T04:52:29.251721Z	    relatedBrands: null,
-2025-09-16T04:52:29.251833Z	    slug: '99999',
-2025-09-16T04:52:29.251938Z	    summary: '99999',
-2025-09-16T04:52:29.252043Z	    targetMarket: 'industrial-automation',
-2025-09-16T04:52:29.25214Z	    title: '99999',
-2025-09-16T04:52:29.252239Z	    viewCount: 0
-2025-09-16T04:52:29.252344Z	  }
-2025-09-16T04:52:29.252488Z	}
-2025-09-16T04:52:29.2526Z	🔧 [solutions/[slug]] Generated 0 static params from real data
-2025-09-16T04:52:30.056045Z	   Generating static pages (0/33) ...
-2025-09-16T04:52:30.504083Z	🔍 [getAllBrands] Starting brand data fetch from Sanity...
-2025-09-16T04:52:30.504506Z	🔍 [getAllBrands] Executing Sanity query...
-2025-09-16T04:52:30.5047Z	🔍 [getAllBrands] Starting brand data fetch from Sanity...
-2025-09-16T04:52:30.504832Z	🔍 [getAllBrands] Executing Sanity query...
-2025-09-16T04:52:30.505291Z	🔍 [getAllBrands] Sanity query returned: 12 brands
-2025-09-16T04:52:30.505482Z	🔍 [getAllBrands] Sanity query returned: 12 brands
-2025-09-16T04:52:30.505617Z	Fetching solutions with query: 
-2025-09-16T04:52:30.505724Z	    {
-2025-09-16T04:52:30.50582Z	      "solutions": *[_type == "solution" && (isPublished == true || !defined(isPublished)) && ("test-brand" in relatedBrands[]->slug.current || primaryBrand->slug.current == "test-brand")] | order(publishedAt desc) [0...20] {
-2025-09-16T04:52:30.505922Z	        
-2025-09-16T04:52:30.506206Z	    _id,
-2025-09-16T04:52:30.506352Z	    title,
-2025-09-16T04:52:30.506421Z	    "slug": slug.current,
-2025-09-16T04:52:30.506521Z	    summary,
-2025-09-16T04:52:30.506589Z	    description,
-2025-09-16T04:52:30.506849Z	    coverImage,
-2025-09-16T04:52:30.506952Z	    primaryBrand->{
-2025-09-16T04:52:30.507032Z	      _id,
-2025-09-16T04:52:30.507127Z	      name,
-2025-09-16T04:52:30.507285Z	      "slug": slug.current,
-2025-09-16T04:52:30.507395Z	      logo
-2025-09-16T04:52:30.507544Z	    },
-2025-09-16T04:52:30.507644Z	    relatedBrands[]->{
-2025-09-16T04:52:30.507737Z	      _id,
-2025-09-16T04:52:30.507828Z	      name,
-2025-09-16T04:52:30.507913Z	      "slug": slug.current,
-2025-09-16T04:52:30.508001Z	      logo
-2025-09-16T04:52:30.508091Z	    },
-2025-09-16T04:52:30.508186Z	    targetMarket,
-2025-09-16T04:52:30.509652Z	    complexity,
-2025-09-16T04:52:30.509914Z	    publishedAt,
-2025-09-16T04:52:30.510212Z	    isPublished,
-2025-09-16T04:52:30.51038Z	    isFeatured,
-2025-09-16T04:52:30.539545Z	    viewCount,
-2025-09-16T04:52:30.539701Z	    _createdAt,
-2025-09-16T04:52:30.539806Z	    _updatedAt
-2025-09-16T04:52:30.539904Z	  
-2025-09-16T04:52:30.54Z	      },
-2025-09-16T04:52:30.54012Z	      "total": count(*[_type == "solution" && (isPublished == true || !defined(isPublished)) && ("test-brand" in relatedBrands[]->slug.current || primaryBrand->slug.current == "test-brand")])
-2025-09-16T04:52:30.54028Z	    }
-2025-09-16T04:52:30.540404Z	  
-2025-09-16T04:52:30.540733Z	Query parameters: {
-2025-09-16T04:52:30.540952Z	  limit: 20,
-2025-09-16T04:52:30.541117Z	  offset: 0,
-2025-09-16T04:52:30.541239Z	  targetMarket: undefined,
-2025-09-16T04:52:30.541355Z	  brand: 'test-brand',
-2025-09-16T04:52:30.541479Z	  featured: undefined
-2025-09-16T04:52:30.541586Z	}
-2025-09-16T04:52:30.54173Z	Fetching solutions with query: 
-2025-09-16T04:52:30.542145Z	    {
-2025-09-16T04:52:30.542556Z	      "solutions": *[_type == "solution" && (isPublished == true || !defined(isPublished)) && ("test-brand" in relatedBrands[]->slug.current || primaryBrand->slug.current == "test-brand")] | order(publishedAt desc) [0...20] {
-2025-09-16T04:52:30.542679Z	        
-2025-09-16T04:52:30.543197Z	    _id,
-2025-09-16T04:52:30.543354Z	    title,
-2025-09-16T04:52:30.543556Z	    "slug": slug.current,
-2025-09-16T04:52:30.543798Z	    summary,
-2025-09-16T04:52:30.543963Z	    description,
-2025-09-16T04:52:30.544086Z	    coverImage,
-2025-09-16T04:52:30.544203Z	    primaryBrand->{
-2025-09-16T04:52:30.544327Z	      _id,
-2025-09-16T04:52:30.544726Z	      name,
-2025-09-16T04:52:30.544978Z	      "slug": slug.current,
-2025-09-16T04:52:30.545098Z	      logo
-2025-09-16T04:52:30.545273Z	    },
-2025-09-16T04:52:30.547406Z	    relatedBrands[]->{
-2025-09-16T04:52:30.547627Z	      _id,
-2025-09-16T04:52:30.54775Z	      name,
-2025-09-16T04:52:30.547866Z	      "slug": slug.current,
-2025-09-16T04:52:30.54797Z	      logo
-2025-09-16T04:52:30.548071Z	    },
-2025-09-16T04:52:30.548243Z	    targetMarket,
-2025-09-16T04:52:30.54835Z	    complexity,
-2025-09-16T04:52:30.548496Z	    publishedAt,
-2025-09-16T04:52:30.548625Z	    isPublished,
-2025-09-16T04:52:30.548754Z	    isFeatured,
-2025-09-16T04:52:30.548906Z	    viewCount,
-2025-09-16T04:52:30.549361Z	    _createdAt,
-2025-09-16T04:52:30.551744Z	    _updatedAt
-2025-09-16T04:52:30.551869Z	  
-2025-09-16T04:52:30.551974Z	      },
-2025-09-16T04:52:30.552072Z	      "total": count(*[_type == "solution" && (isPublished == true || !defined(isPublished)) && ("test-brand" in relatedBrands[]->slug.current || primaryBrand->slug.current == "test-brand")])
-2025-09-16T04:52:30.552177Z	    }
-2025-09-16T04:52:30.55227Z	  
-2025-09-16T04:52:30.552371Z	Query parameters: {
-2025-09-16T04:52:30.552869Z	  limit: 20,
-2025-09-16T04:52:30.554027Z	  offset: 0,
-2025-09-16T04:52:30.554357Z	  targetMarket: undefined,
-2025-09-16T04:52:30.554665Z	  brand: 'test-brand',
-2025-09-16T04:52:30.554842Z	  featured: undefined
-2025-09-16T04:52:30.555054Z	}
-2025-09-16T04:52:30.555198Z	Fetching products with query: 
-2025-09-16T04:52:30.5564Z	    {
-2025-09-16T04:52:30.556621Z	      "products": *[_type == "product" && isActive == true && !(_id in path("drafts.**")) && brand->slug.current == "test-brand"] | order(_createdAt desc) [0...24] {
-2025-09-16T04:52:30.556857Z	        
-2025-09-16T04:52:30.557054Z	    _id,
-2025-09-16T04:52:30.557254Z	    _type,
-2025-09-16T04:52:30.557434Z	    partNumber,
-2025-09-16T04:52:30.55765Z	    "slug": slug.current,
-2025-09-16T04:52:30.557828Z	    title,
-2025-09-16T04:52:30.558005Z	    shortDescription,
-2025-09-16T04:52:30.558146Z	    image,
-2025-09-16T04:52:30.558459Z	    brand->{
-2025-09-16T04:52:30.558811Z	      name,
-2025-09-16T04:52:30.559042Z	      "slug": slug.current,
-2025-09-16T04:52:30.559218Z	      logo
-2025-09-16T04:52:30.559386Z	    },
-2025-09-16T04:52:30.559553Z	    category->{
-2025-09-16T04:52:30.559732Z	      name,
-2025-09-16T04:52:30.559856Z	      "slug": slug.current
-2025-09-16T04:52:30.559961Z	    },
-2025-09-16T04:52:30.560068Z	    pricing{
-2025-09-16T04:52:30.560173Z	      currency,
-2025-09-16T04:52:30.560296Z	      tiers[]{
-2025-09-16T04:52:30.560583Z	        quantity,
-2025-09-16T04:52:30.56202Z	        price,
-2025-09-16T04:52:30.56257Z	        unit
-2025-09-16T04:52:30.563002Z	      },
-2025-09-16T04:52:30.563425Z	      moq,
-2025-09-16T04:52:30.567607Z	      leadTime,
-2025-09-16T04:52:30.567744Z	      // 兼容字段：提取第一个价格作为默认价格
-2025-09-16T04:52:30.567899Z	      "price": tiers[0].price,
-2025-09-16T04:52:30.56806Z	      "currency": coalesce(currency, "CNY")
-2025-09-16T04:52:30.576666Z	    },
-2025-09-16T04:52:30.584243Z	    inventory{
-2025-09-16T04:52:30.589387Z	      quantity,
-2025-09-16T04:52:30.638745Z	      status,
-2025-09-16T04:52:30.638902Z	      warehouse,
-2025-09-16T04:52:30.639053Z	      lastUpdated,
-2025-09-16T04:52:30.639241Z	      // 兼容字段：转换状态为布尔值
-2025-09-16T04:52:30.639358Z	      "inStock": status == "in_stock",
-2025-09-16T04:52:30.639505Z	      "quantity": coalesce(quantity, 0)
-2025-09-16T04:52:30.639598Z	    },
-2025-09-16T04:52:30.639683Z	    isActive,
-2025-09-16T04:52:30.639837Z	    isFeatured,
-2025-09-16T04:52:30.639945Z	    isNew,
-2025-09-16T04:52:30.640037Z	    _createdAt,
-2025-09-16T04:52:30.640127Z	    _updatedAt
-2025-09-16T04:52:30.640215Z	  
-2025-09-16T04:52:30.640304Z	      },
-2025-09-16T04:52:30.6404Z	      "total": count(*[_type == "product" && isActive == true && !(_id in path("drafts.**")) && brand->slug.current == "test-brand"])
-2025-09-16T04:52:30.640563Z	    }
-2025-09-16T04:52:30.645114Z	  
-2025-09-16T04:52:30.645258Z	Query parameters: {
-2025-09-16T04:52:30.645363Z	  limit: 24,
-2025-09-16T04:52:30.645918Z	  offset: 0,
-2025-09-16T04:52:30.646039Z	  category: undefined,
-2025-09-16T04:52:30.646138Z	  brand: 'test-brand',
-2025-09-16T04:52:30.646233Z	  featured: undefined
-2025-09-16T04:52:30.646326Z	}
-2025-09-16T04:52:30.646417Z	Fetching products with query: 
-2025-09-16T04:52:30.646538Z	    {
-2025-09-16T04:52:30.646636Z	      "products": *[_type == "product" && isActive == true && !(_id in path("drafts.**")) && brand->slug.current == "test-brand"] | order(_createdAt desc) [0...24] {
-2025-09-16T04:52:30.646741Z	        
-2025-09-16T04:52:30.646838Z	    _id,
-2025-09-16T04:52:30.646924Z	    _type,
-2025-09-16T04:52:30.647009Z	    partNumber,
-2025-09-16T04:52:30.647099Z	    "slug": slug.current,
-2025-09-16T04:52:30.647195Z	    title,
-2025-09-16T04:52:30.647293Z	    shortDescription,
-2025-09-16T04:52:30.647385Z	    image,
-2025-09-16T04:52:30.647506Z	    brand->{
-2025-09-16T04:52:30.647609Z	      name,
-2025-09-16T04:52:30.647708Z	      "slug": slug.current,
-2025-09-16T04:52:30.647871Z	      logo
-2025-09-16T04:52:30.648079Z	    },
-2025-09-16T04:52:30.648268Z	    category->{
-2025-09-16T04:52:30.648402Z	      name,
-2025-09-16T04:52:30.648572Z	      "slug": slug.current
-2025-09-16T04:52:30.648756Z	    },
-2025-09-16T04:52:30.648894Z	    pricing{
-2025-09-16T04:52:30.649049Z	      currency,
-2025-09-16T04:52:30.65085Z	      tiers[]{
-2025-09-16T04:52:30.651028Z	        quantity,
-2025-09-16T04:52:30.652467Z	        price,
-2025-09-16T04:52:30.653042Z	        unit
-2025-09-16T04:52:30.653515Z	      },
-2025-09-16T04:52:30.653674Z	      moq,
-2025-09-16T04:52:30.653858Z	      leadTime,
-2025-09-16T04:52:30.654027Z	      // 兼容字段：提取第一个价格作为默认价格
-2025-09-16T04:52:30.654382Z	      "price": tiers[0].price,
-2025-09-16T04:52:30.654767Z	      "currency": coalesce(currency, "CNY")
-2025-09-16T04:52:30.65506Z	    },
-2025-09-16T04:52:30.655366Z	    inventory{
-2025-09-16T04:52:30.655665Z	      quantity,
-2025-09-16T04:52:30.655955Z	      status,
-2025-09-16T04:52:30.65624Z	      warehouse,
-2025-09-16T04:52:30.65642Z	      lastUpdated,
-2025-09-16T04:52:30.656586Z	      // 兼容字段：转换状态为布尔值
-2025-09-16T04:52:30.656707Z	      "inStock": status == "in_stock",
-2025-09-16T04:52:30.656842Z	      "quantity": coalesce(quantity, 0)
-2025-09-16T04:52:30.656961Z	    },
-2025-09-16T04:52:30.657049Z	    isActive,
-2025-09-16T04:52:30.657135Z	    isFeatured,
-2025-09-16T04:52:30.657244Z	    isNew,
-2025-09-16T04:52:30.657354Z	    _createdAt,
-2025-09-16T04:52:30.657468Z	    _updatedAt
-2025-09-16T04:52:30.657628Z	  
-2025-09-16T04:52:30.65774Z	      },
-2025-09-16T04:52:30.658058Z	      "total": count(*[_type == "product" && isActive == true && !(_id in path("drafts.**")) && brand->slug.current == "test-brand"])
-2025-09-16T04:52:30.658348Z	    }
-2025-09-16T04:52:30.658646Z	  
-2025-09-16T04:52:30.658872Z	Query parameters: {
-2025-09-16T04:52:30.659Z	  limit: 24,
-2025-09-16T04:52:30.659146Z	  offset: 0,
-2025-09-16T04:52:30.659277Z	  category: undefined,
-2025-09-16T04:52:30.659512Z	  brand: 'test-brand',
-2025-09-16T04:52:30.659761Z	  featured: undefined
-2025-09-16T04:52:30.660596Z	}
-2025-09-16T04:52:30.660738Z	Fetching solutions with query: 
-2025-09-16T04:52:30.660849Z	    {
-2025-09-16T04:52:30.660959Z	      "solutions": *[_type == "solution" && (isPublished == true || !defined(isPublished))] | order(publishedAt desc) [0...50] {
-2025-09-16T04:52:30.661087Z	        
-2025-09-16T04:52:30.661204Z	    _id,
-2025-09-16T04:52:30.661323Z	    title,
-2025-09-16T04:52:30.661423Z	    "slug": slug.current,
-2025-09-16T04:52:30.661568Z	    summary,
-2025-09-16T04:52:30.661687Z	    description,
-2025-09-16T04:52:30.66181Z	    coverImage,
-2025-09-16T04:52:30.662314Z	    primaryBrand->{
-2025-09-16T04:52:30.66246Z	      _id,
-2025-09-16T04:52:30.662593Z	      name,
-2025-09-16T04:52:30.662703Z	      "slug": slug.current,
-2025-09-16T04:52:30.662812Z	      logo
-2025-09-16T04:52:30.662924Z	    },
-2025-09-16T04:52:30.663026Z	    relatedBrands[]->{
-2025-09-16T04:52:30.663142Z	      _id,
-2025-09-16T04:52:30.663243Z	      name,
-2025-09-16T04:52:30.663351Z	      "slug": slug.current,
-2025-09-16T04:52:30.66348Z	      logo
-2025-09-16T04:52:30.663608Z	    },
-2025-09-16T04:52:30.663722Z	    targetMarket,
-2025-09-16T04:52:30.66383Z	    complexity,
-2025-09-16T04:52:30.663941Z	    publishedAt,
-2025-09-16T04:52:30.66405Z	    isPublished,
-2025-09-16T04:52:30.664158Z	    isFeatured,
-2025-09-16T04:52:30.664272Z	    viewCount,
-2025-09-16T04:52:30.664378Z	    _createdAt,
-2025-09-16T04:52:30.664518Z	    _updatedAt
-2025-09-16T04:52:30.664628Z	  
-2025-09-16T04:52:30.664732Z	      },
-2025-09-16T04:52:30.664837Z	      "total": count(*[_type == "solution" && (isPublished == true || !defined(isPublished))])
-2025-09-16T04:52:30.664946Z	    }
-2025-09-16T04:52:30.665052Z	  
-2025-09-16T04:52:30.66516Z	Query parameters: {
-2025-09-16T04:52:30.665271Z	  limit: 50,
-2025-09-16T04:52:30.6654Z	  offset: 0,
-2025-09-16T04:52:30.665542Z	  targetMarket: undefined,
-2025-09-16T04:52:30.665659Z	  brand: undefined,
-2025-09-16T04:52:30.665766Z	  featured: undefined
-2025-09-16T04:52:30.665868Z	}
-2025-09-16T04:52:30.665968Z	Fetching solutions with query: 
-2025-09-16T04:52:30.666066Z	    {
-2025-09-16T04:52:30.666174Z	      "solutions": *[_type == "solution" && (isPublished == true || !defined(isPublished))] | order(publishedAt desc) [0...50] {
-2025-09-16T04:52:30.66629Z	        
-2025-09-16T04:52:30.666601Z	    _id,
-2025-09-16T04:52:30.666764Z	    title,
-2025-09-16T04:52:30.666888Z	    "slug": slug.current,
-2025-09-16T04:52:30.667035Z	    summary,
-2025-09-16T04:52:30.667182Z	    description,
-2025-09-16T04:52:30.667335Z	    coverImage,
-2025-09-16T04:52:30.66749Z	    primaryBrand->{
-2025-09-16T04:52:30.667649Z	      _id,
-2025-09-16T04:52:30.667801Z	      name,
-2025-09-16T04:52:30.667919Z	      "slug": slug.current,
-2025-09-16T04:52:30.66807Z	      logo
-2025-09-16T04:52:30.668228Z	    },
-2025-09-16T04:52:30.668366Z	    relatedBrands[]->{
-2025-09-16T04:52:30.669914Z	      _id,
-2025-09-16T04:52:30.670063Z	      name,
-2025-09-16T04:52:30.67017Z	      "slug": slug.current,
-2025-09-16T04:52:30.670271Z	      logo
-2025-09-16T04:52:30.670373Z	    },
-2025-09-16T04:52:30.670506Z	    targetMarket,
-2025-09-16T04:52:30.67061Z	    complexity,
-2025-09-16T04:52:30.670708Z	    publishedAt,
-2025-09-16T04:52:30.671003Z	    isPublished,
-2025-09-16T04:52:30.671177Z	    isFeatured,
-2025-09-16T04:52:30.671303Z	    viewCount,
-2025-09-16T04:52:30.671428Z	    _createdAt,
-2025-09-16T04:52:30.671589Z	    _updatedAt
-2025-09-16T04:52:30.671694Z	  
-2025-09-16T04:52:30.671803Z	      },
-2025-09-16T04:52:30.671904Z	      "total": count(*[_type == "solution" && (isPublished == true || !defined(isPublished))])
-2025-09-16T04:52:30.672004Z	    }
-2025-09-16T04:52:30.672104Z	  
-2025-09-16T04:52:30.672205Z	Query parameters: {
-2025-09-16T04:52:30.672314Z	  limit: 50,
-2025-09-16T04:52:30.672424Z	  offset: 0,
-2025-09-16T04:52:30.672557Z	  targetMarket: undefined,
-2025-09-16T04:52:30.672667Z	  brand: undefined,
-2025-09-16T04:52:30.67277Z	  featured: undefined
-2025-09-16T04:52:30.677278Z	}
-2025-09-16T04:52:30.752523Z	Products fetch result: { totalProducts: 0, fetchedProducts: 0, firstProduct: null }
-2025-09-16T04:52:30.752858Z	Products fetch result: { totalProducts: 0, fetchedProducts: 0, firstProduct: null }
-2025-09-16T04:52:30.838595Z	Solutions fetch result: { totalSolutions: 0, fetchedSolutions: 0, firstSolution: null }
-2025-09-16T04:52:30.839542Z	Solutions fetch result: { totalSolutions: 0, fetchedSolutions: 0, firstSolution: null }
-2025-09-16T04:52:30.839734Z	   Generating static pages (8/33) 
-2025-09-16T04:52:30.840016Z	Fetching products with query: 
-2025-09-16T04:52:30.84028Z	    {
-2025-09-16T04:52:30.840401Z	      "products": *[_type == "product" && isActive == true && !(_id in path("drafts.**")) && brand->slug.current == "test-brand"] | order(_createdAt desc) [0...6] {
-2025-09-16T04:52:30.840784Z	        
-2025-09-16T04:52:30.840959Z	    _id,
-2025-09-16T04:52:30.841083Z	    _type,
-2025-09-16T04:52:30.84118Z	    partNumber,
-2025-09-16T04:52:30.841287Z	    "slug": slug.current,
-2025-09-16T04:52:30.841388Z	    title,
-2025-09-16T04:52:30.841508Z	    shortDescription,
-2025-09-16T04:52:30.841631Z	    image,
-2025-09-16T04:52:30.841742Z	    brand->{
-2025-09-16T04:52:30.841875Z	      name,
-2025-09-16T04:52:30.841991Z	      "slug": slug.current,
-2025-09-16T04:52:30.842114Z	      logo
-2025-09-16T04:52:30.842233Z	    },
-2025-09-16T04:52:30.842348Z	    category->{
-2025-09-16T04:52:30.842477Z	      name,
-2025-09-16T04:52:30.842578Z	      "slug": slug.current
-2025-09-16T04:52:30.843689Z	    },
-2025-09-16T04:52:30.844297Z	    pricing{
-2025-09-16T04:52:30.844469Z	      currency,
-2025-09-16T04:52:30.844608Z	      tiers[]{
-2025-09-16T04:52:30.844719Z	        quantity,
-2025-09-16T04:52:30.844823Z	        price,
-2025-09-16T04:52:30.844927Z	        unit
-2025-09-16T04:52:30.845032Z	      },
-2025-09-16T04:52:30.845133Z	      moq,
-2025-09-16T04:52:30.845232Z	      leadTime,
-2025-09-16T04:52:30.845328Z	      // 兼容字段：提取第一个价格作为默认价格
-2025-09-16T04:52:30.845427Z	      "price": tiers[0].price,
-2025-09-16T04:52:30.845567Z	      "currency": coalesce(currency, "CNY")
-2025-09-16T04:52:30.845694Z	    },
-2025-09-16T04:52:30.845803Z	    inventory{
-2025-09-16T04:52:30.84591Z	      quantity,
-2025-09-16T04:52:30.846013Z	      status,
-2025-09-16T04:52:30.846109Z	      warehouse,
-2025-09-16T04:52:30.846217Z	      lastUpdated,
-2025-09-16T04:52:30.846322Z	      // 兼容字段：转换状态为布尔值
-2025-09-16T04:52:30.846421Z	      "inStock": status == "in_stock",
-2025-09-16T04:52:30.846546Z	      "quantity": coalesce(quantity, 0)
-2025-09-16T04:52:30.846642Z	    },
-2025-09-16T04:52:30.846739Z	    isActive,
-2025-09-16T04:52:30.846838Z	    isFeatured,
-2025-09-16T04:52:30.846926Z	    isNew,
-2025-09-16T04:52:30.847017Z	    _createdAt,
-2025-09-16T04:52:30.847109Z	    _updatedAt
-2025-09-16T04:52:30.847196Z	  
-2025-09-16T04:52:30.847287Z	      },
-2025-09-16T04:52:30.847402Z	      "total": count(*[_type == "product" && isActive == true && !(_id in path("drafts.**")) && brand->slug.current == "test-brand"])
-2025-09-16T04:52:30.847552Z	    }
-2025-09-16T04:52:30.852184Z	  
-2025-09-16T04:52:30.8523Z	Query parameters: {
-2025-09-16T04:52:30.852395Z	  limit: 6,
-2025-09-16T04:52:30.852514Z	  offset: 0,
-2025-09-16T04:52:30.852626Z	  category: undefined,
-2025-09-16T04:52:30.853395Z	  brand: 'test-brand',
-2025-09-16T04:52:30.853544Z	  featured: undefined
-2025-09-16T04:52:30.858367Z	}
-2025-09-16T04:52:30.858572Z	Fetching solutions with query: 
-2025-09-16T04:52:30.85871Z	    {
-2025-09-16T04:52:30.858833Z	      "solutions": *[_type == "solution" && (isPublished == true || !defined(isPublished)) && ("test-brand" in relatedBrands[]->slug.current || primaryBrand->slug.current == "test-brand")] | order(publishedAt desc) [0...3] {
-2025-09-16T04:52:30.858954Z	        
-2025-09-16T04:52:30.859077Z	    _id,
-2025-09-16T04:52:30.861096Z	    title,
-2025-09-16T04:52:30.861373Z	    "slug": slug.current,
-2025-09-16T04:52:30.861709Z	    summary,
-2025-09-16T04:52:30.861937Z	    description,
-2025-09-16T04:52:30.86338Z	    coverImage,
-2025-09-16T04:52:30.863554Z	    primaryBrand->{
-2025-09-16T04:52:30.863677Z	      _id,
-2025-09-16T04:52:30.863788Z	      name,
-2025-09-16T04:52:30.8639Z	      "slug": slug.current,
-2025-09-16T04:52:30.864004Z	      logo
-2025-09-16T04:52:30.864104Z	    },
-2025-09-16T04:52:30.864205Z	    relatedBrands[]->{
-2025-09-16T04:52:30.864323Z	      _id,
-2025-09-16T04:52:30.864433Z	      name,
-2025-09-16T04:52:30.864585Z	      "slug": slug.current,
-2025-09-16T04:52:30.864696Z	      logo
-2025-09-16T04:52:30.864805Z	    },
-2025-09-16T04:52:30.864924Z	    targetMarket,
-2025-09-16T04:52:30.865036Z	    complexity,
-2025-09-16T04:52:30.865144Z	    publishedAt,
-2025-09-16T04:52:30.865266Z	    isPublished,
-2025-09-16T04:52:30.865372Z	    isFeatured,
-2025-09-16T04:52:30.865498Z	    viewCount,
-2025-09-16T04:52:30.865617Z	    _createdAt,
-2025-09-16T04:52:30.865728Z	    _updatedAt
-2025-09-16T04:52:30.865829Z	  
-2025-09-16T04:52:30.865929Z	      },
-2025-09-16T04:52:30.866028Z	      "total": count(*[_type == "solution" && (isPublished == true || !defined(isPublished)) && ("test-brand" in relatedBrands[]->slug.current || primaryBrand->slug.current == "test-brand")])
-2025-09-16T04:52:30.866134Z	    }
-2025-09-16T04:52:30.866253Z	  
-2025-09-16T04:52:30.866356Z	Query parameters: {
-2025-09-16T04:52:30.866472Z	  limit: 3,
-2025-09-16T04:52:30.866588Z	  offset: 0,
-2025-09-16T04:52:30.866698Z	  targetMarket: undefined,
-2025-09-16T04:52:30.866802Z	  brand: 'test-brand',
-2025-09-16T04:52:30.866906Z	  featured: undefined
-2025-09-16T04:52:30.867006Z	}
-2025-09-16T04:52:30.867118Z	Fetching products with query: 
-2025-09-16T04:52:30.867247Z	    {
-2025-09-16T04:52:30.867361Z	      "products": *[_type == "product" && isActive == true && !(_id in path("drafts.**")) && brand->slug.current == "test-brand"] | order(_createdAt desc) [0...6] {
-2025-09-16T04:52:30.867496Z	        
-2025-09-16T04:52:30.867614Z	    _id,
-2025-09-16T04:52:30.867717Z	    _type,
-2025-09-16T04:52:30.867814Z	    partNumber,
-2025-09-16T04:52:30.867914Z	    "slug": slug.current,
-2025-09-16T04:52:30.868017Z	    title,
-2025-09-16T04:52:30.868119Z	    shortDescription,
-2025-09-16T04:52:30.86874Z	    image,
-2025-09-16T04:52:30.869145Z	    brand->{
-2025-09-16T04:52:30.869376Z	      name,
-2025-09-16T04:52:30.869601Z	      "slug": slug.current,
-2025-09-16T04:52:30.871063Z	      logo
-2025-09-16T04:52:30.871228Z	    },
-2025-09-16T04:52:30.871343Z	    category->{
-2025-09-16T04:52:30.871476Z	      name,
-2025-09-16T04:52:30.871586Z	      "slug": slug.current
-2025-09-16T04:52:30.871696Z	    },
-2025-09-16T04:52:30.871799Z	    pricing{
-2025-09-16T04:52:30.871898Z	      currency,
-2025-09-16T04:52:30.872001Z	      tiers[]{
-2025-09-16T04:52:30.872107Z	        quantity,
-2025-09-16T04:52:30.872211Z	        price,
-2025-09-16T04:52:30.872386Z	        unit
-2025-09-16T04:52:30.872552Z	      },
-2025-09-16T04:52:30.872675Z	      moq,
-2025-09-16T04:52:30.87278Z	      leadTime,
-2025-09-16T04:52:30.872878Z	      // 兼容字段：提取第一个价格作为默认价格
-2025-09-16T04:52:30.872983Z	      "price": tiers[0].price,
-2025-09-16T04:52:30.873077Z	      "currency": coalesce(currency, "CNY")
-2025-09-16T04:52:30.873171Z	    },
-2025-09-16T04:52:30.87327Z	    inventory{
-2025-09-16T04:52:30.873361Z	      quantity,
-2025-09-16T04:52:30.873466Z	      status,
-2025-09-16T04:52:30.873587Z	      warehouse,
-2025-09-16T04:52:30.873683Z	      lastUpdated,
-2025-09-16T04:52:30.873788Z	      // 兼容字段：转换状态为布尔值
-2025-09-16T04:52:30.873895Z	      "inStock": status == "in_stock",
-2025-09-16T04:52:30.874Z	      "quantity": coalesce(quantity, 0)
-2025-09-16T04:52:30.874102Z	    },
-2025-09-16T04:52:30.874203Z	    isActive,
-2025-09-16T04:52:30.874297Z	    isFeatured,
-2025-09-16T04:52:30.874394Z	    isNew,
-2025-09-16T04:52:30.874524Z	    _createdAt,
-2025-09-16T04:52:30.874645Z	    _updatedAt
-2025-09-16T04:52:30.874743Z	  
-2025-09-16T04:52:30.874838Z	      },
-2025-09-16T04:52:30.874945Z	      "total": count(*[_type == "product" && isActive == true && !(_id in path("drafts.**")) && brand->slug.current == "test-brand"])
-2025-09-16T04:52:30.875045Z	    }
-2025-09-16T04:52:30.875151Z	  
-2025-09-16T04:52:30.875251Z	Query parameters: {
-2025-09-16T04:52:30.875349Z	  limit: 6,
-2025-09-16T04:52:30.875459Z	  offset: 0,
-2025-09-16T04:52:30.875571Z	  category: undefined,
-2025-09-16T04:52:30.875668Z	  brand: 'test-brand',
-2025-09-16T04:52:30.875761Z	  featured: undefined
-2025-09-16T04:52:30.875862Z	}
-2025-09-16T04:52:30.875971Z	Fetching solutions with query: 
-2025-09-16T04:52:30.876084Z	    {
-2025-09-16T04:52:30.87621Z	      "solutions": *[_type == "solution" && (isPublished == true || !defined(isPublished)) && ("test-brand" in relatedBrands[]->slug.current || primaryBrand->slug.current == "test-brand")] | order(publishedAt desc) [0...3] {
-2025-09-16T04:52:30.876332Z	        
-2025-09-16T04:52:30.876455Z	    _id,
-2025-09-16T04:52:30.876579Z	    title,
-2025-09-16T04:52:30.876687Z	    "slug": slug.current,
-2025-09-16T04:52:30.876783Z	    summary,
-2025-09-16T04:52:30.876874Z	    description,
-2025-09-16T04:52:30.876973Z	    coverImage,
-2025-09-16T04:52:30.877096Z	    primaryBrand->{
-2025-09-16T04:52:30.877207Z	      _id,
-2025-09-16T04:52:30.877298Z	      name,
-2025-09-16T04:52:30.877388Z	      "slug": slug.current,
-2025-09-16T04:52:30.877525Z	      logo
-2025-09-16T04:52:30.877621Z	    },
-2025-09-16T04:52:30.877729Z	    relatedBrands[]->{
-2025-09-16T04:52:30.87782Z	      _id,
-2025-09-16T04:52:30.877905Z	      name,
-2025-09-16T04:52:30.877997Z	      "slug": slug.current,
-2025-09-16T04:52:30.87809Z	      logo
-2025-09-16T04:52:30.878241Z	    },
-2025-09-16T04:52:30.87857Z	    targetMarket,
-2025-09-16T04:52:30.878897Z	    complexity,
-2025-09-16T04:52:30.879049Z	    publishedAt,
-2025-09-16T04:52:30.879183Z	    isPublished,
-2025-09-16T04:52:30.879369Z	    isFeatured,
-2025-09-16T04:52:30.879564Z	    viewCount,
-2025-09-16T04:52:30.879709Z	    _createdAt,
-2025-09-16T04:52:30.879822Z	    _updatedAt
-2025-09-16T04:52:30.879928Z	  
-2025-09-16T04:52:30.880027Z	      },
-2025-09-16T04:52:30.880128Z	      "total": count(*[_type == "solution" && (isPublished == true || !defined(isPublished)) && ("test-brand" in relatedBrands[]->slug.current || primaryBrand->slug.current == "test-brand")])
-2025-09-16T04:52:30.880283Z	    }
-2025-09-16T04:52:30.880462Z	  
-2025-09-16T04:52:30.880647Z	Query parameters: {
-2025-09-16T04:52:30.880766Z	  limit: 3,
-2025-09-16T04:52:30.880875Z	  offset: 0,
-2025-09-16T04:52:30.881119Z	  targetMarket: undefined,
-2025-09-16T04:52:30.881427Z	  brand: 'test-brand',
-2025-09-16T04:52:30.881618Z	  featured: undefined
-2025-09-16T04:52:30.881739Z	}
-2025-09-16T04:52:30.88189Z	Solutions fetch result: {
-2025-09-16T04:52:30.882004Z	  totalSolutions: 12,
-2025-09-16T04:52:30.882132Z	  fetchedSolutions: 12,
-2025-09-16T04:52:30.88225Z	  firstSolution: {
-2025-09-16T04:52:30.882353Z	    _createdAt: '2025-09-15T10:06:14Z',
-2025-09-16T04:52:30.882484Z	    _id: 'e4682cee-1cd1-4018-97ce-0650c7f700c9',
-2025-09-16T04:52:30.882599Z	    _updatedAt: '2025-09-15T10:07:20Z',
-2025-09-16T04:52:30.882713Z	    complexity: 'medium',
-2025-09-16T04:52:30.882831Z	    coverImage: null,
-2025-09-16T04:52:30.882936Z	    description: [ [Object] ],
-2025-09-16T04:52:30.883032Z	    isFeatured: false,
-2025-09-16T04:52:30.883132Z	    isPublished: true,
-2025-09-16T04:52:30.883232Z	    primaryBrand: {
-2025-09-16T04:52:30.883331Z	      _id: '41db78b7-772e-4324-8263-4897a6ae684f',
-2025-09-16T04:52:30.883462Z	      logo: null,
-2025-09-16T04:52:30.883593Z	      name: 'IXYS',
-2025-09-16T04:52:30.883709Z	      slug: 'ixys'
-2025-09-16T04:52:30.883859Z	    },
-2025-09-16T04:52:30.884028Z	    publishedAt: '2025-09-15T10:05:59.500Z',
-2025-09-16T04:52:30.884157Z	    relatedBrands: null,
-2025-09-16T04:52:30.884291Z	    slug: '99999',
-2025-09-16T04:52:30.884683Z	    summary: '99999',
-2025-09-16T04:52:30.885083Z	    targetMarket: 'industrial-automation',
-2025-09-16T04:52:30.8852Z	    title: '99999',
-2025-09-16T04:52:30.885329Z	    viewCount: 0
-2025-09-16T04:52:30.885471Z	  }
-2025-09-16T04:52:30.885601Z	}
-2025-09-16T04:52:30.990048Z	Solutions fetch result: {
-2025-09-16T04:52:30.99034Z	  totalSolutions: 12,
-2025-09-16T04:52:30.990487Z	  fetchedSolutions: 12,
-2025-09-16T04:52:30.990596Z	  firstSolution: {
-2025-09-16T04:52:30.990692Z	    _createdAt: '2025-09-15T10:06:14Z',
-2025-09-16T04:52:30.990778Z	    _id: 'e4682cee-1cd1-4018-97ce-0650c7f700c9',
-2025-09-16T04:52:30.990862Z	    _updatedAt: '2025-09-15T10:07:20Z',
-2025-09-16T04:52:30.990946Z	    complexity: 'medium',
-2025-09-16T04:52:30.99104Z	    coverImage: null,
-2025-09-16T04:52:30.991126Z	    description: [ [Object] ],
-2025-09-16T04:52:30.991228Z	    isFeatured: false,
-2025-09-16T04:52:30.991317Z	    isPublished: true,
-2025-09-16T04:52:30.991403Z	    primaryBrand: {
-2025-09-16T04:52:30.991564Z	      _id: '41db78b7-772e-4324-8263-4897a6ae684f',
-2025-09-16T04:52:30.991762Z	      logo: null,
-2025-09-16T04:52:30.99191Z	      name: 'IXYS',
-2025-09-16T04:52:30.992032Z	      slug: 'ixys'
-2025-09-16T04:52:30.992128Z	    },
-2025-09-16T04:52:30.99223Z	    publishedAt: '2025-09-15T10:05:59.500Z',
-2025-09-16T04:52:30.992364Z	    relatedBrands: null,
-2025-09-16T04:52:30.992548Z	    slug: '99999',
-2025-09-16T04:52:30.992675Z	    summary: '99999',
-2025-09-16T04:52:30.992931Z	    targetMarket: 'industrial-automation',
-2025-09-16T04:52:30.993475Z	    title: '99999',
-2025-09-16T04:52:30.993908Z	    viewCount: 0
-2025-09-16T04:52:30.994057Z	  }
-2025-09-16T04:52:30.994207Z	}
-2025-09-16T04:52:30.994366Z	Products fetch result: { totalProducts: 0, fetchedProducts: 0, firstProduct: null }
-2025-09-16T04:52:30.99452Z	Products fetch result: { totalProducts: 0, fetchedProducts: 0, firstProduct: null }
-2025-09-16T04:52:31.01089Z	🎨 StudioClient component loaded (emergency mode)
-2025-09-16T04:52:31.054526Z	🎨 StudioClient component loaded (emergency mode)
-2025-09-16T04:52:31.055171Z	   Generating static pages (16/33) 
-2025-09-16T04:52:31.069818Z	Solutions fetch result: { totalSolutions: 0, fetchedSolutions: 0, firstSolution: null }
-2025-09-16T04:52:31.070209Z	Solutions fetch result: { totalSolutions: 0, fetchedSolutions: 0, firstSolution: null }
-2025-09-16T04:52:31.070503Z	🎨 StudioClient component loaded (emergency mode)
-2025-09-16T04:52:31.354648Z	   Generating static pages (24/33) 
-2025-09-16T04:52:31.455335Z	 ✓ Generating static pages (33/33)
-2025-09-16T04:52:31.894666Z	   Finalizing page optimization ...
-2025-09-16T04:52:31.894981Z	   Collecting build traces ...
-2025-09-16T04:52:36.61568Z	
-2025-09-16T04:52:36.620378Z	Route (app)                                          Size     First Load JS
-2025-09-16T04:52:36.62056Z	┌ ○ /                                                152 B          87.5 kB
-2025-09-16T04:52:36.620671Z	├ ○ /_not-found                                      152 B          87.5 kB
-2025-09-16T04:52:36.620776Z	├ ● /[locale]                                        1.28 kB        97.2 kB
-2025-09-16T04:52:36.620886Z	├   └ /zh-CN
-2025-09-16T04:52:36.621009Z	├ ● /[locale]/about                                  6.86 kB         128 kB
-2025-09-16T04:52:36.621119Z	├   └ /zh-CN/about
-2025-09-16T04:52:36.621218Z	├ ● /[locale]/articles/[slug]                        220 B           108 kB
-2025-09-16T04:52:36.621314Z	├ ● /[locale]/brands                                 6.74 kB          94 kB
-2025-09-16T04:52:36.621405Z	├   └ /zh-CN/brands
-2025-09-16T04:52:36.621563Z	├ ● /[locale]/brands/[slug]                          220 B           108 kB
-2025-09-16T04:52:36.621667Z	├   └ /zh-CN/brands/test-brand
-2025-09-16T04:52:36.621765Z	├ ● /[locale]/brands/[slug]/products                 220 B           108 kB
-2025-09-16T04:52:36.621866Z	├   └ /zh-CN/brands/test-brand/products
-2025-09-16T04:52:36.621996Z	├ ● /[locale]/brands/[slug]/products/[id]            220 B           108 kB
-2025-09-16T04:52:36.622112Z	├   ├ /zh-CN/brands/cree/products/55555
-2025-09-16T04:52:36.622229Z	├   ├ /zh-CN/brands/cree/products/11111
-2025-09-16T04:52:36.62235Z	├   ├ /zh-CN/brands/cree/products/c4d02120a
-2025-09-16T04:52:36.62249Z	├   └ [+3 more paths]
-2025-09-16T04:52:36.62268Z	├ ● /[locale]/brands/[slug]/solutions                220 B           108 kB
-2025-09-16T04:52:36.622806Z	├   └ /zh-CN/brands/test-brand/solutions
-2025-09-16T04:52:36.622898Z	├ ● /[locale]/brands/[slug]/solutions/[id]           220 B           108 kB
-2025-09-16T04:52:36.622984Z	├ ● /[locale]/brands/[slug]/support                  6.75 kB         103 kB
-2025-09-16T04:52:36.623107Z	├   └ /zh-CN/brands/test-brand/support
-2025-09-16T04:52:36.623265Z	├ ● /[locale]/brands/[slug]/support/[id]             220 B           108 kB
-2025-09-16T04:52:36.623371Z	├   └ /zh-CN/brands/test-brand/support/test-article
-2025-09-16T04:52:36.62353Z	├ ● /[locale]/products                               6.14 kB         127 kB
-2025-09-16T04:52:36.623658Z	├   └ /zh-CN/products
-2025-09-16T04:52:36.623837Z	├ ● /[locale]/products/[slug]                        221 B           108 kB
-2025-09-16T04:52:36.623965Z	├   ├ /zh-CN/products/55555
-2025-09-16T04:52:36.624114Z	├   ├ /zh-CN/products/11111
-2025-09-16T04:52:36.624223Z	├   ├ /zh-CN/products/c4d02120a
-2025-09-16T04:52:36.624323Z	├   └ [+3 more paths]
-2025-09-16T04:52:36.624423Z	├ ● /[locale]/solutions                              220 B           108 kB
-2025-09-16T04:52:36.624541Z	├   └ /zh-CN/solutions
-2025-09-16T04:52:36.624636Z	├ ● /[locale]/solutions/[slug]                       220 B           108 kB
-2025-09-16T04:52:36.624757Z	├ ○ /admin                                           4.46 kB         100 kB
-2025-09-16T04:52:36.624866Z	├ ○ /admin/debug                                     5.25 kB         126 kB
-2025-09-16T04:52:36.624965Z	├ ○ /admin/products                                  1.91 kB        97.9 kB
-2025-09-16T04:52:36.625062Z	├ ○ /debug-routes                                    152 B          87.5 kB
-2025-09-16T04:52:36.625154Z	└ ● /studio/[[...tool]]                              520 B          87.8 kB
-2025-09-16T04:52:36.625265Z	    ├ /studio
-2025-09-16T04:52:36.625364Z	    ├ /studio/desk
-2025-09-16T04:52:36.625477Z	    └ /studio/vision
-2025-09-16T04:52:36.62558Z	+ First Load JS shared by all                        87.3 kB
-2025-09-16T04:52:36.625682Z	  ├ chunks/117-b69b33846a1ae113.js                   31.6 kB
-2025-09-16T04:52:36.625777Z	  ├ chunks/fd9d1056-36f3b6d38ac70287.js              53.7 kB
-2025-09-16T04:52:36.625882Z	  └ other shared chunks (total)                      2.02 kB
-2025-09-16T04:52:36.625978Z	
-2025-09-16T04:52:36.626073Z	
-2025-09-16T04:52:36.626163Z	○  (Static)  prerendered as static content
-2025-09-16T04:52:36.626268Z	●  (SSG)     prerendered as static HTML (uses getStaticProps)
-2025-09-16T04:52:36.626364Z	
-2025-09-16T04:52:36.687248Z	Finished
-2025-09-16T04:52:37.617585Z	Checking for configuration in a Wrangler configuration file (BETA)
-2025-09-16T04:52:37.618076Z	
-2025-09-16T04:52:38.729323Z	No wrangler.toml file found. Continuing.
-2025-09-16T04:52:38.730302Z	Note: No functions dir at /functions found. Skipping.
-2025-09-16T04:52:38.730484Z	Validating asset output directory
-2025-09-16T04:52:38.730925Z	Error: Output directory "out" not found.
-2025-09-16T04:52:40.388249Z	Failed: build output directory not found
+2025-09-16T09:50:52.549065Z	Cloning repository...
+2025-09-16T09:50:53.32938Z	From https://github.com/befpail737-glitch/litong
+2025-09-16T09:50:53.330051Z	 * branch            1017098ac22325fba9e126024dcb2bf6bc9df6b9 -> FETCH_HEAD
+2025-09-16T09:50:53.330184Z	
+2025-09-16T09:50:53.380267Z	HEAD is now at 1017098 Fix production 404 errors by converting pages to client-side rendering
+2025-09-16T09:50:53.380707Z	
+2025-09-16T09:50:53.460712Z	
+2025-09-16T09:50:53.461454Z	Using v2 root directory strategy
+2025-09-16T09:50:53.483645Z	Success: Finished cloning repository files
+2025-09-16T09:50:55.2636Z	Checking for configuration in a Wrangler configuration file (BETA)
+2025-09-16T09:50:55.264369Z	
+2025-09-16T09:50:56.360235Z	No wrangler.toml file found. Continuing.
+2025-09-16T09:50:56.435789Z	Detected the following tools from environment: nodejs@18.17.0, npm@10.9.2
+2025-09-16T09:50:56.43646Z	Installing nodejs 18.17.0
+2025-09-16T09:50:57.430822Z	Trying to update node-build... ok
+2025-09-16T09:50:57.546991Z	To follow progress, use 'tail -f /tmp/node-build.20250916095057.494.log' or pass --verbose
+2025-09-16T09:50:57.641868Z	Downloading node-v18.17.0-linux-x64.tar.gz...
+2025-09-16T09:50:57.857461Z	-> https://nodejs.org/dist/v18.17.0/node-v18.17.0-linux-x64.tar.gz
+2025-09-16T09:50:59.510543Z	
+2025-09-16T09:50:59.51084Z	WARNING: node-v18.17.0-linux-x64 is in LTS Maintenance mode and nearing its end of life.
+2025-09-16T09:50:59.511097Z	It only receives *critical* security updates, *critical* bug fixes and documentation updates.
+2025-09-16T09:50:59.51123Z	
+2025-09-16T09:50:59.511414Z	Installing node-v18.17.0-linux-x64...
+2025-09-16T09:50:59.915367Z	Installed node-v18.17.0-linux-x64 to /opt/buildhome/.asdf/installs/nodejs/18.17.0
+2025-09-16T09:50:59.915685Z	
+2025-09-16T09:51:00.953617Z	Installing project dependencies: npm install --progress=false
+2025-09-16T09:51:22.999079Z	npm WARN EBADENGINE Unsupported engine {
+2025-09-16T09:51:22.999401Z	npm WARN EBADENGINE   package: '@sanity/client@7.11.1',
+2025-09-16T09:51:22.999576Z	npm WARN EBADENGINE   required: { node: '>=20' },
+2025-09-16T09:51:22.999706Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
+2025-09-16T09:51:22.999825Z	npm WARN EBADENGINE }
+2025-09-16T09:51:22.999967Z	npm WARN EBADENGINE Unsupported engine {
+2025-09-16T09:51:23.000073Z	npm WARN EBADENGINE   package: '@sanity/diff-match-patch@3.2.0',
+2025-09-16T09:51:23.000192Z	npm WARN EBADENGINE   required: { node: '>=18.18' },
+2025-09-16T09:51:23.000304Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
+2025-09-16T09:51:23.000416Z	npm WARN EBADENGINE }
+2025-09-16T09:51:23.000765Z	npm WARN EBADENGINE Unsupported engine {
+2025-09-16T09:51:23.001026Z	npm WARN EBADENGINE   package: '@sanity/message-protocol@0.13.3',
+2025-09-16T09:51:23.001225Z	npm WARN EBADENGINE   required: { node: '>=20.0.0' },
+2025-09-16T09:51:23.0013Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
+2025-09-16T09:51:23.001474Z	npm WARN EBADENGINE }
+2025-09-16T09:51:23.00158Z	npm WARN EBADENGINE Unsupported engine {
+2025-09-16T09:51:23.001738Z	npm WARN EBADENGINE   package: '@sanity/sdk@0.0.0-alpha.25',
+2025-09-16T09:51:23.001803Z	npm WARN EBADENGINE   required: { node: '>=20.0.0' },
+2025-09-16T09:51:23.001875Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
+2025-09-16T09:51:23.002237Z	npm WARN EBADENGINE }
+2025-09-16T09:51:23.002472Z	npm WARN EBADENGINE Unsupported engine {
+2025-09-16T09:51:23.00268Z	npm WARN EBADENGINE   package: '@sanity/client@7.11.1',
+2025-09-16T09:51:23.002765Z	npm WARN EBADENGINE   required: { node: '>=20' },
+2025-09-16T09:51:23.002904Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
+2025-09-16T09:51:23.003099Z	npm WARN EBADENGINE }
+2025-09-16T09:51:23.003192Z	npm WARN EBADENGINE Unsupported engine {
+2025-09-16T09:51:23.003317Z	npm WARN EBADENGINE   package: '@sanity/runtime-cli@9.2.0',
+2025-09-16T09:51:23.003774Z	npm WARN EBADENGINE   required: { node: '>=20.11.0' },
+2025-09-16T09:51:23.003926Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
+2025-09-16T09:51:23.00406Z	npm WARN EBADENGINE }
+2025-09-16T09:51:23.004268Z	npm WARN EBADENGINE Unsupported engine {
+2025-09-16T09:51:23.004416Z	npm WARN EBADENGINE   package: 'rimraf@6.0.1',
+2025-09-16T09:51:23.004495Z	npm WARN EBADENGINE   required: { node: '20 || >=22' },
+2025-09-16T09:51:23.004588Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
+2025-09-16T09:51:23.004651Z	npm WARN EBADENGINE }
+2025-09-16T09:51:23.005213Z	npm WARN EBADENGINE Unsupported engine {
+2025-09-16T09:51:23.005377Z	npm WARN EBADENGINE   package: 'rimraf@6.0.1',
+2025-09-16T09:51:23.005754Z	npm WARN EBADENGINE   required: { node: '20 || >=22' },
+2025-09-16T09:51:23.005857Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
+2025-09-16T09:51:23.005984Z	npm WARN EBADENGINE }
+2025-09-16T09:51:23.006109Z	npm WARN EBADENGINE Unsupported engine {
+2025-09-16T09:51:23.006196Z	npm WARN EBADENGINE   package: '@sanity/client@7.11.1',
+2025-09-16T09:51:23.006261Z	npm WARN EBADENGINE   required: { node: '>=20' },
+2025-09-16T09:51:23.006353Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
+2025-09-16T09:51:23.006481Z	npm WARN EBADENGINE }
+2025-09-16T09:51:23.006584Z	npm WARN EBADENGINE Unsupported engine {
+2025-09-16T09:51:23.006697Z	npm WARN EBADENGINE   package: '@sanity/client@7.11.1',
+2025-09-16T09:51:23.00687Z	npm WARN EBADENGINE   required: { node: '>=20' },
+2025-09-16T09:51:23.00699Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
+2025-09-16T09:51:23.007101Z	npm WARN EBADENGINE }
+2025-09-16T09:51:23.007208Z	npm WARN EBADENGINE Unsupported engine {
+2025-09-16T09:51:23.007312Z	npm WARN EBADENGINE   package: '@sanity/client@7.11.1',
+2025-09-16T09:51:23.007379Z	npm WARN EBADENGINE   required: { node: '>=20' },
+2025-09-16T09:51:23.007445Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
+2025-09-16T09:51:23.007526Z	npm WARN EBADENGINE }
+2025-09-16T09:51:23.007609Z	npm WARN EBADENGINE Unsupported engine {
+2025-09-16T09:51:23.007745Z	npm WARN EBADENGINE   package: 'eventsource@4.0.0',
+2025-09-16T09:51:23.007933Z	npm WARN EBADENGINE   required: { node: '>=20.0.0' },
+2025-09-16T09:51:23.008014Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
+2025-09-16T09:51:23.008071Z	npm WARN EBADENGINE }
+2025-09-16T09:51:23.008282Z	npm WARN EBADENGINE Unsupported engine {
+2025-09-16T09:51:23.008365Z	npm WARN EBADENGINE   package: '@sanity/client@7.11.1',
+2025-09-16T09:51:23.008516Z	npm WARN EBADENGINE   required: { node: '>=20' },
+2025-09-16T09:51:23.008733Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
+2025-09-16T09:51:23.008851Z	npm WARN EBADENGINE }
+2025-09-16T09:51:23.009049Z	npm WARN EBADENGINE Unsupported engine {
+2025-09-16T09:51:23.009129Z	npm WARN EBADENGINE   package: '@sanity/client@7.11.1',
+2025-09-16T09:51:23.00919Z	npm WARN EBADENGINE   required: { node: '>=20' },
+2025-09-16T09:51:23.00931Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
+2025-09-16T09:51:23.009438Z	npm WARN EBADENGINE }
+2025-09-16T09:51:23.010399Z	npm WARN EBADENGINE Unsupported engine {
+2025-09-16T09:51:23.010616Z	npm WARN EBADENGINE   package: 'glob@11.0.3',
+2025-09-16T09:51:23.010704Z	npm WARN EBADENGINE   required: { node: '20 || >=22' },
+2025-09-16T09:51:23.010771Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
+2025-09-16T09:51:23.010953Z	npm WARN EBADENGINE }
+2025-09-16T09:51:23.011062Z	npm WARN EBADENGINE Unsupported engine {
+2025-09-16T09:51:23.01118Z	npm WARN EBADENGINE   package: 'jackspeak@4.1.1',
+2025-09-16T09:51:23.011282Z	npm WARN EBADENGINE   required: { node: '20 || >=22' },
+2025-09-16T09:51:23.011381Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
+2025-09-16T09:51:23.011487Z	npm WARN EBADENGINE }
+2025-09-16T09:51:23.0116Z	npm WARN EBADENGINE Unsupported engine {
+2025-09-16T09:51:23.011775Z	npm WARN EBADENGINE   package: 'minimatch@10.0.3',
+2025-09-16T09:51:23.011908Z	npm WARN EBADENGINE   required: { node: '20 || >=22' },
+2025-09-16T09:51:23.011995Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
+2025-09-16T09:51:23.012059Z	npm WARN EBADENGINE }
+2025-09-16T09:51:23.012141Z	npm WARN EBADENGINE Unsupported engine {
+2025-09-16T09:51:23.012311Z	npm WARN EBADENGINE   package: 'path-scurry@2.0.0',
+2025-09-16T09:51:23.012418Z	npm WARN EBADENGINE   required: { node: '20 || >=22' },
+2025-09-16T09:51:23.012529Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
+2025-09-16T09:51:23.012627Z	npm WARN EBADENGINE }
+2025-09-16T09:51:23.012723Z	npm WARN EBADENGINE Unsupported engine {
+2025-09-16T09:51:23.012823Z	npm WARN EBADENGINE   package: '@isaacs/brace-expansion@5.0.0',
+2025-09-16T09:51:23.01294Z	npm WARN EBADENGINE   required: { node: '20 || >=22' },
+2025-09-16T09:51:23.013035Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
+2025-09-16T09:51:23.013098Z	npm WARN EBADENGINE }
+2025-09-16T09:51:23.013153Z	npm WARN EBADENGINE Unsupported engine {
+2025-09-16T09:51:23.013209Z	npm WARN EBADENGINE   package: '@isaacs/balanced-match@4.0.1',
+2025-09-16T09:51:23.013263Z	npm WARN EBADENGINE   required: { node: '20 || >=22' },
+2025-09-16T09:51:23.013318Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
+2025-09-16T09:51:23.013372Z	npm WARN EBADENGINE }
+2025-09-16T09:51:23.013434Z	npm WARN EBADENGINE Unsupported engine {
+2025-09-16T09:51:23.013512Z	npm WARN EBADENGINE   package: 'lru-cache@11.2.1',
+2025-09-16T09:51:23.013573Z	npm WARN EBADENGINE   required: { node: '20 || >=22' },
+2025-09-16T09:51:23.013638Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
+2025-09-16T09:51:23.013693Z	npm WARN EBADENGINE }
+2025-09-16T09:51:23.013749Z	npm WARN EBADENGINE Unsupported engine {
+2025-09-16T09:51:23.013803Z	npm WARN EBADENGINE   package: 'glob@11.0.3',
+2025-09-16T09:51:23.013857Z	npm WARN EBADENGINE   required: { node: '20 || >=22' },
+2025-09-16T09:51:23.013955Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
+2025-09-16T09:51:23.014042Z	npm WARN EBADENGINE }
+2025-09-16T09:51:23.014126Z	npm WARN EBADENGINE Unsupported engine {
+2025-09-16T09:51:23.014218Z	npm WARN EBADENGINE   package: 'jackspeak@4.1.1',
+2025-09-16T09:51:23.014329Z	npm WARN EBADENGINE   required: { node: '20 || >=22' },
+2025-09-16T09:51:23.014523Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
+2025-09-16T09:51:23.014601Z	npm WARN EBADENGINE }
+2025-09-16T09:51:23.01467Z	npm WARN EBADENGINE Unsupported engine {
+2025-09-16T09:51:23.014732Z	npm WARN EBADENGINE   package: 'minimatch@10.0.3',
+2025-09-16T09:51:23.014849Z	npm WARN EBADENGINE   required: { node: '20 || >=22' },
+2025-09-16T09:51:23.014955Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
+2025-09-16T09:51:23.01507Z	npm WARN EBADENGINE }
+2025-09-16T09:51:23.015166Z	npm WARN EBADENGINE Unsupported engine {
+2025-09-16T09:51:23.015248Z	npm WARN EBADENGINE   package: 'path-scurry@2.0.0',
+2025-09-16T09:51:23.015305Z	npm WARN EBADENGINE   required: { node: '20 || >=22' },
+2025-09-16T09:51:23.015369Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
+2025-09-16T09:51:23.015425Z	npm WARN EBADENGINE }
+2025-09-16T09:51:23.015488Z	npm WARN EBADENGINE Unsupported engine {
+2025-09-16T09:51:23.015555Z	npm WARN EBADENGINE   package: 'lru-cache@11.2.1',
+2025-09-16T09:51:23.015618Z	npm WARN EBADENGINE   required: { node: '20 || >=22' },
+2025-09-16T09:51:23.01568Z	npm WARN EBADENGINE   current: { node: 'v18.17.0', npm: '9.6.7' }
+2025-09-16T09:51:23.015738Z	npm WARN EBADENGINE }
+2025-09-16T09:51:25.175607Z	npm WARN deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+2025-09-16T09:51:29.884758Z	npm WARN deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+2025-09-16T09:51:30.611905Z	npm WARN deprecated @humanwhocodes/object-schema@2.0.3: Use @eslint/object-schema instead
+2025-09-16T09:51:30.930315Z	npm WARN deprecated @humanwhocodes/config-array@0.13.0: Use @eslint/config-array instead
+2025-09-16T09:51:33.209854Z	npm WARN deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+2025-09-16T09:51:37.503324Z	npm WARN deprecated eslint@8.57.1: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+2025-09-16T09:51:54.694645Z	
+2025-09-16T09:51:54.694958Z	added 1436 packages in 53s
+2025-09-16T09:51:54.72894Z	Executing user command: npm run build
+2025-09-16T09:51:55.265662Z	
+2025-09-16T09:51:55.266214Z	> litong-electronics-website@0.1.0 build
+2025-09-16T09:51:55.266834Z	> npm run clear-cache && next build
+2025-09-16T09:51:55.266981Z	
+2025-09-16T09:51:55.603004Z	
+2025-09-16T09:51:55.603244Z	> litong-electronics-website@0.1.0 clear-cache
+2025-09-16T09:51:55.603396Z	> node scripts/clear-cache.js
+2025-09-16T09:51:55.60348Z	
+2025-09-16T09:51:55.655592Z	🧹 Clearing Next.js caches...
+2025-09-16T09:51:55.656178Z	ℹ️  /opt/buildhome/repo/.next does not exist
+2025-09-16T09:51:55.656297Z	ℹ️  /opt/buildhome/repo/node_modules/.cache does not exist
+2025-09-16T09:51:55.656402Z	✅ Cache cleared! Please restart your development server.
+2025-09-16T09:51:55.656516Z	Run: npm run dev
+2025-09-16T09:51:56.284842Z	⚠ No build cache found. Please configure build caching for faster rebuilds. Read more: https://nextjs.org/docs/messages/no-cache
+2025-09-16T09:51:56.288988Z	Attention: Next.js now collects completely anonymous telemetry regarding usage.
+2025-09-16T09:51:56.289179Z	This information is used to shape Next.js' roadmap and prioritize features.
+2025-09-16T09:51:56.28942Z	You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+2025-09-16T09:51:56.28955Z	https://nextjs.org/telemetry
+2025-09-16T09:51:56.289655Z	
+2025-09-16T09:51:56.35919Z	  ▲ Next.js 14.2.32
+2025-09-16T09:51:56.417369Z	
+2025-09-16T09:51:56.477132Z	   Creating an optimized production build ...
+2025-09-16T09:52:10.487787Z	 ✓ Compiled successfully
+2025-09-16T09:52:10.488812Z	   Skipping validation of types
+2025-09-16T09:52:10.489015Z	   Skipping linting
+2025-09-16T09:52:10.801869Z	   Collecting page data ...
+2025-09-16T09:52:12.610386Z	   Generating static pages (0/14) ...
+2025-09-16T09:52:13.021583Z	   Generating static pages (3/14) 
+2025-09-16T09:52:13.107838Z	   Generating static pages (6/14) 
+2025-09-16T09:52:13.229385Z	   Generating static pages (10/14) 
+2025-09-16T09:52:13.435294Z	 ✓ Generating static pages (14/14)
+2025-09-16T09:52:13.877673Z	   Finalizing page optimization ...
+2025-09-16T09:52:13.877962Z	   Collecting build traces ...
+2025-09-16T09:52:18.755366Z	
+2025-09-16T09:52:18.75899Z	Route (app)                              Size     First Load JS
+2025-09-16T09:52:18.759177Z	┌ ○ /                                    200 B           113 kB
+2025-09-16T09:52:18.759357Z	├ ○ /_not-found                          151 B          87.4 kB
+2025-09-16T09:52:18.759488Z	├ ○ /about                               200 B           113 kB
+2025-09-16T09:52:18.759571Z	├ ○ /admin                               4.45 kB         100 kB
+2025-09-16T09:52:18.759659Z	├ ○ /admin/debug                         5.25 kB         126 kB
+2025-09-16T09:52:18.759759Z	├ ○ /admin/products                      1.91 kB        97.8 kB
+2025-09-16T09:52:18.759835Z	├ ○ /brands                              2.34 kB         153 kB
+2025-09-16T09:52:18.759954Z	├ ○ /categories                          2.37 kB         153 kB
+2025-09-16T09:52:18.760052Z	├ ○ /debug-routes                        151 B          87.4 kB
+2025-09-16T09:52:18.760155Z	├ ○ /inquiry                             200 B           113 kB
+2025-09-16T09:52:18.760278Z	├ ○ /search                              200 B           113 kB
+2025-09-16T09:52:18.760375Z	└ ● /studio/[[...tool]]                  152 B          87.4 kB
+2025-09-16T09:52:18.760485Z	    └ /studio
+2025-09-16T09:52:18.760584Z	+ First Load JS shared by all            87.2 kB
+2025-09-16T09:52:18.760681Z	  ├ chunks/117-06850679753cce6c.js       31.6 kB
+2025-09-16T09:52:18.760786Z	  ├ chunks/fd9d1056-d47fc1309dacda51.js  53.7 kB
+2025-09-16T09:52:18.760904Z	  └ other shared chunks (total)          1.95 kB
+2025-09-16T09:52:18.761009Z	
+2025-09-16T09:52:18.761115Z	
+2025-09-16T09:52:18.761217Z	○  (Static)  prerendered as static content
+2025-09-16T09:52:18.761311Z	●  (SSG)     prerendered as static HTML (uses getStaticProps)
+2025-09-16T09:52:18.761404Z	
+2025-09-16T09:52:18.816847Z	Finished
+2025-09-16T09:52:19.754753Z	Checking for configuration in a Wrangler configuration file (BETA)
+2025-09-16T09:52:19.755693Z	
+2025-09-16T09:52:20.863923Z	No wrangler.toml file found. Continuing.
+2025-09-16T09:52:20.864772Z	Note: No functions dir at /functions found. Skipping.
+2025-09-16T09:52:20.864962Z	Validating asset output directory
+2025-09-16T09:52:20.86513Z	Error: Output directory "out" not found.
+2025-09-16T09:52:22.066534Z	Failed: build output directory not found
