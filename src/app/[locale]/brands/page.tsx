@@ -22,7 +22,13 @@ interface BrandStats {
 }
 
 
-export default async function BrandsPage() {
+interface BrandsPageProps {
+  params: {
+    locale: string;
+  };
+}
+
+export default async function BrandsPage({ params: { locale } }: BrandsPageProps) {
   // 服务器端数据获取 - 在构建时执行
   let allBrands: Brand[] = [];
   let featuredBrands: Brand[] = [];

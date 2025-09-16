@@ -7,7 +7,7 @@ export const client = createClient({
   projectId: 'oquvb2bs', // 直接硬编码
   dataset: 'production', // 直接硬编码
   apiVersion: '2023-05-03', // 使用最新API版本
-  useCdn: false, // 禁用CDN以获取最新数据
+  useCdn: process.env.NODE_ENV === 'production', // 生产环境启用CDN以提升构建速度
   perspective: 'published', // 只获取已发布的内容
   // 不使用token进行公开访问
 });

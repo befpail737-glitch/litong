@@ -1,3 +1,6 @@
+import {notFound} from 'next/navigation';
+import {getRequestConfig} from 'next-intl/server';
+
 // 支持的语言列表
 export const locales = [
   'zh-CN', // 简体中文 (默认)
@@ -14,6 +17,33 @@ export const locales = [
 
 export type Locale = typeof locales[number];
 
+export default getRequestConfig(async ({locale}) => {
+  // 验证传入的语言是否受支持
+  if (!locales.includes(locale as Locale)) {
+    notFound();
+  }
+
+  const fallbackMessages = {
+    navigation: {
+      home: "首页",
+      products: "产品",
+      brands: "品牌",
+      about: "关于我们"
+    }
+  };
+
+  try {
+    return {
+      messages: (await import(`../messages/${locale}.json`)).default
+    };
+  } catch (error) {
+    console.warn(`Failed to load messages for locale ${locale}, using fallback`);
+    return {
+      messages: fallbackMessages
+    };
+  }
+});
+
 // 静态导出兼容的国际化配置
 export async function getMessages(locale: string) {
   // 验证传入的语言是否受支持
@@ -22,10 +52,19 @@ export async function getMessages(locale: string) {
     locale = 'zh-CN';
   }
 
+  const fallbackMessages = {
+    navigation: {
+      home: "首页",
+      products: "产品",
+      brands: "品牌",
+      about: "关于我们"
+    }
+  };
+
   try {
     return (await import(`../messages/${locale}.json`)).default;
   } catch (error) {
-    // 如果语言文件不存在，使用默认语言
-    return (await import(`../messages/zh-CN.json`)).default;
+    console.warn(`Failed to load messages for locale ${locale}, using fallback`);
+    return fallbackMessages;
   }
 }

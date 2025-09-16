@@ -294,7 +294,7 @@ export async function generateStaticParams() {
         const originalSlug = brand.slug || brand.name;
 
         // 为英文品牌生成大写和小写两个版本
-        if (/^[A-Za-Z]/.test(originalSlug)) {
+        if (/^[A-Za-z]/.test(originalSlug)) {
           // 原始版本
           staticParams.add(encodeURIComponent(originalSlug));
           console.log(`🔧 [brands/[slug]/solutions] Creating static param (original): ${brand.name} -> ${originalSlug}`);

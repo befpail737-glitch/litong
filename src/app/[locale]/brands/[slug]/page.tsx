@@ -9,6 +9,7 @@ import { urlFor } from '@/lib/sanity/client';
 
 interface BrandPageProps {
   params: {
+    locale: string;
     slug: string;
   };
 }
@@ -349,86 +350,68 @@ export async function generateStaticParams() {
   try {
     console.log('🔧 [brands/[slug]] Generating static params for brand pages...');
 
+    const { locales } = await import('@/i18n');
     const { getAllBrands } = await import('@/lib/sanity/brands');
-    const brands = await getAllBrands();
 
-    console.log(`🔧 [brands/[slug]] Fetched ${brands.length} brands from Sanity`);
-
-    // 扩展的 fallback 品牌列表，包含生产环境常见的品牌
+    // 简化品牌列表以加快构建速度
     const fallbackBrands = [
-      'MediaTek', 'mediatek', 'Qualcomm', 'qualcomm', 'Cree', 'cree',
-      'Littelfuse', 'littelfuse', 'IXYS', 'ixys', 'LEM', 'lem',
-      'PI', 'pi', 'Semikron', 'semikron', 'Sanrex', 'sanrex',
-      'NCC', 'ncc', 'Epcos', 'epcos', 'Infineon', 'infineon',
-      '英飞凌', 'STMicroelectronics', 'stmicroelectronics', 'ST', 'st',
-      'TI', 'ti', 'Texas Instruments', 'texas instruments',
-      'Analog Devices', 'analog devices', 'ADI', 'adi',
-      'Maxim', 'maxim', 'Linear Technology', 'linear technology',
-      'Vishay', 'vishay', 'Murata', 'murata', 'TDK', 'tdk',
-      'Panasonic', 'panasonic', 'Nichicon', 'nichicon'
+      'MediaTek', 'Qualcomm', 'Cree', 'Littelfuse', 'IXYS', 'LEM',
+      'PI', 'Semikron', 'Infineon', 'STMicroelectronics', 'TI',
+      'Analog Devices', 'Maxim', 'Vishay', 'Murata', 'TDK'
     ];
 
-    if (brands.length === 0) {
-      console.warn('⚠️ [brands/[slug]] No brands found, using extended fallback brand list');
-      return fallbackBrands.map(brandName => ({
-        slug: encodeURIComponent(brandName)
-      }));
+    let brands = [];
+    try {
+      brands = await getAllBrands();
+      console.log(`🔧 [brands/[slug]] Fetched ${brands.length} brands from Sanity`);
+    } catch (error) {
+      console.warn('⚠️ [brands/[slug]] Failed to fetch brands from Sanity, using fallback');
+      brands = [];
     }
 
-    const staticParams = new Set();
+    const brandSlugs = new Set();
 
-    // 处理从 Sanity 获取的品牌
+    // 处理从 Sanity 获取的品牌（限制数量以加快构建）
     brands
       .filter(brand => brand.isActive !== false && (brand.slug || brand.name))
+      .slice(0, 20) // 限制只处理前20个品牌以加快构建
       .forEach(brand => {
-        const originalSlug = brand.slug || brand.name;
-
-        // 为英文品牌生成大写和小写两个版本
-        if (/^[A-Za-Z]/.test(originalSlug)) {
-          // 原始版本
-          staticParams.add(encodeURIComponent(originalSlug));
-          console.log(`🔧 [brands/[slug]] Creating static param (original): ${brand.name} -> ${originalSlug}`);
-
-          // 小写版本
-          const lowercaseSlug = originalSlug.toLowerCase();
-          staticParams.add(encodeURIComponent(lowercaseSlug));
-          console.log(`🔧 [brands/[slug]] Creating static param (lowercase): ${brand.name} -> ${lowercaseSlug}`);
-
-          // 大写版本（如果原始不是大写）
-          const uppercaseSlug = originalSlug.toUpperCase();
-          staticParams.add(encodeURIComponent(uppercaseSlug));
-          console.log(`🔧 [brands/[slug]] Creating static param (uppercase): ${brand.name} -> ${uppercaseSlug}`);
-        } else {
-          // 中文品牌或其他特殊字符
-          staticParams.add(encodeURIComponent(originalSlug));
-          console.log(`🔧 [brands/[slug]] Creating static param: ${brand.name} -> ${originalSlug}`);
-        }
+        const slug = brand.slug || brand.name;
+        brandSlugs.add(encodeURIComponent(slug));
       });
 
-    // 添加 fallback 品牌确保生产环境常见品牌都有对应页面
+    // 添加 fallback 品牌
     fallbackBrands.forEach(brandName => {
-      staticParams.add(encodeURIComponent(brandName));
+      brandSlugs.add(encodeURIComponent(brandName));
+      brandSlugs.add(encodeURIComponent(brandName.toLowerCase()));
     });
 
-    const result = Array.from(staticParams).map(slug => ({ slug }));
-    console.log(`🔧 [brands/[slug]] Generated ${result.length} static params`);
+    // 为每个语言和品牌组合生成参数
+    const result = [];
+    for (const locale of locales) {
+      for (const slug of brandSlugs) {
+        result.push({ locale, slug });
+      }
+    }
+
+    console.log(`🔧 [brands/[slug]] Generated ${result.length} static params for ${locales.length} locales`);
     return result;
   } catch (error) {
     console.error('❌ [brands/[slug]] Error generating static params:', error);
 
-    // 即使出错也要提供 fallback，确保基本的品牌页面能生成
-    const emergencyFallback = [
-      'MediaTek', 'mediatek', 'Qualcomm', 'qualcomm', 'Cree', 'cree',
-      'Littelfuse', 'littelfuse', 'IXYS', 'ixys', 'LEM', 'lem',
-      'PI', 'pi', 'Semikron', 'semikron', 'Sanrex', 'sanrex',
-      'NCC', 'ncc', 'Epcos', 'epcos', 'Infineon', 'infineon',
-      '英飞凌', 'STMicroelectronics', 'stmicroelectronics'
-    ];
+    // 极简的应急 fallback
+    const { locales } = await import('@/i18n');
+    const emergencyBrands = ['MediaTek', 'Infineon', 'STMicroelectronics'];
+    const result = [];
 
-    console.log(`🔧 [brands/[slug]] Using emergency fallback: ${emergencyFallback.length} brands`);
-    return emergencyFallback.map(brandName => ({
-      slug: encodeURIComponent(brandName)
-    }));
+    for (const locale of locales) {
+      for (const brand of emergencyBrands) {
+        result.push({ locale, slug: encodeURIComponent(brand) });
+      }
+    }
+
+    console.log(`🔧 [brands/[slug]] Using emergency fallback: ${result.length} params`);
+    return result;
   }
 }
 

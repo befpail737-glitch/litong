@@ -1,5 +1,5 @@
-// const createNextIntlPlugin = require('next-intl/plugin');
-// const withNextIntl = createNextIntlPlugin('./src/i18n.ts');
+const createNextIntlPlugin = require('next-intl/plugin');
+const withNextIntl = createNextIntlPlugin('./src/i18n.ts');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -10,15 +10,7 @@ const nextConfig = {
   images: {
     unoptimized: true, // Required for static export
   },
-  // Rewrites for Studio routing (only works in dev mode, handled by middleware in production)
-  async rewrites() {
-    return [
-      {
-        source: '/studio/:path*',
-        destination: '/studio/:path*', // Ensure studio routes are handled correctly
-      },
-    ];
-  },
+  // Static export doesn't support rewrites
   // Worker pool configuration to prevent Jest worker errors
   experimental: {
     workerThreads: false,
@@ -63,4 +55,4 @@ const nextConfig = {
   generateEtags: true,
 };
 
-module.exports = nextConfig; // withNextIntl(nextConfig);
+module.exports = withNextIntl(nextConfig);
