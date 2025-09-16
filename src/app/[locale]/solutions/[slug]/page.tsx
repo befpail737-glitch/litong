@@ -350,13 +350,20 @@ export async function generateStaticParams() {
     const solutions = await getAllSolutions();
 
     const dynamicParams = solutions
-      .filter(solution => solution.isActive && (solution.slug || solution._id))
+      .filter(solution => solution.isPublished && (solution.slug || solution._id))
       .map(solution => ({
         slug: solution.slug || solution._id
       }));
 
     console.log(`🔧 [solutions/[slug]] Generated ${dynamicParams.length} static params from real data`);
-    return dynamicParams;
+
+    // Limit to prevent too many static pages during build
+    const limitedParams = dynamicParams.slice(0, 10);
+    if (limitedParams.length < dynamicParams.length) {
+      console.log(`🔧 [solutions/[slug]] Limited to ${limitedParams.length} params for build performance`);
+    }
+
+    return limitedParams;
   } catch (error) {
     console.error('Error generating static params for solution detail:', error);
     console.log(`🔧 [solutions/[slug]] Returning empty params due to error`);

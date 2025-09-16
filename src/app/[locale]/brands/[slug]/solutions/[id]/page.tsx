@@ -376,27 +376,44 @@ export default async function BrandSolutionDetailPage({ params }: BrandSolutionD
 
 export async function generateStaticParams() {
   try {
-    const solutions = await getAllSolutions();
+    const [solutions, brands] = await Promise.all([
+      getAllSolutions(),
+      getAllBrands()
+    ]);
 
     const dynamicParams: Array<{ slug: string; id: string }> = [];
 
-    // For each solution, add its brand as the slug and solution as id
+    console.log(`🔧 [brands/[slug]/solutions/[id]] Total solutions: ${solutions.length}, Total brands: ${brands.length}`);
+
+    // Generate params based on solutions and their related brands
     for (const solution of solutions) {
-      if (solution.isActive && solution.brand && (solution.slug || solution._id)) {
-        const brandSlug = solution.brand.slug || solution.brand.name;
+      if (solution.isPublished && (solution.slug || solution._id)) {
         const solutionId = solution.slug || solution._id;
 
-        if (brandSlug && solutionId) {
-          dynamicParams.push({
-            slug: brandSlug,
-            id: solutionId
-          });
+        // Use primaryBrand if available, otherwise use first related brand
+        const relatedBrand = solution.primaryBrand || (solution.relatedBrands && solution.relatedBrands[0]);
+
+        if (relatedBrand) {
+          const brandSlug = relatedBrand.slug || relatedBrand.name;
+          if (brandSlug && solutionId) {
+            dynamicParams.push({
+              slug: encodeURIComponent(brandSlug),
+              id: solutionId
+            });
+          }
         }
       }
     }
 
     console.log(`🔧 [brands/[slug]/solutions/[id]] Generated ${dynamicParams.length} static params from real data`);
-    return dynamicParams;
+
+    // Limit to prevent too many static pages during build
+    const limitedParams = dynamicParams.slice(0, 10);
+    if (limitedParams.length < dynamicParams.length) {
+      console.log(`🔧 [brands/[slug]/solutions/[id]] Limited to ${limitedParams.length} params for build performance`);
+    }
+
+    return limitedParams;
   } catch (error) {
     console.error('Error generating static params for brand solution detail:', error);
     console.log(`🔧 [brands/[slug]/solutions/[id]] Returning empty params due to error`);

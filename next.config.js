@@ -3,7 +3,9 @@ const withNextIntl = createNextIntlPlugin('./src/i18n.ts');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // SSR mode for Cloudflare Pages - simplified configuration
+  // Static export mode for Cloudflare Pages
+  output: 'export',
+  distDir: 'out',
   trailingSlash: true,
   images: {
     unoptimized: true,
