@@ -20,8 +20,6 @@
     "build:force": "NEXT_IGNORE_EXPORT_ERRORS=true next build",
     "build:emergency": "next build --no-lint",
     "build:static": "node scripts/build-static.js",
-    "pages:build": "npx @cloudflare/next-on-pages",
-    "preview": "npm run pages:build && wrangler pages dev",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
@@ -35,7 +33,6 @@
     "dev:fresh": "npm run clear-cache && npm run dev"
   },
   "dependencies": {
-    "@cloudflare/next-on-pages": "^1.13.16",
     "@jridgewell/sourcemap-codec": "^1.5.5",
     "@portabletext/react": "^3.0.11",
     "@portabletext/to-html": "^3.0.0",

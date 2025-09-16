@@ -3,17 +3,14 @@ const withNextIntl = createNextIntlPlugin('./src/i18n.ts');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // SSR mode for Cloudflare Pages Node.js runtime - fixes Server Actions compatibility
+  // SSR mode for Cloudflare Pages - simplified configuration
   trailingSlash: true,
   images: {
-    unoptimized: true, // Required for Cloudflare Pages compatibility
+    unoptimized: true,
   },
-  // Static export doesn't support rewrites
-  // Worker pool configuration to prevent Jest worker errors
+  // Simplified experimental config for stability
   experimental: {
     workerThreads: false,
-    cpus: 1,
-    webpackBuildWorker: false, // Emergency模式：禁用webpack build worker避免hang
   },
   // Emergency模式：极简webpack配置
   webpack: (config, { dev, isServer }) => {

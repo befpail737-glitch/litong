@@ -1,9 +1,9 @@
-# Cloudflare Pages configuration for Next.js SSR
+# Cloudflare Pages configuration for Next.js
 name = "litong-electronics-website"
 
-# Node.js compatibility for SSR
-compatibility_flags = ["nodejs_compat"]
+# Build output directory (required for Pages)
+pages_build_output_dir = ".next"
 
-# Environment variables
-[env.production.vars]
-NODE_ENV = "production"
+# Build command override
+[build]
+command = "npm run build"
