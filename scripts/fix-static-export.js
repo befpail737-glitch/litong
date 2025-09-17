@@ -16,6 +16,7 @@ const brands = ['cree', 'mediatek', 'qualcomm', 'infineon', 'ti', 'semikron', 'i
 const productIds = ['55555', '99999', 'stm32f407vgt6'];
 const solutionIds = ['11111', '22222', '33333'];
 const articleIds = ['aaaaa', 'bbbbb', 'ccccc'];
+const supportIds = ['11111', '22222', '33333'];
 
 console.log('🔧 开始修复静态导出的本地化文件...');
 
@@ -93,6 +94,9 @@ locales.forEach(locale => {
 
     // 创建文章详情页
     createDetailPageFiles(locale, brand, 'articles', articleIds);
+
+    // 创建技术支持详情页
+    createDetailPageFiles(locale, brand, 'support', supportIds);
   });
 });
 
@@ -143,7 +147,7 @@ console.log(`├── HTML文件总数: ${totalFiles}`);
 console.log(`├── 创建目录数: ${totalDirs}`);
 console.log(`├── 支持语言: ${locales.join(', ')}`);
 console.log(`├── 支持品牌: ${brands.length}个`);
-console.log(`└── 详情页类型: products, solutions, articles`);
+console.log(`└── 详情页类型: products, solutions, articles, support`);
 
 console.log(`\n🗂️ 生成的文件结构示例:`);
 console.log('├── out/');
@@ -155,7 +159,8 @@ console.log('│   │   └── brands/');
 console.log('│   │       └── cree/');
 console.log('│   │           ├── products/55555/index.html');
 console.log('│   │           ├── solutions/11111/index.html');
-console.log('│   │           └── articles/aaaaa/index.html');
+console.log('│   │           ├── articles/aaaaa/index.html');
+console.log('│   │           └── support/11111/index.html');
 console.log('│   └── en/');
 console.log('│       └── (同样结构)');
 
@@ -166,7 +171,8 @@ const testPaths = [
   'en/index.html',
   'zh-CN/brands/cree/products/55555/index.html',
   'zh-CN/brands/cree/solutions/11111/index.html',
-  'zh-CN/brands/cree/articles/aaaaa/index.html'
+  'zh-CN/brands/cree/articles/aaaaa/index.html',
+  'zh-CN/brands/cree/support/11111/index.html'
 ];
 
 console.log(`\n🔍 验证关键文件...`);

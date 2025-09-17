@@ -23,17 +23,28 @@
 # DETAIL PAGE ROUTES (HIGHEST PRIORITY)
 # ========================================
 
-# Brand-specific detail pages (maintain brand context)
-/brands/:slug/products/:id/ /brands/:slug/products/:id/index.html 200
-/brands/:slug/solutions/:id/ /brands/:slug/solutions/:id/index.html 200
-/brands/:slug/articles/:id/ /brands/:slug/articles/:id/index.html 200
-/brands/:slug/support/:id/ /brands/:slug/support/:id/index.html 200
+# Brand-specific detail pages (maintain brand context) - with locale support
+/:locale/brands/:slug/products/:id/ /:locale/brands/:slug/products/:id/index.html 200
+/:locale/brands/:slug/solutions/:id/ /:locale/brands/:slug/solutions/:id/index.html 200
+/:locale/brands/:slug/articles/:id/ /:locale/brands/:slug/articles/:id/index.html 200
+/:locale/brands/:slug/support/:id/ /:locale/brands/:slug/support/:id/index.html 200
 
 # Brand-specific detail pages - trailing slash normalization
-/brands/:slug/products/:id /brands/:slug/products/:id/ 301
-/brands/:slug/solutions/:id /brands/:slug/solutions/:id/ 301
-/brands/:slug/articles/:id /brands/:slug/articles/:id/ 301
-/brands/:slug/support/:id /brands/:slug/support/:id/ 301
+/:locale/brands/:slug/products/:id /:locale/brands/:slug/products/:id/ 301
+/:locale/brands/:slug/solutions/:id /:locale/brands/:slug/solutions/:id/ 301
+/:locale/brands/:slug/articles/:id /:locale/brands/:slug/articles/:id/ 301
+/:locale/brands/:slug/support/:id /:locale/brands/:slug/support/:id/ 301
+
+# Legacy brand-specific detail pages (without locale) - redirect to default locale
+/brands/:slug/products/:id/ /zh-CN/brands/:slug/products/:id/ 301
+/brands/:slug/solutions/:id/ /zh-CN/brands/:slug/solutions/:id/ 301
+/brands/:slug/articles/:id/ /zh-CN/brands/:slug/articles/:id/ 301
+/brands/:slug/support/:id/ /zh-CN/brands/:slug/support/:id/ 301
+
+/brands/:slug/products/:id /zh-CN/brands/:slug/products/:id/ 301
+/brands/:slug/solutions/:id /zh-CN/brands/:slug/solutions/:id/ 301
+/brands/:slug/articles/:id /zh-CN/brands/:slug/articles/:id/ 301
+/brands/:slug/support/:id /zh-CN/brands/:slug/support/:id/ 301
 
 # Global detail pages
 /products/:slug/ /products/:slug/index.html 200
@@ -49,19 +60,32 @@
 # LIST PAGE ROUTES
 # ========================================
 
-# Brand routes - direct static file serving
-/brands/:slug/products/ /brands/:slug/products/index.html 200
-/brands/:slug/solutions/ /brands/:slug/solutions/index.html 200
-/brands/:slug/articles/ /brands/:slug/articles/index.html 200
-/brands/:slug/support/ /brands/:slug/support/index.html 200
-/brands/:slug/ /brands/:slug/index.html 200
+# Brand routes - direct static file serving (with locale support)
+/:locale/brands/:slug/products/ /:locale/brands/:slug/products/index.html 200
+/:locale/brands/:slug/solutions/ /:locale/brands/:slug/solutions/index.html 200
+/:locale/brands/:slug/articles/ /:locale/brands/:slug/articles/index.html 200
+/:locale/brands/:slug/support/ /:locale/brands/:slug/support/index.html 200
+/:locale/brands/:slug/ /:locale/brands/:slug/index.html 200
 
 # Brand routes - trailing slash normalization
-/brands/:slug/products /brands/:slug/products/ 301
-/brands/:slug/solutions /brands/:slug/solutions/ 301
-/brands/:slug/articles /brands/:slug/articles/ 301
-/brands/:slug/support /brands/:slug/support/ 301
-/brands/:slug /brands/:slug/ 301
+/:locale/brands/:slug/products /:locale/brands/:slug/products/ 301
+/:locale/brands/:slug/solutions /:locale/brands/:slug/solutions/ 301
+/:locale/brands/:slug/articles /:locale/brands/:slug/articles/ 301
+/:locale/brands/:slug/support /:locale/brands/:slug/support/ 301
+/:locale/brands/:slug /:locale/brands/:slug/ 301
+
+# Legacy brand routes (without locale) - redirect to default locale
+/brands/:slug/products/ /zh-CN/brands/:slug/products/ 301
+/brands/:slug/solutions/ /zh-CN/brands/:slug/solutions/ 301
+/brands/:slug/articles/ /zh-CN/brands/:slug/articles/ 301
+/brands/:slug/support/ /zh-CN/brands/:slug/support/ 301
+/brands/:slug/ /zh-CN/brands/:slug/ 301
+
+/brands/:slug/products /zh-CN/brands/:slug/products/ 301
+/brands/:slug/solutions /zh-CN/brands/:slug/solutions/ 301
+/brands/:slug/articles /zh-CN/brands/:slug/articles/ 301
+/brands/:slug/support /zh-CN/brands/:slug/support/ 301
+/brands/:slug /zh-CN/brands/:slug/ 301
 
 # Global list pages
 /products/ /products/index.html 200
