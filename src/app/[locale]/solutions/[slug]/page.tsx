@@ -31,9 +31,11 @@ interface SolutionPageProps {
 // Generate static params for all solutions and locales
 export async function generateStaticParams() {
   try {
-    const result = await getSolutions({ limit: 1000 });
+    // Temporarily reduce solution limit to improve build performance
+    const result = await getSolutions({ limit: 20 });
     const solutions = result.solutions || [];
-    const locales = ['zh-CN', 'zh-TW', 'en', 'ja', 'ko', 'de', 'fr', 'es', 'ru', 'ar'];
+    // Temporarily limit to primary locales to reduce build time
+    const locales = ['zh-CN', 'en'];
 
     const params = [];
     for (const locale of locales) {

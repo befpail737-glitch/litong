@@ -16,7 +16,8 @@ interface BrandPageProps {
 export async function generateStaticParams() {
   try {
     const brands = await getAllBrands();
-    const locales = ['zh-CN', 'zh-TW', 'en', 'ja', 'ko', 'de', 'fr', 'es', 'ru', 'ar'];
+    // Temporarily limit to primary locales to reduce build time
+    const locales = ['zh-CN', 'en'];
 
     const params = [];
     for (const locale of locales) {

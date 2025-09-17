@@ -30,9 +30,11 @@ interface ArticlePageProps {
 // Generate static params for all articles and locales
 export async function generateStaticParams() {
   try {
-    const result = await getArticles({ limit: 1000 });
+    // Temporarily reduce article limit to improve build performance
+    const result = await getArticles({ limit: 30 });
     const articles = result.articles || [];
-    const locales = ['zh-CN', 'zh-TW', 'en', 'ja', 'ko', 'de', 'fr', 'es', 'ru', 'ar'];
+    // Temporarily limit to primary locales to reduce build time
+    const locales = ['zh-CN', 'en'];
 
     const params = [];
     for (const locale of locales) {

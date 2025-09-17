@@ -29,9 +29,11 @@ interface ProductPageProps {
 // Generate static params for all products and locales
 export async function generateStaticParams() {
   try {
-    const result = await getProducts({ limit: 1000 });
+    // Temporarily reduce product limit to improve build performance
+    const result = await getProducts({ limit: 50 });
     const products = result.products || [];
-    const locales = ['zh-CN', 'zh-TW', 'en', 'ja', 'ko', 'de', 'fr', 'es', 'ru', 'ar'];
+    // Temporarily limit to primary locales to reduce build time
+    const locales = ['zh-CN', 'en'];
 
     const params = [];
     for (const locale of locales) {
