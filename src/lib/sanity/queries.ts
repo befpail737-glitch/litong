@@ -39,6 +39,31 @@ export async function getSolutionSlugsOnly(limit = 10): Promise<string[]> {
   }
 }
 
+// 获取品牌-解决方案组合用于静态参数生成
+export async function getBrandSolutionCombinations(limit = 30): Promise<Array<{brandSlug: string, solutionSlug: string}>> {
+  try {
+    const query = groq`
+      *[_type == "solution" && (isPublished == true || !defined(isPublished)) && defined(slug.current) && defined(primaryBrand->slug.current)] | order(_createdAt desc) [0...${limit}] {
+        "solutionSlug": slug.current,
+        "brandSlug": primaryBrand->slug.current
+      }
+    `;
+
+    const combinations = await client.fetch(query);
+    return combinations?.filter(c => c.brandSlug && c.solutionSlug) || [];
+  } catch (error) {
+    console.error('Error fetching brand-solution combinations, using fallback:', error);
+    // Return some fallback combinations for critical brands
+    return [
+      { brandSlug: 'cree', solutionSlug: '11111' },
+      { brandSlug: 'infineon', solutionSlug: '22222' },
+      { brandSlug: 'ti', solutionSlug: '33333' },
+      { brandSlug: 'mediatek', solutionSlug: '11111' },
+      { brandSlug: 'qualcomm', solutionSlug: '22222' },
+    ];
+  }
+}
+
 export async function getArticleSlugsOnly(limit = 15): Promise<string[]> {
   try {
     const query = groq`

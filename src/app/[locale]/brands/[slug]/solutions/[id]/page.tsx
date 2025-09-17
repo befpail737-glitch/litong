@@ -1,4 +1,4 @@
-import { getSolution, getRelatedSolutions, getSolutions } from '@/lib/sanity/queries';
+import { getSolution, getRelatedSolutions, getSolutions, getBrandSolutionCombinations } from '@/lib/sanity/queries';
 import { getBrandData, getAllBrands } from '@/lib/sanity/brands';
 import { safeImageUrl } from '@/lib/sanity/client';
 import { notFound } from 'next/navigation';
@@ -33,51 +33,62 @@ interface BrandSolutionPageProps {
 
 // Generate static params for all brand-solution combinations
 export async function generateStaticParams() {
-  try {
-    // Get all brands
-    const brands = await getAllBrands();
+  console.log('🔧 Generating brand solution static parameters...');
 
-    // Limit to primary locales to reduce build time
+  try {
     const locales = ['zh-CN', 'en'];
 
-    // Create a set of known solution slugs for faster builds
-    const solutionSlugs = ['11111', '22222', '33333'];
+    // Get real brand-solution combinations from Sanity
+    const combinations = await getBrandSolutionCombinations(25);
+    console.log('🔍 Found brand-solution combinations:', combinations.length);
 
     const params = [];
     for (const locale of locales) {
-      for (const brand of brands.slice(0, 15)) { // Limit brands for faster builds
-        if (brand && brand.slug) {
-          for (const solutionSlug of solutionSlugs) {
-            // Add regular slug
-            params.push({
-              locale,
-              slug: brand.slug,
-              id: solutionSlug,
-            });
+      for (const combination of combinations) {
+        // Add regular slug combination
+        params.push({
+          locale,
+          slug: combination.brandSlug,
+          id: combination.solutionSlug,
+        });
 
-            // For Chinese brands, also add URL-encoded version
-            if (brand.slug !== encodeURIComponent(brand.slug)) {
-              params.push({
-                locale,
-                slug: encodeURIComponent(brand.slug),
-                id: solutionSlug,
-              });
-            }
-          }
+        // For Chinese brands, also add URL-encoded version
+        if (combination.brandSlug !== encodeURIComponent(combination.brandSlug)) {
+          params.push({
+            locale,
+            slug: encodeURIComponent(combination.brandSlug),
+            id: combination.solutionSlug,
+          });
         }
       }
     }
 
-    console.log('Generated static params for brand solutions:', params.length);
+    console.log('📦 Generated static params for brand solutions:', params.length);
     return params;
   } catch (error) {
-    console.error('Error generating static params for brand solutions:', error);
-    // Emergency fallback
-    return [
-      { locale: 'zh-CN', slug: 'cree', id: '11111' },
-      { locale: 'zh-CN', slug: 'mediatek', id: '11111' },
-      { locale: 'en', slug: 'cree', id: '11111' },
+    console.error('❌ Error generating static params for brand solutions:', error);
+    // Emergency fallback with real brand-solution combinations
+    const fallbackParams = [];
+    const locales = ['zh-CN', 'en'];
+    const fallbackCombinations = [
+      { brandSlug: 'cree', solutionSlug: '11111' },
+      { brandSlug: 'infineon', solutionSlug: '22222' },
+      { brandSlug: 'ti', solutionSlug: '33333' },
+      { brandSlug: 'mediatek', solutionSlug: '11111' },
     ];
+
+    for (const locale of locales) {
+      for (const combination of fallbackCombinations) {
+        fallbackParams.push({
+          locale,
+          slug: combination.brandSlug,
+          id: combination.solutionSlug,
+        });
+      }
+    }
+
+    console.log('🔄 Using fallback params:', fallbackParams.length);
+    return fallbackParams;
   }
 }
 
@@ -88,24 +99,37 @@ export default async function BrandSolutionPage({ params }: BrandSolutionPagePro
   const decodedSlug = decodeURIComponent(slug);
 
   // Get both brand and solution data with error handling
-  let brandData, solution;
+  let brand, solution;
 
   try {
-    [brandData, solution] = await Promise.all([
+    console.log(`🔍 Fetching data for brand: ${decodedSlug}, solution: ${id}`);
+    [brand, solution] = await Promise.all([
       getBrandData(decodedSlug),
       getSolution(id)
     ]);
   } catch (error) {
-    console.error(`Error fetching data for brand: ${decodedSlug}, solution: ${id}`, error);
+    console.error(`❌ Error fetching data for brand: ${decodedSlug}, solution: ${id}`, error);
     notFound();
   }
 
-  if (!brandData || !brandData.brand || !solution) {
-    console.warn(`Brand or solution not found for slug: ${decodedSlug}, id: ${id}`);
+  // Enhanced validation with detailed logging
+  if (!brand) {
+    console.warn(`❌ Brand not found: ${decodedSlug}`);
     notFound();
   }
 
-  const { brand } = brandData;
+  if (!solution) {
+    console.warn(`❌ Solution not found: ${id}`);
+    notFound();
+  }
+
+  // Validate that solution is associated with the brand
+  const solutionBrandSlug = solution.primaryBrand?.slug || solution.relatedBrands?.[0]?.slug;
+
+  if (solutionBrandSlug && solutionBrandSlug !== brand.slug && solutionBrandSlug !== brand.name.toLowerCase()) {
+    console.warn(`⚠️ Solution ${id} is not associated with brand ${decodedSlug}. Solution brand: ${solutionBrandSlug}`);
+    // Don't throw 404 immediately - allow solutions to be viewed under any brand for flexibility
+  }
 
   // Get related solutions if target market exists
   const relatedSolutions = solution.targetMarket
