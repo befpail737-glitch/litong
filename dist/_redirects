@@ -15,11 +15,13 @@
 # Brand-specific detail pages (maintain brand context)
 /brands/:slug/products/:id/ /brands/:slug/products/:id/index.html 200
 /brands/:slug/solutions/:id/ /brands/:slug/solutions/:id/index.html 200
+/brands/:slug/articles/:id/ /brands/:slug/articles/:id/index.html 200
 /brands/:slug/support/:id/ /brands/:slug/support/:id/index.html 200
 
 # Brand-specific detail pages - trailing slash normalization
 /brands/:slug/products/:id /brands/:slug/products/:id/ 301
 /brands/:slug/solutions/:id /brands/:slug/solutions/:id/ 301
+/brands/:slug/articles/:id /brands/:slug/articles/:id/ 301
 /brands/:slug/support/:id /brands/:slug/support/:id/ 301
 
 # Global detail pages
@@ -39,12 +41,14 @@
 # Brand routes - direct static file serving
 /brands/:slug/products/ /brands/:slug/products/index.html 200
 /brands/:slug/solutions/ /brands/:slug/solutions/index.html 200
+/brands/:slug/articles/ /brands/:slug/articles/index.html 200
 /brands/:slug/support/ /brands/:slug/support/index.html 200
 /brands/:slug/ /brands/:slug/index.html 200
 
 # Brand routes - trailing slash normalization
 /brands/:slug/products /brands/:slug/products/ 301
 /brands/:slug/solutions /brands/:slug/solutions/ 301
+/brands/:slug/articles /brands/:slug/articles/ 301
 /brands/:slug/support /brands/:slug/support/ 301
 /brands/:slug /brands/:slug/ 301
 
