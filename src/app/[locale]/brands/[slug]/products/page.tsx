@@ -159,11 +159,15 @@ export default async function BrandProductsPage({ params }: BrandProductsPagePro
                         </span>
                       )}
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm" className="flex-1">
-                          查看详情
+                        <Button variant="outline" size="sm" className="flex-1" asChild>
+                          <Link href={`/${locale}/products/${product.slug || product._id}`}>
+                            查看详情
+                          </Link>
                         </Button>
-                        <Button size="sm" className="flex-1">
-                          立即询价
+                        <Button size="sm" className="flex-1" asChild>
+                          <Link href={`/${locale}/inquiry`}>
+                            立即询价
+                          </Link>
                         </Button>
                       </div>
                     </div>

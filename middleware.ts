@@ -30,11 +30,11 @@ export const config = {
     '/',
 
     // Set a cookie to remember the previous locale for
-    // all requests that have a locale prefix
-    '/(zh-CN|zh-TW|en|ja|ko|de|fr|es|ru|ar)/:path*',
+    // all requests that have a locale prefix - updated for reduced locale set
+    '/(zh-CN|en)/:path*',
 
-    // Enable redirects that add missing locales
-    // (e.g. `/pathnames` -> `/en/pathnames`)
-    '/((?!_next|_vercel|.*\\..*).*)'
+    // Enable redirects that add missing locales, exclude static assets and studio
+    // (e.g. `/pathnames` -> `/zh-CN/pathnames`)
+    '/((?!_next|_vercel|studio|admin|api|.*\\..*).*)'
   ]
 };

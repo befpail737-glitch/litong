@@ -1,14 +1,8 @@
-import { redirect } from 'next/navigation';
+import { MainLayout } from '@/components/layout/MainLayout';
 
-export default function RootPage() {
-  // Redirect to default locale - middleware should handle this but this provides fallback
-  redirect('/zh-CN');
-}
-
-// Keep the original homepage content for reference
-function OriginalHomePage() {
+export default function HomePage() {
   return (
-    <div>
+    <MainLayout>
       {/* Hero Section */}
       <section className="relative py-20 bg-gradient-to-br from-blue-50 via-white to-green-50">
         <div className="container mx-auto px-4">
@@ -239,6 +233,6 @@ function OriginalHomePage() {
           </div>
         </div>
       </section>
-    </div>
+    </MainLayout>
   );
 }
