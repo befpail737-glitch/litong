@@ -21,10 +21,18 @@ const buildEnv = {
 
 try {
   console.log('\n🏗️ 执行Next.js构建...');
+
+  // 添加图片处理相关的环境变量
+  const extendedBuildEnv = {
+    ...buildEnv,
+    NEXT_IMAGE_FALLBACK_ENABLED: 'true',
+    SANITY_IMAGE_ERROR_HANDLING: 'fallback'
+  };
+
   execSync('next build', {
     stdio: 'inherit',
-    env: buildEnv,
-    timeout: 300000 // 5分钟超时
+    env: extendedBuildEnv,
+    timeout: 600000 // 10分钟超时，给更多时间处理图片问题
   });
 
   console.log('\n🔧 快速静态文件生成...');

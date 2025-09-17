@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { urlFor } from '@/lib/sanity/client';
+import { safeImageUrl } from '@/lib/sanity/client';
 import { Brand } from '@/lib/sanity/brands';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Home, Package, Settings, HelpCircle, ChevronRight } from 'lucide-react';
@@ -95,7 +95,7 @@ export function BrandNavigation({ brand, locale }: BrandNavigationProps) {
             {brand.logo && (
               <div className="w-12 h-12 flex-shrink-0">
                 <Image
-                  src={urlFor(brand.logo).width(60).height(60).url()}
+                  src={safeImageUrl(brand.logo, { width: 60, height: 60 })}
                   alt={brand.name}
                   width={60}
                   height={60}

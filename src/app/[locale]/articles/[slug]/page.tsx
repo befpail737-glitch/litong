@@ -1,5 +1,5 @@
 import { getArticle, getArticles } from '@/lib/sanity/queries';
-import { urlFor } from '@/lib/sanity/client';
+import { safeImageUrl } from '@/lib/sanity/client';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -123,7 +123,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             {article.image && (
               <div className="aspect-video w-full bg-gray-100 rounded-t-lg overflow-hidden">
                 <Image
-                  src={urlFor(article.image).width(1200).height(600).url()}
+                  src={safeImageUrl(article.image, { width: 1200, height: 600 })}
                   alt={article.title}
                   width={1200}
                   height={600}
@@ -172,7 +172,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                   <div className="flex items-center gap-3">
                     {article.author.avatar && (
                       <Image
-                        src={urlFor(article.author.avatar).width(40).height(40).url()}
+                        src={safeImageUrl(article.author.avatar, { width: 40, height: 40 })}
                         alt={article.author.name}
                         width={40}
                         height={40}
@@ -224,7 +224,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                       >
                         {brand.logo && (
                           <Image
-                            src={urlFor(brand.logo).width(32).height(32).url()}
+                            src={safeImageUrl(brand.logo, { width: 32, height: 32 })}
                             alt={brand.name}
                             width={32}
                             height={32}
@@ -313,7 +313,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                       {related.image && (
                         <div className="aspect-video bg-gray-100">
                           <Image
-                            src={urlFor(related.image).width(400).height(200).url()}
+                            src={safeImageUrl(related.image, { width: 400, height: 200 })}
                             alt={related.title}
                             width={400}
                             height={200}

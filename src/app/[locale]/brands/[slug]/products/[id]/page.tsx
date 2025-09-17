@@ -1,6 +1,6 @@
 import { getProduct, getRelatedProducts, getProducts } from '@/lib/sanity/queries';
 import { getBrandData, getAllBrands } from '@/lib/sanity/brands';
-import { urlFor } from '@/lib/sanity/client';
+import { safeImageUrl } from '@/lib/sanity/client';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -170,7 +170,7 @@ export default async function BrandProductPage({ params }: BrandProductPageProps
               <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
                 {product.image ? (
                   <Image
-                    src={urlFor(product.image).width(600).height(600).url()}
+                    src={safeImageUrl(product.image, { width: 600, height: 600 })}
                     alt={product.title}
                     width={600}
                     height={600}
@@ -189,7 +189,7 @@ export default async function BrandProductPage({ params }: BrandProductPageProps
                   {product.gallery.slice(0, 4).map((image, index) => (
                     <div key={index} className="aspect-square bg-gray-100 rounded border overflow-hidden">
                       <Image
-                        src={urlFor(image).width(150).height(150).url()}
+                        src={safeImageUrl(image, { width: 150, height: 150 })}
                         alt={`${product.title} ${index + 1}`}
                         width={150}
                         height={150}
@@ -208,7 +208,7 @@ export default async function BrandProductPage({ params }: BrandProductPageProps
                 <div className="flex items-center gap-3 mb-2">
                   {brand.logo && (
                     <Image
-                      src={urlFor(brand.logo).width(40).height(40).url()}
+                      src={safeImageUrl(brand.logo, { width: 40, height: 40 })}
                       alt={brand.name}
                       width={40}
                       height={40}
@@ -383,7 +383,7 @@ export default async function BrandProductPage({ params }: BrandProductPageProps
                     {related.image && (
                       <div className="aspect-square bg-white rounded mb-3 overflow-hidden">
                         <Image
-                          src={urlFor(related.image).width(200).height(200).url()}
+                          src={safeImageUrl(related.image, { width: 200, height: 200 })}
                           alt={related.title}
                           width={200}
                           height={200}

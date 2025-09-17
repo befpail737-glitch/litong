@@ -1,5 +1,5 @@
 import { getBrandData, getAllBrands } from '@/lib/sanity/brands';
-import { urlFor } from '@/lib/sanity/client';
+import { safeImageUrl } from '@/lib/sanity/client';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -266,7 +266,7 @@ export default async function BrandSupportDetailPage({ params }: BrandSupportDet
                 <div className="flex items-center gap-3 mb-2">
                   {brand.logo && (
                     <Image
-                      src={urlFor(brand.logo).width(40).height(40).url()}
+                      src={safeImageUrl(brand.logo, { width: 40, height: 40 })}
                       alt={brand.name}
                       width={40}
                       height={40}

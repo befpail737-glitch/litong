@@ -1,6 +1,6 @@
 import { BrandNavigation } from '@/components/layout/BrandNavigation';
 import { getBrandWithContent, getAllBrands } from '@/lib/sanity/brands';
-import { urlFor } from '@/lib/sanity/client';
+import { safeImageUrl } from '@/lib/sanity/client';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -72,7 +72,7 @@ export default async function BrandPage({ params }: BrandPageProps) {
               {brand.logo && (
                 <div className="flex-shrink-0">
                   <Image
-                    src={urlFor(brand.logo).width(200).height(120).url()}
+                    src={safeImageUrl(brand.logo, { width: 200, height: 120 })}
                     alt={`${brand.name} Logo`}
                     width={200}
                     height={120}
@@ -161,7 +161,7 @@ export default async function BrandPage({ params }: BrandPageProps) {
                   <div key={product._id} className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
                     {product.images?.[0] && (
                       <Image
-                        src={urlFor(product.images[0]).width(200).height(150).url()}
+                        src={safeImageUrl(product.images[0], { width: 200, height: 150 })}
                         alt={product.title}
                         width={200}
                         height={150}

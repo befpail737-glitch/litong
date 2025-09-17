@@ -1,6 +1,6 @@
 import { BrandNavigation } from '@/components/layout/BrandNavigation';
 import { getBrandWithContent, getAllBrands } from '@/lib/sanity/brands';
-import { urlFor } from '@/lib/sanity/client';
+import { safeImageUrl } from '@/lib/sanity/client';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -151,7 +151,7 @@ export default async function BrandSolutionsPage({ params }: BrandSolutionsPageP
                     {solution.image && (
                       <div className="aspect-video relative bg-gray-100">
                         <Image
-                          src={urlFor(solution.image).width(600).height(300).url()}
+                          src={safeImageUrl(solution.image, { width: 600, height: 300 })}
                           alt={solution.title}
                           fill
                           className="object-cover"

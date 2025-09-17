@@ -2,7 +2,7 @@ import Image from 'next/image';
 
 import { PortableText as BasePortableText } from '@portabletext/react';
 
-import { urlFor } from '@/lib/sanity/client';
+import { safeImageUrl } from '@/lib/sanity/client';
 
 // 富文本内容类型定义
 type PortableTextProps = {
@@ -88,7 +88,7 @@ const components = {
     // 图片处理
     image: ({ value }: any) => {
       const { alt, caption } = value;
-      const imageUrl = urlFor(value).width(800).height(600).url();
+      const imageUrl = safeImageUrl(value, { width: 800, height: 600 });
 
       return (
         <figure className="my-6">

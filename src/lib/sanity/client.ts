@@ -92,11 +92,39 @@ export function safeImageUrl(
     fallback?: string;
   } = {}
 ): string {
-  const { width, height, quality = 80, format = 'auto', fallback = '/images/placeholder.jpg' } = options;
+  const { width, height, quality = 80, format = 'auto', fallback = '/images/placeholder.svg' } = options;
+
+  // 早期返回无效输入
+  if (!source) {
+    console.log('🖼️ [safeImageUrl] No source provided, using fallback');
+    return fallback;
+  }
 
   try {
+    // 验证图片对象结构
+    if (typeof source === 'object' && '_type' in source) {
+      if (source._type !== 'image') {
+        console.warn(`⚠️ [safeImageUrl] Invalid image type: ${source._type}, using fallback`);
+        return fallback;
+      }
+
+      // 检查asset引用
+      if (!('asset' in source) || !source.asset) {
+        console.warn('⚠️ [safeImageUrl] Image missing asset reference, using fallback:', source);
+        return fallback;
+      }
+
+      // 检查asset._ref是否存在
+      if (typeof source.asset === 'object' && !('_ref' in source.asset)) {
+        console.warn('⚠️ [safeImageUrl] Image asset missing _ref, using fallback:', source);
+        return fallback;
+      }
+    }
+
+    // 尝试构建安全URL
     const safeUrl = safeUrlFor(source);
     if (!safeUrl) {
+      console.warn('⚠️ [safeImageUrl] safeUrlFor returned null, using fallback');
       return fallback;
     }
 
@@ -116,9 +144,16 @@ export function safeImageUrl(
     }
 
     const finalUrl = imageBuilder.url();
-    return finalUrl || fallback;
+    if (!finalUrl) {
+      console.warn('⚠️ [safeImageUrl] Image builder returned empty URL, using fallback');
+      return fallback;
+    }
+
+    return finalUrl;
   } catch (error) {
-    console.error('Error building safe image URL:', error);
+    console.error('❌ [safeImageUrl] Error building image URL:', error);
+    console.error('❌ [safeImageUrl] Source:', source);
+    console.error('❌ [safeImageUrl] Options:', options);
     return fallback;
   }
 }
@@ -373,6 +408,118 @@ export async function checkDocumentPublishStatus(documentId: string, documentTyp
       publishedVersion: null,
       lastUpdated: null
     };
+  }
+}
+
+// 构建时图片验证函数
+export function validateImageForBuild(imageSource: any): boolean {
+  try {
+    if (!imageSource) {
+      return false;
+    }
+
+    // 检查基本结构
+    if (typeof imageSource === 'object') {
+      if (imageSource._type !== 'image') {
+        console.warn('🖼️ [validateImageForBuild] Invalid image type:', imageSource._type);
+        return false;
+      }
+
+      if (!imageSource.asset) {
+        console.warn('🖼️ [validateImageForBuild] Missing asset reference');
+        return false;
+      }
+
+      if (typeof imageSource.asset === 'object' && !imageSource.asset._ref) {
+        console.warn('🖼️ [validateImageForBuild] Missing asset._ref');
+        return false;
+      }
+    }
+
+    return true;
+  } catch (error) {
+    console.warn('🖼️ [validateImageForBuild] Validation error:', error);
+    return false;
+  }
+}
+
+// 批量验证产品图片
+export async function validateProductImages(limit: number = 100) {
+  try {
+    console.log('🔍 开始验证产品图片...');
+
+    const query = `*[_type == "product" && !(_id in path("drafts.**"))][0...${limit}] {
+      _id,
+      title,
+      partNumber,
+      image,
+      gallery,
+      brand->{
+        name,
+        logo
+      }
+    }`;
+
+    const products = await client.fetch(query);
+
+    const issues = [];
+
+    products.forEach((product, index) => {
+      console.log(`🔍 验证产品 ${index + 1}/${products.length}: ${product.title || product.partNumber}`);
+
+      // 验证主图片
+      if (product.image && !validateImageForBuild(product.image)) {
+        issues.push({
+          type: 'invalid_main_image',
+          productId: product._id,
+          productName: product.title || product.partNumber,
+          image: product.image
+        });
+      }
+
+      // 验证图库
+      if (product.gallery && Array.isArray(product.gallery)) {
+        product.gallery.forEach((img, imgIndex) => {
+          if (!validateImageForBuild(img)) {
+            issues.push({
+              type: 'invalid_gallery_image',
+              productId: product._id,
+              productName: product.title || product.partNumber,
+              galleryIndex: imgIndex,
+              image: img
+            });
+          }
+        });
+      }
+
+      // 验证品牌Logo
+      if (product.brand?.logo && !validateImageForBuild(product.brand.logo)) {
+        issues.push({
+          type: 'invalid_brand_logo',
+          productId: product._id,
+          productName: product.title || product.partNumber,
+          brandName: product.brand.name,
+          image: product.brand.logo
+        });
+      }
+    });
+
+    console.log(`✅ 图片验证完成. 发现 ${issues.length} 个问题`);
+
+    return {
+      totalProducts: products.length,
+      totalIssues: issues.length,
+      issues: issues,
+      summary: {
+        invalidMainImages: issues.filter(i => i.type === 'invalid_main_image').length,
+        invalidGalleryImages: issues.filter(i => i.type === 'invalid_gallery_image').length,
+        invalidBrandLogos: issues.filter(i => i.type === 'invalid_brand_logo').length
+      }
+    };
+
+  } catch (error) {
+    console.error('❌ 图片验证失败:', error);
+    throw error;
   }
 }
 

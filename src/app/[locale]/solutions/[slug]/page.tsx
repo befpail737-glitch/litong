@@ -1,5 +1,5 @@
 import { getSolution, getRelatedSolutions, getSolutions } from '@/lib/sanity/queries';
-import { urlFor } from '@/lib/sanity/client';
+import { safeImageUrl } from '@/lib/sanity/client';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -119,7 +119,7 @@ export default async function SolutionPage({ params }: SolutionPageProps) {
             {solution.coverImage && (
               <div className="aspect-video w-full bg-gray-100 rounded-t-lg overflow-hidden">
                 <Image
-                  src={urlFor(solution.coverImage).width(1200).height(600).url()}
+                  src={safeImageUrl(solution.coverImage, { width: 1200, height: 600 })}
                   alt={solution.title}
                   width={1200}
                   height={600}
@@ -167,7 +167,7 @@ export default async function SolutionPage({ params }: SolutionPageProps) {
                     >
                       {solution.primaryBrand.logo && (
                         <Image
-                          src={urlFor(solution.primaryBrand.logo).width(32).height(32).url()}
+                          src={safeImageUrl(solution.primaryBrand.logo, { width: 32, height: 32 })}
                           alt={solution.primaryBrand.name}
                           width={32}
                           height={32}
@@ -191,7 +191,7 @@ export default async function SolutionPage({ params }: SolutionPageProps) {
                         >
                           {brand.logo && (
                             <Image
-                              src={urlFor(brand.logo).width(24).height(24).url()}
+                              src={safeImageUrl(brand.logo, { width: 24, height: 24 })}
                               alt={brand.name}
                               width={24}
                               height={24}
@@ -331,7 +331,7 @@ export default async function SolutionPage({ params }: SolutionPageProps) {
                       {related.coverImage && (
                         <div className="aspect-video bg-gray-100">
                           <Image
-                            src={urlFor(related.coverImage).width(400).height(200).url()}
+                            src={safeImageUrl(related.coverImage, { width: 400, height: 200 })}
                             alt={related.title}
                             width={400}
                             height={200}

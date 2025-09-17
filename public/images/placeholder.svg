@@ -1,0 +1,5 @@
+<svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="300" fill="#F3F4F6"/>
+  <path d="M150 120H155V135H150V120ZM255 120H260V135H255V120ZM150 200H155V215H150V200ZM255 200H260V215H255V200Z" fill="#9CA3AF"/>
+  <text x="200" y="155" text-anchor="middle" fill="#6B788C" font-family="Arial, sans-serif" font-size="14">图片加载中</text>
+</svg>
