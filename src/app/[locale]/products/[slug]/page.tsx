@@ -289,7 +289,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">产品详情</h2>
               <div className="prose max-w-none text-gray-700">
-                {product.description}
+                {typeof product.description === 'string' ? (
+                  <div dangerouslySetInnerHTML={{ __html: product.description }} />
+                ) : (
+                  <p>产品详情将在此处显示。请联系开发团队完成 Portable Text 渲染组件的集成。</p>
+                )}
               </div>
             </div>
           )}

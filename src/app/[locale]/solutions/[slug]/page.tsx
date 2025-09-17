@@ -269,7 +269,11 @@ export default async function SolutionPage({ params }: SolutionPageProps) {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">方案详情</h2>
               <div className="prose max-w-none text-gray-700">
-                {solution.description}
+                {typeof solution.description === 'string' ? (
+                  <div dangerouslySetInnerHTML={{ __html: solution.description }} />
+                ) : (
+                  <p>方案详情将在此处显示。请联系开发团队完成 Portable Text 渲染组件的集成。</p>
+                )}
               </div>
             </div>
           )}
