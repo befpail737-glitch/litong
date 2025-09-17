@@ -69,13 +69,10 @@ export async function getProduct(slug: string, preview = false) {
 
   try {
     const product = await withRetry(() => client.fetch(query, { slug }));
-    if (!product) {
-      throw new SanityError('Product not found', 'PRODUCT_NOT_FOUND');
-    }
-    return product;
+    return product || null;
   } catch (error) {
-    if (error instanceof SanityError) throw error;
-    throw new SanityError('Failed to fetch product', 'FETCH_PRODUCT_ERROR');
+    console.error(`Error fetching product with slug ${slug}:`, error);
+    return null;
   }
 }
 
@@ -242,13 +239,10 @@ export async function getArticle(slug: string) {
 
   try {
     const article = await withRetry(() => client.fetch(query, { slug }));
-    if (!article) {
-      throw new SanityError('Article not found', 'ARTICLE_NOT_FOUND');
-    }
-    return article;
+    return article || null;
   } catch (error) {
-    if (error instanceof SanityError) throw error;
-    throw new SanityError('Failed to fetch article', 'FETCH_ARTICLE_ERROR');
+    console.error(`Error fetching article with slug ${slug}:`, error);
+    return null;
   }
 }
 
@@ -319,13 +313,10 @@ export async function getSolution(slug: string, preview = false) {
 
   try {
     const solution = await withRetry(() => client.fetch(query, { slug }));
-    if (!solution) {
-      throw new SanityError('Solution not found', 'SOLUTION_NOT_FOUND');
-    }
-    return solution;
+    return solution || null;
   } catch (error) {
-    if (error instanceof SanityError) throw error;
-    throw new SanityError('Failed to fetch solution', 'FETCH_SOLUTION_ERROR');
+    console.error(`Error fetching solution with slug ${slug}:`, error);
+    return null;
   }
 }
 

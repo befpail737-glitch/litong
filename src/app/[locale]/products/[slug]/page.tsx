@@ -56,20 +56,19 @@ export async function generateStaticParams() {
 export default async function ProductPage({ params }: ProductPageProps) {
   const { locale, slug } = params;
 
-  try {
-    const product = await getProduct(slug);
+  const product = await getProduct(slug);
 
-    if (!product) {
-      console.warn(`Product not found for slug: ${slug}`);
-      notFound();
-    }
+  if (!product) {
+    console.warn(`Product not found for slug: ${slug}`);
+    notFound();
+  }
 
-    // Get related products if category exists
-    const relatedProducts = product.category?._id
-      ? await getRelatedProducts(product._id, product.category._id, 4)
-      : [];
+  // Get related products if category exists
+  const relatedProducts = product.category?._id
+    ? await getRelatedProducts(product._id, product.category._id, 4)
+    : [];
 
-    return (
+  return (
       <div className="min-h-screen bg-gray-50">
         {/* Breadcrumb */}
         <div className="bg-white border-b border-gray-200">
@@ -355,8 +354,4 @@ export default async function ProductPage({ params }: ProductPageProps) {
         </div>
       </div>
     );
-  } catch (error) {
-    console.error('Error fetching product data:', error);
-    notFound();
-  }
 }

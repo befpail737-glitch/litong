@@ -58,20 +58,19 @@ export async function generateStaticParams() {
 export default async function SolutionPage({ params }: SolutionPageProps) {
   const { locale, slug } = params;
 
-  try {
-    const solution = await getSolution(slug);
+  const solution = await getSolution(slug);
 
-    if (!solution) {
-      console.warn(`Solution not found for slug: ${slug}`);
-      notFound();
-    }
+  if (!solution) {
+    console.warn(`Solution not found for slug: ${slug}`);
+    notFound();
+  }
 
-    // Get related solutions if target market exists
-    const relatedSolutions = solution.targetMarket
-      ? await getRelatedSolutions(solution._id, solution.targetMarket, 4)
-      : [];
+  // Get related solutions if target market exists
+  const relatedSolutions = solution.targetMarket
+    ? await getRelatedSolutions(solution._id, solution.targetMarket, 4)
+    : [];
 
-    return (
+  return (
       <div className="min-h-screen bg-gray-50">
         {/* Breadcrumb */}
         <div className="bg-white border-b border-gray-200">
@@ -365,8 +364,4 @@ export default async function SolutionPage({ params }: SolutionPageProps) {
         </div>
       </div>
     );
-  } catch (error) {
-    console.error('Error fetching solution data:', error);
-    notFound();
-  }
 }

@@ -57,25 +57,24 @@ export async function generateStaticParams() {
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const { locale, slug } = params;
 
-  try {
-    const article = await getArticle(slug);
+  const article = await getArticle(slug);
 
-    if (!article) {
-      console.warn(`Article not found for slug: ${slug}`);
-      notFound();
-    }
+  if (!article) {
+    console.warn(`Article not found for slug: ${slug}`);
+    notFound();
+  }
 
-    // Get related articles from the same category
-    const relatedArticles = article.category
-      ? await getArticles({ category: article.category.slug, limit: 4 })
-      : { articles: [] };
+  // Get related articles from the same category
+  const relatedArticles = article.category
+    ? await getArticles({ category: article.category.slug, limit: 4 })
+    : { articles: [] };
 
-    // Filter out current article from related articles
-    const filteredRelated = relatedArticles.articles?.filter(
-      (related) => related._id !== article._id
-    ) || [];
+  // Filter out current article from related articles
+  const filteredRelated = relatedArticles.articles?.filter(
+    (related) => related._id !== article._id
+  ) || [];
 
-    return (
+  return (
       <div className="min-h-screen bg-gray-50">
         {/* Breadcrumb */}
         <div className="bg-white border-b border-gray-200">
@@ -364,8 +363,4 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         </div>
       </div>
     );
-  } catch (error) {
-    console.error('Error fetching article data:', error);
-    notFound();
-  }
 }
