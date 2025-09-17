@@ -7,6 +7,11 @@ import Image from 'next/image';
 import { Search, Filter, ArrowRight, Target, Lightbulb, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+// Helper function to clean .txt suffix from slugs
+function cleanSlug(slug: string): string {
+  return slug?.replace(/\.txt$/, '') || '';
+}
+
 interface BrandSolutionsPageProps {
   params: {
     locale: string;
@@ -179,7 +184,7 @@ export default async function BrandSolutionsPage({ params }: BrandSolutionsPageP
                       )}
                       <div className="flex gap-3">
                         <Button variant="outline" size="sm" className="flex-1" asChild>
-                          <Link href={`/${locale}/brands/${encodeURIComponent(brand.slug || brand.name)}/solutions/${solution.slug}`}>
+                          <Link href={`/${locale}/brands/${encodeURIComponent(brand.slug || brand.name)}/solutions/${cleanSlug(solution.slug)}`}>
                             了解详情
                           </Link>
                         </Button>
