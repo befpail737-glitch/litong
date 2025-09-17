@@ -4,6 +4,7 @@ import { safeImageUrl } from '@/lib/sanity/client';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { generateSolutionUrl } from '@/lib/utils/slug';
 
 interface BrandPageProps {
   params: {
@@ -16,7 +17,7 @@ interface BrandPageProps {
 export async function generateStaticParams() {
   try {
     // 使用轻量级查询仅获取slugs，大幅减少查询复杂度
-    const brandSlugs = await getBrandSlugsOnly(30); // 限制到30个品牌减少构建时间
+    const brandSlugs = await getBrandSlugsOnly(50); // 增加到50个品牌确保足够的详情页
     // 仅限制为主要语言以减少构建时间
     const locales = ['zh-CN', 'en'];
 
@@ -213,7 +214,7 @@ export default async function BrandPage({ params }: BrandPageProps) {
                       <p className="text-gray-600 text-sm mb-4 line-clamp-3">{solution.summary}</p>
                     )}
                     <Link
-                      href={`/${locale}/brands/${encodeURIComponent(brand.slug || brand.name)}/solutions/${solution.slug}`}
+                      href={generateSolutionUrl(locale, brand.slug || brand.name, solution.slug)}
                       className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                     >
                       了解更多 →

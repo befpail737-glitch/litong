@@ -3,6 +3,7 @@ import { safeImageUrl } from '@/lib/sanity/client';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { cleanSlug } from '@/lib/utils/slug';
 import {
   ArrowLeft,
   Star,
@@ -32,7 +33,7 @@ interface SolutionPageProps {
 export async function generateStaticParams() {
   try {
     // 使用轻量级查询仅获取slugs，大幅减少查询复杂度
-    const solutionSlugs = await getSolutionSlugsOnly(10); // 限制到10个解决方案减少构建时间
+    const solutionSlugs = await getSolutionSlugsOnly(30); // 增加到30个解决方案确保足够的详情页
     // 仅限制为主要语言以减少构建时间
     const locales = ['zh-CN', 'en'];
 
@@ -328,7 +329,7 @@ export default async function SolutionPage({ params }: SolutionPageProps) {
                 {relatedSolutions.map((related) => (
                   <Link
                     key={related._id}
-                    href={`/${locale}/solutions/${related.slug}`}
+                    href={`/${locale}/solutions/${cleanSlug(related.slug)}`}
                     className="group"
                   >
                     <div className="bg-gray-50 rounded-lg overflow-hidden hover:shadow-md transition-shadow">

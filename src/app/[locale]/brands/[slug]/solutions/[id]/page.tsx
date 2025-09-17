@@ -4,11 +4,7 @@ import { safeImageUrl } from '@/lib/sanity/client';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-
-// Helper function to clean .txt suffix from slugs
-function cleanSlug(slug: string): string {
-  return slug?.replace(/\.txt$/, '') || '';
-}
+import { generateSolutionUrl } from '@/lib/utils/slug';
 import {
   ArrowLeft,
   Star,
@@ -352,7 +348,7 @@ export default async function BrandSolutionPage({ params }: BrandSolutionPagePro
               {relatedSolutions.map((related) => (
                 <Link
                   key={related._id}
-                  href={`/${locale}/brands/${encodeURIComponent(brand.slug || brand.name)}/solutions/${cleanSlug(related.slug)}`}
+                  href={generateSolutionUrl(locale, brand.slug || brand.name, related.slug)}
                   className="group"
                 >
                   <div className="bg-gray-50 rounded-lg p-6 hover:shadow-md transition-shadow">
