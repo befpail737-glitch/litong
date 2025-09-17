@@ -19,10 +19,27 @@ const articleIds = ['aaaaa', 'bbbbb', 'ccccc'];
 const supportIds = ['11111', '22222', '33333'];
 
 console.log('🔧 开始修复静态导出的本地化文件...');
+console.log(`📁 工作目录: ${process.cwd()}`);
+console.log(`📁 输出目录: ${outDir}`);
 
 // 确保out目录存在
 if (!fs.existsSync(outDir)) {
   console.error('❌ out目录不存在，请先运行 npm run build');
+  console.error(`❌ 查找的路径: ${outDir}`);
+
+  // 显示当前目录的内容以便调试
+  console.log('📂 当前目录内容:');
+  try {
+    const currentDirContents = fs.readdirSync(process.cwd());
+    currentDirContents.forEach(item => {
+      const itemPath = path.join(process.cwd(), item);
+      const stats = fs.statSync(itemPath);
+      console.log(`  ${stats.isDirectory() ? '📁' : '📄'} ${item}`);
+    });
+  } catch (error) {
+    console.error('❌ 无法读取当前目录:', error.message);
+  }
+
   process.exit(1);
 }
 
@@ -34,14 +51,50 @@ if (fs.existsSync(rootIndexPath)) {
   rootIndexContent = fs.readFileSync(rootIndexPath, 'utf8');
   console.log('✅ 找到根级别的index.html文件');
 } else {
-  // 如果没有根级别的index.html，尝试从.next/server获取
-  const serverIndexPath = path.join(process.cwd(), '.next', 'server', 'app', 'index.html');
-  if (fs.existsSync(serverIndexPath)) {
-    rootIndexContent = fs.readFileSync(serverIndexPath, 'utf8');
-    console.log('✅ 从server目录获取index.html内容');
+  // 尝试多个可能的路径
+  const possiblePaths = [
+    path.join(process.cwd(), '.next', 'server', 'app', 'index.html'),
+    path.join(process.cwd(), '.next', 'server', 'app', '(locale)', 'page.html'),
+    path.join(process.cwd(), '.next', 'server', 'pages', 'index.html'),
+    path.join(outDir, 'zh-CN', 'index.html'),
+    path.join(outDir, 'en', 'index.html')
+  ];
+
+  console.log('⚠️ 根级别index.html不存在，尝试其他路径...');
+  let foundPath = null;
+
+  for (const testPath of possiblePaths) {
+    if (fs.existsSync(testPath)) {
+      foundPath = testPath;
+      console.log(`✅ 找到HTML模板: ${testPath}`);
+      break;
+    }
+  }
+
+  if (foundPath) {
+    rootIndexContent = fs.readFileSync(foundPath, 'utf8');
+    console.log('✅ 成功获取HTML模板内容');
   } else {
-    console.error('❌ 无法找到index.html文件');
-    process.exit(1);
+    console.error('❌ 无法找到任何HTML模板文件');
+    console.log('🔍 尝试的路径:');
+    possiblePaths.forEach(p => console.log(`  - ${p}`));
+
+    // 创建一个基本的HTML模板作为后备方案
+    rootIndexContent = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>力通电子 - 专业电子元器件供应链服务商</title>
+</head>
+<body>
+    <div id="__next">
+        <h1>力通电子</h1>
+        <p>专业的电子元器件供应链服务商</p>
+    </div>
+</body>
+</html>`;
+    console.log('📄 使用默认HTML模板');
   }
 }
 

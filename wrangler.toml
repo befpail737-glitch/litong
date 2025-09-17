@@ -1,0 +1,17 @@
+name = "litong-electronics"
+compatibility_date = "2024-01-01"
+
+[env.production]
+routes = [
+  { pattern = "litong.pages.dev/*", zone_name = "pages.dev" }
+]
+
+# Cloudflare Pages specific configuration
+[[env.production.services]]
+service = "litong-electronics"
+environment = "production"
+
+# Environment variables for production
+[env.production.vars]
+NODE_ENV = "production"
+NEXT_PUBLIC_SITE_URL = "https://litong.pages.dev"

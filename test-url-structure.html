@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL结构测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .test-link { display: block; margin: 10px 0; padding: 10px; background: #f0f0f0; text-decoration: none; border-radius: 5px; }
+        .test-link:hover { background: #e0e0e0; }
+        .old-url { background: #ffcccc; }
+        .new-url { background: #ccffcc; }
+    </style>
+</head>
+<body>
+    <h1>产品URL结构测试</h1>
+
+    <h2>旧URL结构（应该停止使用）</h2>
+    <a href="/zh-CN/products/55555" class="test-link old-url">
+        /zh-CN/products/55555 - 全局产品页面
+    </a>
+
+    <h2>新URL结构（品牌上下文）</h2>
+    <a href="/zh-CN/brands/cree/products/55555" class="test-link new-url">
+        /zh-CN/brands/cree/products/55555 - CREE品牌产品
+    </a>
+
+    <a href="/zh-CN/brands/mediatek/products/55555" class="test-link new-url">
+        /zh-CN/brands/mediatek/products/55555 - MediaTek品牌产品
+    </a>
+
+    <a href="/zh-CN/brands/英飞凌/products/55555" class="test-link new-url">
+        /zh-CN/brands/英飞凌/products/55555 - 英飞凌品牌产品（中文）
+    </a>
+
+    <h2>品牌产品列表页面</h2>
+    <a href="/zh-CN/brands/cree/products/" class="test-link new-url">
+        /zh-CN/brands/cree/products/ - CREE产品列表
+    </a>
+
+    <a href="/zh-CN/brands/mediatek/products/" class="test-link new-url">
+        /zh-CN/brands/mediatek/products/ - MediaTek产品列表
+    </a>
+
+    <h2>测试说明</h2>
+    <p>新的URL结构提供了更好的：</p>
+    <ul>
+        <li>🎯 品牌上下文 - 产品URL包含品牌信息</li>
+        <li>🔍 SEO优化 - 更明确的页面层次结构</li>
+        <li>👥 用户体验 - 用户可以从URL看出产品所属品牌</li>
+        <li>🌐 国际化支持 - 支持中文品牌名称</li>
+    </ul>
+</body>
+</html>

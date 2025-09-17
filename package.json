@@ -24,6 +24,7 @@
     "build:force": "NEXT_IGNORE_EXPORT_ERRORS=true next build",
     "build:emergency": "next build --no-lint",
     "build:static": "node scripts/build-static.js",
+    "build:cloudflare": "node scripts/cloudflare-build.js",
     "fix-static-export": "node scripts/fix-static-export.js",
     "start": "next start",
     "lint": "next lint",
