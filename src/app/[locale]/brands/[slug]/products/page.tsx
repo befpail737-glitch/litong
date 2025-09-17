@@ -160,7 +160,7 @@ export default async function BrandProductsPage({ params }: BrandProductsPagePro
                       )}
                       <div className="flex gap-2">
                         <Button variant="outline" size="sm" className="flex-1" asChild>
-                          <Link href={`/${locale}/products/${product.slug || product._id}`}>
+                          <Link href={`/${locale}/brands/${encodeURIComponent(brand.slug || brand.name)}/products/${product.slug || product._id}`}>
                             查看详情
                           </Link>
                         </Button>

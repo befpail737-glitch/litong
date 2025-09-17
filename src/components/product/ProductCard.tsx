@@ -45,6 +45,8 @@ interface ProductCardProps {
   showInventory?: boolean
   showCompare?: boolean
   onAddToCompare?: (productId: string) => void
+  locale?: string
+  useBrandContext?: boolean
 }
 
 const inventoryStatusMap = {
@@ -62,11 +64,18 @@ export function ProductCard({
   showInventory = true,
   showCompare = false,
   onAddToCompare,
+  locale = 'zh-CN',
+  useBrandContext = true,
 }: ProductCardProps) {
   const inventoryStatus = product.inventory?.status || 'in_stock';
   const inventoryInfo = inventoryStatusMap[inventoryStatus];
   const basePrice = product.pricing?.tiers[0]?.price;
   const currency = product.pricing?.currency || 'CNY';
+
+  // Generate the appropriate product detail URL
+  const productDetailUrl = useBrandContext
+    ? `/${locale}/brands/${encodeURIComponent(product.brand.slug)}/products/${product.id}`
+    : `/${locale}/products/${product.id}`;
 
   return (
     <Card className={cn('group hover:shadow-lg transition-all duration-200', className)}>
@@ -184,7 +193,7 @@ export function ProductCard({
               className="text-xs px-2 py-1 h-7"
               asChild
             >
-              <Link href={`/products/${product.id}`}>
+              <Link href={productDetailUrl}>
                 详情
               </Link>
             </Button>

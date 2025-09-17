@@ -1,0 +1,222 @@
+import { BrandNavigation } from '@/components/layout/BrandNavigation';
+import { getBrandWithContent, getAllBrands } from '@/lib/sanity/brands';
+import { getArticles } from '@/lib/sanity/queries';
+import { urlFor } from '@/lib/sanity/client';
+import { notFound } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
+import { Search, Filter, Calendar, User, Tag, BookOpen, Eye } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+
+interface BrandArticlesPageProps {
+  params: {
+    locale: string;
+    slug: string;
+  };
+}
+
+// Generate static params for all brands and locales
+export async function generateStaticParams() {
+  try {
+    const brands = await getAllBrands();
+    // Temporarily limit to primary locales to reduce build time
+    const locales = ['zh-CN', 'en'];
+
+    const params = [];
+    for (const locale of locales) {
+      for (const brand of brands) {
+        if (brand.slug) {
+          params.push({
+            locale,
+            slug: brand.slug,
+          });
+
+          // For Chinese brands, also add URL-encoded version
+          if (brand.slug !== encodeURIComponent(brand.slug)) {
+            params.push({
+              locale,
+              slug: encodeURIComponent(brand.slug),
+            });
+          }
+        }
+      }
+    }
+
+    console.log('Generated static params for brand articles:', params.length);
+    return params;
+  } catch (error) {
+    console.error('Error generating static params for brand articles:', error);
+    return [];
+  }
+}
+
+export default async function BrandArticlesPage({ params }: BrandArticlesPageProps) {
+  const { locale, slug } = params;
+
+  // Decode slug to handle Chinese brand names
+  const decodedSlug = decodeURIComponent(slug);
+
+  const { brand } = await getBrandWithContent(decodedSlug);
+
+  if (!brand) {
+    console.warn(`Brand not found for slug: ${decodedSlug}`);
+    notFound();
+  }
+
+  // Get articles related to this brand (placeholder for now)
+  const articlesResult = await getArticles({ limit: 20, brand: decodedSlug });
+  const articles = articlesResult.articles || [];
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <BrandNavigation brand={brand} locale={locale} />
+      <div className="container mx-auto px-4 py-8">
+        {/* Page Header */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                {brand.name} 技术文章
+              </h1>
+              <p className="text-gray-600">
+                浏览 {brand.name} 的技术文章和行业洞察
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <Search className="h-4 w-4 absolute left-3 top-3 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="搜索文章..."
+                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <Button variant="outline" size="sm">
+                <Filter className="h-4 w-4 mr-2" />
+                筛选
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Articles Grid */}
+        {articles && articles.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {articles.map((article) => (
+              <div key={article._id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                {/* Article Image */}
+                {article.coverImage && (
+                  <div className="aspect-video relative bg-gray-100">
+                    <Image
+                      src={urlFor(article.coverImage).width(400).height(250).url()}
+                      alt={article.title}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                )}
+
+                <div className="p-6">
+                  {/* Article Meta */}
+                  <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                    {article.publishedAt && (
+                      <div className="flex items-center gap-1">
+                        <Calendar className="h-4 w-4" />
+                        <span>{new Date(article.publishedAt).toLocaleDateString('zh-CN')}</span>
+                      </div>
+                    )}
+                    {article.author && (
+                      <div className="flex items-center gap-1">
+                        <User className="h-4 w-4" />
+                        <span>{article.author.name}</span>
+                      </div>
+                    )}
+                    {article.readTime && (
+                      <div className="flex items-center gap-1">
+                        <BookOpen className="h-4 w-4" />
+                        <span>{article.readTime}分钟</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Article Title */}
+                  <h3 className="font-semibold text-gray-900 mb-3 line-clamp-2 leading-6">
+                    {article.title}
+                  </h3>
+
+                  {/* Article Summary */}
+                  {article.summary && (
+                    <p className="text-gray-600 mb-4 line-clamp-3 text-sm leading-relaxed">
+                      {article.summary}
+                    </p>
+                  )}
+
+                  {/* Tags */}
+                  {article.tags && article.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {article.tags.slice(0, 3).map((tag, index) => (
+                        <span
+                          key={index}
+                          className="inline-block px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Article Footer */}
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                    <div className="flex items-center gap-4 text-sm text-gray-600">
+                      {article.viewCount && (
+                        <div className="flex items-center gap-1">
+                          <Eye className="h-4 w-4" />
+                          <span>{article.viewCount}</span>
+                        </div>
+                      )}
+                    </div>
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href={`/${locale}/brands/${encodeURIComponent(brand.slug || brand.name)}/articles/${article.slug || article._id}`}>
+                        阅读全文
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          /* No Articles */
+          <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
+            <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">暂无文章</h3>
+            <p className="text-gray-600 mb-6">
+              {brand.name} 的技术文章正在整理中，请稍后再来查看。
+            </p>
+            <div className="flex justify-center gap-4">
+              <Button variant="outline" asChild>
+                <Link href={`/${locale}/brands/${encodeURIComponent(brand.slug || brand.name)}`}>
+                  返回品牌首页
+                </Link>
+              </Button>
+              <Button asChild>
+                <Link href={`/${locale}/inquiry`}>
+                  联系我们
+                </Link>
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Load More Button */}
+        {articles.length >= 20 && (
+          <div className="text-center mt-8">
+            <Button variant="outline" size="lg">
+              加载更多文章
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

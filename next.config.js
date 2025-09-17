@@ -7,6 +7,8 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // Fix for next-intl static export compatibility
+  skipTrailingSlashRedirect: true,
   // Simplified experimental config for stability
   experimental: {
     workerThreads: false,

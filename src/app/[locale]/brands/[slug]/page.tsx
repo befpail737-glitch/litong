@@ -173,7 +173,7 @@ export default async function BrandPage({ params }: BrandPageProps) {
                       <p className="text-sm text-gray-600 mb-2">型号: {product.partNumber}</p>
                     )}
                     <Link
-                      href={`/${locale}/products/${product.slug}`}
+                      href={`/${locale}/brands/${encodeURIComponent(brand.slug || brand.name)}/products/${product.slug}`}
                       className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                     >
                       查看详情 →
@@ -204,7 +204,7 @@ export default async function BrandPage({ params }: BrandPageProps) {
                       <p className="text-gray-600 text-sm mb-4 line-clamp-3">{solution.summary}</p>
                     )}
                     <Link
-                      href={`/${locale}/solutions/${solution.slug}`}
+                      href={`/${locale}/brands/${encodeURIComponent(brand.slug || brand.name)}/solutions/${solution.slug}`}
                       className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                     >
                       了解更多 →
@@ -236,7 +236,7 @@ export default async function BrandPage({ params }: BrandPageProps) {
                     )}
                     <div className="flex justify-between items-center">
                       <Link
-                        href={`/${locale}/articles/${article.slug}`}
+                        href={`/${locale}/brands/${encodeURIComponent(brand.slug || brand.name)}/articles/${article.slug}`}
                         className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                       >
                         阅读全文 →

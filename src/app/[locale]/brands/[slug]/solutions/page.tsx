@@ -179,7 +179,7 @@ export default async function BrandSolutionsPage({ params }: BrandSolutionsPageP
                       )}
                       <div className="flex gap-3">
                         <Button variant="outline" size="sm" className="flex-1" asChild>
-                          <Link href={`/${locale}/solutions/${solution.slug}`}>
+                          <Link href={`/${locale}/brands/${encodeURIComponent(brand.slug || brand.name)}/solutions/${solution.slug}`}>
                             了解详情
                           </Link>
                         </Button>
