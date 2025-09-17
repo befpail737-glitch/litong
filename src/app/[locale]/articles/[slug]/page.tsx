@@ -1,4 +1,4 @@
-import { getArticle, getArticleSlugsOnly } from '@/lib/sanity/queries';
+import { getArticle, getArticleSlugsOnly, getArticles } from '@/lib/sanity/queries';
 import { safeImageUrl } from '@/lib/sanity/client';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
