@@ -54,13 +54,12 @@ export default async function BrandProductsPage({ params }: BrandProductsPagePro
   // Decode slug to handle Chinese brand names
   const decodedSlug = decodeURIComponent(slug);
 
-  try {
-    const { brand, products, categories } = await getBrandWithContent(decodedSlug);
+  const { brand, products, categories } = await getBrandWithContent(decodedSlug);
 
-    if (!brand) {
-      console.warn(`Brand not found for slug: ${decodedSlug}`);
-      notFound();
-    }
+  if (!brand) {
+    console.warn(`Brand not found for slug: ${decodedSlug}`);
+    notFound();
+  }
 
     return (
       <div className="min-h-screen bg-gray-50">
@@ -207,8 +206,4 @@ export default async function BrandProductsPage({ params }: BrandProductsPagePro
         </div>
       </div>
     );
-  } catch (error) {
-    console.error('Error fetching brand products data:', error);
-    notFound();
-  }
 }

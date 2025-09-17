@@ -54,13 +54,12 @@ export default async function BrandSolutionsPage({ params }: BrandSolutionsPageP
   // Decode slug to handle Chinese brand names
   const decodedSlug = decodeURIComponent(slug);
 
-  try {
-    const { brand, solutions } = await getBrandWithContent(decodedSlug);
+  const { brand, solutions } = await getBrandWithContent(decodedSlug);
 
-    if (!brand) {
-      console.warn(`Brand not found for slug: ${decodedSlug}`);
-      notFound();
-    }
+  if (!brand) {
+    console.warn(`Brand not found for slug: ${decodedSlug}`);
+    notFound();
+  }
 
     // Mock solution categories for demonstration
     const solutionCategories = [
@@ -254,8 +253,4 @@ export default async function BrandSolutionsPage({ params }: BrandSolutionsPageP
         </div>
       </div>
     );
-  } catch (error) {
-    console.error('Error fetching brand solutions data:', error);
-    notFound();
-  }
 }
