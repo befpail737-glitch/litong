@@ -1,4 +1,4 @@
-import { getProduct, getRelatedProducts, getProducts } from '@/lib/sanity/queries';
+import { getProduct, getRelatedProducts, getProductSlugsOnly } from '@/lib/sanity/queries';
 import { safeImageUrl } from '@/lib/sanity/client';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -29,19 +29,18 @@ interface ProductPageProps {
 // Generate static params for all products and locales
 export async function generateStaticParams() {
   try {
-    // Temporarily reduce product limit to improve build performance
-    const result = await getProducts({ limit: 50 });
-    const products = result.products || [];
-    // Temporarily limit to primary locales to reduce build time
+    // 使用轻量级查询仅获取slugs，大幅减少查询复杂度
+    const productSlugs = await getProductSlugsOnly(20); // 限制到20个产品减少构建时间
+    // 仅限制为主要语言以减少构建时间
     const locales = ['zh-CN', 'en'];
 
     const params = [];
     for (const locale of locales) {
-      for (const product of products) {
-        if (product.slug) {
+      for (const slug of productSlugs) {
+        if (slug) {
           params.push({
             locale,
-            slug: product.slug,
+            slug,
           });
         }
       }
@@ -51,7 +50,12 @@ export async function generateStaticParams() {
     return params;
   } catch (error) {
     console.error('Error generating static params for products:', error);
-    return [];
+    // 紧急情况下使用最小化的fallback
+    return [
+      { locale: 'zh-CN', slug: 'demo-product-1' },
+      { locale: 'zh-CN', slug: 'demo-product-2' },
+      { locale: 'en', slug: 'demo-product-1' }
+    ];
   }
 }
 

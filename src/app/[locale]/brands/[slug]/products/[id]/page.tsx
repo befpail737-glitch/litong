@@ -31,52 +31,17 @@ interface BrandProductPageProps {
 
 // Generate static params for all brand-product combinations
 export async function generateStaticParams() {
-  try {
-    // Get all brands
-    const brands = await getAllBrands();
+  // EMERGENCY FIX: Use minimal static generation to prevent Cloudflare timeout
+  console.log('🚨 Using minimal static generation to fix deployment timeout');
 
-    // Limit to primary locales to reduce build time
-    const locales = ['zh-CN', 'en'];
-
-    // Create a set of known product slugs for faster builds
-    const productSlugs = ['55555', '99999', 'stm32f407vgt6'];
-
-    const params = [];
-    for (const locale of locales) {
-      for (const brand of brands.slice(0, 15)) { // Limit brands for faster builds
-        if (brand && brand.slug) {
-          for (const productSlug of productSlugs) {
-            // Add regular slug
-            params.push({
-              locale,
-              slug: brand.slug,
-              id: productSlug,
-            });
-
-            // For Chinese brands, also add URL-encoded version
-            if (brand.slug !== encodeURIComponent(brand.slug)) {
-              params.push({
-                locale,
-                slug: encodeURIComponent(brand.slug),
-                id: productSlug,
-              });
-            }
-          }
-        }
-      }
-    }
-
-    console.log('Generated static params for brand products:', params.length);
-    return params;
-  } catch (error) {
-    console.error('Error generating static params for brand products:', error);
-    // Emergency fallback
-    return [
-      { locale: 'zh-CN', slug: 'cree', id: '55555' },
-      { locale: 'zh-CN', slug: 'mediatek', id: '55555' },
-      { locale: 'en', slug: 'cree', id: '55555' },
-    ];
-  }
+  // Only generate for most critical pages - other pages will use ISR
+  return [
+    { locale: 'zh-CN', slug: 'cree', id: '55555' },
+    { locale: 'zh-CN', slug: 'cree', id: '99999' },
+    { locale: 'zh-CN', slug: 'infineon', id: '55555' },
+    { locale: 'zh-CN', slug: '英飞凌', id: '55555' },
+    { locale: 'zh-CN', slug: 'ti', id: '55555' }
+  ];
 }
 
 export default async function BrandProductPage({ params }: BrandProductPageProps) {

@@ -7,6 +7,10 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // 排除 favicon.ico 的路由，让静态文件直接提供
+  async rewrites() {
+    return []
+  },
   // Fix for next-intl static export compatibility
   skipTrailingSlashRedirect: true,
   // Simplified experimental config for stability
@@ -20,6 +24,8 @@ const nextConfig = {
     config.infrastructureLogging = {
       level: 'error',
     };
+    // 减少构建日志输出
+    config.stats = 'errors-warnings';
     // 禁用复杂缓存配置
     return config;
   },

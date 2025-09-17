@@ -12,7 +12,7 @@
   "author": "Litong Electronics Team",
   "license": "MIT",
   "engines": {
-    "node": "18.x",
+    "node": ">=18.17.0",
     "npm": ">=9.0.0"
   },
   "scripts": {

@@ -2,6 +2,61 @@ import { groq } from 'next-sanity';
 
 import { client, GROQ_FRAGMENTS, withRetry, SanityError } from './client';
 
+// 轻量级函数仅用于generateStaticParams，减少查询复杂度
+export async function getProductSlugsOnly(limit = 20): Promise<string[]> {
+  try {
+    const query = groq`
+      *[_type == "product" && isActive == true && defined(slug.current)] | order(_createdAt desc) [0...${limit}] {
+        "slug": slug.current
+      }
+    `;
+
+    const products = await client.fetch(query);
+    const slugs = products?.map(product => product.slug).filter(Boolean) || [];
+
+    return slugs;
+  } catch (error) {
+    console.error('Error fetching product slugs, using fallback:', error);
+    return ['demo-product-1', 'demo-product-2', 'demo-product-3'];
+  }
+}
+
+export async function getSolutionSlugsOnly(limit = 10): Promise<string[]> {
+  try {
+    const query = groq`
+      *[_type == "solution" && (isPublished == true || !defined(isPublished)) && defined(slug.current)] | order(_createdAt desc) [0...${limit}] {
+        "slug": slug.current
+      }
+    `;
+
+    const solutions = await client.fetch(query);
+    const slugs = solutions?.map(solution => solution.slug).filter(Boolean) || [];
+
+    return slugs;
+  } catch (error) {
+    console.error('Error fetching solution slugs, using fallback:', error);
+    return ['demo-solution-1', 'demo-solution-2'];
+  }
+}
+
+export async function getArticleSlugsOnly(limit = 15): Promise<string[]> {
+  try {
+    const query = groq`
+      *[_type == "article" && (isPublished == true || !defined(isPublished)) && defined(slug.current)] | order(_createdAt desc) [0...${limit}] {
+        "slug": slug.current
+      }
+    `;
+
+    const articles = await client.fetch(query);
+    const slugs = articles?.map(article => article.slug).filter(Boolean) || [];
+
+    return slugs;
+  } catch (error) {
+    console.error('Error fetching article slugs, using fallback:', error);
+    return ['demo-article-1', 'demo-article-2'];
+  }
+}
+
 // 产品查询
 export async function getProducts(params: {
   limit?: number

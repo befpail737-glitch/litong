@@ -346,6 +346,25 @@ export async function getBrandProductCategories(brandSlug: string) {
   }
 }
 
+// 获取品牌slug列表（仅用于generateStaticParams，减少查询复杂度）
+export async function getBrandSlugsOnly(limit = 50): Promise<string[]> {
+  try {
+    // 最简化查询，仅获取slug字段
+    const query = `*[_type == "brandBasic" && (isActive == true || !defined(isActive)) && defined(slug.current)] | order(name asc) [0...${limit}] {
+      "slug": slug.current
+    }`;
+
+    const brands = await client.fetch(query);
+    const slugs = brands?.map(brand => brand.slug).filter(Boolean) || [];
+
+    return slugs;
+  } catch (error) {
+    console.error('Error fetching brand slugs, using fallback:', error);
+    // 返回最小化的fallback slugs
+    return ['cree', 'infineon', 'ti', 'mediatek', 'qualcomm', 'analog-devices'];
+  }
+}
+
 // 获取品牌完整数据（包含相关内容）
 export async function getBrandWithContent(brandSlug: string) {
   try {

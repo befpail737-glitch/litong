@@ -30,6 +30,11 @@ export const metadata: Metadata = {
   authors: [{ name: '力通电子' }],
   creator: '力通电子',
   publisher: '力通电子',
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
   formatDetection: {
     email: false,
     address: false,

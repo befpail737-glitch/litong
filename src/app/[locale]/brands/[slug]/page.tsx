@@ -1,5 +1,5 @@
 import { BrandNavigation } from '@/components/layout/BrandNavigation';
-import { getBrandWithContent, getAllBrands } from '@/lib/sanity/brands';
+import { getBrandWithContent, getBrandSlugsOnly } from '@/lib/sanity/brands';
 import { safeImageUrl } from '@/lib/sanity/client';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -15,25 +15,26 @@ interface BrandPageProps {
 // Generate static params for all brands and locales
 export async function generateStaticParams() {
   try {
-    const brands = await getAllBrands();
-    // Temporarily limit to primary locales to reduce build time
+    // 使用轻量级查询仅获取slugs，大幅减少查询复杂度
+    const brandSlugs = await getBrandSlugsOnly(30); // 限制到30个品牌减少构建时间
+    // 仅限制为主要语言以减少构建时间
     const locales = ['zh-CN', 'en'];
 
     const params = [];
     for (const locale of locales) {
-      for (const brand of brands) {
-        if (brand.slug) {
-          // Add both encoded and decoded versions for Chinese brands
+      for (const slug of brandSlugs) {
+        if (slug) {
+          // 添加原始slug
           params.push({
             locale,
-            slug: brand.slug,
+            slug,
           });
 
-          // For Chinese brands, also add URL-encoded version
-          if (brand.slug !== encodeURIComponent(brand.slug)) {
+          // 对于中文品牌，也添加URL编码版本
+          if (slug !== encodeURIComponent(slug)) {
             params.push({
               locale,
-              slug: encodeURIComponent(brand.slug),
+              slug: encodeURIComponent(slug),
             });
           }
         }
@@ -44,7 +45,15 @@ export async function generateStaticParams() {
     return params;
   } catch (error) {
     console.error('Error generating static params for brands:', error);
-    return [];
+    // 紧急情况下使用最小化的fallback
+    return [
+      { locale: 'zh-CN', slug: 'cree' },
+      { locale: 'zh-CN', slug: 'infineon' },
+      { locale: 'zh-CN', slug: 'ti' },
+      { locale: 'en', slug: 'cree' },
+      { locale: 'en', slug: 'infineon' },
+      { locale: 'en', slug: 'ti' }
+    ];
   }
 }
 

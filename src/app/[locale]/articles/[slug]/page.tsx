@@ -1,4 +1,4 @@
-import { getArticle, getArticles } from '@/lib/sanity/queries';
+import { getArticle, getArticleSlugsOnly } from '@/lib/sanity/queries';
 import { safeImageUrl } from '@/lib/sanity/client';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -30,19 +30,18 @@ interface ArticlePageProps {
 // Generate static params for all articles and locales
 export async function generateStaticParams() {
   try {
-    // Temporarily reduce article limit to improve build performance
-    const result = await getArticles({ limit: 30 });
-    const articles = result.articles || [];
-    // Temporarily limit to primary locales to reduce build time
+    // 使用轻量级查询仅获取slugs，大幅减少查询复杂度
+    const articleSlugs = await getArticleSlugsOnly(15); // 限制到15个文章减少构建时间
+    // 仅限制为主要语言以减少构建时间
     const locales = ['zh-CN', 'en'];
 
     const params = [];
     for (const locale of locales) {
-      for (const article of articles) {
-        if (article.slug) {
+      for (const slug of articleSlugs) {
+        if (slug) {
           params.push({
             locale,
-            slug: article.slug,
+            slug,
           });
         }
       }
@@ -52,7 +51,12 @@ export async function generateStaticParams() {
     return params;
   } catch (error) {
     console.error('Error generating static params for articles:', error);
-    return [];
+    // 紧急情况下使用最小化的fallback
+    return [
+      { locale: 'zh-CN', slug: 'demo-article-1' },
+      { locale: 'zh-CN', slug: 'demo-article-2' },
+      { locale: 'en', slug: 'demo-article-1' }
+    ];
   }
 }
 

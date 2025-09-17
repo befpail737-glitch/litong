@@ -8,6 +8,8 @@ export async function generateStaticParams() {
   ];
 }
 
+export const dynamic = 'force-static';
+
 export default function HomePage() {
   return (
     <MainLayout>

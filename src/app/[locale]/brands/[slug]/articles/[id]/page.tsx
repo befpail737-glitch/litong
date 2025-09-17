@@ -1,5 +1,5 @@
-import { getArticle, getArticles } from '@/lib/sanity/queries';
-import { getBrandData, getAllBrands } from '@/lib/sanity/brands';
+import { getArticle, getArticleSlugsOnly } from '@/lib/sanity/queries';
+import { getBrandData, getBrandSlugsOnly } from '@/lib/sanity/brands';
 import { safeImageUrl } from '@/lib/sanity/client';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -34,49 +34,23 @@ interface BrandArticlePageProps {
 // Generate static params for all brand-article combinations
 export async function generateStaticParams() {
   try {
-    // Get all brands
-    const brands = await getAllBrands();
+    // 紧急优化：最小化静态生成防止Cloudflare超时
+    console.log('😨 使用最小静态生成修复部署超时');
 
-    // Limit to primary locales to reduce build time
-    const locales = ['zh-CN', 'en'];
-
-    // Create a set of known article slugs for faster builds
-    const articleSlugs = ['aaaaa', 'bbbbb', 'ccccc'];
-
-    const params = [];
-    for (const locale of locales) {
-      for (const brand of brands.slice(0, 15)) { // Limit brands for faster builds
-        if (brand && brand.slug) {
-          for (const articleSlug of articleSlugs) {
-            // Add regular slug
-            params.push({
-              locale,
-              slug: brand.slug,
-              id: articleSlug,
-            });
-
-            // For Chinese brands, also add URL-encoded version
-            if (brand.slug !== encodeURIComponent(brand.slug)) {
-              params.push({
-                locale,
-                slug: encodeURIComponent(brand.slug),
-                id: articleSlug,
-              });
-            }
-          }
-        }
-      }
-    }
-
-    console.log('Generated static params for brand articles:', params.length);
-    return params;
+    // 只为最关键的页面生成静态页面，其他页面使用ISR
+    return [
+      { locale: 'zh-CN', slug: 'cree', id: 'aaaaa' },
+      { locale: 'zh-CN', slug: 'infineon', id: 'aaaaa' },
+      { locale: 'zh-CN', slug: 'ti', id: 'aaaaa' },
+      { locale: 'en', slug: 'cree', id: 'aaaaa' },
+      { locale: 'en', slug: 'infineon', id: 'aaaaa' }
+    ];
   } catch (error) {
     console.error('Error generating static params for brand articles:', error);
     // Emergency fallback
     return [
       { locale: 'zh-CN', slug: 'cree', id: 'aaaaa' },
-      { locale: 'zh-CN', slug: 'mediatek', id: 'aaaaa' },
-      { locale: 'en', slug: 'cree', id: 'aaaaa' },
+      { locale: 'en', slug: 'cree', id: 'aaaaa' }
     ];
   }
 }

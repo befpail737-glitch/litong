@@ -1,4 +1,4 @@
-import { getSolution, getRelatedSolutions, getSolutions } from '@/lib/sanity/queries';
+import { getSolution, getRelatedSolutions, getSolutionSlugsOnly } from '@/lib/sanity/queries';
 import { safeImageUrl } from '@/lib/sanity/client';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -31,19 +31,18 @@ interface SolutionPageProps {
 // Generate static params for all solutions and locales
 export async function generateStaticParams() {
   try {
-    // Temporarily reduce solution limit to improve build performance
-    const result = await getSolutions({ limit: 20 });
-    const solutions = result.solutions || [];
-    // Temporarily limit to primary locales to reduce build time
+    // 使用轻量级查询仅获取slugs，大幅减少查询复杂度
+    const solutionSlugs = await getSolutionSlugsOnly(10); // 限制到10个解决方案减少构建时间
+    // 仅限制为主要语言以减少构建时间
     const locales = ['zh-CN', 'en'];
 
     const params = [];
     for (const locale of locales) {
-      for (const solution of solutions) {
-        if (solution.slug) {
+      for (const slug of solutionSlugs) {
+        if (slug) {
           params.push({
             locale,
-            slug: solution.slug,
+            slug,
           });
         }
       }
@@ -53,7 +52,12 @@ export async function generateStaticParams() {
     return params;
   } catch (error) {
     console.error('Error generating static params for solutions:', error);
-    return [];
+    // 紧急情况下使用最小化的fallback
+    return [
+      { locale: 'zh-CN', slug: 'demo-solution-1' },
+      { locale: 'zh-CN', slug: 'demo-solution-2' },
+      { locale: 'en', slug: 'demo-solution-1' }
+    ];
   }
 }
 

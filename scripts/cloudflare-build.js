@@ -17,22 +17,23 @@ console.log(`  - 环境: ${process.env.NODE_ENV || 'development'}`);
 
 try {
   console.log('\n📦 安装依赖...');
-  execSync('npm ci --prefer-offline --no-audit', { stdio: 'inherit' });
+  execSync('npm ci --prefer-offline --no-audit --silent', { stdio: 'pipe' });
 
   console.log('\n🧹 清理缓存...');
-  execSync('npm run clear-cache', { stdio: 'inherit' });
+  execSync('npm run clear-cache', { stdio: 'pipe' });
 
   console.log('\n🏗️ 构建项目（优化模式）...');
   const buildEnv = {
     ...process.env,
     NODE_ENV: 'production',
     NEXT_TELEMETRY_DISABLED: '1',
-    NEXT_BUILD_LINT: 'false'
+    NEXT_BUILD_LINT: 'false',
+    CI: 'true' // 减少构建输出
   };
-  execSync('next build', { stdio: 'inherit', env: buildEnv });
+  execSync('next build', { stdio: 'pipe', env: buildEnv });
 
   console.log('\n🔧 修复静态导出...');
-  execSync('npm run fix-static-export', { stdio: 'inherit' });
+  execSync('npm run fix-static-export', { stdio: 'pipe' });
 
   // 验证构建结果
   const outDir = path.join(process.cwd(), 'out');
