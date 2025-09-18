@@ -235,6 +235,21 @@ module.exports = {
         '.text-end': {
           'text-align': 'end',
         },
+        // 移动端触摸目标最小尺寸 (44px)
+        '.touch-target-44': {
+          'min-height': '44px',
+          'min-width': '44px',
+        },
+        // 增强的触摸目标 (48px)
+        '.touch-target-48': {
+          'min-height': '48px',
+          'min-width': '48px',
+        },
+        // 触摸友好的间距
+        '.touch-spacing': {
+          'padding': '12px',
+          'margin': '4px',
+        },
       });
     },
   ],

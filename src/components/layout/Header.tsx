@@ -53,21 +53,22 @@ export function Header() {
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link href={`/${currentLocale}`} className="flex items-center space-x-2">
+          {/* Logo - 响应式调整 */}
+          <Link href={`/${currentLocale}`} className="flex items-center space-x-2 flex-shrink-0">
             <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-green-500 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">力</span>
             </div>
-            <span className="text-xl font-bold text-gray-900">力通电子</span>
+            <span className="text-lg sm:text-xl font-bold text-gray-900 hidden xs:block">力通电子</span>
+            <span className="text-lg font-bold text-gray-900 xs:hidden">LT</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-gray-700 hover:text-blue-600 transition-colors"
+                className="text-gray-700 hover:text-blue-600 transition-colors whitespace-nowrap"
               >
                 {item.name}
               </Link>
@@ -75,8 +76,8 @@ export function Header() {
           </nav>
 
           {/* Search & Actions */}
-          <div className="hidden md:flex items-center space-x-4">
-            <div className="relative">
+          <div className="hidden md:flex items-center space-x-2 lg:space-x-4 flex-1 justify-end max-w-2xl">
+            <div className="relative flex-1 max-w-xs lg:max-w-md">
               <form onSubmit={handleSearch}>
                 <input
                   type="text"
@@ -89,7 +90,7 @@ export function Header() {
                   onFocus={() => setShowSuggestions(searchQuery.length > 0)}
                   onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                   placeholder="搜索产品..."
-                  className="w-64 px-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 <button
                   type="submit"
@@ -127,33 +128,35 @@ export function Header() {
               )}
             </div>
 
-            <Button variant="ghost" size="sm" asChild className="relative">
-              <Link href={`/${currentLocale}/cart`}>
-                <ShoppingCart className="h-4 w-4" />
-                {cartCount > 0 && (
-                  <Badge variant="default" className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs flex items-center justify-center">
-                    {cartCount}
-                  </Badge>
-                )}
-              </Link>
-            </Button>
+            <div className="flex items-center space-x-1 lg:space-x-2">
+              <Button variant="ghost" size="sm" asChild className="relative">
+                <Link href={`/${currentLocale}/cart`}>
+                  <ShoppingCart className="h-4 w-4" />
+                  {cartCount > 0 && (
+                    <Badge variant="default" className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs flex items-center justify-center">
+                      {cartCount}
+                    </Badge>
+                  )}
+                </Link>
+              </Button>
 
-            <Button variant="ghost" size="sm" asChild className="relative">
-              <Link href={`/${currentLocale}/wishlist`}>
-                <Heart className="h-4 w-4" />
-                {wishlistCount > 0 && (
-                  <Badge variant="default" className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs flex items-center justify-center">
-                    {wishlistCount}
-                  </Badge>
-                )}
-              </Link>
-            </Button>
+              <Button variant="ghost" size="sm" asChild className="relative">
+                <Link href={`/${currentLocale}/wishlist`}>
+                  <Heart className="h-4 w-4" />
+                  {wishlistCount > 0 && (
+                    <Badge variant="default" className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs flex items-center justify-center">
+                      {wishlistCount}
+                    </Badge>
+                  )}
+                </Link>
+              </Button>
 
-            <Button size="sm" asChild>
-              <Link href={`/${currentLocale}/inquiry`}>
-                获取报价
-              </Link>
-            </Button>
+              <Button size="sm" asChild className="hidden lg:inline-flex">
+                <Link href={`/${currentLocale}/inquiry`}>
+                  获取报价
+                </Link>
+              </Button>
+            </div>
 
             {/* 用户认证区域 */}
             {user ? (
@@ -188,7 +191,7 @@ export function Header() {
           {/* Mobile menu button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100"
+            className="lg:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100 touch-target-44"
           >
             <svg
               className="w-6 h-6"
@@ -207,43 +210,54 @@ export function Header() {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200">
+          <div className="lg:hidden py-4 border-t border-gray-200">
             <div className="flex flex-col space-y-3">
               {navigation.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
+                  className="block px-4 py-4 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition-colors touch-target-44"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item.name}
                 </Link>
               ))}
               <div className="px-3 py-2">
-                <form onSubmit={handleSearch}>
+                <form onSubmit={handleSearch} className="relative">
                   <input
                     type="text"
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      updateSearchSuggestions(e.target.value);
+                    }}
                     placeholder="搜索产品..."
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 pr-12 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent touch-target-44"
                   />
+                  <button
+                    type="submit"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 hover:text-blue-600 transition-colors touch-target-44"
+                  >
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </button>
                 </form>
               </div>
-              <div className="px-3 space-y-3">
-                <Button variant="ghost" size="sm" asChild className="w-full justify-start">
-                  <Link href={`/${currentLocale}/cart`} className="flex items-center gap-2">
-                    <ShoppingCart className="h-4 w-4" />
+              <div className="px-3 space-y-2">
+                <Button variant="ghost" asChild className="w-full justify-start h-12 text-base">
+                  <Link href={`/${currentLocale}/cart`} className="flex items-center gap-3">
+                    <ShoppingCart className="h-5 w-5" />
                     购物车 ({cartCount})
                   </Link>
                 </Button>
-                <Button variant="ghost" size="sm" asChild className="w-full justify-start">
-                  <Link href={`/${currentLocale}/wishlist`} className="flex items-center gap-2">
-                    <Heart className="h-4 w-4" />
+                <Button variant="ghost" asChild className="w-full justify-start h-12 text-base">
+                  <Link href={`/${currentLocale}/wishlist`} className="flex items-center gap-3">
+                    <Heart className="h-5 w-5" />
                     心愿单 ({wishlistCount})
                   </Link>
                 </Button>
-                <Button className="w-full" size="sm" asChild>
+                <Button className="w-full h-12 text-base" asChild>
                   <Link href={`/${currentLocale}/inquiry`}>
                     获取报价
                   </Link>
@@ -253,33 +267,32 @@ export function Header() {
                 <div className="border-t pt-3 mt-3">
                   {user ? (
                     <div className="space-y-2">
-                      <Button variant="ghost" size="sm" asChild className="w-full justify-start">
-                        <Link href={`/${currentLocale}/profile`} className="flex items-center gap-2">
-                          <User className="h-4 w-4" />
+                      <Button variant="ghost" asChild className="w-full justify-start h-12 text-base">
+                        <Link href={`/${currentLocale}/profile`} className="flex items-center gap-3">
+                          <User className="h-5 w-5" />
                           {user.name}
                         </Link>
                       </Button>
                       <Button
                         variant="ghost"
-                        size="sm"
                         onClick={() => {
                           logout();
                           setIsMenuOpen(false);
                         }}
-                        className="w-full justify-start text-red-600 hover:text-red-800"
+                        className="w-full justify-start h-12 text-base text-red-600 hover:text-red-800"
                       >
-                        <LogOut className="h-4 w-4 mr-2" />
+                        <LogOut className="h-5 w-5 mr-3" />
                         退出登录
                       </Button>
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <Button variant="ghost" size="sm" asChild className="w-full">
+                      <Button variant="ghost" asChild className="w-full h-12 text-base">
                         <Link href={`/${currentLocale}/auth/login`} onClick={() => setIsMenuOpen(false)}>
                           登录
                         </Link>
                       </Button>
-                      <Button size="sm" asChild className="w-full">
+                      <Button asChild className="w-full h-12 text-base">
                         <Link href={`/${currentLocale}/auth/register`} onClick={() => setIsMenuOpen(false)}>
                           注册
                         </Link>

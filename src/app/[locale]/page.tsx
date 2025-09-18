@@ -14,49 +14,49 @@ export default function HomePage() {
   return (
     <MainLayout>
       {/* Hero Section */}
-      <section className="relative py-20 bg-gradient-to-br from-blue-50 via-white to-green-50">
-        <div className="container mx-auto px-4">
+      <section className="relative py-12 sm:py-16 lg:py-20 bg-gradient-to-br from-blue-50 via-white to-green-50">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 border-transparent mb-4 bg-blue-100 text-blue-800">
+            <div className="inline-flex items-center rounded-full border px-3 py-1 text-xs sm:text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 border-transparent mb-4 sm:mb-6 bg-blue-100 text-blue-800">
               专业B2B电子元器件平台
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 tracking-tight">
+            <h1 className="text-3xl xs:text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 sm:mb-6 tracking-tight leading-tight">
               欢迎来到
-              <span className="block sm:inline text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-green-600 ml-0 sm:ml-3">
+              <span className="block xs:inline text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-green-600 ml-0 xs:ml-2 sm:ml-3">
                 力通电子
               </span>
             </h1>
-            <p className="text-xl text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg lg:text-xl text-gray-600 mb-6 sm:mb-8 leading-relaxed max-w-3xl mx-auto px-2">
               专业的电子元器件供应链服务商，为全球客户提供高品质产品和专业技术支持，
               助力您的项目成功
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-              <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-600 text-white hover:bg-blue-700 h-10 px-6 py-2">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-8 sm:mb-12 px-4">
+              <button className="w-full sm:w-auto inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm sm:text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-600 text-white hover:bg-blue-700 h-12 sm:h-10 px-6 sm:px-8 py-3 sm:py-2 touch-target-44">
                 立即询价
               </button>
-              <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-gray-300 bg-white hover:bg-gray-50 h-10 px-6 py-2">
+              <button className="w-full sm:w-auto inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm sm:text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-gray-300 bg-white hover:bg-gray-50 h-12 sm:h-10 px-6 sm:px-8 py-3 sm:py-2 touch-target-44">
                 浏览品牌
               </button>
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-blue-600 mb-1">15+</div>
-                <div className="text-gray-600 text-sm">年行业经验</div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-4xl mx-auto px-2">
+              <div className="text-center p-3 sm:p-4 bg-white/60 backdrop-blur-sm rounded-lg border border-white/20">
+                <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-1 sm:mb-2">15+</div>
+                <div className="text-gray-600 text-xs sm:text-sm">年行业经验</div>
               </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-green-600 mb-1">12+</div>
-                <div className="text-gray-600 text-sm">合作品牌</div>
+              <div className="text-center p-3 sm:p-4 bg-white/60 backdrop-blur-sm rounded-lg border border-white/20">
+                <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-1 sm:mb-2">12+</div>
+                <div className="text-gray-600 text-xs sm:text-sm">合作品牌</div>
               </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-purple-600 mb-1">174K+</div>
-                <div className="text-gray-600 text-sm">产品型号</div>
+              <div className="text-center p-3 sm:p-4 bg-white/60 backdrop-blur-sm rounded-lg border border-white/20">
+                <div className="text-2xl sm:text-3xl font-bold text-purple-600 mb-1 sm:mb-2">174K+</div>
+                <div className="text-gray-600 text-xs sm:text-sm">产品型号</div>
               </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-orange-600 mb-1">10,000+</div>
-                <div className="text-gray-600 text-sm">客户信赖</div>
+              <div className="text-center p-3 sm:p-4 bg-white/60 backdrop-blur-sm rounded-lg border border-white/20">
+                <div className="text-2xl sm:text-3xl font-bold text-orange-600 mb-1 sm:mb-2">10,000+</div>
+                <div className="text-gray-600 text-xs sm:text-sm">客户信赖</div>
               </div>
             </div>
           </div>
@@ -225,19 +225,19 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-blue-600 to-green-600">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
+      <section className="py-12 sm:py-16 bg-gradient-to-r from-blue-600 to-green-600">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-6">
             准备开始您的项目了吗？
           </h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-lg sm:text-xl text-blue-100 mb-6 sm:mb-8 max-w-2xl mx-auto px-2">
             让我们的专业团队为您提供最优质的电子元器件供应链服务
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-white text-blue-600 hover:bg-gray-100 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-6 py-2">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4">
+            <button className="w-full sm:w-auto bg-white text-blue-600 hover:bg-gray-100 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm sm:text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-12 sm:h-10 px-6 sm:px-8 py-3 sm:py-2 touch-target-44">
               立即询价
             </button>
-            <button className="border-white text-white hover:bg-white hover:text-blue-600 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border h-10 px-6 py-2">
+            <button className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-blue-600 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm sm:text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border h-12 sm:h-10 px-6 sm:px-8 py-3 sm:py-2 touch-target-44">
               联系我们
             </button>
           </div>
