@@ -1,5 +1,5 @@
 import { BrandNavigation } from '@/components/layout/BrandNavigation';
-import { getBrandWithContent, getAllBrands } from '@/lib/sanity/brands';
+import { getBrandWithContent, getAllBrands, getBrandSlugsOnly } from '@/lib/sanity/brands';
 import { urlFor } from '@/lib/sanity/client';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -31,21 +31,24 @@ export async function generateStaticParams() {
   try {
     console.log('🔧 [generateStaticParams] Starting brand support page static generation...');
 
-    // 使用更可靠的slug获取方式
-    const brandSlugs = await getBrandSlugsOnly(30);
+    // 使用更可靠的slug获取方式，确保与主品牌页面一致
+    const brandSlugs = await getBrandSlugsOnly(50);
 
     if (!brandSlugs || brandSlugs.length === 0) {
-      console.warn('⚠️ [generateStaticParams] No brand slugs found for support, using fallback');
-      return [
-        { locale: 'zh-CN', slug: 'cree' },
-        { locale: 'zh-CN', slug: 'infineon' },
-        { locale: 'zh-CN', slug: 'ti' },
-        { locale: 'zh-CN', slug: 'stmicroelectronics' },
-        { locale: 'en', slug: 'cree' },
-        { locale: 'en', slug: 'infineon' },
-        { locale: 'en', slug: 'ti' },
-        { locale: 'en', slug: 'stmicroelectronics' }
+      console.warn('⚠️ [generateStaticParams] No brand slugs found for support, using comprehensive fallback');
+      const comprehensiveFallback = [
+        'cree', 'infineon', 'ti', 'stmicroelectronics', 'lem',
+        'qualcomm', 'mediatek', 'epcos', 'ixys', 'littelfuse',
+        'semikron', 'ncc', 'pi', 'sanrex', 'electronicon'
       ];
+      const fallbackParams = [];
+      for (const locale of ['zh-CN', 'en']) {
+        for (const slug of comprehensiveFallback) {
+          fallbackParams.push({ locale, slug });
+        }
+      }
+      console.log(`📋 [generateStaticParams] Generated ${fallbackParams.length} fallback params for support`);
+      return fallbackParams;
     }
 
     // Temporarily limit to primary locales to reduce build time

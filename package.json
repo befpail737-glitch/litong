@@ -29,6 +29,8 @@
     "build:simple": "node scripts/build-static-simple.js",
     "build:emergency": "node scripts/emergency-build.js",
     "fix-static-export": "node scripts/fix-static-export.js",
+    "verify-brand-subdirs": "node scripts/verify-brand-subdirs.js",
+    "build:verify": "npm run build && npm run verify-brand-subdirs",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",

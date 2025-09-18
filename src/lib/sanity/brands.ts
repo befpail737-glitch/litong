@@ -411,6 +411,8 @@ export async function getBrandProductCategories(brandSlug: string) {
 // 获取品牌slug列表（仅用于generateStaticParams，减少查询复杂度）
 export async function getBrandSlugsOnly(limit = 50): Promise<string[]> {
   try {
+    console.log(`🔍 [getBrandSlugsOnly] Fetching up to ${limit} brand slugs from Sanity...`);
+
     // 最简化查询，仅获取slug字段，并确保数据完整性
     const query = `*[_type == "brandBasic" && (isActive == true || !defined(isActive)) && defined(slug.current) && defined(name)] | order(name asc) [0...${limit}] {
       "slug": slug.current,
@@ -419,23 +421,45 @@ export async function getBrandSlugsOnly(limit = 50): Promise<string[]> {
     }`;
 
     const brands = await client.fetch(query);
+    console.log(`📊 [getBrandSlugsOnly] Sanity returned ${brands?.length || 0} brand records`);
 
     if (!brands || brands.length === 0) {
-      console.warn('No brands found from Sanity, using fallback slugs');
-      return ['cree', 'infineon', 'ti', 'stmicroelectronics', 'lem'];
+      console.warn('⚠️ [getBrandSlugsOnly] No brands found from Sanity, using comprehensive fallback slugs');
+      return [
+        'cree', 'infineon', 'ti', 'stmicroelectronics', 'lem',
+        'qualcomm', 'mediatek', 'epcos', 'ixys', 'littelfuse',
+        'semikron', 'ncc', 'pi', 'sanrex', 'electronicon'
+      ];
     }
 
     // 验证并过滤有效的slug
     const validSlugs = brands
-      .filter(brand => brand.slug && brand.name && brand._id)
-      .map(brand => brand.slug)
-      .filter(slug => typeof slug === 'string' && slug.trim().length > 0);
+      .filter(brand => {
+        const isValid = brand.slug && brand.name && brand._id &&
+          typeof brand.slug === 'string' && brand.slug.trim().length > 0;
+        if (!isValid) {
+          console.warn(`⚠️ [getBrandSlugsOnly] Invalid brand data: ${JSON.stringify(brand)}`);
+        }
+        return isValid;
+      })
+      .map(brand => brand.slug.trim())
+      .filter(slug => slug.length > 0);
 
-    console.log(`✅ [getBrandSlugsOnly] Found ${validSlugs.length} valid brand slugs`);
+    console.log(`✅ [getBrandSlugsOnly] Found ${validSlugs.length} valid brand slugs out of ${brands.length} records`);
 
-    // 如果有效slug太少，补充fallback
-    if (validSlugs.length < 3) {
-      const fallbackSlugs = ['cree', 'infineon', 'ti', 'stmicroelectronics', 'lem'];
+    // 详细日志记录找到的品牌
+    if (validSlugs.length > 0) {
+      console.log(`📋 [getBrandSlugsOnly] Valid brand slugs: ${validSlugs.slice(0, 10).join(', ')}${validSlugs.length > 10 ? '...' : ''}`);
+    }
+
+    // 如果有效slug太少，补充fallback但保留现有数据
+    if (validSlugs.length < 5) {
+      console.warn(`⚠️ [getBrandSlugsOnly] Only ${validSlugs.length} valid slugs found, augmenting with fallback`);
+      const fallbackSlugs = [
+        'cree', 'infineon', 'ti', 'stmicroelectronics', 'lem',
+        'qualcomm', 'mediatek', 'epcos', 'ixys', 'littelfuse',
+        'semikron', 'ncc', 'pi', 'sanrex', 'electronicon'
+      ];
       const combinedSlugs = [...new Set([...validSlugs, ...fallbackSlugs])];
       console.log(`🔄 [getBrandSlugsOnly] Augmented with fallback slugs: ${combinedSlugs.length} total`);
       return combinedSlugs;
@@ -443,9 +467,14 @@ export async function getBrandSlugsOnly(limit = 50): Promise<string[]> {
 
     return validSlugs;
   } catch (error) {
-    console.error('Error fetching brand slugs, using fallback:', error);
-    // 返回有保证的fallback slugs
-    return ['cree', 'infineon', 'ti', 'stmicroelectronics', 'lem'];
+    console.error('❌ [getBrandSlugsOnly] Error fetching brand slugs, using comprehensive fallback:', error);
+    // 返回全面的fallback slugs确保所有常见品牌都有子目录
+    return [
+      'cree', 'infineon', 'ti', 'stmicroelectronics', 'lem',
+      'qualcomm', 'mediatek', 'epcos', 'ixys', 'littelfuse',
+      'semikron', 'ncc', 'pi', 'sanrex', 'electronicon',
+      '英飞凌' // 包含中文品牌
+    ];
   }
 }
 
