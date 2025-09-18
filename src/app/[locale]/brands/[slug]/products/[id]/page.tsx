@@ -1,4 +1,4 @@
-import { getProduct, getRelatedProducts, getProducts, getBrandProductCombinations } from '@/lib/sanity/queries';
+import { getBrandProduct, getRelatedProducts, getProducts, getBrandProductCombinations } from '@/lib/sanity/queries';
 import { getBrandData, getAllBrands } from '@/lib/sanity/brands';
 import { safeImageUrl } from '@/lib/sanity/client';
 import { notFound } from 'next/navigation';
@@ -76,21 +76,28 @@ export default async function BrandProductPage({ params }: BrandProductPageProps
   // Decode slug to handle Chinese brand names
   const decodedSlug = decodeURIComponent(slug);
 
-  // Get both brand and product data with error handling
+  // Get brand data and verify brand-product association
   let brandData, product;
 
   try {
-    [brandData, product] = await Promise.all([
-      getBrandData(decodedSlug),
-      getProduct(id)
-    ]);
+    // First get brand data to ensure brand exists
+    brandData = await getBrandData(decodedSlug);
+
+    if (!brandData || !brandData.brand) {
+      console.warn(`Brand not found for slug: ${decodedSlug}`);
+      notFound();
+    }
+
+    // Then get product with brand association validation
+    product = await getBrandProduct(decodedSlug, id);
+
+    if (!product) {
+      console.warn(`Product ${id} not found for brand ${decodedSlug} or not associated with this brand`);
+      notFound();
+    }
+
   } catch (error) {
     console.error(`Error fetching data for brand: ${decodedSlug}, product: ${id}`, error);
-    notFound();
-  }
-
-  if (!brandData || !brandData.brand || !product) {
-    console.warn(`Brand or product not found for slug: ${decodedSlug}, id: ${id}`);
     notFound();
   }
 

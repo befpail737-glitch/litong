@@ -183,6 +183,35 @@ export async function getProduct(slug: string, preview = false) {
   }
 }
 
+// 获取品牌特定的产品（确保品牌-产品关联正确）
+export async function getBrandProduct(brandSlug: string, productSlug: string, preview = false) {
+  const query = groq`
+    *[_type == "product" &&
+      slug.current == $productSlug &&
+      brand->slug.current == $brandSlug &&
+      isActive == true &&
+      !(_id in path("drafts.**"))][0] {
+      ${GROQ_FRAGMENTS.productDetail}
+    }
+  `;
+
+  try {
+    console.log(`🔍 [getBrandProduct] Searching for product ${productSlug} in brand ${brandSlug}`);
+    const product = await withRetry(() => client.fetch(query, { brandSlug, productSlug }));
+
+    if (product) {
+      console.log(`✅ [getBrandProduct] Found product: ${product.title} for brand ${brandSlug}`);
+    } else {
+      console.log(`❌ [getBrandProduct] Product ${productSlug} not found for brand ${brandSlug}`);
+    }
+
+    return product || null;
+  } catch (error) {
+    console.error(`Error fetching brand product ${brandSlug}/${productSlug}:`, error);
+    return null;
+  }
+}
+
 // 获取产品分类
 export async function getProductCategories(parentId?: string) {
   let filter = '_type == "productCategory" && isVisible == true';
