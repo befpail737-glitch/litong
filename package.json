@@ -12,7 +12,7 @@
   "author": "Litong Electronics Team",
   "license": "MIT",
   "engines": {
-    "node": ">=20.11.0",
+    "node": ">=20.10.0",
     "npm": ">=10.0.0"
   },
   "scripts": {
@@ -80,7 +80,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-is": "^19.1.1",
-    "sanity": "^3.17.0",
+    "sanity": "3.16.9",
     "sharp": "^0.33.1",
     "styled-components": "^6.1.19",
     "tailwind-merge": "^2.2.0",

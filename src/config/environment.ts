@@ -9,10 +9,10 @@ export const environment = {
   SANITY_API_VERSION: process.env.SANITY_API_VERSION || '2023-05-03',
   SANITY_API_TOKEN: process.env.SANITY_API_TOKEN,
 
-  // 构建配置
-  BRAND_LIMIT: parseInt(process.env.BRAND_LIMIT || '50'),
-  PRODUCT_LIMIT: parseInt(process.env.PRODUCT_LIMIT || '100'),
-  SOLUTION_LIMIT: parseInt(process.env.SOLUTION_LIMIT || '50'),
+  // 构建配置 - 降低限制以减少构建时间
+  BRAND_LIMIT: parseInt(process.env.BRAND_LIMIT || '30'),
+  PRODUCT_LIMIT: parseInt(process.env.PRODUCT_LIMIT || '50'),
+  SOLUTION_LIMIT: parseInt(process.env.SOLUTION_LIMIT || '20'),
 
   // 缓存配置
   ENABLE_CDN: process.env.NODE_ENV === 'production',
