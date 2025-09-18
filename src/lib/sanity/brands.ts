@@ -409,73 +409,14 @@ export async function getBrandProductCategories(brandSlug: string) {
 }
 
 // 获取品牌slug列表（仅用于generateStaticParams，减少查询复杂度）
+// 注意：此函数已被 brand-config.ts 中的动态系统替换
+// 保留用于向后兼容，建议使用 getBrandSlugs() from '@/lib/brands/brand-config'
 export async function getBrandSlugsOnly(limit = 50): Promise<string[]> {
-  try {
-    console.log(`🔍 [getBrandSlugsOnly] Fetching up to ${limit} brand slugs from Sanity...`);
+  console.warn('⚠️ [getBrandSlugsOnly] This function is deprecated. Use getBrandSlugs from @/lib/brands/brand-config instead.');
 
-    // 最简化查询，仅获取slug字段，并确保数据完整性
-    const query = `*[_type == "brandBasic" && (isActive == true || !defined(isActive)) && defined(slug.current) && defined(name)] | order(name asc) [0...${limit}] {
-      "slug": slug.current,
-      name,
-      _id
-    }`;
-
-    const brands = await client.fetch(query);
-    console.log(`📊 [getBrandSlugsOnly] Sanity returned ${brands?.length || 0} brand records`);
-
-    if (!brands || brands.length === 0) {
-      console.warn('⚠️ [getBrandSlugsOnly] No brands found from Sanity, using comprehensive fallback slugs');
-      return [
-        'cree', 'infineon', 'ti', 'stmicroelectronics', 'lem',
-        'qualcomm', 'mediatek', 'epcos', 'ixys', 'littelfuse',
-        'semikron', 'ncc', 'pi', 'sanrex', 'electronicon'
-      ];
-    }
-
-    // 验证并过滤有效的slug
-    const validSlugs = brands
-      .filter(brand => {
-        const isValid = brand.slug && brand.name && brand._id &&
-          typeof brand.slug === 'string' && brand.slug.trim().length > 0;
-        if (!isValid) {
-          console.warn(`⚠️ [getBrandSlugsOnly] Invalid brand data: ${JSON.stringify(brand)}`);
-        }
-        return isValid;
-      })
-      .map(brand => brand.slug.trim())
-      .filter(slug => slug.length > 0);
-
-    console.log(`✅ [getBrandSlugsOnly] Found ${validSlugs.length} valid brand slugs out of ${brands.length} records`);
-
-    // 详细日志记录找到的品牌
-    if (validSlugs.length > 0) {
-      console.log(`📋 [getBrandSlugsOnly] Valid brand slugs: ${validSlugs.slice(0, 10).join(', ')}${validSlugs.length > 10 ? '...' : ''}`);
-    }
-
-    // 如果有效slug太少，补充fallback但保留现有数据
-    if (validSlugs.length < 5) {
-      console.warn(`⚠️ [getBrandSlugsOnly] Only ${validSlugs.length} valid slugs found, augmenting with fallback`);
-      const fallbackSlugs = [
-        'cree', 'infineon', 'ti', 'stmicroelectronics', 'lem',
-        'qualcomm', 'mediatek', 'epcos', 'ixys', 'littelfuse',
-        'semikron', 'ncc', 'pi', 'sanrex', 'electronicon'
-      ];
-      const combinedSlugs = [...new Set([...validSlugs, ...fallbackSlugs])];
-      console.log(`🔄 [getBrandSlugsOnly] Augmented with fallback slugs: ${combinedSlugs.length} total`);
-      return combinedSlugs;
-    }
-
-    return validSlugs;
-  } catch (error) {
-    console.error('❌ [getBrandSlugsOnly] Error fetching brand slugs, using comprehensive fallback:', error);
-    // 返回全面的fallback slugs确保所有常见品牌都有子目录
-    return [
-      'cree', 'infineon', 'ti', 'stmicroelectronics', 'lem',
-      'qualcomm', 'mediatek', 'epcos', 'ixys', 'littelfuse',
-      'semikron', 'ncc', 'pi', 'sanrex', 'electronicon',
-      '英飞凌' // 包含中文品牌
-    ];
-  }
+  // 导入动态配置
+  const { getBrandSlugs } = await import('@/lib/brands/brand-config');
+  return getBrandSlugs(limit);
 }
 
 // 获取品牌完整数据（包含相关内容）

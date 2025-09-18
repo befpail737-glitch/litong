@@ -1,10 +1,12 @@
 import { BrandNavigation } from '@/components/layout/BrandNavigation';
-import { getBrandWithContent, getBrandSlugsOnly } from '@/lib/sanity/brands';
+import { getBrandWithContent } from '@/lib/sanity/brands';
 import { safeImageUrl } from '@/lib/sanity/client';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { generateSolutionUrl } from '@/lib/utils/slug';
+import { generateBrandStaticParams } from '@/lib/brands/brand-registry';
+import { APP_CONSTANTS } from '@/config/constants';
 
 interface BrandPageProps {
   params: {
@@ -16,92 +18,37 @@ interface BrandPageProps {
 // Generate static params for all brands and locales
 export async function generateStaticParams() {
   try {
-    console.log('🔧 [generateStaticParams] Starting brand page static generation...');
+    console.log('🔧 [generateStaticParams] Starting brand page static generation using dynamic brand registry...');
 
-    // 使用轻量级查询仅获取slugs，大幅减少查询复杂度
-    const brandSlugs = await getBrandSlugsOnly(50); // 增加到50个品牌确保足够的详情页
+    // 使用新的动态品牌管理系统
+    const params = await generateBrandStaticParams(['zh-CN', 'en']);
 
-    if (!brandSlugs || brandSlugs.length === 0) {
-      console.warn('⚠️ [generateStaticParams] No brand slugs found, using fallback');
-      const fallbackSlugs = ['cree', 'infineon', 'ti', 'stmicroelectronics', 'lem'];
-      const fallbackParams = [];
-      for (const locale of ['zh-CN', 'en']) {
-        for (const slug of fallbackSlugs) {
-          fallbackParams.push({ locale, slug });
-        }
-      }
-      return fallbackParams;
+    if (!params || params.length === 0) {
+      console.warn('⚠️ [generateStaticParams] No params generated from brand registry, using emergency fallback');
+      return [
+        { locale: 'zh-CN', slug: 'cree' },
+        { locale: 'zh-CN', slug: 'infineon' },
+        { locale: 'zh-CN', slug: 'ti' },
+        { locale: 'en', slug: 'cree' },
+        { locale: 'en', slug: 'infineon' },
+        { locale: 'en', slug: 'ti' }
+      ];
     }
 
-    // 仅限制为主要语言以减少构建时间
-    const locales = ['zh-CN', 'en'];
+    console.log(`✅ [generateStaticParams] Generated ${params.length} static params for brands using dynamic registry`);
+    return params;
 
-    const params = [];
-    for (const locale of locales) {
-      for (const slug of brandSlugs) {
-        if (slug && typeof slug === 'string' && slug.trim().length > 0) {
-          // 验证slug格式
-          const trimmedSlug = slug.trim();
-
-          // 添加原始slug
-          params.push({
-            locale,
-            slug: trimmedSlug,
-          });
-
-          // 对于中文品牌，也添加URL编码版本
-          const encodedSlug = encodeURIComponent(trimmedSlug);
-          if (trimmedSlug !== encodedSlug) {
-            params.push({
-              locale,
-              slug: encodedSlug,
-            });
-          }
-        }
-      }
-    }
-
-    // 验证生成的参数
-    const validParams = params.filter(param =>
-      param.locale &&
-      param.slug &&
-      typeof param.slug === 'string' &&
-      param.slug.trim().length > 0
-    );
-
-    console.log(`✅ [generateStaticParams] Generated ${validParams.length} static params for brands (from ${brandSlugs.length} slugs)`);
-
-    // 如果有效参数太少，添加fallback
-    if (validParams.length < 10) {
-      const fallbackSlugs = ['cree', 'infineon', 'ti', 'stmicroelectronics', 'lem'];
-      for (const locale of locales) {
-        for (const slug of fallbackSlugs) {
-          if (!validParams.find(p => p.locale === locale && p.slug === slug)) {
-            validParams.push({ locale, slug });
-          }
-        }
-      }
-      console.log(`🔄 [generateStaticParams] Augmented with fallback params, total: ${validParams.length}`);
-    }
-
-    return validParams;
   } catch (error) {
     console.error('❌ [generateStaticParams] Error generating static params for brands:', error);
     // 紧急情况下使用最小化的fallback
-    const emergencyParams = [
+    return [
       { locale: 'zh-CN', slug: 'cree' },
       { locale: 'zh-CN', slug: 'infineon' },
       { locale: 'zh-CN', slug: 'ti' },
-      { locale: 'zh-CN', slug: 'stmicroelectronics' },
-      { locale: 'zh-CN', slug: 'lem' },
       { locale: 'en', slug: 'cree' },
       { locale: 'en', slug: 'infineon' },
-      { locale: 'en', slug: 'ti' },
-      { locale: 'en', slug: 'stmicroelectronics' },
-      { locale: 'en', slug: 'lem' }
+      { locale: 'en', slug: 'ti' }
     ];
-    console.log(`🆘 [generateStaticParams] Using emergency fallback params: ${emergencyParams.length}`);
-    return emergencyParams;
   }
 }
 

@@ -1,37 +1,24 @@
 import { createClient } from '@sanity/client';
 import imageUrlBuilder from '@sanity/image-url';
 import type { SanityImageSource } from '@sanity/image-url/lib/types';
+import { getClientConfig, validateSanityConfig } from '@/config/sanity';
 
-// 公开客户端（不需要token）- 硬编码配置确保一致性
-export const client = createClient({
-  projectId: 'oquvb2bs', // 直接硬编码
-  dataset: 'production', // 直接硬编码
-  apiVersion: '2023-05-03', // 使用最新API版本
-  useCdn: process.env.NODE_ENV === 'production', // 生产环境启用CDN以提升构建速度
-  perspective: 'published', // 只获取已发布的内容
-  // 不使用token进行公开访问
-});
+// 验证配置
+validateSanityConfig();
+
+// 公开客户端（不需要token）- 使用动态配置
+export const client = createClient(getClientConfig(false));
 
 // 带认证的客户端（用于需要权限的操作）
 export const authenticatedClient = createClient({
-  projectId: 'oquvb2bs', // 直接硬编码
-  dataset: 'production', // 直接硬编码
-  apiVersion: '2023-05-03',
+  ...getClientConfig(false),
   useCdn: false,
   token: process.env.SANITY_API_TOKEN,
-  perspective: 'published',
   ignoreBrowserTokenWarning: true,
 });
 
 // 预览模式客户端（包含草稿）
-export const previewClient = createClient({
-  projectId: 'oquvb2bs', // 直接硬编码
-  dataset: 'production', // 直接硬编码
-  apiVersion: '2023-05-03',
-  useCdn: false,
-  token: process.env.SANITY_API_TOKEN,
-  perspective: 'previewDrafts', // 包含草稿内容
-});
+export const previewClient = createClient(getClientConfig(true));
 
 // 获取客户端实例
 export function getClient(preview?: boolean) {

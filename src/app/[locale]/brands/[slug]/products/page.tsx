@@ -1,11 +1,12 @@
 import { BrandNavigation } from '@/components/layout/BrandNavigation';
-import { getBrandWithContent, getAllBrands, getBrandSlugsOnly } from '@/lib/sanity/brands';
+import { getBrandWithContent } from '@/lib/sanity/brands';
 import { safeImageUrl } from '@/lib/sanity/client';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Search, Filter, Grid, List, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { generateBrandStaticParams } from '@/lib/brands/brand-registry';
 
 interface BrandProductsPageProps {
   params: {
@@ -17,68 +18,28 @@ interface BrandProductsPageProps {
 // Generate static params for all brands and locales
 export async function generateStaticParams() {
   try {
-    console.log('🔧 [generateStaticParams] Starting brand products page static generation...');
+    console.log('🔧 [generateStaticParams] Starting brand products page static generation using dynamic brand registry...');
 
-    // 使用更可靠的slug获取方式，确保与主品牌页面一致
-    const brandSlugs = await getBrandSlugsOnly(50);
+    // 使用新的动态品牌管理系统
+    const params = await generateBrandStaticParams(['zh-CN', 'en']);
 
-    if (!brandSlugs || brandSlugs.length === 0) {
-      console.warn('⚠️ [generateStaticParams] No brand slugs found for products, using comprehensive fallback');
-      const comprehensiveFallback = [
-        'cree', 'infineon', 'ti', 'stmicroelectronics', 'lem',
-        'qualcomm', 'mediatek', 'epcos', 'ixys', 'littelfuse',
-        'semikron', 'ncc', 'pi', 'sanrex', 'electronicon'
+    if (!params || params.length === 0) {
+      console.warn('⚠️ [generateStaticParams] No params generated for products, using emergency fallback');
+      return [
+        { locale: 'zh-CN', slug: 'cree' },
+        { locale: 'zh-CN', slug: 'infineon' },
+        { locale: 'zh-CN', slug: 'ti' },
+        { locale: 'en', slug: 'cree' },
+        { locale: 'en', slug: 'infineon' },
+        { locale: 'en', slug: 'ti' }
       ];
-      const fallbackParams = [];
-      for (const locale of ['zh-CN', 'en']) {
-        for (const slug of comprehensiveFallback) {
-          fallbackParams.push({ locale, slug });
-        }
-      }
-      console.log(`📋 [generateStaticParams] Generated ${fallbackParams.length} fallback params for products`);
-      return fallbackParams;
     }
 
-    // Temporarily limit to primary locales to reduce build time
-    const locales = ['zh-CN', 'en'];
+    console.log(`✅ [generateStaticParams] Generated ${params.length} static params for brand products using dynamic registry`);
+    return params;
 
-    const params = [];
-    for (const locale of locales) {
-      for (const slug of brandSlugs) {
-        if (slug && typeof slug === 'string' && slug.trim().length > 0) {
-          const trimmedSlug = slug.trim();
-
-          params.push({
-            locale,
-            slug: trimmedSlug,
-          });
-
-          // For Chinese brands, also add URL-encoded version
-          const encodedSlug = encodeURIComponent(trimmedSlug);
-          if (trimmedSlug !== encodedSlug) {
-            params.push({
-              locale,
-              slug: encodedSlug,
-            });
-          }
-        }
-      }
-    }
-
-    // 验证生成的参数
-    const validParams = params.filter(param =>
-      param.locale &&
-      param.slug &&
-      typeof param.slug === 'string' &&
-      param.slug.trim().length > 0
-    );
-
-    console.log(`✅ [generateStaticParams] Generated ${validParams.length} static params for brand products`);
-
-    return validParams;
   } catch (error) {
     console.error('❌ [generateStaticParams] Error generating static params for brand products:', error);
-    // 返回基本的fallback参数
     return [
       { locale: 'zh-CN', slug: 'cree' },
       { locale: 'zh-CN', slug: 'infineon' },
