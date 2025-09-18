@@ -2,8 +2,8 @@ import { groq } from 'next-sanity';
 
 import { client, GROQ_FRAGMENTS, withRetry, SanityError } from './client';
 
-// 轻量级函数仅用于generateStaticParams，减少查询复杂度
-export async function getProductSlugsOnly(limit = 20): Promise<string[]> {
+// 轻量级函数仅用于generateStaticParams，减少查询复杂度 - 大幅减少以避免超时
+export async function getProductSlugsOnly(limit = 5): Promise<string[]> {
   try {
     const query = groq`
       *[_type == "product" && isActive == true && defined(slug.current)] | order(_createdAt desc) [0...${limit}] {
@@ -21,7 +21,7 @@ export async function getProductSlugsOnly(limit = 20): Promise<string[]> {
   }
 }
 
-export async function getSolutionSlugsOnly(limit = 10): Promise<string[]> {
+export async function getSolutionSlugsOnly(limit = 3): Promise<string[]> {
   try {
     const query = groq`
       *[_type == "solution" && (isPublished == true || !defined(isPublished)) && defined(slug.current)] | order(_createdAt desc) [0...${limit}] {
@@ -39,10 +39,25 @@ export async function getSolutionSlugsOnly(limit = 10): Promise<string[]> {
   }
 }
 
-// 获取品牌-产品组合用于静态参数生成
-export async function getBrandProductCombinations(limit = 50): Promise<Array<{brandSlug: string, productSlug: string}>> {
+// 获取品牌-产品组合用于静态参数生成 - 大幅减少数量以避免Cloudflare超时
+export async function getBrandProductCombinations(limit = 8): Promise<Array<{brandSlug: string, productSlug: string}>> {
   try {
-    console.log('🔧 [getBrandProductCombinations] Fetching real brand-product combinations from Sanity...');
+    console.log('🔧 [getBrandProductCombinations] Fetching minimal brand-product combinations from Sanity...');
+
+    // 应急模式：硬编码核心产品组合，避免复杂查询
+    const emergencyMode = process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'phase-production-build';
+
+    if (emergencyMode) {
+      console.log('🚨 Emergency mode: Using hardcoded product combinations to avoid timeout');
+      return [
+        { brandSlug: 'cree', productSlug: '55555' },
+        { brandSlug: 'cree', productSlug: '11111' },
+        { brandSlug: 'cree', productSlug: 'sic mosfet' },
+        { brandSlug: 'ti', productSlug: 'opa2134pa' },
+        { brandSlug: 'infineon', productSlug: 'bss123' }
+      ];
+    }
+
     const query = groq`
       *[_type == "product" && (isActive == true || !defined(isActive)) && defined(slug.current) && defined(brand->slug.current)] | order(_createdAt desc) [0...${limit}] {
         "productSlug": slug.current,

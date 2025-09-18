@@ -22,13 +22,27 @@ export interface Brand {
   established?: string
 }
 
-// 获取所有品牌 - 带fallback支持和增强调试
+// 获取所有品牌 - 应急模式，减少数据库查询
 export async function getAllBrands(): Promise<Brand[]> {
   try {
     console.log('🔍 [getAllBrands] Starting brand data fetch from Sanity...');
 
+    // 应急模式：在构建时使用简化数据，减少查询负载
+    const emergencyMode = process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'phase-production-build';
+
+    if (emergencyMode) {
+      console.log('🚨 [getAllBrands] Emergency mode: Using hardcoded brands to avoid timeout');
+      return [
+        { _id: 'cree-id', name: 'Cree', slug: 'cree', isActive: true, isFeatured: true },
+        { _id: 'ti-id', name: 'Texas Instruments', slug: 'ti', isActive: true, isFeatured: true },
+        { _id: 'infineon-id', name: 'Infineon', slug: 'infineon', isActive: true, isFeatured: false },
+        { _id: 'stm-id', name: 'STMicroelectronics', slug: 'stmicroelectronics', isActive: true, isFeatured: false },
+        { _id: 'lem-id', name: 'LEM', slug: 'lem', isActive: true, isFeatured: false }
+      ];
+    }
+
     // 尝试更宽松的查询条件
-    const query = `*[_type == "brandBasic" && (isActive == true || !defined(isActive))] | order(name asc) {
+    const query = `*[_type == "brandBasic" && (isActive == true || !defined(isActive))] | order(name asc) [0...10] {
       _id,
       _type,
       name,

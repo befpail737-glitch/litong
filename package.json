@@ -27,6 +27,7 @@
     "build:static": "node scripts/build-static.js",
     "build:cloudflare": "node scripts/cloudflare-build.js",
     "build:simple": "node scripts/build-static-simple.js",
+    "build:emergency": "node scripts/emergency-build.js",
     "fix-static-export": "node scripts/fix-static-export.js",
     "start": "next start",
     "lint": "next lint",

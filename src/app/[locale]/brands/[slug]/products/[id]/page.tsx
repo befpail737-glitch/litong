@@ -32,19 +32,18 @@ interface BrandProductPageProps {
 // Generate static params for all brand-product combinations
 export async function generateStaticParams() {
   try {
-    console.log('🔧 Generating brand product static parameters...');
+    console.log('🔧 Generating minimal brand product static parameters for Cloudflare...');
 
-    // Use real brand-product combinations from Sanity
-    const brandProductCombinations = await getBrandProductCombinations(50);
-    const locales = ['zh-CN', 'en'];
+    // Emergency mode for Cloudflare: drastically reduce static generation
+    const brandProductCombinations = await getBrandProductCombinations(5);
+    const locales = ['zh-CN']; // Only Chinese locale for emergency deployment
 
     const params = [];
 
     for (const locale of locales) {
       for (const combo of brandProductCombinations) {
         if (combo.brandSlug && combo.productSlug) {
-          // Validate that this combination will actually work
-          console.log(`📋 Adding static param: ${locale}/${combo.brandSlug}/${combo.productSlug}`);
+          console.log(`📋 Adding minimal static param: ${locale}/${combo.brandSlug}/${combo.productSlug}`);
           params.push({
             locale,
             slug: combo.brandSlug,
