@@ -134,17 +134,29 @@
 /brands/:slug/support /zh-CN/brands/:slug/support/ 301
 /brands/:slug /zh-CN/brands/:slug/ 301
 
-# Global list pages
-/products/ /products/index.html 200
-/solutions/ /solutions/index.html 200
-/articles/ /articles/index.html 200
-/brands/ /brands/index.html 200
+# Global list pages with locale support
+/:locale/products/ /:locale/products/index.html 200
+/:locale/solutions/ /:locale/solutions/index.html 200
+/:locale/articles/ /:locale/articles/index.html 200
+/:locale/brands/ /:locale/brands/index.html 200
 
-# Global list pages - trailing slash normalization
-/products /products/ 301
-/solutions /solutions/ 301
-/articles /articles/ 301
-/brands /brands/ 301
+# Legacy global list pages (redirect to default locale)
+/products/ /zh-CN/products/ 301
+/solutions/ /zh-CN/solutions/ 301
+/articles/ /zh-CN/articles/ 301
+/brands/ /zh-CN/brands/ 301
+
+# Global list pages - trailing slash normalization with locale support
+/:locale/products /:locale/products/ 301
+/:locale/solutions /:locale/solutions/ 301
+/:locale/articles /:locale/articles/ 301
+/:locale/brands /:locale/brands/ 301
+
+# Legacy global list pages - trailing slash normalization (redirect to default locale)
+/products /zh-CN/products/ 301
+/solutions /zh-CN/solutions/ 301
+/articles /zh-CN/articles/ 301
+/brands /zh-CN/brands/ 301
 
 # ========================================
 # API AND OTHER ROUTES

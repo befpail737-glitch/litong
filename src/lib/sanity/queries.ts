@@ -39,6 +39,33 @@ export async function getSolutionSlugsOnly(limit = 10): Promise<string[]> {
   }
 }
 
+// 获取品牌-产品组合用于静态参数生成
+export async function getBrandProductCombinations(limit = 50): Promise<Array<{brandSlug: string, productSlug: string}>> {
+  try {
+    const query = groq`
+      *[_type == "product" && (isActive == true || !defined(isActive)) && defined(slug.current) && defined(brand->slug.current)] | order(_createdAt desc) [0...${limit}] {
+        "productSlug": slug.current,
+        "brandSlug": brand->slug.current
+      }
+    `;
+
+    const combinations = await client.fetch(query);
+    return combinations?.filter(c => c.brandSlug && c.productSlug) || [];
+  } catch (error) {
+    console.error('Error fetching brand-product combinations, using fallback:', error);
+    // Return some fallback combinations based on the real data analysis
+    return [
+      { brandSlug: 'cree', productSlug: '11111' },
+      { brandSlug: 'cree', productSlug: 'sic mosfet' },
+      { brandSlug: 'cree', productSlug: '55555' },
+      { brandSlug: 'cree', productSlug: 'c4d02120a' },
+      { brandSlug: 'Electronicon', productSlug: '33333' },
+      { brandSlug: 'Electronicon', productSlug: '99999' },
+      { brandSlug: 'stmicroelectronics', productSlug: 'stm32f407vgt6' },
+    ];
+  }
+}
+
 // 获取品牌-解决方案组合用于静态参数生成
 export async function getBrandSolutionCombinations(limit = 30): Promise<Array<{brandSlug: string, solutionSlug: string}>> {
   try {

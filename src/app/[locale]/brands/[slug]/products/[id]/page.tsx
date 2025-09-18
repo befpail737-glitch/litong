@@ -1,4 +1,4 @@
-import { getProduct, getRelatedProducts, getProducts } from '@/lib/sanity/queries';
+import { getProduct, getRelatedProducts, getProducts, getBrandProductCombinations } from '@/lib/sanity/queries';
 import { getBrandData, getAllBrands } from '@/lib/sanity/brands';
 import { safeImageUrl } from '@/lib/sanity/client';
 import { notFound } from 'next/navigation';
@@ -31,28 +31,43 @@ interface BrandProductPageProps {
 
 // Generate static params for all brand-product combinations
 export async function generateStaticParams() {
-  console.log('🔧 Generating brand product static parameters...');
+  try {
+    console.log('🔧 Generating brand product static parameters...');
 
-  // Expand to include more critical brand-product combinations
-  const criticalBrands = [
-    'cree', 'infineon', 'ti', 'mediatek', 'qualcomm',
-    'analog-devices', 'epcos', 'ixys', 'lem', 'littelfuse'
-  ];
-  const commonProductIds = ['55555', '99999', 'stm32f407vgt6'];
-  const locales = ['zh-CN', 'en'];
+    // Use real brand-product combinations from Sanity
+    const brandProductCombinations = await getBrandProductCombinations(50);
+    const locales = ['zh-CN', 'en'];
 
-  const params = [];
+    const params = [];
 
-  for (const locale of locales) {
-    for (const brand of criticalBrands) {
-      for (const id of commonProductIds) {
-        params.push({ locale, slug: brand, id });
+    for (const locale of locales) {
+      for (const combo of brandProductCombinations) {
+        if (combo.brandSlug && combo.productSlug) {
+          params.push({
+            locale,
+            slug: combo.brandSlug,
+            id: combo.productSlug
+          });
+        }
       }
     }
-  }
 
-  console.log(`Generated ${params.length} brand product static params`);
-  return params;
+    console.log(`Generated ${params.length} brand product static params from ${brandProductCombinations.length} combinations`);
+    return params;
+  } catch (error) {
+    console.error('Error generating brand product static params:', error);
+    // Fallback to ensure critical pages are generated
+    const fallbackParams = [
+      { locale: 'zh-CN', slug: 'cree', id: '11111' },
+      { locale: 'zh-CN', slug: 'cree', id: '55555' },
+      { locale: 'zh-CN', slug: 'cree', id: 'c4d02120a' },
+      { locale: 'zh-CN', slug: 'cree', id: 'sic mosfet' },
+      { locale: 'en', slug: 'cree', id: '11111' },
+      { locale: 'en', slug: 'cree', id: '55555' },
+    ];
+    console.log(`Using fallback: generated ${fallbackParams.length} params`);
+    return fallbackParams;
+  }
 }
 
 export default async function BrandProductPage({ params }: BrandProductPageProps) {
