@@ -26,6 +26,9 @@ interface ProductsPageProps {
   };
 }
 
+// Force static generation for this page
+export const dynamic = 'force-static';
+
 // Generate static params for supported locales
 export async function generateStaticParams() {
   const locales = ['zh-CN', 'en'];
@@ -37,7 +40,17 @@ export async function generateStaticParams() {
 
 export default async function ProductsPage({ params, searchParams }: ProductsPageProps) {
   const { locale } = params;
-  const { category, brand, search, page = '1' } = searchParams;
+
+  // For static generation, use default values. In production, filtering will be handled client-side
+  const defaultParams = {
+    category: undefined,
+    brand: undefined,
+    search: undefined,
+    page: '1'
+  };
+
+  // Use default params for static generation, searchParams for runtime (if not static)
+  const { category, brand, search, page = '1' } = process.env.NODE_ENV === 'production' ? defaultParams : (searchParams || defaultParams);
 
   const currentPage = parseInt(page, 10);
   const pageSize = 12;
