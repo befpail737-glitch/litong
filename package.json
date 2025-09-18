@@ -16,6 +16,7 @@
     "npm": ">=9.0.0"
   },
   "scripts": {
+    "_deploy_trigger": "echo 'Force deployment trigger - 2025-09-18'",
     "dev": "next dev",
     "build": "npm run clear-cache && next build && npm run fix-static-export",
     "build:enhanced": "npm run clear-cache && next build && npm run fix-static-export",
