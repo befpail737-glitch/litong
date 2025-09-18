@@ -1,32 +1,17 @@
-# Cloudflare Pages Configuration - 应急模式优化
+# Cloudflare Pages Configuration - 修复Pages兼容性
 name = "litong-electronics"
 compatibility_date = "2024-01-01"
 
 # Pages 构建输出目录
 pages_build_output_dir = "out"
 
-# 环境变量 - 添加构建优化变量
+# 环境变量 - 只保留Pages支持的变量
 [vars]
 NODE_ENV = "production"
 NEXT_PUBLIC_SITE_URL = "https://litong.pages.dev"
 NEXT_PHASE = "phase-production-build"
-# 应急模式：减少构建复杂度
 EMERGENCY_BUILD = "true"
+NEXT_TELEMETRY_DISABLED = "1"
 
 # 兼容性设置
 compatibility_flags = ["nodejs_compat"]
-
-# 构建配置优化
-[build]
-# 设置构建命令超时时间
-command = "npm run build"
-# 提高内存限制
-NODE_OPTIONS = "--max_old_space_size=4096"
-
-# 节点配置优化
-[build.environment_variables]
-NODE_ENV = "production"
-NEXT_PHASE = "phase-production-build"
-EMERGENCY_BUILD = "true"
-# 禁用 Next.js 遥测以加快构建
-NEXT_TELEMETRY_DISABLED = "1"
