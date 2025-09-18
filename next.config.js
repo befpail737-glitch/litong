@@ -7,10 +7,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // 排除 favicon.ico 的路由，让静态文件直接提供
-  async rewrites() {
-    return []
-  },
+  // Static export mode doesn't support rewrites - removed to eliminate warnings
   // Fix for next-intl static export compatibility
   skipTrailingSlashRedirect: true,
   // Simplified experimental config for stability
