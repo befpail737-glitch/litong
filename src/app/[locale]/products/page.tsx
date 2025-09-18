@@ -188,7 +188,7 @@ export default async function ProductsPage({ params, searchParams }: ProductsPag
                       <div className="mb-2">
                         {product.brand && (
                           <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                            {product.brand}
+                            {product.brand.name}
                           </span>
                         )}
                       </div>
@@ -205,7 +205,7 @@ export default async function ProductsPage({ params, searchParams }: ProductsPag
 
                       {product.category && (
                         <p className="text-sm text-gray-500 mb-3">
-                          类别: {product.category}
+                          类别: {product.category.name}
                         </p>
                       )}
 
