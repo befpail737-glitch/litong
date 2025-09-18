@@ -24,35 +24,39 @@
 # ========================================
 
 # Remove .txt suffixes from all content URLs (301 permanent redirects)
-# Brand solution pages - remove .txt suffix
-/:locale/brands/:brand/solutions/*.txt  /:locale/brands/:brand/solutions/:splat  301
-/:locale/brands/:brand/solutions/*.txt/ /:locale/brands/:brand/solutions/:splat  301
+# Specific redirect for the reported issue
+/zh-CN/brands/cree/solutions/11111.txt   /zh-CN/brands/cree/solutions/11111   301
+/zh-CN/brands/cree/solutions/11111.txt/  /zh-CN/brands/cree/solutions/11111   301
+
+# Brand solution pages - remove .txt suffix (using specific pattern)
+/:locale/brands/:brand/solutions/:id.txt   /:locale/brands/:brand/solutions/:id   301
+/:locale/brands/:brand/solutions/:id.txt/  /:locale/brands/:brand/solutions/:id   301
 
 # General solution pages - remove .txt suffix
-/:locale/solutions/*.txt   /:locale/solutions/:splat   301
-/:locale/solutions/*.txt/  /:locale/solutions/:splat   301
+/:locale/solutions/:id.txt   /:locale/solutions/:id   301
+/:locale/solutions/:id.txt/  /:locale/solutions/:id   301
 
 # Support pages - remove .txt suffix
-/:locale/brands/:brand/support/*.txt   /:locale/brands/:brand/support/:splat   301
-/:locale/brands/:brand/support/*.txt/  /:locale/brands/:brand/support/:splat   301
+/:locale/brands/:brand/support/:id.txt   /:locale/brands/:brand/support/:id   301
+/:locale/brands/:brand/support/:id.txt/  /:locale/brands/:brand/support/:id   301
 
 # Articles - remove .txt suffix
-/:locale/brands/:brand/articles/*.txt   /:locale/brands/:brand/articles/:splat   301
-/:locale/brands/:brand/articles/*.txt/  /:locale/brands/:brand/articles/:splat   301
-/:locale/articles/*.txt   /:locale/articles/:splat   301
-/:locale/articles/*.txt/  /:locale/articles/:splat   301
+/:locale/brands/:brand/articles/:id.txt   /:locale/brands/:brand/articles/:id   301
+/:locale/brands/:brand/articles/:id.txt/  /:locale/brands/:brand/articles/:id   301
+/:locale/articles/:id.txt   /:locale/articles/:id   301
+/:locale/articles/:id.txt/  /:locale/articles/:id   301
 
 # Products - remove .txt suffix
-/:locale/brands/:brand/products/*.txt   /:locale/brands/:brand/products/:splat   301
-/:locale/brands/:brand/products/*.txt/  /:locale/brands/:brand/products/:splat   301
-/:locale/products/*.txt   /:locale/products/:splat   301
-/:locale/products/*.txt/  /:locale/products/:splat   301
+/:locale/brands/:brand/products/:id.txt   /:locale/brands/:brand/products/:id   301
+/:locale/brands/:brand/products/:id.txt/  /:locale/brands/:brand/products/:id   301
+/:locale/products/:id.txt   /:locale/products/:id   301
+/:locale/products/:id.txt/  /:locale/products/:id   301
 
 # Legacy URLs without locale prefix - redirect to default locale and remove .txt
-/brands/:brand/solutions/*.txt   /zh-CN/brands/:brand/solutions/:splat   301
-/brands/:brand/solutions/*.txt/  /zh-CN/brands/:brand/solutions/:splat   301
-/solutions/*.txt   /zh-CN/solutions/:splat   301
-/solutions/*.txt/  /zh-CN/solutions/:splat   301
+/brands/:brand/solutions/:id.txt   /zh-CN/brands/:brand/solutions/:id   301
+/brands/:brand/solutions/:id.txt/  /zh-CN/brands/:brand/solutions/:id   301
+/solutions/:id.txt   /zh-CN/solutions/:id   301
+/solutions/:id.txt/  /zh-CN/solutions/:id   301
 
 # ========================================
 # DETAIL PAGE ROUTES (HIGHEST PRIORITY)
