@@ -12,8 +12,8 @@
   "author": "Litong Electronics Team",
   "license": "MIT",
   "engines": {
-    "node": ">=20.10.0",
-    "npm": ">=9.0.0"
+    "node": ">=20.11.0",
+    "npm": ">=10.0.0"
   },
   "scripts": {
     "_deploy_trigger": "echo 'Force deployment trigger - 2025-09-18'",
@@ -31,8 +31,10 @@
     "fix-static-export": "node scripts/fix-static-export.js",
     "verify-brand-subdirs": "node scripts/verify-brand-subdirs.js",
     "validate-config": "node scripts/validate-config.js",
+    "validate-cloudflare": "node scripts/validate-cloudflare-build.js",
     "build:verify": "npm run build && npm run verify-brand-subdirs",
     "build:safe": "npm run validate-config && npm run build",
+    "build:cloudflare": "npm run validate-cloudflare && npm run validate-config && npm run build",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",

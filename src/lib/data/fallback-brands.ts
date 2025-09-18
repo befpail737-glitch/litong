@@ -10,7 +10,7 @@ export interface FallbackBrand {
   isActive: boolean;
   isFeatured?: boolean;
   slug?: string;
-  logo?: string; // 静态logo路径
+  logo?: string; // 静态logo路径 - 注意：不应传递给Sanity图片处理器
 }
 
 export const fallbackBrands: FallbackBrand[] = [
@@ -24,8 +24,8 @@ export const fallbackBrands: FallbackBrand[] = [
     established: '1987',
     isActive: true,
     isFeatured: true,
-    slug: 'stmicroelectronics',
-    logo: '/logos/stm.png'
+    slug: 'stmicroelectronics'
+    // logo: '/logos/stm.png' // 移除静态路径以避免Sanity处理错误
   },
   {
     _id: 'fallback-ti',
@@ -38,7 +38,7 @@ export const fallbackBrands: FallbackBrand[] = [
     isActive: true,
     isFeatured: true,
     slug: 'texas-instruments',
-    logo: '/logos/ti.png'
+    // logo: '/logos/ti.png' // 移除静态路径
   },
   {
     _id: 'fallback-espressif',
@@ -51,7 +51,7 @@ export const fallbackBrands: FallbackBrand[] = [
     isActive: true,
     isFeatured: true,
     slug: 'espressif',
-    logo: '/logos/espressif.png'
+    // logo: '/logos/espressif.png' // 移除静态路径
   },
   {
     _id: 'fallback-infineon',
@@ -64,7 +64,7 @@ export const fallbackBrands: FallbackBrand[] = [
     isActive: true,
     isFeatured: true,
     slug: 'infineon',
-    logo: '/logos/infineon.png'
+    // logo: '/logos/infineon.png' // 移除静态路径
   },
   {
     _id: 'fallback-nxp',
@@ -77,7 +77,7 @@ export const fallbackBrands: FallbackBrand[] = [
     isActive: true,
     isFeatured: false,
     slug: 'nxp',
-    logo: '/logos/nxp.png'
+    // logo: '/logos/nxp.png' // 移除静态路径
   },
   {
     _id: 'fallback-microchip',
@@ -90,7 +90,7 @@ export const fallbackBrands: FallbackBrand[] = [
     isActive: true,
     isFeatured: false,
     slug: 'microchip',
-    logo: '/logos/microchip.png'
+    // logo: '/logos/microchip.png' // 移除静态路径以避免Sanity处理错误
   },
   {
     _id: 'fallback-adi',
@@ -103,7 +103,7 @@ export const fallbackBrands: FallbackBrand[] = [
     isActive: true,
     isFeatured: false,
     slug: 'analog-devices',
-    logo: '/logos/adi.png'
+    // logo: '/logos/adi.png'
   },
   {
     _id: 'fallback-maxim',
@@ -116,7 +116,7 @@ export const fallbackBrands: FallbackBrand[] = [
     isActive: true,
     isFeatured: false,
     slug: 'maxim',
-    logo: '/logos/maxim.png'
+    // logo: '/logos/maxim.png'
   },
   {
     _id: 'fallback-nordic',
@@ -129,7 +129,7 @@ export const fallbackBrands: FallbackBrand[] = [
     isActive: true,
     isFeatured: false,
     slug: 'nordic',
-    logo: '/logos/nordic.png'
+    // logo: '/logos/nordic.png'
   },
   {
     _id: 'fallback-cypress',
@@ -142,7 +142,7 @@ export const fallbackBrands: FallbackBrand[] = [
     isActive: true,
     isFeatured: false,
     slug: 'cypress',
-    logo: '/logos/cypress.png'
+    // logo: '/logos/cypress.png'
   },
   {
     _id: 'fallback-renesas',
@@ -155,7 +155,7 @@ export const fallbackBrands: FallbackBrand[] = [
     isActive: true,
     isFeatured: false,
     slug: 'renesas',
-    logo: '/logos/renesas.png'
+    // logo: '/logos/renesas.png'
   },
   {
     _id: 'fallback-on',
@@ -168,7 +168,7 @@ export const fallbackBrands: FallbackBrand[] = [
     isActive: true,
     isFeatured: false,
     slug: 'on-semiconductor',
-    logo: '/logos/onsemi.png'
+    // logo: '/logos/onsemi.png'
   },
   {
     _id: 'fallback-lattice',
@@ -181,7 +181,7 @@ export const fallbackBrands: FallbackBrand[] = [
     isActive: true,
     isFeatured: false,
     slug: 'lattice',
-    logo: '/logos/lattice.png'
+    // logo: '/logos/lattice.png'
   },
   {
     _id: 'fallback-xilinx',
@@ -194,7 +194,7 @@ export const fallbackBrands: FallbackBrand[] = [
     isActive: true,
     isFeatured: false,
     slug: 'xilinx',
-    logo: '/logos/xilinx.png'
+    // logo: '/logos/xilinx.png'
   },
   {
     _id: 'fallback-qualcomm',
@@ -207,7 +207,7 @@ export const fallbackBrands: FallbackBrand[] = [
     isActive: true,
     isFeatured: true,
     slug: 'qualcomm',
-    logo: '/logos/qualcomm.png'
+    // logo: '/logos/qualcomm.png'
   },
   {
     _id: 'fallback-broadcom',
@@ -220,7 +220,7 @@ export const fallbackBrands: FallbackBrand[] = [
     isActive: true,
     isFeatured: false,
     slug: 'broadcom',
-    logo: '/logos/broadcom.png'
+    // logo: '/logos/broadcom.png'
   }
 ];
 

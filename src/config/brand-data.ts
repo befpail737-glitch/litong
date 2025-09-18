@@ -6,7 +6,7 @@ export interface StaticBrandData {
   name: string;
   slug: string;
   description: string;
-  logo?: string;
+  logo?: string; // 注意：仅用于静态展示，不传递给Sanity图片处理器
   website: string;
   founded: string;
   headquarters: string;
@@ -40,6 +40,7 @@ export const CORE_BRAND_DATA: StaticBrandData[] = [
     keyTechnologies: ['碳化硅', 'LED技术', '宽禁带半导体'],
     marketPosition: 'SiC功率器件领导者',
     partnership: 'authorized_distributor'
+    // logo: 移除静态路径，避免与Sanity图片处理冲突
   },
   {
     id: 'infineon',
@@ -58,6 +59,7 @@ export const CORE_BRAND_DATA: StaticBrandData[] = [
     keyTechnologies: ['IGBT', 'CoolMOS', 'AURIX MCU'],
     marketPosition: '全球功率半导体第一',
     partnership: 'authorized_distributor'
+    // logo: 移除静态路径，避免与Sanity图片处理冲突
   },
   {
     id: 'ti',

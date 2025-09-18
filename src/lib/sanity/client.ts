@@ -87,24 +87,45 @@ export function safeImageUrl(
     return fallback;
   }
 
+  // 检查是否为静态路径字符串（不是Sanity资产）
+  if (typeof source === 'string') {
+    // 如果是相对路径或绝对路径，直接返回
+    if (source.startsWith('/') || source.startsWith('http')) {
+      console.log('🖼️ [safeImageUrl] Static path detected, returning as-is:', source);
+      return source;
+    }
+  }
+
   try {
-    // 验证图片对象结构
-    if (typeof source === 'object' && '_type' in source) {
-      if (source._type !== 'image') {
-        console.warn(`⚠️ [safeImageUrl] Invalid image type: ${source._type}, using fallback`);
-        return fallback;
-      }
+    // 对于对象类型的source，进行详细验证
+    if (typeof source === 'object' && source !== null) {
+      // 检查是否为有效的Sanity图片对象
+      if ('_type' in source) {
+        if (source._type !== 'image') {
+          console.warn(`⚠️ [safeImageUrl] Invalid image type: ${source._type}, using fallback`);
+          return fallback;
+        }
 
-      // 检查asset引用
-      if (!('asset' in source) || !source.asset) {
-        console.warn('⚠️ [safeImageUrl] Image missing asset reference, using fallback:', source);
-        return fallback;
-      }
+        // 检查asset引用
+        if (!('asset' in source) || !source.asset) {
+          console.warn('⚠️ [safeImageUrl] Image missing asset reference, using fallback');
+          return fallback;
+        }
 
-      // 检查asset._ref是否存在
-      if (typeof source.asset === 'object' && !('_ref' in source.asset)) {
-        console.warn('⚠️ [safeImageUrl] Image asset missing _ref, using fallback:', source);
-        return fallback;
+        // 检查asset._ref格式
+        if (typeof source.asset === 'object' && source.asset !== null) {
+          if (!('_ref' in source.asset) || !source.asset._ref) {
+            console.warn('⚠️ [safeImageUrl] Image asset missing _ref, using fallback');
+            return fallback;
+          }
+
+          // 验证_ref格式 - 应该像 "image-Tb9Ew8CXIwaY6R1kjMvI0uRR-2000x3000-jpg"
+          const ref = source.asset._ref;
+          if (typeof ref === 'string' && !ref.startsWith('image-')) {
+            console.warn(`⚠️ [safeImageUrl] Invalid Sanity asset _ref format: ${ref}, using fallback`);
+            return fallback;
+          }
+        }
       }
     }
 
@@ -115,6 +136,7 @@ export function safeImageUrl(
       return fallback;
     }
 
+    // 构建图片URL
     let imageBuilder = builder.image(source);
 
     if (width) {

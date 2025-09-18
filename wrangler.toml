@@ -1,17 +1,29 @@
-# Cloudflare Pages Configuration - 修复Pages兼容性
+# Cloudflare Pages Configuration - 优化构建和图片处理
 name = "litong-electronics"
 compatibility_date = "2024-01-01"
 
 # Pages 构建输出目录
 pages_build_output_dir = "out"
 
-# 环境变量 - 只保留Pages支持的变量
+# 构建命令优化
+build = { command = "npm run build", cwd = "." }
+
+# 环境变量 - 针对图片处理和构建优化
 [vars]
 NODE_ENV = "production"
 NEXT_PUBLIC_SITE_URL = "https://litong.pages.dev"
 NEXT_PHASE = "phase-production-build"
 EMERGENCY_BUILD = "true"
 NEXT_TELEMETRY_DISABLED = "1"
+# Sanity 配置
+SANITY_PROJECT_ID = "oquvb2bs"
+SANITY_DATASET = "production"
+SANITY_API_VERSION = "2023-05-03"
+# 图片处理优化
+NEXT_IMAGES_FALLBACK = "true"
+# 构建优化
+NEXT_BUILD_LINT = "false"
+NEXT_DISABLE_STATIC_IMAGES = "false"
 
-# 兼容性设置
-compatibility_flags = ["nodejs_compat"]
+# 兼容性设置 - 增强Node.js支持
+compatibility_flags = ["nodejs_compat", "streams_enable_constructors"]
