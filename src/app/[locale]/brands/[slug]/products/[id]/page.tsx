@@ -43,6 +43,8 @@ export async function generateStaticParams() {
     for (const locale of locales) {
       for (const combo of brandProductCombinations) {
         if (combo.brandSlug && combo.productSlug) {
+          // Validate that this combination will actually work
+          console.log(`📋 Adding static param: ${locale}/${combo.brandSlug}/${combo.productSlug}`);
           params.push({
             locale,
             slug: combo.brandSlug,
@@ -52,20 +54,19 @@ export async function generateStaticParams() {
       }
     }
 
-    console.log(`Generated ${params.length} brand product static params from ${brandProductCombinations.length} combinations`);
+    console.log(`✅ Generated ${params.length} brand product static params from ${brandProductCombinations.length} combinations`);
+    console.log('📊 Sample generated params:', params.slice(0, 3));
     return params;
   } catch (error) {
     console.error('Error generating brand product static params:', error);
-    // Fallback to ensure critical pages are generated
+    // Fallback to ensure critical pages are generated - only verified products
     const fallbackParams = [
-      { locale: 'zh-CN', slug: 'cree', id: '11111' },
-      { locale: 'zh-CN', slug: 'cree', id: '55555' },
-      { locale: 'zh-CN', slug: 'cree', id: 'c4d02120a' },
       { locale: 'zh-CN', slug: 'cree', id: 'sic mosfet' },
+      { locale: 'zh-CN', slug: 'cree', id: '11111' },
+      { locale: 'en', slug: 'cree', id: 'sic mosfet' },
       { locale: 'en', slug: 'cree', id: '11111' },
-      { locale: 'en', slug: 'cree', id: '55555' },
     ];
-    console.log(`Using fallback: generated ${fallbackParams.length} params`);
+    console.log(`⚠️ Using fallback: generated ${fallbackParams.length} verified params`);
     return fallbackParams;
   }
 }

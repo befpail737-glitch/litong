@@ -42,6 +42,7 @@ export async function getSolutionSlugsOnly(limit = 10): Promise<string[]> {
 // 获取品牌-产品组合用于静态参数生成
 export async function getBrandProductCombinations(limit = 50): Promise<Array<{brandSlug: string, productSlug: string}>> {
   try {
+    console.log('🔧 [getBrandProductCombinations] Fetching real brand-product combinations from Sanity...');
     const query = groq`
       *[_type == "product" && (isActive == true || !defined(isActive)) && defined(slug.current) && defined(brand->slug.current)] | order(_createdAt desc) [0...${limit}] {
         "productSlug": slug.current,
@@ -50,18 +51,21 @@ export async function getBrandProductCombinations(limit = 50): Promise<Array<{br
     `;
 
     const combinations = await client.fetch(query);
-    return combinations?.filter(c => c.brandSlug && c.productSlug) || [];
+    const validCombinations = combinations?.filter(c => c.brandSlug && c.productSlug) || [];
+
+    console.log('✅ [getBrandProductCombinations] Found combinations:', {
+      total: validCombinations.length,
+      combinations: validCombinations.slice(0, 5) // Log first 5 for debugging
+    });
+
+    return validCombinations;
   } catch (error) {
     console.error('Error fetching brand-product combinations, using fallback:', error);
-    // Return some fallback combinations based on the real data analysis
+    // Return only verified fallback combinations that actually exist in the database
+    // Based on real data analysis from development server logs
     return [
-      { brandSlug: 'cree', productSlug: '11111' },
       { brandSlug: 'cree', productSlug: 'sic mosfet' },
-      { brandSlug: 'cree', productSlug: '55555' },
-      { brandSlug: 'cree', productSlug: 'c4d02120a' },
-      { brandSlug: 'Electronicon', productSlug: '33333' },
-      { brandSlug: 'Electronicon', productSlug: '99999' },
-      { brandSlug: 'stmicroelectronics', productSlug: 'stm32f407vgt6' },
+      { brandSlug: 'cree', productSlug: '11111' },
     ];
   }
 }
