@@ -24,6 +24,10 @@
 # ========================================
 
 # Remove .txt suffixes from all content URLs (301 permanent redirects)
+# Brand homepage pages - remove .txt suffix (HIGHEST PRIORITY)
+/:locale/brands/:brand.txt   /:locale/brands/:brand   301
+/:locale/brands/:brand.txt/  /:locale/brands/:brand   301
+
 # Specific redirect for the reported issue
 /zh-CN/brands/cree/solutions/11111.txt   /zh-CN/brands/cree/solutions/11111   301
 /zh-CN/brands/cree/solutions/11111.txt/  /zh-CN/brands/cree/solutions/11111   301
@@ -53,6 +57,10 @@
 /:locale/products/:id.txt/  /:locale/products/:id   301
 
 # Legacy URLs without locale prefix - redirect to default locale and remove .txt
+# Brand homepage - legacy without locale
+/brands/:brand.txt   /zh-CN/brands/:brand   301
+/brands/:brand.txt/  /zh-CN/brands/:brand   301
+
 /brands/:brand/solutions/:id.txt   /zh-CN/brands/:brand/solutions/:id   301
 /brands/:brand/solutions/:id.txt/  /zh-CN/brands/:brand/solutions/:id   301
 /solutions/:id.txt   /zh-CN/solutions/:id   301
