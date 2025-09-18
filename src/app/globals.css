@@ -41,16 +41,23 @@
   * {
     @apply border-gray-200;
   }
-  
+
   html {
     @apply scroll-smooth;
     font-feature-settings: 'cv11', 'ss01';
     font-variation-settings: 'opsz' 32;
+    /* 强制响应式设计 */
+    width: 100%;
+    overflow-x: hidden;
   }
-  
+
   body {
     @apply bg-white text-gray-900 font-sans antialiased;
     font-feature-settings: 'rlig' 1, 'calt' 1;
+    /* 确保body响应式 */
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -152,7 +159,7 @@
   }
 
   .container {
-    @apply mx-auto px-4 sm:px-6 lg:px-8;
+    @apply w-full mx-auto px-4 sm:px-6 lg:px-8;
   }
 
   .container-sm {
@@ -220,5 +227,21 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+  }
+
+  /* 强制响应式布局 */
+  .responsive-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  /* 确保断点生效 */
+  @media (max-width: 475px) {
+    .debug-xs { border: 2px solid red !important; }
+  }
+
+  @media (max-width: 640px) {
+    .debug-sm { border: 2px solid orange !important; }
   }
 }
