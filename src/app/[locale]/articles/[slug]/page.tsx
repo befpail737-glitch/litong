@@ -31,7 +31,7 @@ interface ArticlePageProps {
 export async function generateStaticParams() {
   try {
     // 使用轻量级查询仅获取slugs，大幅减少查询复杂度
-    const articleSlugs = await getArticleSlugsOnly(15); // 限制到15个文章减少构建时间
+    const articleSlugs = await getArticleSlugsOnly(40); // 增加到40个文章确保足够的详情页
     // 仅限制为主要语言以减少构建时间
     const locales = ['zh-CN', 'en'];
 

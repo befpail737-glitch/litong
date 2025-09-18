@@ -31,17 +31,28 @@ interface BrandProductPageProps {
 
 // Generate static params for all brand-product combinations
 export async function generateStaticParams() {
-  // EMERGENCY FIX: Use minimal static generation to prevent Cloudflare timeout
-  console.log('🚨 Using minimal static generation to fix deployment timeout');
+  console.log('🔧 Generating brand product static parameters...');
 
-  // Only generate for most critical pages - other pages will use ISR
-  return [
-    { locale: 'zh-CN', slug: 'cree', id: '55555' },
-    { locale: 'zh-CN', slug: 'cree', id: '99999' },
-    { locale: 'zh-CN', slug: 'infineon', id: '55555' },
-    { locale: 'zh-CN', slug: '英飞凌', id: '55555' },
-    { locale: 'zh-CN', slug: 'ti', id: '55555' }
+  // Expand to include more critical brand-product combinations
+  const criticalBrands = [
+    'cree', 'infineon', 'ti', 'mediatek', 'qualcomm',
+    'analog-devices', 'epcos', 'ixys', 'lem', 'littelfuse'
   ];
+  const commonProductIds = ['55555', '99999', 'stm32f407vgt6'];
+  const locales = ['zh-CN', 'en'];
+
+  const params = [];
+
+  for (const locale of locales) {
+    for (const brand of criticalBrands) {
+      for (const id of commonProductIds) {
+        params.push({ locale, slug: brand, id });
+      }
+    }
+  }
+
+  console.log(`Generated ${params.length} brand product static params`);
+  return params;
 }
 
 export default async function BrandProductPage({ params }: BrandProductPageProps) {

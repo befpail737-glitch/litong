@@ -30,7 +30,7 @@ interface ProductPageProps {
 export async function generateStaticParams() {
   try {
     // 使用轻量级查询仅获取slugs，大幅减少查询复杂度
-    const productSlugs = await getProductSlugsOnly(20); // 限制到20个产品减少构建时间
+    const productSlugs = await getProductSlugsOnly(50); // 增加到50个产品确保足够的详情页
     // 仅限制为主要语言以减少构建时间
     const locales = ['zh-CN', 'en'];
 

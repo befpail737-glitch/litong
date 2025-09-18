@@ -20,6 +20,41 @@
 / /zh-CN/ 302
 
 # ========================================
+# .TXT SUFFIX CLEANUP (HIGHEST PRIORITY)
+# ========================================
+
+# Remove .txt suffixes from all content URLs (301 permanent redirects)
+# Brand solution pages - remove .txt suffix
+/:locale/brands/:brand/solutions/*.txt  /:locale/brands/:brand/solutions/:splat  301
+/:locale/brands/:brand/solutions/*.txt/ /:locale/brands/:brand/solutions/:splat  301
+
+# General solution pages - remove .txt suffix
+/:locale/solutions/*.txt   /:locale/solutions/:splat   301
+/:locale/solutions/*.txt/  /:locale/solutions/:splat   301
+
+# Support pages - remove .txt suffix
+/:locale/brands/:brand/support/*.txt   /:locale/brands/:brand/support/:splat   301
+/:locale/brands/:brand/support/*.txt/  /:locale/brands/:brand/support/:splat   301
+
+# Articles - remove .txt suffix
+/:locale/brands/:brand/articles/*.txt   /:locale/brands/:brand/articles/:splat   301
+/:locale/brands/:brand/articles/*.txt/  /:locale/brands/:brand/articles/:splat   301
+/:locale/articles/*.txt   /:locale/articles/:splat   301
+/:locale/articles/*.txt/  /:locale/articles/:splat   301
+
+# Products - remove .txt suffix
+/:locale/brands/:brand/products/*.txt   /:locale/brands/:brand/products/:splat   301
+/:locale/brands/:brand/products/*.txt/  /:locale/brands/:brand/products/:splat   301
+/:locale/products/*.txt   /:locale/products/:splat   301
+/:locale/products/*.txt/  /:locale/products/:splat   301
+
+# Legacy URLs without locale prefix - redirect to default locale and remove .txt
+/brands/:brand/solutions/*.txt   /zh-CN/brands/:brand/solutions/:splat   301
+/brands/:brand/solutions/*.txt/  /zh-CN/brands/:brand/solutions/:splat   301
+/solutions/*.txt   /zh-CN/solutions/:splat   301
+/solutions/*.txt/  /zh-CN/solutions/:splat   301
+
+# ========================================
 # DETAIL PAGE ROUTES (HIGHEST PRIORITY)
 # ========================================
 
