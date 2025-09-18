@@ -33,7 +33,7 @@ function validateCloudflareConfiguration() {
     } else {
       const wranglerContent = fs.readFileSync(wranglerPath, 'utf8');
 
-      // 检查必要配置
+      // 检查Pages项目必要配置
       const requiredConfigs = [
         'pages_build_output_dir = "out"',
         'compatibility_flags',
@@ -45,6 +45,20 @@ function validateCloudflareConfiguration() {
       for (const config of requiredConfigs) {
         if (!wranglerContent.includes(config)) {
           result.warnings.push(`Missing or incomplete config: ${config}`);
+        }
+      }
+
+      // 检查Pages项目不兼容的配置
+      const incompatibleConfigs = [
+        { pattern: /^build\s*=/, name: 'build command' },
+        { pattern: /^main\s*=/, name: 'main script' },
+        { pattern: /^workers_dev\s*=/, name: 'workers_dev' }
+      ];
+
+      for (const config of incompatibleConfigs) {
+        if (config.pattern.test(wranglerContent)) {
+          result.errors.push(`Incompatible configuration found: ${config.name} is not supported in Pages projects`);
+          result.isValid = false;
         }
       }
 
@@ -191,11 +205,13 @@ async function validateCloudflareDeployment() {
       });
     }
 
-    console.log('\n🔧 Cloudflare优化建议:');
+    console.log('\n🔧 Cloudflare Pages优化建议:');
     console.log('  • 确保所有静态图片路径不会传递给Sanity处理器');
     console.log('  • 使用Node.js v20.11.0+以满足依赖要求');
     console.log('  • 启用nodejs_compat兼容性标志');
     console.log('  • 配置适当的环境变量用于生产构建');
+    console.log('  • 避免使用Workers专用配置（如build命令）');
+    console.log('  • 确保pages_build_output_dir指向正确的输出目录');
 
     console.log('\n' + '='.repeat(60));
     if (result.isValid && result.warnings.length === 0) {
