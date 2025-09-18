@@ -1,5 +1,15 @@
 import { MainLayout } from '@/components/layout/MainLayout';
 
+// Generate static params for all supported locales
+export async function generateStaticParams() {
+  return [
+    { locale: 'zh-CN' },
+    { locale: 'en' }
+  ];
+}
+
+export const dynamic = 'force-static';
+
 export default function AboutPage() {
   return (
     <MainLayout>

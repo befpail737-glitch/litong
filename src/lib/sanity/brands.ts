@@ -153,33 +153,42 @@ export async function getBrandByName(name: string): Promise<Brand | null> {
   }
 }
 
+// 标准化slug格式
+function normalizeSlug(slug: string): string {
+  return slug.toLowerCase()
+    .replace(/[^a-z0-9\u4e00-\u9fff]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
 // 根据slug获取品牌数据
 export async function getBrandData(slug: string): Promise<Brand | null> {
   try {
     console.log(`🔍 [getBrandData] Searching for brand with slug: ${slug}`);
 
-    // Try exact match first
-    let query = `*[_type == "brandBasic" && slug.current == $slug && isActive == true && !(_id in path("drafts.**"))][0] {
-      _id,
-      _type,
-      name,
-      description,
-      website,
-      country,
-      isActive,
-      isFeatured,
-      "slug": slug.current,
-      logo,
-      headquarters,
-      established
-    }`;
+    if (!slug || slug.trim() === '') {
+      console.warn('❌ [getBrandData] Empty slug provided');
+      return null;
+    }
 
-    let brand = await client.fetch(query, { slug });
+    const normalizedSlug = normalizeSlug(slug);
+    const decodedSlug = decodeURIComponent(slug);
 
-    // If no exact match found, try with more relaxed conditions
-    if (!brand) {
-      console.log(`🔍 [getBrandData] No exact match found, trying relaxed search for: ${slug}`);
-      query = `*[_type == "brandBasic" && (slug.current == $slug || name == $slug) && (isActive == true || !defined(isActive)) && !(_id in path("drafts.**"))][0] {
+    // 尝试多种匹配策略
+    const searchTerms = [
+      slug,                    // 原始slug
+      decodedSlug,            // URL解码后的slug
+      normalizedSlug,         // 标准化slug
+      slug.toLowerCase(),     // 小写slug
+      decodedSlug.toLowerCase() // 小写解码slug
+    ];
+
+    // 去重搜索词
+    const uniqueSearchTerms = [...new Set(searchTerms)];
+
+    for (const searchTerm of uniqueSearchTerms) {
+      // 精确匹配
+      let query = `*[_type == "brandBasic" && slug.current == $slug && isActive == true && !(_id in path("drafts.**"))][0] {
         _id,
         _type,
         name,
@@ -194,18 +203,57 @@ export async function getBrandData(slug: string): Promise<Brand | null> {
         established
       }`;
 
-      brand = await client.fetch(query, { slug });
+      let brand = await client.fetch(query, { slug: searchTerm });
+
+      if (brand) {
+        console.log(`✅ [getBrandData] Found brand: ${brand.name} with search term: ${searchTerm}`);
+        return brand;
+      }
+
+      // 名称匹配
+      query = `*[_type == "brandBasic" && (name match $slug || slug.current match $slug) && (isActive == true || !defined(isActive)) && !(_id in path("drafts.**"))][0] {
+        _id,
+        _type,
+        name,
+        description,
+        website,
+        country,
+        isActive,
+        isFeatured,
+        "slug": slug.current,
+        logo,
+        headquarters,
+        established
+      }`;
+
+      brand = await client.fetch(query, { slug: searchTerm + '*' });
+
+      if (brand) {
+        console.log(`✅ [getBrandData] Found brand by name match: ${brand.name} with search term: ${searchTerm}`);
+        return brand;
+      }
     }
 
-    if (brand) {
-      console.log(`✅ [getBrandData] Found brand: ${brand.name}`);
-    } else {
-      console.warn(`❌ [getBrandData] Brand not found for slug: ${slug}`);
+    console.warn(`❌ [getBrandData] Brand not found for any search terms: ${uniqueSearchTerms.join(', ')}`);
+
+    // 作为最后的fallback，从fallback数据中查找
+    const fallbackBrand = getFallbackBrandBySlug(slug);
+    if (fallbackBrand) {
+      console.log(`🔄 [getBrandData] Using fallback brand: ${fallbackBrand.name}`);
+      return fallbackBrand as Brand;
     }
 
-    return brand || null;
+    return null;
   } catch (error) {
     console.error('Error fetching brand data:', error);
+
+    // 错误时尝试fallback数据
+    const fallbackBrand = getFallbackBrandBySlug(slug);
+    if (fallbackBrand) {
+      console.log(`🔄 [getBrandData] Using fallback brand due to error: ${fallbackBrand.name}`);
+      return fallbackBrand as Brand;
+    }
+
     return null;
   }
 }
@@ -363,50 +411,112 @@ export async function getBrandProductCategories(brandSlug: string) {
 // 获取品牌slug列表（仅用于generateStaticParams，减少查询复杂度）
 export async function getBrandSlugsOnly(limit = 50): Promise<string[]> {
   try {
-    // 最简化查询，仅获取slug字段
-    const query = `*[_type == "brandBasic" && (isActive == true || !defined(isActive)) && defined(slug.current)] | order(name asc) [0...${limit}] {
-      "slug": slug.current
+    // 最简化查询，仅获取slug字段，并确保数据完整性
+    const query = `*[_type == "brandBasic" && (isActive == true || !defined(isActive)) && defined(slug.current) && defined(name)] | order(name asc) [0...${limit}] {
+      "slug": slug.current,
+      name,
+      _id
     }`;
 
     const brands = await client.fetch(query);
-    const slugs = brands?.map(brand => brand.slug).filter(Boolean) || [];
 
-    return slugs;
+    if (!brands || brands.length === 0) {
+      console.warn('No brands found from Sanity, using fallback slugs');
+      return ['cree', 'infineon', 'ti', 'stmicroelectronics', 'lem'];
+    }
+
+    // 验证并过滤有效的slug
+    const validSlugs = brands
+      .filter(brand => brand.slug && brand.name && brand._id)
+      .map(brand => brand.slug)
+      .filter(slug => typeof slug === 'string' && slug.trim().length > 0);
+
+    console.log(`✅ [getBrandSlugsOnly] Found ${validSlugs.length} valid brand slugs`);
+
+    // 如果有效slug太少，补充fallback
+    if (validSlugs.length < 3) {
+      const fallbackSlugs = ['cree', 'infineon', 'ti', 'stmicroelectronics', 'lem'];
+      const combinedSlugs = [...new Set([...validSlugs, ...fallbackSlugs])];
+      console.log(`🔄 [getBrandSlugsOnly] Augmented with fallback slugs: ${combinedSlugs.length} total`);
+      return combinedSlugs;
+    }
+
+    return validSlugs;
   } catch (error) {
     console.error('Error fetching brand slugs, using fallback:', error);
-    // 返回最小化的fallback slugs
-    return ['cree', 'infineon', 'ti', 'mediatek', 'qualcomm', 'analog-devices'];
+    // 返回有保证的fallback slugs
+    return ['cree', 'infineon', 'ti', 'stmicroelectronics', 'lem'];
   }
 }
 
 // 获取品牌完整数据（包含相关内容）
 export async function getBrandWithContent(brandSlug: string) {
   try {
+    console.log(`🔍 [getBrandWithContent] Fetching content for brand: ${brandSlug}`);
+
+    if (!brandSlug || brandSlug.trim() === '') {
+      console.warn('❌ [getBrandWithContent] Empty brandSlug provided');
+      return {
+        brand: null,
+        products: [],
+        solutions: [],
+        articles: [],
+        categories: []
+      };
+    }
+
+    // 首先获取品牌数据，如果品牌不存在就不需要获取其他数据
+    const brand = await getBrandData(brandSlug);
+
+    if (!brand) {
+      console.warn(`❌ [getBrandWithContent] Brand not found: ${brandSlug}`);
+      return {
+        brand: null,
+        products: [],
+        solutions: [],
+        articles: [],
+        categories: []
+      };
+    }
+
+    console.log(`✅ [getBrandWithContent] Brand found: ${brand.name}, fetching related content...`);
+
+    // 并行获取相关内容，但有错误容错
     const [
-      brand,
       products,
       solutions,
       articles,
       categories
-    ] = await Promise.all([
-      getBrandData(brandSlug),
+    ] = await Promise.allSettled([
       getBrandProducts(brandSlug, 8),
       getBrandSolutions(brandSlug, 4),
       getBrandArticles(brandSlug, 4),
       getBrandProductCategories(brandSlug)
     ]);
 
+    // 安全地提取结果，失败的请求返回空数组
+    const safeProducts = products.status === 'fulfilled' ? products.value : [];
+    const safeSolutions = solutions.status === 'fulfilled' ? solutions.value : [];
+    const safeArticles = articles.status === 'fulfilled' ? articles.value : [];
+    const safeCategories = categories.status === 'fulfilled' ? categories.value : [];
+
+    console.log(`✅ [getBrandWithContent] Content fetched - Products: ${safeProducts.length}, Solutions: ${safeSolutions.length}, Articles: ${safeArticles.length}, Categories: ${safeCategories.length}`);
+
     return {
       brand,
-      products,
-      solutions,
-      articles,
-      categories
+      products: safeProducts,
+      solutions: safeSolutions,
+      articles: safeArticles,
+      categories: safeCategories
     };
   } catch (error) {
     console.error('Error fetching brand with content:', error);
+
+    // 尝试至少返回brand数据，即使其他内容获取失败
+    const brand = await getBrandData(brandSlug).catch(() => null);
+
     return {
-      brand: null,
+      brand,
       products: [],
       solutions: [],
       articles: [],

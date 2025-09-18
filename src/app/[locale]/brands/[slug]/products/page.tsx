@@ -17,35 +17,73 @@ interface BrandProductsPageProps {
 // Generate static params for all brands and locales
 export async function generateStaticParams() {
   try {
-    const brands = await getAllBrands();
+    console.log('🔧 [generateStaticParams] Starting brand products page static generation...');
+
+    // 使用更可靠的slug获取方式
+    const brandSlugs = await getBrandSlugsOnly(30);
+
+    if (!brandSlugs || brandSlugs.length === 0) {
+      console.warn('⚠️ [generateStaticParams] No brand slugs found for products, using fallback');
+      return [
+        { locale: 'zh-CN', slug: 'cree' },
+        { locale: 'zh-CN', slug: 'infineon' },
+        { locale: 'zh-CN', slug: 'ti' },
+        { locale: 'zh-CN', slug: 'stmicroelectronics' },
+        { locale: 'en', slug: 'cree' },
+        { locale: 'en', slug: 'infineon' },
+        { locale: 'en', slug: 'ti' },
+        { locale: 'en', slug: 'stmicroelectronics' }
+      ];
+    }
+
     // Temporarily limit to primary locales to reduce build time
     const locales = ['zh-CN', 'en'];
 
     const params = [];
     for (const locale of locales) {
-      for (const brand of brands) {
-        if (brand.slug) {
+      for (const slug of brandSlugs) {
+        if (slug && typeof slug === 'string' && slug.trim().length > 0) {
+          const trimmedSlug = slug.trim();
+
           params.push({
             locale,
-            slug: brand.slug,
+            slug: trimmedSlug,
           });
 
           // For Chinese brands, also add URL-encoded version
-          if (brand.slug !== encodeURIComponent(brand.slug)) {
+          const encodedSlug = encodeURIComponent(trimmedSlug);
+          if (trimmedSlug !== encodedSlug) {
             params.push({
               locale,
-              slug: encodeURIComponent(brand.slug),
+              slug: encodedSlug,
             });
           }
         }
       }
     }
 
-    console.log('Generated static params for brand products:', params.length);
-    return params;
+    // 验证生成的参数
+    const validParams = params.filter(param =>
+      param.locale &&
+      param.slug &&
+      typeof param.slug === 'string' &&
+      param.slug.trim().length > 0
+    );
+
+    console.log(`✅ [generateStaticParams] Generated ${validParams.length} static params for brand products`);
+
+    return validParams;
   } catch (error) {
-    console.error('Error generating static params for brand products:', error);
-    return [];
+    console.error('❌ [generateStaticParams] Error generating static params for brand products:', error);
+    // 返回基本的fallback参数
+    return [
+      { locale: 'zh-CN', slug: 'cree' },
+      { locale: 'zh-CN', slug: 'infineon' },
+      { locale: 'zh-CN', slug: 'ti' },
+      { locale: 'en', slug: 'cree' },
+      { locale: 'en', slug: 'infineon' },
+      { locale: 'en', slug: 'ti' }
+    ];
   }
 }
 

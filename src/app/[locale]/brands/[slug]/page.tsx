@@ -16,45 +16,92 @@ interface BrandPageProps {
 // Generate static params for all brands and locales
 export async function generateStaticParams() {
   try {
+    console.log('🔧 [generateStaticParams] Starting brand page static generation...');
+
     // 使用轻量级查询仅获取slugs，大幅减少查询复杂度
     const brandSlugs = await getBrandSlugsOnly(50); // 增加到50个品牌确保足够的详情页
+
+    if (!brandSlugs || brandSlugs.length === 0) {
+      console.warn('⚠️ [generateStaticParams] No brand slugs found, using fallback');
+      const fallbackSlugs = ['cree', 'infineon', 'ti', 'stmicroelectronics', 'lem'];
+      const fallbackParams = [];
+      for (const locale of ['zh-CN', 'en']) {
+        for (const slug of fallbackSlugs) {
+          fallbackParams.push({ locale, slug });
+        }
+      }
+      return fallbackParams;
+    }
+
     // 仅限制为主要语言以减少构建时间
     const locales = ['zh-CN', 'en'];
 
     const params = [];
     for (const locale of locales) {
       for (const slug of brandSlugs) {
-        if (slug) {
+        if (slug && typeof slug === 'string' && slug.trim().length > 0) {
+          // 验证slug格式
+          const trimmedSlug = slug.trim();
+
           // 添加原始slug
           params.push({
             locale,
-            slug,
+            slug: trimmedSlug,
           });
 
           // 对于中文品牌，也添加URL编码版本
-          if (slug !== encodeURIComponent(slug)) {
+          const encodedSlug = encodeURIComponent(trimmedSlug);
+          if (trimmedSlug !== encodedSlug) {
             params.push({
               locale,
-              slug: encodeURIComponent(slug),
+              slug: encodedSlug,
             });
           }
         }
       }
     }
 
-    console.log('Generated static params for brands:', params.length);
-    return params;
+    // 验证生成的参数
+    const validParams = params.filter(param =>
+      param.locale &&
+      param.slug &&
+      typeof param.slug === 'string' &&
+      param.slug.trim().length > 0
+    );
+
+    console.log(`✅ [generateStaticParams] Generated ${validParams.length} static params for brands (from ${brandSlugs.length} slugs)`);
+
+    // 如果有效参数太少，添加fallback
+    if (validParams.length < 10) {
+      const fallbackSlugs = ['cree', 'infineon', 'ti', 'stmicroelectronics', 'lem'];
+      for (const locale of locales) {
+        for (const slug of fallbackSlugs) {
+          if (!validParams.find(p => p.locale === locale && p.slug === slug)) {
+            validParams.push({ locale, slug });
+          }
+        }
+      }
+      console.log(`🔄 [generateStaticParams] Augmented with fallback params, total: ${validParams.length}`);
+    }
+
+    return validParams;
   } catch (error) {
-    console.error('Error generating static params for brands:', error);
+    console.error('❌ [generateStaticParams] Error generating static params for brands:', error);
     // 紧急情况下使用最小化的fallback
-    return [
+    const emergencyParams = [
       { locale: 'zh-CN', slug: 'cree' },
       { locale: 'zh-CN', slug: 'infineon' },
       { locale: 'zh-CN', slug: 'ti' },
+      { locale: 'zh-CN', slug: 'stmicroelectronics' },
+      { locale: 'zh-CN', slug: 'lem' },
       { locale: 'en', slug: 'cree' },
       { locale: 'en', slug: 'infineon' },
-      { locale: 'en', slug: 'ti' }
+      { locale: 'en', slug: 'ti' },
+      { locale: 'en', slug: 'stmicroelectronics' },
+      { locale: 'en', slug: 'lem' }
     ];
+    console.log(`🆘 [generateStaticParams] Using emergency fallback params: ${emergencyParams.length}`);
+    return emergencyParams;
   }
 }
 
@@ -64,13 +111,47 @@ export default async function BrandPage({ params }: BrandPageProps) {
   // Decode slug to handle Chinese brand names
   const decodedSlug = decodeURIComponent(slug);
 
-  const { brand, products, solutions, articles, categories } = await getBrandWithContent(decodedSlug);
+  console.log(`🔍 [BrandPage] Loading brand page for: ${decodedSlug} (locale: ${locale})`);
 
-  if (!brand) {
-    console.warn(`Brand not found for slug: ${decodedSlug}`);
-    notFound();
-  }
+  try {
+    const { brand, products, solutions, articles, categories } = await getBrandWithContent(decodedSlug);
 
+    if (!brand) {
+      console.warn(`❌ [BrandPage] Brand not found for slug: ${decodedSlug}`);
+
+      // 返回友好的品牌未找到页面而不是404
+      return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="max-w-md mx-auto text-center p-8">
+            <div className="w-24 h-24 mx-auto mb-6 bg-gray-200 rounded-full flex items-center justify-center">
+              <span className="text-gray-500 text-2xl">?</span>
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">品牌未找到</h1>
+            <p className="text-gray-600 mb-6">
+              抱歉，我们没有找到 "{decodedSlug}" 品牌的相关信息。
+            </p>
+            <div className="space-y-3">
+              <Link
+                href={`/${locale}/brands`}
+                className="block w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                浏览所有品牌
+              </Link>
+              <Link
+                href={`/${locale}/search?q=${encodeURIComponent(decodedSlug)}`}
+                className="block w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                搜索相关产品
+              </Link>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    console.log(`✅ [BrandPage] Successfully loaded brand: ${brand.name}`);
+
+    // 正常渲染品牌页面
     return (
       <div className="min-h-screen bg-gray-50">
         <BrandNavigation brand={brand} locale={locale} />
@@ -275,4 +356,37 @@ export default async function BrandPage({ params }: BrandPageProps) {
         </div>
       </div>
     );
+
+  } catch (error) {
+    console.error(`❌ [BrandPage] Error loading brand page for ${decodedSlug}:`, error);
+
+    // 返回错误页面而不是崩溃
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="max-w-md mx-auto text-center p-8">
+          <div className="w-24 h-24 mx-auto mb-6 bg-red-100 rounded-full flex items-center justify-center">
+            <span className="text-red-500 text-2xl">!</span>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">页面加载错误</h1>
+          <p className="text-gray-600 mb-6">
+            抱歉，加载品牌页面时发生了错误。请稍后重试。
+          </p>
+          <div className="space-y-3">
+            <button
+              onClick={() => window.location.reload()}
+              className="block w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              重新加载
+            </button>
+            <Link
+              href={`/${locale}/brands`}
+              className="block w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              返回品牌列表
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 }
