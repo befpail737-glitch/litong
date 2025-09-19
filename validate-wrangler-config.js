@@ -7,15 +7,16 @@ function validateWranglerConfig() {
   try {
     const configContent = fs.readFileSync('./wrangler.toml', 'utf8');
 
-    // 检查基本配置项
+    // 检查基本配置项 - 符合 Cloudflare Pages 规范
     const checks = [
       { name: '项目名称', pattern: /name\s*=\s*"litong-electronics"/, required: true },
       { name: '兼容性日期', pattern: /compatibility_date\s*=\s*"2024-01-01"/, required: true },
       { name: '输出目录', pattern: /pages_build_output_dir\s*=\s*"out"/, required: true },
       { name: '兼容性标志', pattern: /compatibility_flags\s*=/, required: true },
       { name: '生产环境配置', pattern: /\[env\.production\]/, required: true },
-      { name: '开发环境配置', pattern: /\[env\.development\]/, required: true },
-      { name: '顶层vars节', pattern: /^\[vars\]/m, required: false, shouldNotExist: true }
+      { name: '预览环境配置', pattern: /\[env\.preview\]/, required: true },
+      { name: '顶层vars节', pattern: /^\[vars\]/m, required: false, shouldNotExist: true },
+      { name: '不支持的development环境', pattern: /\[env\.development\]/, required: false, shouldNotExist: true }
     ];
 
     let errors = [];
@@ -34,7 +35,7 @@ function validateWranglerConfig() {
     });
 
     // 检查生产环境变量
-    const prodSection = configContent.match(/\[env\.production\]([\s\S]*?)(?=\[env\.development\]|$)/);
+    const prodSection = configContent.match(/\[env\.production\]([\s\S]*?)(?=\[env\.preview\]|$)/);
     if (prodSection) {
       const prodVars = [
         'NODE_ENV',
@@ -49,6 +50,25 @@ function validateWranglerConfig() {
           console.log(`✅ 生产环境变量 ${varName}: 存在`);
         } else {
           warnings.push(`⚠️ 生产环境变量 ${varName}: 缺失`);
+        }
+      });
+    }
+
+    // 检查预览环境变量
+    const previewSection = configContent.match(/\[env\.preview\]([\s\S]*?)$/);
+    if (previewSection) {
+      const previewVars = [
+        'NODE_ENV',
+        'SANITY_PROJECT_ID',
+        'SANITY_DATASET'
+      ];
+
+      console.log('\n📋 预览环境变量检查:');
+      previewVars.forEach(varName => {
+        if (previewSection[1].includes(varName)) {
+          console.log(`✅ 预览环境变量 ${varName}: 存在`);
+        } else {
+          warnings.push(`⚠️ 预览环境变量 ${varName}: 缺失`);
         }
       });
     }

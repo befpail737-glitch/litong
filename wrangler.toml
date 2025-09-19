@@ -31,12 +31,18 @@ SANITY_API_VERSION = "2023-05-03"
 # GitHub Actions标识
 GITHUB_ACTIONS_BUILD = "true"
 
-# 开发环境配置
-[env.development]
+# 预览环境配置 - 用于开发和预览部署
+[env.preview]
 NODE_ENV = "development"
 NEXT_PUBLIC_SITE_URL = "http://localhost:3000"
 NEXT_TELEMETRY_DISABLED = "1"
+# 构建优化设置 - 预览环境使用较宽松设置
+NEXT_BUILD_LINT = "false"
+BUILD_STAGE = "minimal"
+EMERGENCY_BUILD = "true"
+# Sanity CMS 配置
 SANITY_PROJECT_ID = "oquvb2bs"
 SANITY_DATASET = "production"
 SANITY_API_VERSION = "2023-05-03"
+# GitHub Actions标识
 GITHUB_ACTIONS_BUILD = "false"
