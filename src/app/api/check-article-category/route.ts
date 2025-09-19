@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { client } from '@/lib/sanity/client';
 import { groq } from 'next-sanity';
 
+// Force dynamic rendering to avoid static export issues
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const articleId = searchParams.get('articleId');
