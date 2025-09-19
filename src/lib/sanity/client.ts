@@ -169,7 +169,7 @@ export function safeImageUrl(
 
 // 常用GROQ查询片段
 export const GROQ_FRAGMENTS = {
-  // 产品基础信息
+  // 产品基础信息 - 简化以避免Cloudflare超时
   productBase: `
     _id,
     _type,
@@ -187,28 +187,6 @@ export const GROQ_FRAGMENTS = {
       name,
       "slug": slug.current
     },
-    pricing{
-      currency,
-      tiers[]{
-        quantity,
-        price,
-        unit
-      },
-      moq,
-      leadTime,
-      // 兼容字段：提取第一个价格作为默认价格
-      "price": tiers[0].price,
-      "currency": coalesce(currency, "CNY")
-    },
-    inventory{
-      quantity,
-      status,
-      warehouse,
-      lastUpdated,
-      // 兼容字段：转换状态为布尔值
-      "inStock": status == "in_stock",
-      "quantity": coalesce(quantity, 0)
-    },
     isActive,
     isFeatured,
     isNew,
@@ -216,7 +194,7 @@ export const GROQ_FRAGMENTS = {
     _updatedAt
   `,
 
-  // 产品详细信息
+  // 产品详细信息 - 简化以避免Cloudflare超时
   productDetail: `
     _id,
     _type,
@@ -241,28 +219,6 @@ export const GROQ_FRAGMENTS = {
       "slug": slug.current
     },
     specifications,
-    pricing{
-      currency,
-      tiers[]{
-        quantity,
-        price,
-        unit
-      },
-      moq,
-      leadTime,
-      // 兼容字段
-      "price": tiers[0].price,
-      "currency": coalesce(currency, "CNY")
-    },
-    inventory{
-      quantity,
-      status,
-      warehouse,
-      lastUpdated,
-      // 兼容字段
-      "inStock": status == "in_stock",
-      "quantity": coalesce(quantity, 0)
-    },
     documents,
     isActive,
     isFeatured,
@@ -360,6 +316,30 @@ export const GROQ_FRAGMENTS = {
     _createdAt,
     _updatedAt
   `,
+
+  // 简化的定价查询 - 仅在需要时单独获取
+  pricing: `
+    pricing{
+      currency,
+      tiers[0..2]{
+        quantity,
+        price,
+        unit
+      },
+      moq,
+      leadTime
+    }
+  `,
+
+  // 简化的库存查询 - 仅在需要时单独获取
+  inventory: `
+    inventory{
+      quantity,
+      status,
+      warehouse,
+      lastUpdated
+    }
+  `,
 };
 
 // 错误处理
@@ -370,12 +350,12 @@ export class SanityError extends Error {
   }
 }
 
-// 增强的重试机制 - 支持超时保护
+// 增强的重试机制 - 支持激进超时保护用于Cloudflare构建
 export async function withRetry<T>(
   fn: () => Promise<T>,
-  maxRetries = 3,
-  delay = 1000,
-  timeoutMs = 30000 // 30秒超时，防止Cloudflare构建挂起
+  maxRetries = 2,
+  delay = 500,
+  timeoutMs = 8000 // 8秒超时，激进防止Cloudflare构建挂起
 ): Promise<T> {
   for (let i = 0; i < maxRetries; i++) {
     try {

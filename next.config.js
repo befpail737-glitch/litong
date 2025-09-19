@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 
+const webpack = require('webpack');
+
 // 分阶段构建策略：根据环境动态调整构建行为
 const isCloudflare = process.env.CF_PAGES === 'true' || process.env.CLOUDFLARE_ENVIRONMENT !== undefined;
 const isEmergencyBuild = process.env.EMERGENCY_BUILD === 'true';
@@ -48,7 +50,7 @@ const nextConfig = {
     }
 
     // 设置环境变量以供查询函数使用
-    config.plugins.push(new config.webpack.DefinePlugin({
+    config.plugins.push(new webpack.DefinePlugin({
       'process.env.RUNTIME_BRAND_LIMIT': JSON.stringify(limits.brand.toString()),
       'process.env.RUNTIME_PRODUCT_LIMIT': JSON.stringify(limits.product.toString()),
       'process.env.RUNTIME_SOLUTION_LIMIT': JSON.stringify(limits.solution.toString()),

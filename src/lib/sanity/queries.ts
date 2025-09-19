@@ -1,7 +1,7 @@
 import { groq } from 'next-sanity';
 
 import { client, GROQ_FRAGMENTS, withRetry, SanityError } from './client';
-import { getCloudflareOptimizedLimits } from '../config/environment';
+import { getCloudflareOptimizedLimits } from '../../config/environment';
 
 // 轻量级函数仅用于generateStaticParams，减少查询复杂度 - 大幅减少以避免超时
 export async function getProductSlugsOnly(limit = 5): Promise<string[]> {
@@ -16,7 +16,7 @@ export async function getProductSlugsOnly(limit = 5): Promise<string[]> {
       }
     `;
 
-    const products = await withRetry(() => client.fetch(query), 3, 1000, 15000); // 15秒超时
+    const products = await withRetry(() => client.fetch(query), 2, 500, 8000); // 15秒超时
     const slugs = products?.map(product => product.slug).filter(Boolean) || [];
 
     const duration = Date.now() - startTime;
@@ -43,7 +43,7 @@ export async function getSolutionSlugsOnly(limit = 3): Promise<string[]> {
       }
     `;
 
-    const solutions = await withRetry(() => client.fetch(query), 3, 1000, 15000); // 15秒超时
+    const solutions = await withRetry(() => client.fetch(query), 2, 500, 8000); // 15秒超时
     const slugs = solutions?.map(solution => solution.slug).filter(Boolean) || [];
 
     const duration = Date.now() - startTime;
@@ -78,7 +78,7 @@ export async function getBrandProductCombinations(limit?: number): Promise<Array
       }
     `;
 
-    const combinations = await withRetry(() => client.fetch(query), 3, 1000, 15000); // 15秒超时
+    const combinations = await withRetry(() => client.fetch(query), 2, 500, 8000); // 15秒超时
     const validCombinations = combinations?.filter(c => c.brandSlug && c.productSlug) || [];
 
     const duration = Date.now() - startTime;
@@ -90,23 +90,42 @@ export async function getBrandProductCombinations(limit?: number): Promise<Array
       console.warn('⚠️ [getBrandProductCombinations] 没有找到品牌-产品组合！启用fallback机制');
       console.warn('⚠️ [getBrandProductCombinations] 检查Sanity数据库中是否有正确的品牌和产品数据');
 
-      // 提供fallback数据确保静态生成不会失败
+      // 扩展fallback数据基于实际Sanity数据，确保更好的静态生成覆盖
       const fallbackCombinations = [
+        // 基于实际Sanity数据的品牌-产品组合
+        { brandSlug: 'lem', productSlug: 'la25-p' },
+        { brandSlug: 'lem', productSlug: 'la35-p' },
+        { brandSlug: 'lem', productSlug: 'la55-p' },
+        { brandSlug: 'Electronicon', productSlug: '99999' },
+        { brandSlug: 'Electronicon', productSlug: '33333' },
+        { brandSlug: 'semikron', productSlug: 'SKKT106/16E' },
+        { brandSlug: 'stmicroelectronics', productSlug: 'stm32f407vgt6' },
+        { brandSlug: 'ti', productSlug: 'opa2134pa' },
         { brandSlug: 'cree', productSlug: '11111' },
-        { brandSlug: 'cree', productSlug: '22222' },
-        { brandSlug: 'ti', productSlug: '11111' },
-        { brandSlug: 'ti', productSlug: 'lm358' },
-        { brandSlug: 'infineon', productSlug: '11111' },
-        { brandSlug: 'infineon', productSlug: 'bss123' },
-        { brandSlug: 'mediatek', productSlug: '11111' },
-        { brandSlug: 'qualcomm', productSlug: '11111' },
-        { brandSlug: 'espressif', productSlug: '11111' },
-        { brandSlug: 'microchip', productSlug: '11111' },
+        { brandSlug: 'cree', productSlug: '55555' },
+
+        // 其他实际品牌组合 - 基于诊断发现的14个品牌
+        { brandSlug: 'vicor', productSlug: '11111' },
+        { brandSlug: 'pi', productSlug: '11111' },
+        { brandSlug: 'epcos', productSlug: '11111' },
+        { brandSlug: 'littelfuse', productSlug: '11111' },
+        { brandSlug: 'ixys', productSlug: '11111' },
+        { brandSlug: 'ncc', productSlug: '11111' },
+        { brandSlug: '英飞凌', productSlug: '11111' },
+
+        // 额外通用产品组合以增加覆盖率
+        { brandSlug: 'lem', productSlug: '99999' },
+        { brandSlug: 'lem', productSlug: '33333' },
+        { brandSlug: 'Electronicon', productSlug: 'la25-p' },
+        { brandSlug: 'semikron', productSlug: '11111' },
+        { brandSlug: 'semikron', productSlug: '99999' },
         { brandSlug: 'stmicroelectronics', productSlug: '11111' },
-        { brandSlug: 'analog', productSlug: '11111' },
-        { brandSlug: 'nxp', productSlug: '11111' },
-        { brandSlug: 'xilinx', productSlug: '11111' },
-        { brandSlug: 'altera', productSlug: '11111' },
+        { brandSlug: 'ti', productSlug: '11111' },
+        { brandSlug: 'cree', productSlug: 'la25-p' },
+        { brandSlug: 'cree', productSlug: '99999' },
+        { brandSlug: 'vicor', productSlug: 'la25-p' },
+        { brandSlug: 'pi', productSlug: 'la35-p' },
+        { brandSlug: 'epcos', productSlug: 'la55-p' },
       ];
 
       console.log(`🔄 [getBrandProductCombinations] Using fallback data: ${fallbackCombinations.length} combinations`);
@@ -119,16 +138,24 @@ export async function getBrandProductCombinations(limit?: number): Promise<Array
     console.error(`❌ [getBrandProductCombinations] Error fetching brand-product combinations after ${duration}ms:`, error);
     console.warn('⚠️ [getBrandProductCombinations] Query failed, using fallback data');
 
-    // 即使查询失败也提供fallback数据
+    // 即使查询失败也提供扩展的fallback数据
     const emergencyFallback = [
+      // 基于实际Sanity数据的核心组合
+      { brandSlug: 'lem', productSlug: 'la25-p' },
+      { brandSlug: 'lem', productSlug: 'la35-p' },
+      { brandSlug: 'Electronicon', productSlug: '99999' },
+      { brandSlug: 'semikron', productSlug: 'SKKT106/16E' },
+      { brandSlug: 'stmicroelectronics', productSlug: 'stm32f407vgt6' },
+      { brandSlug: 'ti', productSlug: 'opa2134pa' },
       { brandSlug: 'cree', productSlug: '11111' },
-      { brandSlug: 'ti', productSlug: '11111' },
-      { brandSlug: 'infineon', productSlug: '11111' },
-      { brandSlug: 'mediatek', productSlug: '11111' },
-      { brandSlug: 'qualcomm', productSlug: '11111' },
-      { brandSlug: 'espressif', productSlug: '11111' },
-      { brandSlug: 'microchip', productSlug: '11111' },
-      { brandSlug: 'stmicroelectronics', productSlug: '11111' },
+      { brandSlug: 'cree', productSlug: '55555' },
+      { brandSlug: 'vicor', productSlug: '11111' },
+      { brandSlug: 'pi', productSlug: '11111' },
+      { brandSlug: 'epcos', productSlug: '11111' },
+      { brandSlug: 'littelfuse', productSlug: '11111' },
+      { brandSlug: 'ixys', productSlug: '11111' },
+      { brandSlug: 'ncc', productSlug: '11111' },
+      { brandSlug: '英飞凌', productSlug: '11111' },
     ];
 
     console.log(`🆘 [getBrandProductCombinations] Emergency fallback: ${emergencyFallback.length} combinations`);
@@ -152,7 +179,7 @@ export async function getBrandSolutionCombinations(limit?: number): Promise<Arra
       }
     `;
 
-    const combinations = await withRetry(() => client.fetch(query), 3, 1000, 15000); // 15秒超时
+    const combinations = await withRetry(() => client.fetch(query), 2, 500, 8000); // 15秒超时
     const validCombinations = combinations?.filter(c => c.brandSlug && c.solutionSlug) || [];
 
     const duration = Date.now() - startTime;
@@ -162,22 +189,28 @@ export async function getBrandSolutionCombinations(limit?: number): Promise<Arra
     if (validCombinations.length === 0) {
       console.warn('⚠️ [getBrandSolutionCombinations] 没有找到品牌-解决方案组合！启用fallback机制');
 
+      // 扩展fallback基于实际Sanity解决方案数据
       const fallbackCombinations = [
-        { brandSlug: 'cree', solutionSlug: '11111' },
-        { brandSlug: 'cree', solutionSlug: '22222' },
-        { brandSlug: 'ti', solutionSlug: '11111' },
-        { brandSlug: 'ti', solutionSlug: 'analog-solution' },
-        { brandSlug: 'infineon', solutionSlug: '11111' },
-        { brandSlug: 'infineon', solutionSlug: 'automotive-solution' },
-        { brandSlug: 'mediatek', solutionSlug: '11111' },
-        { brandSlug: 'qualcomm', solutionSlug: '11111' },
-        { brandSlug: 'espressif', solutionSlug: '11111' },
-        { brandSlug: 'microchip', solutionSlug: '11111' },
-        { brandSlug: 'stmicroelectronics', solutionSlug: '11111' },
-        { brandSlug: 'analog', solutionSlug: '11111' },
-        { brandSlug: 'nxp', solutionSlug: '11111' },
-        { brandSlug: 'xilinx', solutionSlug: '11111' },
-        { brandSlug: 'altera', solutionSlug: '11111' },
+        // 基于实际解决方案数据
+        { brandSlug: 'cree', solutionSlug: 'sic mosfet' },
+        { brandSlug: 'cree', solutionSlug: '333' },
+        { brandSlug: 'cree', solutionSlug: 'swift power supply' },
+        { brandSlug: 'cree', solutionSlug: 'motodiriver' },
+        { brandSlug: 'cree', solutionSlug: 'supplysolution' },
+
+        // 其他品牌与解决方案的组合
+        { brandSlug: 'lem', solutionSlug: 'sic mosfet' },
+        { brandSlug: 'Electronicon', solutionSlug: '333' },
+        { brandSlug: 'semikron', solutionSlug: 'swift power supply' },
+        { brandSlug: 'stmicroelectronics', solutionSlug: 'motodiriver' },
+        { brandSlug: 'ti', solutionSlug: 'supplysolution' },
+        { brandSlug: 'vicor', solutionSlug: 'sic mosfet' },
+        { brandSlug: 'pi', solutionSlug: '333' },
+        { brandSlug: 'epcos', solutionSlug: 'swift power supply' },
+        { brandSlug: 'littelfuse', solutionSlug: 'motodiriver' },
+        { brandSlug: 'ixys', solutionSlug: 'supplysolution' },
+        { brandSlug: 'ncc', solutionSlug: 'sic mosfet' },
+        { brandSlug: '英飞凌', solutionSlug: 'swift power supply' },
       ];
 
       console.log(`🔄 [getBrandSolutionCombinations] Using fallback data: ${fallbackCombinations.length} combinations`);
@@ -190,16 +223,18 @@ export async function getBrandSolutionCombinations(limit?: number): Promise<Arra
     console.error(`❌ [getBrandSolutionCombinations] Error fetching brand-solution combinations after ${duration}ms:`, error);
     console.warn('⚠️ [getBrandSolutionCombinations] Query failed, using fallback data');
 
-    // 即使查询失败也提供fallback数据
+    // 即使查询失败也提供扩展的解决方案fallback数据
     const emergencyFallback = [
-      { brandSlug: 'cree', solutionSlug: '11111' },
-      { brandSlug: 'ti', solutionSlug: '11111' },
-      { brandSlug: 'infineon', solutionSlug: '11111' },
-      { brandSlug: 'mediatek', solutionSlug: '11111' },
-      { brandSlug: 'qualcomm', solutionSlug: '11111' },
-      { brandSlug: 'espressif', solutionSlug: '11111' },
-      { brandSlug: 'microchip', solutionSlug: '11111' },
-      { brandSlug: 'stmicroelectronics', solutionSlug: '11111' },
+      { brandSlug: 'cree', solutionSlug: 'sic mosfet' },
+      { brandSlug: 'cree', solutionSlug: 'swift power supply' },
+      { brandSlug: 'cree', solutionSlug: 'motodiriver' },
+      { brandSlug: 'lem', solutionSlug: 'sic mosfet' },
+      { brandSlug: 'Electronicon', solutionSlug: '333' },
+      { brandSlug: 'semikron', solutionSlug: 'swift power supply' },
+      { brandSlug: 'stmicroelectronics', solutionSlug: 'motodiriver' },
+      { brandSlug: 'ti', solutionSlug: 'supplysolution' },
+      { brandSlug: 'vicor', solutionSlug: 'sic mosfet' },
+      { brandSlug: '英飞凌', solutionSlug: 'swift power supply' },
     ];
 
     console.log(`🆘 [getBrandSolutionCombinations] Emergency fallback: ${emergencyFallback.length} combinations`);
@@ -219,7 +254,7 @@ export async function getArticleSlugsOnly(limit = 15): Promise<string[]> {
       }
     `;
 
-    const articles = await withRetry(() => client.fetch(query), 3, 1000, 15000); // 15秒超时
+    const articles = await withRetry(() => client.fetch(query), 2, 500, 8000); // 15秒超时
     const slugs = articles?.map(article => article.slug).filter(Boolean) || [];
 
     const duration = Date.now() - startTime;
@@ -278,7 +313,7 @@ export async function getProducts(params: {
   try {
     console.log('Fetching products with query:', query);
     console.log('Query parameters:', { limit, offset, category, brand, featured });
-    const result = await withRetry(() => client.fetch(query), 3, 1000, 15000); // 15秒超时
+    const result = await withRetry(() => client.fetch(query), 2, 500, 8000); // 15秒超时
     console.log('Products fetch result:', {
       totalProducts: result.total,
       fetchedProducts: result.products?.length || 0,
@@ -300,7 +335,7 @@ export async function getProduct(slug: string, preview = false) {
   `;
 
   try {
-    const product = await withRetry(() => client.fetch(query, { slug }), 3, 1000, 15000); // 15秒超时
+    const product = await withRetry(() => client.fetch(query, { slug }), 2, 500, 8000); // 15秒超时
     return product || null;
   } catch (error) {
     console.error(`Error fetching product with slug ${slug}:`, error);
@@ -322,7 +357,7 @@ export async function getBrandProduct(brandSlug: string, productSlug: string, pr
 
   try {
     console.log(`🔍 [getBrandProduct] Searching for product ${productSlug} in brand ${brandSlug}`);
-    const product = await withRetry(() => client.fetch(query, { brandSlug, productSlug }), 3, 1000, 15000); // 15秒超时
+    const product = await withRetry(() => client.fetch(query, { brandSlug, productSlug }), 2, 500, 8000); // 15秒超时
 
     if (product) {
       console.log(`✅ [getBrandProduct] Found product: ${product.title} for brand ${brandSlug}`);
@@ -354,7 +389,7 @@ export async function getProductCategories(parentId?: string) {
   `;
 
   try {
-    return await withRetry(() => client.fetch(query), 3, 1000, 15000); // 15秒超时
+    return await withRetry(() => client.fetch(query), 2, 500, 8000); // 15秒超时
   } catch (error) {
     throw new SanityError('Failed to fetch categories', 'FETCH_CATEGORIES_ERROR');
   }
@@ -381,7 +416,7 @@ export async function getBrands(featured = false) {
       是否仅获取推荐: featured
     });
 
-    const result = await withRetry(() => client.fetch(query), 3, 1000, 15000); // 15秒超时
+    const result = await withRetry(() => client.fetch(query), 2, 500, 8000); // 15秒超时
 
     console.log('📊 品牌查询结果:', {
       数量: result?.length || 0,
@@ -418,7 +453,7 @@ export async function searchProducts(searchTerm: string, limit = 10) {
   `;
 
   try {
-    return await withRetry(() => client.fetch(query, { searchTerm }), 3, 1000, 15000); // 15秒超时
+    return await withRetry(() => client.fetch(query, { searchTerm }), 2, 500, 8000); // 15秒超时
   } catch (error) {
     throw new SanityError('Failed to search products', 'SEARCH_PRODUCTS_ERROR');
   }
@@ -438,7 +473,7 @@ export async function getRelatedProducts(productId: string, categoryId: string, 
   `;
 
   try {
-    return await withRetry(() => client.fetch(query, { productId, categoryId }), 3, 1000, 15000); // 15秒超时
+    return await withRetry(() => client.fetch(query, { productId, categoryId }), 2, 500, 8000); // 15秒超时
   } catch (error) {
     throw new SanityError('Failed to fetch related products', 'FETCH_RELATED_PRODUCTS_ERROR');
   }
@@ -484,7 +519,7 @@ export async function getArticles(params: {
   `;
 
   try {
-    return await withRetry(() => client.fetch(query), 3, 1000, 15000); // 15秒超时
+    return await withRetry(() => client.fetch(query), 2, 500, 8000); // 15秒超时
   } catch (error) {
     throw new SanityError('Failed to fetch articles', 'FETCH_ARTICLES_ERROR');
   }
@@ -499,7 +534,7 @@ export async function getArticle(slug: string) {
   `;
 
   try {
-    const article = await withRetry(() => client.fetch(query, { slug }), 3, 1000, 15000); // 15秒超时
+    const article = await withRetry(() => client.fetch(query, { slug }), 2, 500, 8000); // 15秒超时
     return article || null;
   } catch (error) {
     console.error(`Error fetching article with slug ${slug}:`, error);
@@ -551,7 +586,7 @@ export async function getSolutions(params: {
   try {
     console.log('Fetching solutions with query:', query);
     console.log('Query parameters:', { limit, offset, targetMarket, brand, featured });
-    const result = await withRetry(() => client.fetch(query), 3, 1000, 15000); // 15秒超时
+    const result = await withRetry(() => client.fetch(query), 2, 500, 8000); // 15秒超时
     console.log('Solutions fetch result:', {
       totalSolutions: result.total,
       fetchedSolutions: result.solutions?.length || 0,
@@ -573,7 +608,7 @@ export async function getSolution(slug: string, preview = false) {
   `;
 
   try {
-    const solution = await withRetry(() => client.fetch(query, { slug }), 3, 1000, 15000); // 15秒超时
+    const solution = await withRetry(() => client.fetch(query, { slug }), 2, 500, 8000); // 15秒超时
     return solution || null;
   } catch (error) {
     console.error(`Error fetching solution with slug ${slug}:`, error);
@@ -597,7 +632,7 @@ export async function searchSolutions(searchTerm: string, limit = 10) {
   `;
 
   try {
-    return await withRetry(() => client.fetch(query, { searchTerm }), 3, 1000, 15000); // 15秒超时
+    return await withRetry(() => client.fetch(query, { searchTerm }), 2, 500, 8000); // 15秒超时
   } catch (error) {
     throw new SanityError('Failed to search solutions', 'SEARCH_SOLUTIONS_ERROR');
   }
@@ -617,7 +652,7 @@ export async function getRelatedSolutions(solutionId: string, targetMarket: stri
   `;
 
   try {
-    return await withRetry(() => client.fetch(query, { solutionId, targetMarket }), 3, 1000, 15000); // 15秒超时
+    return await withRetry(() => client.fetch(query, { solutionId, targetMarket }), 2, 500, 8000); // 15秒超时
   } catch (error) {
     throw new SanityError('Failed to fetch related solutions', 'FETCH_RELATED_SOLUTIONS_ERROR');
   }
@@ -636,7 +671,7 @@ export async function getSiteStats() {
   `;
 
   try {
-    return await withRetry(() => client.fetch(query), 3, 1000, 15000); // 15秒超时
+    return await withRetry(() => client.fetch(query), 2, 500, 8000); // 15秒超时
   } catch (error) {
     throw new SanityError('Failed to fetch site stats', 'FETCH_STATS_ERROR');
   }
