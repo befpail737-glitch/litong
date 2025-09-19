@@ -16,7 +16,8 @@
     "npm": ">=10.0.0"
   },
   "scripts": {
-    "_deploy_trigger": "echo 'Force deployment trigger - 2025-09-18'",
+    "_deploy_trigger": "echo 'Force deployment trigger - 2025-01-19'",
+    "deploy:trigger": "echo 'GitHub Actions deployment trigger' && git add . && git commit -m 'Trigger deployment' && git push",
     "dev": "next dev",
     "build": "npm run clear-cache && next build && npm run fix-static-export",
     "build:enhanced": "npm run clear-cache && next build && npm run fix-static-export",
@@ -45,7 +46,10 @@
     "sanity:build": "sanity build",
     "sanity:deploy": "sanity deploy",
     "clear-cache": "node scripts/clear-cache.js",
-    "dev:fresh": "npm run clear-cache && npm run dev"
+    "dev:fresh": "npm run clear-cache && npm run dev",
+    "deploy:check": "echo 'Checking deployment readiness...' && npm run typecheck && npm run build && echo 'Ready for deployment!'",
+    "deploy:preview": "echo 'Building preview deployment...' && npm run build",
+    "deploy:production": "echo 'Triggering production deployment...' && npm run deploy:trigger"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "1.4.0",

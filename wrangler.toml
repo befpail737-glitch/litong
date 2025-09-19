@@ -5,6 +5,9 @@ compatibility_date = "2024-01-01"
 # Pages 构建输出目录
 pages_build_output_dir = "out"
 
+# GitHub Actions 自动部署配置
+# 当使用GitHub Actions时，这些设置确保正确的构建行为
+
 # 环境变量 - 针对图片处理和构建优化
 [vars]
 NODE_ENV = "production"
@@ -24,3 +27,11 @@ NEXT_DISABLE_STATIC_IMAGES = "false"
 
 # 兼容性设置 - 增强Node.js支持
 compatibility_flags = ["nodejs_compat", "streams_enable_constructors"]
+
+# GitHub Actions环境配置
+[env.production]
+GITHUB_ACTIONS_BUILD = "true"
+
+# 开发环境配置
+[env.development]
+GITHUB_ACTIONS_BUILD = "false"
