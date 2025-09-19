@@ -4,183 +4,141 @@ import { client, GROQ_FRAGMENTS, withRetry, SanityError } from './client';
 
 // 轻量级函数仅用于generateStaticParams，减少查询复杂度 - 大幅减少以避免超时
 export async function getProductSlugsOnly(limit = 5): Promise<string[]> {
+  const startTime = Date.now();
+  console.log(`🚀 [getProductSlugsOnly] Starting query with limit: ${limit}`);
+
   try {
     const query = groq`
-      *[_type == "product" && isActive == true && defined(slug.current)] | order(_createdAt desc) [0...${limit}] {
+      *[_type == "product" && isActive == true && defined(slug.current) && !(_id in path("drafts.**"))] | order(_updatedAt desc) [0...${limit}] {
         "slug": slug.current
       }
     `;
 
-    const products = await client.fetch(query);
+    const products = await withRetry(() => client.fetch(query), 3, 1000);
     const slugs = products?.map(product => product.slug).filter(Boolean) || [];
+
+    const duration = Date.now() - startTime;
+    console.log(`✅ [getProductSlugsOnly] Query completed in ${duration}ms, returned ${slugs.length} slugs`);
 
     return slugs;
   } catch (error) {
-    console.error('Error fetching product slugs, using fallback:', error);
-    return ['demo-product-1', 'demo-product-2', 'demo-product-3'];
+    const duration = Date.now() - startTime;
+    console.error(`❌ [getProductSlugsOnly] Error fetching product slugs after ${duration}ms:`, error);
+    console.warn('⚠️ [getProductSlugsOnly] Returning empty array - no hardcoded fallbacks');
+    return [];
   }
 }
 
 export async function getSolutionSlugsOnly(limit = 3): Promise<string[]> {
+  const startTime = Date.now();
+  console.log(`🚀 [getSolutionSlugsOnly] Starting query with limit: ${limit}`);
+
   try {
     const query = groq`
-      *[_type == "solution" && (isPublished == true || !defined(isPublished)) && defined(slug.current)] | order(_createdAt desc) [0...${limit}] {
+      *[_type == "solution" && (isPublished == true || !defined(isPublished)) && defined(slug.current) && !(_id in path("drafts.**"))] | order(_updatedAt desc) [0...${limit}] {
         "slug": slug.current
       }
     `;
 
-    const solutions = await client.fetch(query);
+    const solutions = await withRetry(() => client.fetch(query), 3, 1000);
     const slugs = solutions?.map(solution => solution.slug).filter(Boolean) || [];
+
+    const duration = Date.now() - startTime;
+    console.log(`✅ [getSolutionSlugsOnly] Query completed in ${duration}ms, returned ${slugs.length} slugs`);
 
     return slugs;
   } catch (error) {
-    console.error('Error fetching solution slugs, using fallback:', error);
-    return ['demo-solution-1', 'demo-solution-2'];
+    const duration = Date.now() - startTime;
+    console.error(`❌ [getSolutionSlugsOnly] Error fetching solution slugs after ${duration}ms:`, error);
+    console.warn('⚠️ [getSolutionSlugsOnly] Returning empty array - no hardcoded fallbacks');
+    return [];
   }
 }
 
-// 获取品牌-产品组合用于静态参数生成 - 扩大覆盖范围解决404问题
+// 获取品牌-产品组合用于静态参数生成 - 使用真实Sanity数据
 export async function getBrandProductCombinations(limit = 200): Promise<Array<{brandSlug: string, productSlug: string}>> {
+  const startTime = Date.now();
+  console.log(`🚀 [getBrandProductCombinations] Starting query with limit: ${limit}`);
+
   try {
-    console.log('🔧 [getBrandProductCombinations] Fetching comprehensive brand-product combinations from Sanity...');
+    console.log(`🔧 [getBrandProductCombinations] Fetching real brand-product combinations from Sanity (limit: ${limit})...`);
 
-    // 智能应急模式：提供更全面的硬编码组合
-    const emergencyMode = process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'phase-production-build';
-
-    if (emergencyMode) {
-      console.log('🚨 Smart emergency mode: Using comprehensive hardcoded product combinations');
-      return [
-        // Cree products
-        { brandSlug: 'cree', productSlug: '55555' },
-        { brandSlug: 'cree', productSlug: '11111' },
-        { brandSlug: 'cree', productSlug: 'sic mosfet' },
-        { brandSlug: 'cree', productSlug: '99999' },
-        { brandSlug: 'cree', productSlug: 'stm32f407vgt6' },
-
-        // TI products
-        { brandSlug: 'ti', productSlug: 'opa2134pa' },
-        { brandSlug: 'ti', productSlug: 'lm358' },
-        { brandSlug: 'ti', productSlug: 'ne555' },
-        { brandSlug: 'ti', productSlug: 'tl074' },
-
-        // Infineon products
-        { brandSlug: 'infineon', productSlug: 'bss123' },
-        { brandSlug: 'infineon', productSlug: 'irfz44n' },
-        { brandSlug: 'infineon', productSlug: 'buz11' },
-
-        // STMicroelectronics products
-        { brandSlug: 'stmicroelectronics', productSlug: 'stm32f103c8t6' },
-        { brandSlug: 'stmicroelectronics', productSlug: 'stm32f407vgt6' },
-        { brandSlug: 'stmicroelectronics', productSlug: 'l7805cv' },
-
-        // Additional major brands
-        { brandSlug: 'mediatek', productSlug: 'mt6580' },
-        { brandSlug: 'mediatek', productSlug: 'mt6737' },
-        { brandSlug: 'qualcomm', productSlug: 'snapdragon_865' },
-        { brandSlug: 'espressif', productSlug: 'esp32' },
-        { brandSlug: 'espressif', productSlug: 'esp8266' },
-        { brandSlug: 'microchip', productSlug: 'pic16f877a' },
-        { brandSlug: 'analog-devices', productSlug: 'ad8620' },
-        { brandSlug: 'maxim', productSlug: 'max232' },
-        { brandSlug: 'nordic', productSlug: 'nrf52840' },
-        { brandSlug: 'cypress', productSlug: 'cy7c68013a' },
-        { brandSlug: 'renesas', productSlug: 'rh850' }
-      ];
-    }
+    // 移除应急模式 - 始终使用真实Sanity数据
 
     const query = groq`
-      *[_type == "product" && (isActive == true || !defined(isActive)) && defined(slug.current) && defined(brand->slug.current)] | order(_createdAt desc) [0...${limit}] {
+      *[_type == "product" && (isActive == true || !defined(isActive)) && defined(slug.current) && defined(brand) && defined(brand->slug.current) && !(_id in path("drafts.**"))] | order(_updatedAt desc) [0...${limit}] {
         "productSlug": slug.current,
         "brandSlug": brand->slug.current
       }
     `;
 
-    const combinations = await client.fetch(query);
+    const combinations = await withRetry(() => client.fetch(query), 3, 1000);
     const validCombinations = combinations?.filter(c => c.brandSlug && c.productSlug) || [];
 
-    console.log('✅ [getBrandProductCombinations] Found combinations:', {
-      total: validCombinations.length,
-      combinations: validCombinations.slice(0, 5) // Log first 5 for debugging
-    });
+    const duration = Date.now() - startTime;
+    console.log(`✅ [getBrandProductCombinations] Query completed in ${duration}ms, returned ${validCombinations.length} combinations`);
+    console.log('🔍 [getBrandProductCombinations] Sample combinations:', validCombinations.slice(0, 5));
 
     return validCombinations;
   } catch (error) {
-    console.error('Error fetching brand-product combinations, using fallback:', error);
-    // Return only verified fallback combinations that actually exist in the database
-    // Based on real data analysis from development server logs
-    return [
-      { brandSlug: 'cree', productSlug: 'sic mosfet' },
-      { brandSlug: 'cree', productSlug: '11111' },
-    ];
+    const duration = Date.now() - startTime;
+    console.error(`❌ [getBrandProductCombinations] Error fetching brand-product combinations after ${duration}ms:`, error);
+    console.warn('⚠️ [getBrandProductCombinations] Returning empty array - no hardcoded fallbacks');
+    return [];
   }
 }
 
 // 获取品牌-解决方案组合用于静态参数生成 - 扩大覆盖范围
 export async function getBrandSolutionCombinations(limit = 150): Promise<Array<{brandSlug: string, solutionSlug: string}>> {
+  const startTime = Date.now();
+  console.log(`🚀 [getBrandSolutionCombinations] Starting query with limit: ${limit}`);
+
   try {
     const query = groq`
-      *[_type == "solution" && (isPublished == true || !defined(isPublished)) && defined(slug.current) && defined(primaryBrand->slug.current)] | order(_createdAt desc) [0...${limit}] {
+      *[_type == "solution" && (isPublished == true || !defined(isPublished)) && defined(slug.current) && defined(primaryBrand) && defined(primaryBrand->slug.current) && !(_id in path("drafts.**"))] | order(_updatedAt desc) [0...${limit}] {
         "solutionSlug": slug.current,
         "brandSlug": primaryBrand->slug.current
       }
     `;
 
-    const combinations = await client.fetch(query);
-    return combinations?.filter(c => c.brandSlug && c.solutionSlug) || [];
+    const combinations = await withRetry(() => client.fetch(query), 3, 1000);
+    const validCombinations = combinations?.filter(c => c.brandSlug && c.solutionSlug) || [];
+
+    const duration = Date.now() - startTime;
+    console.log(`✅ [getBrandSolutionCombinations] Query completed in ${duration}ms, returned ${validCombinations.length} combinations`);
+
+    return validCombinations;
   } catch (error) {
-    console.error('Error fetching brand-solution combinations, using fallback:', error);
-    // Return comprehensive fallback combinations for critical brands
-    return [
-      // Cree solutions
-      { brandSlug: 'cree', solutionSlug: '11111' },
-      { brandSlug: 'cree', solutionSlug: 'power-management' },
-      { brandSlug: 'cree', solutionSlug: 'led-lighting' },
-
-      // Infineon solutions
-      { brandSlug: 'infineon', solutionSlug: '22222' },
-      { brandSlug: 'infineon', solutionSlug: 'automotive-power' },
-      { brandSlug: 'infineon', solutionSlug: 'iot-security' },
-
-      // TI solutions
-      { brandSlug: 'ti', solutionSlug: '33333' },
-      { brandSlug: 'ti', solutionSlug: 'analog-design' },
-      { brandSlug: 'ti', solutionSlug: 'embedded-processing' },
-
-      // MediaTek solutions
-      { brandSlug: 'mediatek', solutionSlug: '11111' },
-      { brandSlug: 'mediatek', solutionSlug: 'mobile-connectivity' },
-      { brandSlug: 'mediatek', solutionSlug: 'smart-tv' },
-
-      // Qualcomm solutions
-      { brandSlug: 'qualcomm', solutionSlug: '22222' },
-      { brandSlug: 'qualcomm', solutionSlug: '5g-solutions' },
-      { brandSlug: 'qualcomm', solutionSlug: 'ai-processing' },
-
-      // Additional brand solutions
-      { brandSlug: 'stmicroelectronics', solutionSlug: 'mcu-solutions' },
-      { brandSlug: 'espressif', solutionSlug: 'iot-wifi' },
-      { brandSlug: 'microchip', solutionSlug: 'microcontroller' },
-      { brandSlug: 'nordic', solutionSlug: 'bluetooth-mesh' },
-      { brandSlug: 'cypress', solutionSlug: 'usb-connectivity' }
-    ];
+    const duration = Date.now() - startTime;
+    console.error(`❌ [getBrandSolutionCombinations] Error fetching brand-solution combinations after ${duration}ms:`, error);
+    console.warn('⚠️ [getBrandSolutionCombinations] Returning empty array - no hardcoded fallbacks');
+    return [];
   }
 }
 
 export async function getArticleSlugsOnly(limit = 15): Promise<string[]> {
+  const startTime = Date.now();
+  console.log(`🚀 [getArticleSlugsOnly] Starting query with limit: ${limit}`);
+
   try {
     const query = groq`
-      *[_type == "article" && (isPublished == true || !defined(isPublished)) && defined(slug.current)] | order(_createdAt desc) [0...${limit}] {
+      *[_type == "article" && (isPublished == true || !defined(isPublished)) && defined(slug.current) && !(_id in path("drafts.**"))] | order(_updatedAt desc) [0...${limit}] {
         "slug": slug.current
       }
     `;
 
-    const articles = await client.fetch(query);
+    const articles = await withRetry(() => client.fetch(query), 3, 1000);
     const slugs = articles?.map(article => article.slug).filter(Boolean) || [];
+
+    const duration = Date.now() - startTime;
+    console.log(`✅ [getArticleSlugsOnly] Query completed in ${duration}ms, returned ${slugs.length} slugs`);
 
     return slugs;
   } catch (error) {
-    console.error('Error fetching article slugs, using fallback:', error);
-    return ['demo-article-1', 'demo-article-2'];
+    const duration = Date.now() - startTime;
+    console.error(`❌ [getArticleSlugsOnly] Error fetching article slugs after ${duration}ms:`, error);
+    console.warn('⚠️ [getArticleSlugsOnly] Returning empty array - no hardcoded fallbacks');
+    return [];
   }
 }
 
