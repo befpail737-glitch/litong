@@ -1,4 +1,5 @@
-import { getBrandData, getAllBrands, getBrandSupportCombinations, getSupportDocument } from '@/lib/sanity/queries';
+import { getBrandSupportCombinations, getSupportDocument } from '@/lib/sanity/queries';
+import { getBrandData, getAllBrands } from '@/lib/sanity/brands';
 import { safeImageUrl } from '@/lib/sanity/client';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
