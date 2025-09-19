@@ -52,6 +52,10 @@ export async function generateStaticParams() {
   }
 }
 
+// Enable ISR for dynamic brand subdirectory generation
+export const dynamic = 'force-static';
+export const revalidate = 3600; // Revalidate every hour
+
 export default async function BrandSolutionsPage({ params }: BrandSolutionsPageProps) {
   const { locale, slug } = params;
 

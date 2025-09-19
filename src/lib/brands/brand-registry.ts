@@ -20,13 +20,13 @@ class BrandRegistry {
     return BrandRegistry.instance;
   }
 
-  // 初始化品牌注册表
+  // 初始化品牌注册表 - 支持大规模品牌数据
   async initialize(): Promise<void> {
     try {
-      console.log('🚀 [BrandRegistry] Initializing brand registry...');
+      console.log('🚀 [BrandRegistry] Initializing brand registry with expanded coverage...');
 
       const [allSlugs, featuredSlugs] = await Promise.all([
-        getBrandSlugs(queryLimits.brands),
+        getBrandSlugs(queryLimits.brands), // 现在是200个品牌
         getFeaturedBrandSlugs(APP_CONSTANTS.MAX_FEATURED_BRANDS)
       ]);
 
@@ -35,9 +35,16 @@ class BrandRegistry {
       this.lastUpdate = Date.now();
 
       console.log(`✅ [BrandRegistry] Initialized with ${allSlugs.length} brands (${featuredSlugs.length} featured)`);
+      console.log(`📊 [BrandRegistry] Coverage increased from 30 to ${allSlugs.length} brands`);
     } catch (error) {
       console.error('❌ [BrandRegistry] Failed to initialize:', error);
-      throw error;
+      // 使用扩展的fallback以确保大规模覆盖
+      console.log('🆘 [BrandRegistry] Using expanded fallback brand coverage');
+      const { getExpandedCoreBrandSlugs } = await import('@/config/brand-data');
+      this.brandSlugs = getExpandedCoreBrandSlugs();
+      this.featuredSlugs = this.brandSlugs.slice(0, 10); // 前10个作为特色
+      this.lastUpdate = Date.now();
+      console.log(`🔄 [BrandRegistry] Fallback initialized with ${this.brandSlugs.length} brands`);
     }
   }
 

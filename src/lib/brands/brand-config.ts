@@ -25,16 +25,16 @@ let brandCache: {
 };
 
 // 导入配置化的品牌数据
-import { getCoreBrandSlugs, getBrandDataBySlug } from '@/config/brand-data';
+import { getCoreBrandSlugs, getBrandDataBySlug, getExpandedCoreBrandSlugs } from '@/config/brand-data';
 
-// 从Sanity获取所有激活的品牌配置
-export async function fetchBrandConfigs(limit?: number): Promise<BrandConfig[]> {
+// 从Sanity获取所有激活的品牌配置 - 支持分批查询优化
+export async function fetchBrandConfigs(limit?: number, offset: number = 0): Promise<BrandConfig[]> {
   try {
     const actualLimit = limit || queryLimits.brands;
 
-    console.log(`🔍 [fetchBrandConfigs] Fetching up to ${actualLimit} brand configs from Sanity...`);
+    console.log(`🔍 [fetchBrandConfigs] Fetching up to ${actualLimit} brand configs from Sanity (offset: ${offset})...`);
 
-    const query = `*[_type == "${DOCUMENT_TYPES.BRAND}" && (isActive == true || !defined(isActive)) && defined(slug.current) && defined(name)] | order(coalesce(priority, 999) asc, name asc) [0...${actualLimit}] {
+    const query = `*[_type == "${DOCUMENT_TYPES.BRAND}" && (isActive == true || !defined(isActive)) && defined(slug.current) && defined(name)] | order(coalesce(priority, 999) asc, name asc) [${offset}...${offset + actualLimit}] {
       _id,
       name,
       "slug": slug.current,
@@ -75,25 +75,44 @@ export async function fetchBrandConfigs(limit?: number): Promise<BrandConfig[]> 
   }
 }
 
-// 获取品牌slug列表（用于generateStaticParams）
+// 获取品牌slug列表（用于generateStaticParams）- 支持大批量查询
 export async function getBrandSlugs(limit?: number): Promise<string[]> {
   try {
+    const requestedLimit = limit || queryLimits.brands;
+
     // 检查缓存
     if (brandCache.data && (Date.now() - brandCache.timestamp) < brandCache.ttl) {
       console.log('📦 [getBrandSlugs] Using cached brand data');
       const slugs = brandCache.data
-        .slice(0, limit || queryLimits.brands)
+        .slice(0, requestedLimit)
         .map(brand => brand.slug);
       return slugs;
     }
 
-    // 获取新数据
-    const brands = await fetchBrandConfigs(limit);
-    return brands.map(brand => brand.slug);
+    // 如果请求大量品牌，使用分批查询避免超时
+    if (requestedLimit > 100) {
+      console.log(`🔧 [getBrandSlugs] Using batched queries for ${requestedLimit} brands`);
+      const batch1 = await fetchBrandConfigs(100, 0);
+      const batch2 = await fetchBrandConfigs(requestedLimit - 100, 100);
+      const allBrands = [...batch1, ...batch2];
+
+      // 更新缓存
+      brandCache = {
+        data: allBrands,
+        timestamp: Date.now(),
+        ttl: brandCache.ttl
+      };
+
+      return allBrands.map(brand => brand.slug);
+    } else {
+      // 获取新数据
+      const brands = await fetchBrandConfigs(requestedLimit);
+      return brands.map(brand => brand.slug);
+    }
 
   } catch (error) {
     console.error('❌ [getBrandSlugs] Error getting brand slugs:', error);
-    return getCoreBrandSlugs();
+    return getExpandedCoreBrandSlugs();
   }
 }
 

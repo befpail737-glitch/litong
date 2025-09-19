@@ -158,6 +158,31 @@ export function getCoreBrandSlugs(): string[] {
   return CORE_BRAND_DATA.map(brand => brand.slug);
 }
 
+// 获取扩展的核心品牌slugs列表 - 用于大规模fallback
+export function getExpandedCoreBrandSlugs(): string[] {
+  // 核心品牌 + 常见品牌的扩展列表
+  const coreSlugs = getCoreBrandSlugs();
+  const expandedSlugs = [
+    ...coreSlugs,
+    // 常见半导体品牌
+    'analog-devices', 'maxim', 'linear-technology', 'microchip', 'atmel',
+    'nordic', 'cypress', 'renesas', 'rohm', 'toshiba', 'fujitsu',
+    'freescale', 'nxp', 'on-semiconductor', 'fairchild', 'intersil',
+    'lattice', 'xilinx', 'altera', 'microsemi', 'actel',
+    // 中国品牌
+    'huawei', 'zte', 'unisoc', 'allwinner', 'rockchip', 'amlogic',
+    'gigadevice', 'winner-micro', 'esp', 'realtek', 'hisilicon',
+    // 日韩品牌
+    'sony', 'panasonic', 'murata', 'kyocera', 'tdk', 'samsung',
+    'hynix', 'lg-innotek', 'sk-hynix',
+    // 欧洲品牌
+    'st', 'stmicroelectronics', 'nxp', 'ams', 'melexis', 'elmos'
+  ];
+
+  // 去重并返回
+  return [...new Set(expandedSlugs)];
+}
+
 // 获取特色品牌数据
 export function getFeaturedBrandData(): StaticBrandData[] {
   return CORE_BRAND_DATA.filter(brand => brand.featured);
