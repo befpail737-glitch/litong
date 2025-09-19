@@ -34,8 +34,8 @@ export async function generateStaticParams() {
   try {
     console.log('🔧 Generating minimal brand product static parameters for Cloudflare...');
 
-    // Emergency mode for Cloudflare: drastically reduce static generation
-    const brandProductCombinations = await getBrandProductCombinations(5);
+    // Expanded mode for comprehensive coverage: increase static generation
+    const brandProductCombinations = await getBrandProductCombinations(100);
     const locales = ['zh-CN']; // Only Chinese locale for emergency deployment
 
     const params = [];
@@ -69,6 +69,10 @@ export async function generateStaticParams() {
     return fallbackParams;
   }
 }
+
+// Enable ISR for dynamic page generation of uncached pages
+export const dynamic = 'force-static';
+export const revalidate = 3600; // Revalidate every hour
 
 export default async function BrandProductPage({ params }: BrandProductPageProps) {
   const { locale, slug, id } = params;

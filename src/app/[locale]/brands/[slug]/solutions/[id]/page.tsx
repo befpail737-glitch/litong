@@ -39,8 +39,8 @@ export async function generateStaticParams() {
   try {
     const locales = ['zh-CN', 'en'];
 
-    // Get real brand-solution combinations from Sanity
-    const combinations = await getBrandSolutionCombinations(25);
+    // Get comprehensive brand-solution combinations from Sanity
+    const combinations = await getBrandSolutionCombinations(75);
     console.log('🔍 Found brand-solution combinations:', combinations.length);
 
     const params = [];
@@ -92,6 +92,10 @@ export async function generateStaticParams() {
     return fallbackParams;
   }
 }
+
+// Enable ISR for dynamic page generation of uncached pages
+export const dynamic = 'force-static';
+export const revalidate = 3600; // Revalidate every hour
 
 export default async function BrandSolutionPage({ params }: BrandSolutionPageProps) {
   const { locale, slug, id } = params;

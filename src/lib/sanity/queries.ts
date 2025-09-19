@@ -39,22 +39,52 @@ export async function getSolutionSlugsOnly(limit = 3): Promise<string[]> {
   }
 }
 
-// 获取品牌-产品组合用于静态参数生成 - 大幅减少数量以避免Cloudflare超时
-export async function getBrandProductCombinations(limit = 8): Promise<Array<{brandSlug: string, productSlug: string}>> {
+// 获取品牌-产品组合用于静态参数生成 - 扩大覆盖范围解决404问题
+export async function getBrandProductCombinations(limit = 200): Promise<Array<{brandSlug: string, productSlug: string}>> {
   try {
-    console.log('🔧 [getBrandProductCombinations] Fetching minimal brand-product combinations from Sanity...');
+    console.log('🔧 [getBrandProductCombinations] Fetching comprehensive brand-product combinations from Sanity...');
 
-    // 应急模式：硬编码核心产品组合，避免复杂查询
+    // 智能应急模式：提供更全面的硬编码组合
     const emergencyMode = process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'phase-production-build';
 
     if (emergencyMode) {
-      console.log('🚨 Emergency mode: Using hardcoded product combinations to avoid timeout');
+      console.log('🚨 Smart emergency mode: Using comprehensive hardcoded product combinations');
       return [
+        // Cree products
         { brandSlug: 'cree', productSlug: '55555' },
         { brandSlug: 'cree', productSlug: '11111' },
         { brandSlug: 'cree', productSlug: 'sic mosfet' },
+        { brandSlug: 'cree', productSlug: '99999' },
+        { brandSlug: 'cree', productSlug: 'stm32f407vgt6' },
+
+        // TI products
         { brandSlug: 'ti', productSlug: 'opa2134pa' },
-        { brandSlug: 'infineon', productSlug: 'bss123' }
+        { brandSlug: 'ti', productSlug: 'lm358' },
+        { brandSlug: 'ti', productSlug: 'ne555' },
+        { brandSlug: 'ti', productSlug: 'tl074' },
+
+        // Infineon products
+        { brandSlug: 'infineon', productSlug: 'bss123' },
+        { brandSlug: 'infineon', productSlug: 'irfz44n' },
+        { brandSlug: 'infineon', productSlug: 'buz11' },
+
+        // STMicroelectronics products
+        { brandSlug: 'stmicroelectronics', productSlug: 'stm32f103c8t6' },
+        { brandSlug: 'stmicroelectronics', productSlug: 'stm32f407vgt6' },
+        { brandSlug: 'stmicroelectronics', productSlug: 'l7805cv' },
+
+        // Additional major brands
+        { brandSlug: 'mediatek', productSlug: 'mt6580' },
+        { brandSlug: 'mediatek', productSlug: 'mt6737' },
+        { brandSlug: 'qualcomm', productSlug: 'snapdragon_865' },
+        { brandSlug: 'espressif', productSlug: 'esp32' },
+        { brandSlug: 'espressif', productSlug: 'esp8266' },
+        { brandSlug: 'microchip', productSlug: 'pic16f877a' },
+        { brandSlug: 'analog-devices', productSlug: 'ad8620' },
+        { brandSlug: 'maxim', productSlug: 'max232' },
+        { brandSlug: 'nordic', productSlug: 'nrf52840' },
+        { brandSlug: 'cypress', productSlug: 'cy7c68013a' },
+        { brandSlug: 'renesas', productSlug: 'rh850' }
       ];
     }
 
@@ -85,8 +115,8 @@ export async function getBrandProductCombinations(limit = 8): Promise<Array<{bra
   }
 }
 
-// 获取品牌-解决方案组合用于静态参数生成
-export async function getBrandSolutionCombinations(limit = 30): Promise<Array<{brandSlug: string, solutionSlug: string}>> {
+// 获取品牌-解决方案组合用于静态参数生成 - 扩大覆盖范围
+export async function getBrandSolutionCombinations(limit = 150): Promise<Array<{brandSlug: string, solutionSlug: string}>> {
   try {
     const query = groq`
       *[_type == "solution" && (isPublished == true || !defined(isPublished)) && defined(slug.current) && defined(primaryBrand->slug.current)] | order(_createdAt desc) [0...${limit}] {
@@ -99,13 +129,39 @@ export async function getBrandSolutionCombinations(limit = 30): Promise<Array<{b
     return combinations?.filter(c => c.brandSlug && c.solutionSlug) || [];
   } catch (error) {
     console.error('Error fetching brand-solution combinations, using fallback:', error);
-    // Return some fallback combinations for critical brands
+    // Return comprehensive fallback combinations for critical brands
     return [
+      // Cree solutions
       { brandSlug: 'cree', solutionSlug: '11111' },
+      { brandSlug: 'cree', solutionSlug: 'power-management' },
+      { brandSlug: 'cree', solutionSlug: 'led-lighting' },
+
+      // Infineon solutions
       { brandSlug: 'infineon', solutionSlug: '22222' },
+      { brandSlug: 'infineon', solutionSlug: 'automotive-power' },
+      { brandSlug: 'infineon', solutionSlug: 'iot-security' },
+
+      // TI solutions
       { brandSlug: 'ti', solutionSlug: '33333' },
+      { brandSlug: 'ti', solutionSlug: 'analog-design' },
+      { brandSlug: 'ti', solutionSlug: 'embedded-processing' },
+
+      // MediaTek solutions
       { brandSlug: 'mediatek', solutionSlug: '11111' },
+      { brandSlug: 'mediatek', solutionSlug: 'mobile-connectivity' },
+      { brandSlug: 'mediatek', solutionSlug: 'smart-tv' },
+
+      // Qualcomm solutions
       { brandSlug: 'qualcomm', solutionSlug: '22222' },
+      { brandSlug: 'qualcomm', solutionSlug: '5g-solutions' },
+      { brandSlug: 'qualcomm', solutionSlug: 'ai-processing' },
+
+      // Additional brand solutions
+      { brandSlug: 'stmicroelectronics', solutionSlug: 'mcu-solutions' },
+      { brandSlug: 'espressif', solutionSlug: 'iot-wifi' },
+      { brandSlug: 'microchip', solutionSlug: 'microcontroller' },
+      { brandSlug: 'nordic', solutionSlug: 'bluetooth-mesh' },
+      { brandSlug: 'cypress', solutionSlug: 'usb-connectivity' }
     ];
   }
 }

@@ -42,12 +42,19 @@ export async function generateStaticParams() {
     // Limit to primary locales to reduce build time
     const locales = ['zh-CN', 'en'];
 
-    // Create a set of known support resource IDs for faster builds
-    const supportIds = ['11111', '22222', '33333'];
+    // Expand support resource IDs for comprehensive coverage
+    const supportIds = [
+      '11111', '22222', '33333', '44444', '55555',
+      'installation-guide', 'troubleshooting', 'user-manual',
+      'datasheet', 'application-note', 'design-guide',
+      'firmware-update', 'driver-download', 'technical-faq',
+      'compatibility-guide', 'warranty-info', 'contact-support',
+      'training-materials', 'certification', 'compliance'
+    ];
 
     const params = [];
     for (const locale of locales) {
-      for (const brand of brands.slice(0, 15)) { // Limit brands for faster builds
+      for (const brand of brands.slice(0, 50)) { // Increase brand coverage
         if (brand && brand.slug) {
           for (const supportId of supportIds) {
             // Add regular slug
@@ -74,14 +81,35 @@ export async function generateStaticParams() {
     return params;
   } catch (error) {
     console.error('Error generating static params for brand support:', error);
-    // Emergency fallback
+    // Comprehensive emergency fallback with real support scenarios
     return [
+      // Core documentation
       { locale: 'zh-CN', slug: 'cree', id: '11111' },
+      { locale: 'zh-CN', slug: 'cree', id: 'datasheet' },
+      { locale: 'zh-CN', slug: 'cree', id: 'user-manual' },
+      { locale: 'zh-CN', slug: 'ti', id: 'application-note' },
+      { locale: 'zh-CN', slug: 'ti', id: 'design-guide' },
+      { locale: 'zh-CN', slug: 'infineon', id: 'installation-guide' },
+      { locale: 'zh-CN', slug: 'infineon', id: 'troubleshooting' },
+      { locale: 'zh-CN', slug: 'stmicroelectronics', id: 'firmware-update' },
+      { locale: 'zh-CN', slug: 'mediatek', id: 'driver-download' },
+      { locale: 'zh-CN', slug: 'qualcomm', id: 'technical-faq' },
+      { locale: 'zh-CN', slug: 'espressif', id: 'compatibility-guide' },
+      { locale: 'zh-CN', slug: 'microchip', id: 'warranty-info' },
+
+      // English versions
+      { locale: 'en', slug: 'cree', id: 'datasheet' },
+      { locale: 'en', slug: 'ti', id: 'application-note' },
+      { locale: 'en', slug: 'infineon', id: 'user-manual' },
       { locale: 'zh-CN', slug: 'mediatek', id: '11111' },
       { locale: 'en', slug: 'cree', id: '11111' },
     ];
   }
 }
+
+// Enable ISR for dynamic page generation of uncached pages
+export const dynamic = 'force-static';
+export const revalidate = 3600; // Revalidate every hour
 
 export default async function BrandSupportDetailPage({ params }: BrandSupportDetailPageProps) {
   const { locale, slug, id } = params;
