@@ -13,6 +13,7 @@ export const environment = {
   BRAND_LIMIT: parseInt(process.env.RUNTIME_BRAND_LIMIT || process.env.BRAND_LIMIT || '50'),
   PRODUCT_LIMIT: parseInt(process.env.RUNTIME_PRODUCT_LIMIT || process.env.PRODUCT_LIMIT || '30'),
   SOLUTION_LIMIT: parseInt(process.env.RUNTIME_SOLUTION_LIMIT || process.env.SOLUTION_LIMIT || '20'),
+  SUPPORT_LIMIT: parseInt(process.env.RUNTIME_SUPPORT_LIMIT || process.env.SUPPORT_LIMIT || '40'),
 
   // Cloudflare优化配置
   IS_CLOUDFLARE: process.env.CF_PAGES === 'true' || process.env.CLOUDFLARE_ENVIRONMENT !== undefined,
@@ -93,6 +94,7 @@ export const getCloudflareOptimizedLimits = () => {
       BRAND_LIMIT: Math.min(environment.BRAND_LIMIT, 10),
       PRODUCT_LIMIT: Math.min(environment.PRODUCT_LIMIT, 5),
       SOLUTION_LIMIT: Math.min(environment.SOLUTION_LIMIT, 3),
+      SUPPORT_LIMIT: Math.min(environment.SUPPORT_LIMIT, 15),
     };
   }
 
@@ -101,6 +103,7 @@ export const getCloudflareOptimizedLimits = () => {
       BRAND_LIMIT: Math.min(environment.BRAND_LIMIT, 30),
       PRODUCT_LIMIT: Math.min(environment.PRODUCT_LIMIT, 20),
       SOLUTION_LIMIT: Math.min(environment.SOLUTION_LIMIT, 15),
+      SUPPORT_LIMIT: Math.min(environment.SUPPORT_LIMIT, 30),
     };
   }
 
@@ -109,5 +112,6 @@ export const getCloudflareOptimizedLimits = () => {
     BRAND_LIMIT: environment.BRAND_LIMIT,
     PRODUCT_LIMIT: environment.PRODUCT_LIMIT,
     SOLUTION_LIMIT: environment.SOLUTION_LIMIT,
+    SUPPORT_LIMIT: environment.SUPPORT_LIMIT,
   };
 };
