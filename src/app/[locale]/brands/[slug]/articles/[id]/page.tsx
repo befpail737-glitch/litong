@@ -1,7 +1,7 @@
 import { getArticle, getArticleSlugsOnly } from '@/lib/sanity/queries';
 import { getBrandData, getBrandSlugsOnly } from '@/lib/sanity/brands';
 import { safeImageUrl } from '@/lib/sanity/client';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -36,11 +36,16 @@ export async function generateStaticParams() {
   try {
     console.log('🔧 [generateStaticParams] 生成品牌-文章组合的静态参数...');
 
-    // 使用真实的Sanity数据生成所有品牌-文章组合
+    // 使用真实的Sanity数据生成所有品牌-文章组合（排除技术支持文章）
     const { client } = await import('@/lib/sanity/client');
 
     const combinations = await client.fetch(`
-      *[_type == "article" && isPublished == true && defined(slug.current) && count(relatedBrands) > 0] {
+      *[_type == "article" &&
+        isPublished == true &&
+        defined(slug.current) &&
+        count(relatedBrands) > 0 &&
+        category->slug.current != "technical-support"
+      ] {
         "articleSlug": slug.current,
         "brandSlugs": relatedBrands[]->slug.current
       }
@@ -69,20 +74,18 @@ export async function generateStaticParams() {
   } catch (error) {
     console.error('❌ [generateStaticParams] 生成静态参数失败:', error);
 
-    // 增强的fallback，包含实际存在的重要组合
+    // 增强的fallback，包含实际存在的重要组合（排除技术支持文章）
     const fallbackParams = [
-      // 基于实际Sanity数据的重要组合
-      { locale: 'zh-CN', slug: 'ixys', id: '33333' },
-      { locale: 'zh-CN', slug: 'ixys', id: '111111111' },
-      { locale: 'zh-CN', slug: 'cree', id: 'aaaaa' },
-      { locale: 'zh-CN', slug: 'cree', id: '11111' },
-      { locale: 'zh-CN', slug: 'cree', id: '55555' },
-      { locale: 'zh-CN', slug: 'cree', id: 'loss' },
+      // 基于实际Sanity数据的重要组合（仅普通文章）
       { locale: 'zh-CN', slug: 'cree', id: 'supply' },
+      { locale: 'zh-CN', slug: 'infineon', id: 'innovation' },
+      { locale: 'zh-CN', slug: 'ti', id: 'technology' },
+      { locale: 'zh-CN', slug: 'adi', id: 'analog' },
+      { locale: 'zh-CN', slug: 'qualcomm', id: 'wireless' },
       // 英文版本
-      { locale: 'en', slug: 'ixys', id: '33333' },
-      { locale: 'en', slug: 'cree', id: 'aaaaa' },
-      { locale: 'en', slug: 'cree', id: '11111' }
+      { locale: 'en', slug: 'cree', id: 'supply' },
+      { locale: 'en', slug: 'infineon', id: 'innovation' },
+      { locale: 'en', slug: 'ti', id: 'technology' }
     ];
 
     console.log(`🆘 [generateStaticParams] 使用fallback: ${fallbackParams.length} 个组合`);
@@ -123,6 +126,12 @@ export default async function BrandArticlePage({ params }: BrandArticlePageProps
   if (!article) {
     console.warn(`⚠️ [BrandArticlePage] 文章未找到: ${id}`);
     notFound();
+  }
+
+  // Check if this is a technical support article and redirect if so
+  if (article.category?.slug === 'technical-support') {
+    console.log(`🔄 [BrandArticlePage] 重定向技术支持文章: ${id} → support路径`);
+    redirect(`/${locale}/brands/${encodeURIComponent(brandData.brand.slug || brandData.brand.name)}/support/${id}`);
   }
 
   // Validate that the article is actually related to this brand
