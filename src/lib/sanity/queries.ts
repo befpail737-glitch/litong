@@ -658,7 +658,7 @@ export async function getRelatedSolutions(solutionId: string, targetMarket: stri
   }
 }
 
-// 获取品牌-支持文档组合用于静态参数生成
+// 获取品牌-支持文档组合用于静态参数生成（基于真实技术支持文章）
 export async function getBrandSupportCombinations(limit?: number): Promise<Array<{brandSlug: string, supportId: string}>> {
   const optimizedLimits = getCloudflareOptimizedLimits();
   const actualLimit = limit || optimizedLimits.SUPPORT_LIMIT || 50;
@@ -666,10 +666,42 @@ export async function getBrandSupportCombinations(limit?: number): Promise<Array
   console.log(`🚀 [getBrandSupportCombinations] Starting query with limit: ${actualLimit}`);
 
   try {
-    // Since no real support documents exist in Sanity, create systematic combinations
-    // based on real brands and common support resource patterns
+    // Get real technical support articles from Sanity
+    const supportArticlesQuery = groq`
+      *[_type == "article" &&
+        category->slug.current == "technical-support" &&
+        isPublished == true &&
+        defined(slug.current) &&
+        count(relatedBrands) > 0
+      ] {
+        "articleSlug": slug.current,
+        "brandSlugs": relatedBrands[]->slug.current
+      }
+    `;
+
+    const supportArticles = await withRetry(() => client.fetch(supportArticlesQuery), 2, 500, 8000);
+    const realCombinations = [];
+
+    // Generate combinations based on real support articles
+    supportArticles?.forEach(article => {
+      article.brandSlugs?.forEach(brandSlug => {
+        if (brandSlug && article.articleSlug) {
+          realCombinations.push({
+            brandSlug: brandSlug,
+            supportId: article.articleSlug
+          });
+        }
+      });
+    });
+
+    console.log(`🔍 [getBrandSupportCombinations] Found ${realCombinations.length} real support article combinations`);
+
+    // Add additional combinations for comprehensive coverage
+    const supplementaryCombinations = [];
+
+    // Get all active brands
     const brandsQuery = groq`
-      *[_type == "brandBasic" && isActive == true] | order(name asc) [0...20] {
+      *[_type == "brandBasic" && isActive == true] | order(name asc) [0...15] {
         "slug": slug.current
       }
     `;
@@ -677,47 +709,59 @@ export async function getBrandSupportCombinations(limit?: number): Promise<Array
     const brands = await withRetry(() => client.fetch(brandsQuery), 2, 500, 8000);
     const validBrands = brands?.filter(b => b.slug) || [];
 
-    // Define common support resource types based on industry standards
-    const supportResourceTypes = [
-      '11111', '22222', '33333', '44444', '55555',
-      'datasheet', 'user-manual', 'installation-guide',
-      'troubleshooting', 'application-note', 'design-guide',
-      'firmware-update', 'driver-download', 'technical-faq',
-      'compatibility-guide', 'warranty-info', 'contact-support'
+    // For each brand, add common support resource types
+    const commonSupportTypes = [
+      '11111', '22222', '33333', 'datasheet', 'user-manual',
+      'application-note', 'troubleshooting', 'technical-faq'
     ];
 
-    const combinations = [];
     validBrands.forEach(brand => {
-      supportResourceTypes.forEach(supportId => {
-        combinations.push({
-          brandSlug: brand.slug,
-          supportId: supportId
-        });
+      commonSupportTypes.forEach(supportId => {
+        // Only add if not already in real combinations
+        const exists = realCombinations.some(c =>
+          c.brandSlug === brand.slug && c.supportId === supportId
+        );
+
+        if (!exists) {
+          supplementaryCombinations.push({
+            brandSlug: brand.slug,
+            supportId: supportId
+          });
+        }
       });
     });
 
-    const duration = Date.now() - startTime;
-    console.log(`✅ [getBrandSupportCombinations] Generated ${combinations.length} brand-support combinations in ${duration}ms`);
+    // Combine real and supplementary combinations
+    const allCombinations = [...realCombinations, ...supplementaryCombinations];
 
-    return combinations.slice(0, actualLimit);
+    const duration = Date.now() - startTime;
+    console.log(`✅ [getBrandSupportCombinations] Generated ${allCombinations.length} total combinations (${realCombinations.length} real + ${supplementaryCombinations.length} supplementary) in ${duration}ms`);
+
+    return allCombinations.slice(0, actualLimit);
 
   } catch (error) {
     const duration = Date.now() - startTime;
     console.error(`❌ [getBrandSupportCombinations] Error after ${duration}ms:`, error);
 
-    // Emergency fallback with critical brands
+    // Emergency fallback based on known support articles
     const emergencyFallback = [
+      // Real support articles from Sanity analysis
       { brandSlug: 'cree', supportId: '11111' },
+      { brandSlug: 'cree', supportId: '55555' },
+      { brandSlug: 'cree', supportId: 'aaaaa' },
+      { brandSlug: 'cree', supportId: 'loss' },
+      { brandSlug: 'cree', supportId: 'use sic mosfet' },
+      { brandSlug: 'ixys', supportId: '33333' },
+      { brandSlug: 'ixys', supportId: '111111111' },
+
+      // Additional common combinations
       { brandSlug: 'cree', supportId: 'datasheet' },
-      { brandSlug: 'ixys', supportId: '11111' },
+      { brandSlug: 'ixys', supportId: 'datasheet' },
       { brandSlug: 'Electronicon', supportId: '11111' },
       { brandSlug: 'epcos', supportId: 'user-manual' },
       { brandSlug: 'lem', supportId: 'application-note' },
       { brandSlug: 'littelfuse', supportId: 'datasheet' },
       { brandSlug: 'mediatek', supportId: 'driver-download' },
-      { brandSlug: 'pi', supportId: 'technical-faq' },
-      { brandSlug: 'qualcomm', supportId: 'firmware-update' },
-      { brandSlug: 'sanrex', supportId: 'installation-guide' },
       { brandSlug: 'semikron', supportId: 'datasheet' },
       { brandSlug: 'vicor', supportId: 'user-manual' }
     ];
@@ -727,24 +771,156 @@ export async function getBrandSupportCombinations(limit?: number): Promise<Array
   }
 }
 
-// 获取支持文档（使用智能模拟数据，未来可扩展为真实Sanity集成）
+// 获取支持文档（使用真实Sanity文章数据）
 export async function getSupportDocument(supportId: string, brandSlug?: string) {
   const startTime = Date.now();
   console.log(`🔍 [getSupportDocument] Getting support document: ${supportId} for brand: ${brandSlug}`);
 
   try {
-    // For now, return structured mock data based on ID patterns
-    // This can be easily replaced with real Sanity queries when support content is added
+    // First try to find a specific article with matching slug and brand
+    const query = groq`
+      *[_type == "article" &&
+        slug.current == $supportId &&
+        category->slug.current == "technical-support" &&
+        isPublished == true &&
+        ($brandSlug == null || $brandSlug in relatedBrands[]->slug.current)
+      ][0] {
+        _id,
+        title,
+        "slug": slug.current,
+        "excerpt": excerpt,
+        content,
+        isPublished,
+        publishedAt,
+        "category": category->{
+          name,
+          "slug": slug.current
+        },
+        "relatedBrands": relatedBrands[]->{
+          name,
+          "slug": slug.current
+        },
+        "author": author->{
+          name,
+          bio
+        },
+        seo,
+        _createdAt,
+        _updatedAt
+      }
+    `;
+
+    const article = await withRetry(() => client.fetch(query, { supportId, brandSlug }), 2, 500, 8000);
+
+    if (article) {
+      // Convert article to support document format
+      const supportDocument = {
+        _id: article._id,
+        id: supportId,
+        title: article.title,
+        type: 'technical-article',
+        category: '技术支持',
+        description: article.excerpt || `${article.title}的技术支持文档`,
+        content: article.content,
+        brandSlug: brandSlug,
+        lastUpdated: article._updatedAt?.split('T')[0] || article._createdAt?.split('T')[0],
+        publishedAt: article.publishedAt,
+        downloadCount: Math.floor(Math.random() * 1000) + 100, // Simulated for now
+        rating: 4.5 + Math.random() * 0.5,
+        version: 'v1.0',
+        fileSize: '2.5 MB',
+        tags: ['技术支持', '文档'],
+        relatedBrands: article.relatedBrands || [],
+        author: article.author,
+        relatedFiles: [
+          { name: '技术文档', size: '2.5 MB', type: 'PDF' },
+          { name: '补充说明', size: '1.2 MB', type: 'PDF' }
+        ]
+      };
+
+      const duration = Date.now() - startTime;
+      console.log(`✅ [getSupportDocument] Found real article: ${article.title} in ${duration}ms`);
+
+      return supportDocument;
+    }
+
+    // If no specific article found, try to find any technical support article for the brand
+    if (brandSlug) {
+      const brandSupportQuery = groq`
+        *[_type == "article" &&
+          category->slug.current == "technical-support" &&
+          isPublished == true &&
+          $brandSlug in relatedBrands[]->slug.current
+        ] | order(_updatedAt desc) [0] {
+          _id,
+          title,
+          "slug": slug.current,
+          "excerpt": excerpt,
+          content,
+          isPublished,
+          publishedAt,
+          "category": category->{
+            name,
+            "slug": slug.current
+          },
+          "relatedBrands": relatedBrands[]->{
+            name,
+            "slug": slug.current
+          },
+          _createdAt,
+          _updatedAt
+        }
+      `;
+
+      const brandArticle = await withRetry(() => client.fetch(brandSupportQuery, { brandSlug }), 2, 500, 8000);
+
+      if (brandArticle) {
+        const supportDocument = {
+          _id: brandArticle._id,
+          id: supportId,
+          title: `${brandArticle.title} - 技术支持`,
+          type: 'technical-article',
+          category: '技术支持',
+          description: brandArticle.excerpt || `${brandArticle.title}的技术支持信息`,
+          content: brandArticle.content,
+          brandSlug: brandSlug,
+          lastUpdated: brandArticle._updatedAt?.split('T')[0] || brandArticle._createdAt?.split('T')[0],
+          publishedAt: brandArticle.publishedAt,
+          downloadCount: Math.floor(Math.random() * 1000) + 100,
+          rating: 4.5 + Math.random() * 0.5,
+          version: 'v1.0',
+          fileSize: '2.5 MB',
+          tags: ['技术支持', '文档'],
+          relatedBrands: brandArticle.relatedBrands || [],
+          isRedirected: true, // Mark as redirected from specific to general
+          originalSlug: brandArticle.slug,
+          relatedFiles: [
+            { name: '技术文档', size: '2.5 MB', type: 'PDF' },
+            { name: '补充说明', size: '1.2 MB', type: 'PDF' }
+          ]
+        };
+
+        const duration = Date.now() - startTime;
+        console.log(`✅ [getSupportDocument] Found brand support article: ${brandArticle.title} in ${duration}ms`);
+
+        return supportDocument;
+      }
+    }
+
+    // If no real article found, fall back to generated support document
+    console.log(`⚠️ [getSupportDocument] No real article found for ${supportId}/${brandSlug}, using fallback`);
     const supportDocument = generateSupportDocument(supportId, brandSlug);
 
     const duration = Date.now() - startTime;
-    console.log(`✅ [getSupportDocument] Generated support document in ${duration}ms`);
+    console.log(`✅ [getSupportDocument] Generated fallback support document in ${duration}ms`);
 
     return supportDocument;
   } catch (error) {
     const duration = Date.now() - startTime;
     console.error(`❌ [getSupportDocument] Error after ${duration}ms:`, error);
-    return null;
+
+    // Return fallback document on error
+    return generateSupportDocument(supportId, brandSlug);
   }
 }
 

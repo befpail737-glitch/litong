@@ -379,6 +379,29 @@ export default async function BrandSupportDetailPage({ params }: BrandSupportDet
                 </div>
               )}
 
+              {/* Redirected Article Notice */}
+              {supportResource.isRedirected && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                  <div className="flex items-start gap-3">
+                    <Info className="h-5 w-5 text-blue-600 mt-0.5" />
+                    <div>
+                      <h4 className="text-blue-800 font-medium mb-1">相关技术支持文档</h4>
+                      <p className="text-blue-700 text-sm">
+                        我们为您找到了 {brand.name} 的相关技术支持文档。
+                        {supportResource.originalSlug && (
+                          <Link
+                            href={`/${locale}/brands/${encodeURIComponent(brand.slug || brand.name)}/support/${supportResource.originalSlug}`}
+                            className="underline hover:text-blue-800 ml-1"
+                          >
+                            查看原始文档
+                          </Link>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Description */}
               <p className="text-gray-700 text-lg leading-relaxed">
                 {supportResource.description}
