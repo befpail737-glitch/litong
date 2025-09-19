@@ -1,6 +1,7 @@
 import { groq } from 'next-sanity';
 
 import { client, GROQ_FRAGMENTS, withRetry, SanityError } from './client';
+import { getCloudflareOptimizedLimits } from '../config/environment';
 
 // 轻量级函数仅用于generateStaticParams，减少查询复杂度 - 大幅减少以避免超时
 export async function getProductSlugsOnly(limit = 5): Promise<string[]> {
@@ -8,13 +9,14 @@ export async function getProductSlugsOnly(limit = 5): Promise<string[]> {
   console.log(`🚀 [getProductSlugsOnly] Starting query with limit: ${limit}`);
 
   try {
+    // 简化查询 - 移除草稿检查，提高性能
     const query = groq`
-      *[_type == "product" && isActive == true && defined(slug.current) && !(_id in path("drafts.**"))] | order(_updatedAt desc) [0...${limit}] {
+      *[_type == "product" && isActive == true && defined(slug.current)] | order(_updatedAt desc) [0...${limit}] {
         "slug": slug.current
       }
     `;
 
-    const products = await withRetry(() => client.fetch(query), 3, 1000);
+    const products = await withRetry(() => client.fetch(query), 3, 1000, 15000); // 15秒超时
     const slugs = products?.map(product => product.slug).filter(Boolean) || [];
 
     const duration = Date.now() - startTime;
@@ -34,13 +36,14 @@ export async function getSolutionSlugsOnly(limit = 3): Promise<string[]> {
   console.log(`🚀 [getSolutionSlugsOnly] Starting query with limit: ${limit}`);
 
   try {
+    // 简化查询 - 减少条件复杂度
     const query = groq`
-      *[_type == "solution" && (isPublished == true || !defined(isPublished)) && defined(slug.current) && !(_id in path("drafts.**"))] | order(_updatedAt desc) [0...${limit}] {
+      *[_type == "solution" && isPublished == true && defined(slug.current)] | order(_updatedAt desc) [0...${limit}] {
         "slug": slug.current
       }
     `;
 
-    const solutions = await withRetry(() => client.fetch(query), 3, 1000);
+    const solutions = await withRetry(() => client.fetch(query), 3, 1000, 15000); // 15秒超时
     const slugs = solutions?.map(solution => solution.slug).filter(Boolean) || [];
 
     const duration = Date.now() - startTime;
@@ -55,24 +58,27 @@ export async function getSolutionSlugsOnly(limit = 3): Promise<string[]> {
   }
 }
 
-// 获取品牌-产品组合用于静态参数生成 - 使用真实Sanity数据
-export async function getBrandProductCombinations(limit = 200): Promise<Array<{brandSlug: string, productSlug: string}>> {
+// 获取品牌-产品组合用于静态参数生成 - 使用真实Sanity数据，减少批次大小
+export async function getBrandProductCombinations(limit?: number): Promise<Array<{brandSlug: string, productSlug: string}>> {
+  const optimizedLimits = getCloudflareOptimizedLimits();
+  const actualLimit = limit || optimizedLimits.BRAND_LIMIT;
   const startTime = Date.now();
-  console.log(`🚀 [getBrandProductCombinations] Starting query with limit: ${limit}`);
+  console.log(`🚀 [getBrandProductCombinations] Starting query with limit: ${actualLimit}`);
 
   try {
-    console.log(`🔧 [getBrandProductCombinations] Fetching real brand-product combinations from Sanity (limit: ${limit})...`);
+    console.log(`🔧 [getBrandProductCombinations] Fetching real brand-product combinations from Sanity (limit: ${actualLimit})...`);
 
     // 移除应急模式 - 始终使用真实Sanity数据
 
+    // 简化查询 - 仅获取必要字段，减少处理时间
     const query = groq`
-      *[_type == "product" && (isActive == true || !defined(isActive)) && defined(slug.current) && defined(brand) && defined(brand->slug.current) && !(_id in path("drafts.**"))] | order(_updatedAt desc) [0...${limit}] {
+      *[_type == "product" && isActive == true && defined(slug.current) && defined(brand->slug.current)] | order(_updatedAt desc) [0...${actualLimit}] {
         "productSlug": slug.current,
         "brandSlug": brand->slug.current
       }
     `;
 
-    const combinations = await withRetry(() => client.fetch(query), 3, 1000);
+    const combinations = await withRetry(() => client.fetch(query), 3, 1000, 15000); // 15秒超时
     const validCombinations = combinations?.filter(c => c.brandSlug && c.productSlug) || [];
 
     const duration = Date.now() - startTime;
@@ -94,20 +100,23 @@ export async function getBrandProductCombinations(limit = 200): Promise<Array<{b
   }
 }
 
-// 获取品牌-解决方案组合用于静态参数生成 - 扩大覆盖范围
-export async function getBrandSolutionCombinations(limit = 150): Promise<Array<{brandSlug: string, solutionSlug: string}>> {
+// 获取品牌-解决方案组合用于静态参数生成 - 减少批次大小防止超时
+export async function getBrandSolutionCombinations(limit?: number): Promise<Array<{brandSlug: string, solutionSlug: string}>> {
+  const optimizedLimits = getCloudflareOptimizedLimits();
+  const actualLimit = limit || optimizedLimits.SOLUTION_LIMIT;
   const startTime = Date.now();
-  console.log(`🚀 [getBrandSolutionCombinations] Starting query with limit: ${limit}`);
+  console.log(`🚀 [getBrandSolutionCombinations] Starting query with limit: ${actualLimit}`);
 
   try {
+    // 简化查询 - 减少条件复杂度，提高查询效率
     const query = groq`
-      *[_type == "solution" && (isPublished == true || !defined(isPublished)) && defined(slug.current) && defined(primaryBrand) && defined(primaryBrand->slug.current) && !(_id in path("drafts.**"))] | order(_updatedAt desc) [0...${limit}] {
+      *[_type == "solution" && isPublished == true && defined(slug.current) && defined(primaryBrand->slug.current)] | order(_updatedAt desc) [0...${actualLimit}] {
         "solutionSlug": slug.current,
         "brandSlug": primaryBrand->slug.current
       }
     `;
 
-    const combinations = await withRetry(() => client.fetch(query), 3, 1000);
+    const combinations = await withRetry(() => client.fetch(query), 3, 1000, 15000); // 15秒超时
     const validCombinations = combinations?.filter(c => c.brandSlug && c.solutionSlug) || [];
 
     const duration = Date.now() - startTime;
@@ -127,13 +136,14 @@ export async function getArticleSlugsOnly(limit = 15): Promise<string[]> {
   console.log(`🚀 [getArticleSlugsOnly] Starting query with limit: ${limit}`);
 
   try {
+    // 简化查询 - 仅查询必要条件
     const query = groq`
-      *[_type == "article" && (isPublished == true || !defined(isPublished)) && defined(slug.current) && !(_id in path("drafts.**"))] | order(_updatedAt desc) [0...${limit}] {
+      *[_type == "article" && isPublished == true && defined(slug.current)] | order(_updatedAt desc) [0...${limit}] {
         "slug": slug.current
       }
     `;
 
-    const articles = await withRetry(() => client.fetch(query), 3, 1000);
+    const articles = await withRetry(() => client.fetch(query), 3, 1000, 15000); // 15秒超时
     const slugs = articles?.map(article => article.slug).filter(Boolean) || [];
 
     const duration = Date.now() - startTime;
@@ -192,7 +202,7 @@ export async function getProducts(params: {
   try {
     console.log('Fetching products with query:', query);
     console.log('Query parameters:', { limit, offset, category, brand, featured });
-    const result = await withRetry(() => client.fetch(query));
+    const result = await withRetry(() => client.fetch(query), 3, 1000, 15000); // 15秒超时
     console.log('Products fetch result:', {
       totalProducts: result.total,
       fetchedProducts: result.products?.length || 0,
@@ -214,7 +224,7 @@ export async function getProduct(slug: string, preview = false) {
   `;
 
   try {
-    const product = await withRetry(() => client.fetch(query, { slug }));
+    const product = await withRetry(() => client.fetch(query, { slug }), 3, 1000, 15000); // 15秒超时
     return product || null;
   } catch (error) {
     console.error(`Error fetching product with slug ${slug}:`, error);
@@ -236,7 +246,7 @@ export async function getBrandProduct(brandSlug: string, productSlug: string, pr
 
   try {
     console.log(`🔍 [getBrandProduct] Searching for product ${productSlug} in brand ${brandSlug}`);
-    const product = await withRetry(() => client.fetch(query, { brandSlug, productSlug }));
+    const product = await withRetry(() => client.fetch(query, { brandSlug, productSlug }), 3, 1000, 15000); // 15秒超时
 
     if (product) {
       console.log(`✅ [getBrandProduct] Found product: ${product.title} for brand ${brandSlug}`);
@@ -268,7 +278,7 @@ export async function getProductCategories(parentId?: string) {
   `;
 
   try {
-    return await withRetry(() => client.fetch(query));
+    return await withRetry(() => client.fetch(query), 3, 1000, 15000); // 15秒超时
   } catch (error) {
     throw new SanityError('Failed to fetch categories', 'FETCH_CATEGORIES_ERROR');
   }
@@ -295,7 +305,7 @@ export async function getBrands(featured = false) {
       是否仅获取推荐: featured
     });
 
-    const result = await withRetry(() => client.fetch(query));
+    const result = await withRetry(() => client.fetch(query), 3, 1000, 15000); // 15秒超时
 
     console.log('📊 品牌查询结果:', {
       数量: result?.length || 0,
@@ -332,7 +342,7 @@ export async function searchProducts(searchTerm: string, limit = 10) {
   `;
 
   try {
-    return await withRetry(() => client.fetch(query, { searchTerm }));
+    return await withRetry(() => client.fetch(query, { searchTerm }), 3, 1000, 15000); // 15秒超时
   } catch (error) {
     throw new SanityError('Failed to search products', 'SEARCH_PRODUCTS_ERROR');
   }
@@ -352,7 +362,7 @@ export async function getRelatedProducts(productId: string, categoryId: string, 
   `;
 
   try {
-    return await withRetry(() => client.fetch(query, { productId, categoryId }));
+    return await withRetry(() => client.fetch(query, { productId, categoryId }), 3, 1000, 15000); // 15秒超时
   } catch (error) {
     throw new SanityError('Failed to fetch related products', 'FETCH_RELATED_PRODUCTS_ERROR');
   }
@@ -398,7 +408,7 @@ export async function getArticles(params: {
   `;
 
   try {
-    return await withRetry(() => client.fetch(query));
+    return await withRetry(() => client.fetch(query), 3, 1000, 15000); // 15秒超时
   } catch (error) {
     throw new SanityError('Failed to fetch articles', 'FETCH_ARTICLES_ERROR');
   }
@@ -413,7 +423,7 @@ export async function getArticle(slug: string) {
   `;
 
   try {
-    const article = await withRetry(() => client.fetch(query, { slug }));
+    const article = await withRetry(() => client.fetch(query, { slug }), 3, 1000, 15000); // 15秒超时
     return article || null;
   } catch (error) {
     console.error(`Error fetching article with slug ${slug}:`, error);
@@ -465,7 +475,7 @@ export async function getSolutions(params: {
   try {
     console.log('Fetching solutions with query:', query);
     console.log('Query parameters:', { limit, offset, targetMarket, brand, featured });
-    const result = await withRetry(() => client.fetch(query));
+    const result = await withRetry(() => client.fetch(query), 3, 1000, 15000); // 15秒超时
     console.log('Solutions fetch result:', {
       totalSolutions: result.total,
       fetchedSolutions: result.solutions?.length || 0,
@@ -487,7 +497,7 @@ export async function getSolution(slug: string, preview = false) {
   `;
 
   try {
-    const solution = await withRetry(() => client.fetch(query, { slug }));
+    const solution = await withRetry(() => client.fetch(query, { slug }), 3, 1000, 15000); // 15秒超时
     return solution || null;
   } catch (error) {
     console.error(`Error fetching solution with slug ${slug}:`, error);
@@ -511,7 +521,7 @@ export async function searchSolutions(searchTerm: string, limit = 10) {
   `;
 
   try {
-    return await withRetry(() => client.fetch(query, { searchTerm }));
+    return await withRetry(() => client.fetch(query, { searchTerm }), 3, 1000, 15000); // 15秒超时
   } catch (error) {
     throw new SanityError('Failed to search solutions', 'SEARCH_SOLUTIONS_ERROR');
   }
@@ -531,7 +541,7 @@ export async function getRelatedSolutions(solutionId: string, targetMarket: stri
   `;
 
   try {
-    return await withRetry(() => client.fetch(query, { solutionId, targetMarket }));
+    return await withRetry(() => client.fetch(query, { solutionId, targetMarket }), 3, 1000, 15000); // 15秒超时
   } catch (error) {
     throw new SanityError('Failed to fetch related solutions', 'FETCH_RELATED_SOLUTIONS_ERROR');
   }
@@ -550,7 +560,7 @@ export async function getSiteStats() {
   `;
 
   try {
-    return await withRetry(() => client.fetch(query));
+    return await withRetry(() => client.fetch(query), 3, 1000, 15000); // 15秒超时
   } catch (error) {
     throw new SanityError('Failed to fetch site stats', 'FETCH_STATS_ERROR');
   }

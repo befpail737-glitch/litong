@@ -34,8 +34,8 @@ export async function generateStaticParams() {
   try {
     console.log('🔧 [generateStaticParams] Starting brand product static parameter generation...');
 
-    // 尝试从Sanity获取真实数据
-    const brandProductCombinations = await getBrandProductCombinations(200);
+    // 尝试从Sanity获取真实数据 - 减少批次大小防止Cloudflare超时
+    const brandProductCombinations = await getBrandProductCombinations(50);
     const locales = ['zh-CN', 'en']; // 支持中英文
 
     const params = [];

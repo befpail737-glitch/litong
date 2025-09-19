@@ -370,18 +370,32 @@ export class SanityError extends Error {
   }
 }
 
-// 重试机制
+// 增强的重试机制 - 支持超时保护
 export async function withRetry<T>(
   fn: () => Promise<T>,
   maxRetries = 3,
-  delay = 1000
+  delay = 1000,
+  timeoutMs = 30000 // 30秒超时，防止Cloudflare构建挂起
 ): Promise<T> {
   for (let i = 0; i < maxRetries; i++) {
     try {
-      return await fn();
+      // 包装函数以支持超时
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('Query timeout')), timeoutMs);
+      });
+
+      return await Promise.race([fn(), timeoutPromise]);
     } catch (error) {
-      if (i === maxRetries - 1) throw error;
-      await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+      console.error(`❌ [withRetry] Attempt ${i + 1}/${maxRetries} failed:`, error instanceof Error ? error.message : error);
+
+      if (i === maxRetries - 1) {
+        console.error(`🚨 [withRetry] All ${maxRetries} attempts failed, throwing error`);
+        throw error;
+      }
+
+      const currentDelay = delay * Math.pow(2, i);
+      console.log(`⏳ [withRetry] Retrying in ${currentDelay}ms...`);
+      await new Promise(resolve => setTimeout(resolve, currentDelay));
     }
   }
   throw new Error('Maximum retries exceeded');
