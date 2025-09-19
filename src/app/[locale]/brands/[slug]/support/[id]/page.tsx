@@ -21,7 +21,8 @@ import {
   Headphones,
   Calendar,
   Tag,
-  Building2
+  Building2,
+  Info
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BrandNavigation } from '@/components/layout/BrandNavigation';
