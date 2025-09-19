@@ -40,15 +40,23 @@ export async function generateStaticParams() {
 
     const params = [];
 
-    // 添加从Sanity获取的真实组合
+    // 添加从Sanity获取的真实组合，处理URL编码
     for (const locale of locales) {
       for (const combo of brandProductCombinations) {
         if (combo.brandSlug && combo.productSlug) {
+          // 对包含特殊字符的产品slug进行URL编码
+          const encodedProductSlug = encodeURIComponent(combo.productSlug);
+
           params.push({
             locale,
             slug: combo.brandSlug,
-            id: combo.productSlug
+            id: encodedProductSlug
           });
+
+          // 如果编码后的slug与原始slug不同，说明包含特殊字符
+          if (encodedProductSlug !== combo.productSlug) {
+            console.log(`🔧 [generateStaticParams] 编码特殊字符产品: ${combo.productSlug} -> ${encodedProductSlug}`);
+          }
         }
       }
     }
@@ -92,6 +100,9 @@ export async function generateStaticParams() {
       { brandSlug: 'xilinx', productSlug: '11111' },
       { brandSlug: 'altera', productSlug: 'cyclone' },
       { brandSlug: 'altera', productSlug: '11111' },
+
+      // 特殊字符产品 - 用户报告的404案例
+      { brandSlug: 'semikron', productSlug: 'SKKT106/16E' },
 
       // 中文品牌示例
       { brandSlug: '海思', productSlug: '11111' },
@@ -163,6 +174,10 @@ export async function generateStaticParams() {
       { locale: 'en', slug: 'qualcomm', id: '11111' },
       { locale: 'en', slug: 'espressif', id: '11111' },
       { locale: 'en', slug: 'microchip', id: '11111' },
+
+      // 特殊字符产品 - URL编码版本
+      { locale: 'zh-CN', slug: 'semikron', id: 'SKKT106%2F16E' },
+      { locale: 'en', slug: 'semikron', id: 'SKKT106%2F16E' },
     ];
 
     console.log(`🆘 [generateStaticParams] Using emergency fallback: ${emergencyParams.length} params`);
@@ -180,6 +195,9 @@ export default async function BrandProductPage({ params }: BrandProductPageProps
   // Decode slug to handle Chinese brand names
   const decodedSlug = decodeURIComponent(slug);
 
+  // Decode product ID to handle special characters like / in SKKT106/16E
+  const decodedProductId = decodeURIComponent(id);
+
   // Detect if we're in build time (static generation)
   const isBuildTime = process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'phase-production-build';
 
@@ -187,7 +205,7 @@ export default async function BrandProductPage({ params }: BrandProductPageProps
   let brandData, product;
 
   try {
-    console.log(`🔧 [BrandProductPage] Loading page for ${decodedSlug}/${id} ${isBuildTime ? '(BUILD TIME)' : '(RUNTIME)'}`);
+    console.log(`🔧 [BrandProductPage] 请求品牌产品页面: ${decodedSlug}/${id} -> ${decodedProductId} ${isBuildTime ? '(构建时)' : '(运行时)'}`);
 
     // First get brand data to ensure brand exists
     brandData = await getBrandData(decodedSlug);
@@ -202,19 +220,19 @@ export default async function BrandProductPage({ params }: BrandProductPageProps
     }
 
     // Then get product with brand association validation
-    product = await getBrandProduct(decodedSlug, id);
+    product = await getBrandProduct(decodedSlug, decodedProductId);
 
     if (!product) {
-      console.warn(`Product ${id} not found for brand ${decodedSlug} or not associated with this brand`);
+      console.warn(`Product ${decodedProductId} not found for brand ${decodedSlug} or not associated with this brand`);
 
       if (!isBuildTime) {
         // 运行时：不要直接404，而是创建一个"产品不存在"的页面
-        console.log(`🔧 [BrandProductPage] Creating "product not found" page for runtime access: ${decodedSlug}/${id}`);
+        console.log(`🔧 [BrandProductPage] Creating "product not found" page for runtime access: ${decodedSlug}/${decodedProductId}`);
         product = {
-          _id: `not-found-${id}`,
-          title: `产品 "${id}" 暂时不可用`,
-          slug: id,
-          shortDescription: `抱歉，产品 "${id}" 在品牌 "${brandData?.brand?.name || decodedSlug}" 下暂时不可用。这可能是因为产品已下架、更改了型号，或者数据正在更新中。`,
+          _id: `not-found-${decodedProductId}`,
+          title: `产品 "${decodedProductId}" 暂时不可用`,
+          slug: decodedProductId,
+          shortDescription: `抱歉，产品 "${decodedProductId}" 在品牌 "${brandData?.brand?.name || decodedSlug}" 下暂时不可用。这可能是因为产品已下架、更改了型号，或者数据正在更新中。`,
           brand: brandData?.brand || { name: decodedSlug, slug: decodedSlug },
           category: null,
           image: null,
@@ -230,9 +248,9 @@ export default async function BrandProductPage({ params }: BrandProductPageProps
       } else {
         // 构建时：创建fallback以防止构建失败
         product = {
-          _id: `fallback-${id}`,
-          title: `产品 ${id}`,
-          slug: id,
+          _id: `fallback-${decodedProductId}`,
+          title: `产品 ${decodedProductId}`,
+          slug: decodedProductId,
           shortDescription: '产品详情加载中...',
           brand: brandData?.brand || { name: decodedSlug, slug: decodedSlug },
           category: null,
@@ -249,16 +267,16 @@ export default async function BrandProductPage({ params }: BrandProductPageProps
     }
 
   } catch (error) {
-    console.error(`Error fetching data for brand: ${decodedSlug}, product: ${id}`, error);
+    console.error(`Error fetching data for brand: ${decodedSlug}, product: ${decodedProductId}`, error);
     if (!isBuildTime) {
       notFound();
     }
     // During build time, provide fallback data
     brandData = { brand: { name: decodedSlug, slug: decodedSlug } };
     product = {
-      _id: `fallback-${id}`,
-      title: `产品 ${id}`,
-      slug: id,
+      _id: `fallback-${decodedProductId}`,
+      title: `产品 ${decodedProductId}`,
+      slug: decodedProductId,
       shortDescription: '产品详情加载中...',
       brand: { name: decodedSlug, slug: decodedSlug },
       category: null,
@@ -503,7 +521,7 @@ export default async function BrandProductPage({ params }: BrandProductPageProps
                       </Link>
                     </Button>
                     <Button size="lg" className="flex-1" asChild>
-                      <Link href={`/${locale}/inquiry?brand=${encodeURIComponent(brand.name)}&product=${encodeURIComponent(id)}`}>
+                      <Link href={`/${locale}/inquiry?brand=${encodeURIComponent(brand.name)}&product=${encodeURIComponent(decodedProductId)}`}>
                         <ShoppingCart className="h-5 w-5 mr-2" />
                         咨询此产品
                       </Link>
