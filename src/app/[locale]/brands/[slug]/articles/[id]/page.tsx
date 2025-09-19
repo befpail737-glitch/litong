@@ -34,24 +34,59 @@ interface BrandArticlePageProps {
 // Generate static params for all brand-article combinations
 export async function generateStaticParams() {
   try {
-    // 紧急优化：最小化静态生成防止Cloudflare超时
-    console.log('😨 使用最小静态生成修复部署超时');
+    console.log('🔧 [generateStaticParams] 生成品牌-文章组合的静态参数...');
 
-    // 只为最关键的页面生成静态页面，其他页面使用ISR
-    return [
-      { locale: 'zh-CN', slug: 'cree', id: 'aaaaa' },
-      { locale: 'zh-CN', slug: 'infineon', id: 'aaaaa' },
-      { locale: 'zh-CN', slug: 'ti', id: 'aaaaa' },
-      { locale: 'en', slug: 'cree', id: 'aaaaa' },
-      { locale: 'en', slug: 'infineon', id: 'aaaaa' }
-    ];
+    // 使用真实的Sanity数据生成所有品牌-文章组合
+    const { client } = await import('@/lib/sanity/client');
+
+    const combinations = await client.fetch(`
+      *[_type == "article" && isPublished == true && defined(slug.current) && count(relatedBrands) > 0] {
+        "articleSlug": slug.current,
+        "brandSlugs": relatedBrands[]->slug.current
+      }
+    `);
+
+    const params = [];
+
+    // 为每个文章生成其关联品牌的所有语言版本
+    combinations.forEach(article => {
+      article.brandSlugs?.forEach(brandSlug => {
+        if (brandSlug) {
+          // 生成中英文版本
+          params.push(
+            { locale: 'zh-CN', slug: brandSlug, id: article.articleSlug },
+            { locale: 'en', slug: brandSlug, id: article.articleSlug }
+          );
+        }
+      });
+    });
+
+    console.log(`✅ [generateStaticParams] 成功生成 ${params.length} 个品牌-文章组合`);
+    console.log('🔍 [generateStaticParams] 示例组合:', params.slice(0, 5));
+
+    return params;
+
   } catch (error) {
-    console.error('Error generating static params for brand articles:', error);
-    // Emergency fallback
-    return [
+    console.error('❌ [generateStaticParams] 生成静态参数失败:', error);
+
+    // 增强的fallback，包含实际存在的重要组合
+    const fallbackParams = [
+      // 基于实际Sanity数据的重要组合
+      { locale: 'zh-CN', slug: 'ixys', id: '33333' },
+      { locale: 'zh-CN', slug: 'ixys', id: '111111111' },
       { locale: 'zh-CN', slug: 'cree', id: 'aaaaa' },
-      { locale: 'en', slug: 'cree', id: 'aaaaa' }
+      { locale: 'zh-CN', slug: 'cree', id: '11111' },
+      { locale: 'zh-CN', slug: 'cree', id: '55555' },
+      { locale: 'zh-CN', slug: 'cree', id: 'loss' },
+      { locale: 'zh-CN', slug: 'cree', id: 'supply' },
+      // 英文版本
+      { locale: 'en', slug: 'ixys', id: '33333' },
+      { locale: 'en', slug: 'cree', id: 'aaaaa' },
+      { locale: 'en', slug: 'cree', id: '11111' }
     ];
+
+    console.log(`🆘 [generateStaticParams] 使用fallback: ${fallbackParams.length} 个组合`);
+    return fallbackParams;
   }
 }
 
@@ -61,6 +96,8 @@ export default async function BrandArticlePage({ params }: BrandArticlePageProps
   // Decode slug to handle Chinese brand names
   const decodedSlug = decodeURIComponent(slug);
 
+  console.log(`🔍 [BrandArticlePage] 请求品牌文章页面: brand=${decodedSlug}, article=${id}, locale=${locale}`);
+
   // Get both brand and article data with error handling
   let brandData, article;
 
@@ -69,15 +106,40 @@ export default async function BrandArticlePage({ params }: BrandArticlePageProps
       getBrandData(decodedSlug),
       getArticle(id)
     ]);
+
+    console.log(`📊 [BrandArticlePage] 数据获取结果: brand=${brandData?.brand?.name || 'null'}, article=${article?.title || 'null'}`);
+
   } catch (error) {
-    console.error(`Error fetching data for brand: ${decodedSlug}, article: ${id}`, error);
+    console.error(`❌ [BrandArticlePage] 数据获取失败 brand: ${decodedSlug}, article: ${id}`, error);
     notFound();
   }
 
-  if (!brandData || !brandData.brand || !article) {
-    console.warn(`Brand or article not found for slug: ${decodedSlug}, id: ${id}`);
+  // Enhanced validation and logging
+  if (!brandData?.brand) {
+    console.warn(`⚠️ [BrandArticlePage] 品牌未找到: ${decodedSlug}`);
     notFound();
   }
+
+  if (!article) {
+    console.warn(`⚠️ [BrandArticlePage] 文章未找到: ${id}`);
+    notFound();
+  }
+
+  // Validate that the article is actually related to this brand
+  const articleBrands = article.relatedBrands || [];
+  const isRelatedToBrand = articleBrands.some(brand =>
+    brand.slug === brandData.brand.slug ||
+    brand.slug === decodedSlug ||
+    brand.name === brandData.brand.name
+  );
+
+  if (!isRelatedToBrand) {
+    console.warn(`⚠️ [BrandArticlePage] 文章 ${id} 不属于品牌 ${decodedSlug}`);
+    console.log(`📋 [BrandArticlePage] 文章关联的品牌:`, articleBrands.map(b => `${b.name}(${b.slug})`));
+    notFound();
+  }
+
+  console.log(`✅ [BrandArticlePage] 成功匹配品牌文章: ${brandData.brand.name} - ${article.title}`);
 
   const { brand } = brandData;
 
