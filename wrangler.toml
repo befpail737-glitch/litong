@@ -8,30 +8,35 @@ pages_build_output_dir = "out"
 # GitHub Actions 自动部署配置
 # 当使用GitHub Actions时，这些设置确保正确的构建行为
 
-# 环境变量 - 针对图片处理和构建优化
-[vars]
+# 兼容性设置 - 增强Node.js支持
+compatibility_flags = ["nodejs_compat", "streams_enable_constructors"]
+
+# 生产环境配置 - 用于Cloudflare Pages部署
+[env.production]
+# 基础构建配置
 NODE_ENV = "production"
 NEXT_PUBLIC_SITE_URL = "https://litong.pages.dev"
 NEXT_PHASE = "phase-production-build"
 EMERGENCY_BUILD = "true"
 NEXT_TELEMETRY_DISABLED = "1"
-# Sanity 配置
+# 构建优化设置
+NEXT_BUILD_LINT = "false"
+NEXT_DISABLE_STATIC_IMAGES = "false"
+NEXT_IMAGES_FALLBACK = "true"
+BUILD_STAGE = "partial"
+# Sanity CMS 配置
 SANITY_PROJECT_ID = "oquvb2bs"
 SANITY_DATASET = "production"
 SANITY_API_VERSION = "2023-05-03"
-# 图片处理优化
-NEXT_IMAGES_FALLBACK = "true"
-# 构建优化
-NEXT_BUILD_LINT = "false"
-NEXT_DISABLE_STATIC_IMAGES = "false"
-
-# 兼容性设置 - 增强Node.js支持
-compatibility_flags = ["nodejs_compat", "streams_enable_constructors"]
-
-# GitHub Actions环境配置
-[env.production]
+# GitHub Actions标识
 GITHUB_ACTIONS_BUILD = "true"
 
 # 开发环境配置
 [env.development]
+NODE_ENV = "development"
+NEXT_PUBLIC_SITE_URL = "http://localhost:3000"
+NEXT_TELEMETRY_DISABLED = "1"
+SANITY_PROJECT_ID = "oquvb2bs"
+SANITY_DATASET = "production"
+SANITY_API_VERSION = "2023-05-03"
 GITHUB_ACTIONS_BUILD = "false"
