@@ -54,7 +54,7 @@ export async function generateStaticParams() {
 
     const params = [];
     for (const locale of locales) {
-      for (const brand of brands.slice(0, 50)) { // Increase brand coverage
+      for (const brand of brands.slice(0, 100)) { // 大幅增加品牌覆盖范围
         if (brand && brand.slug) {
           for (const supportId of supportIds) {
             // Add regular slug
@@ -81,28 +81,81 @@ export async function generateStaticParams() {
     return params;
   } catch (error) {
     console.error('Error generating static params for brand support:', error);
-    // Comprehensive emergency fallback with real support scenarios
+    // Comprehensive emergency fallback with real support scenarios - 大幅扩展
     return [
-      // Core documentation
+      // Core documentation - 扩展所有主要品牌
       { locale: 'zh-CN', slug: 'cree', id: '11111' },
+      { locale: 'zh-CN', slug: 'cree', id: '22222' },
+      { locale: 'zh-CN', slug: 'cree', id: '33333' },
       { locale: 'zh-CN', slug: 'cree', id: 'datasheet' },
       { locale: 'zh-CN', slug: 'cree', id: 'user-manual' },
+      { locale: 'zh-CN', slug: 'cree', id: 'application-note' },
+
+      { locale: 'zh-CN', slug: 'ti', id: '11111' },
+      { locale: 'zh-CN', slug: 'ti', id: '22222' },
       { locale: 'zh-CN', slug: 'ti', id: 'application-note' },
       { locale: 'zh-CN', slug: 'ti', id: 'design-guide' },
+      { locale: 'zh-CN', slug: 'ti', id: 'datasheet' },
+
+      { locale: 'zh-CN', slug: 'infineon', id: '11111' },
+      { locale: 'zh-CN', slug: 'infineon', id: '22222' },
       { locale: 'zh-CN', slug: 'infineon', id: 'installation-guide' },
       { locale: 'zh-CN', slug: 'infineon', id: 'troubleshooting' },
+      { locale: 'zh-CN', slug: 'infineon', id: 'user-manual' },
+
+      { locale: 'zh-CN', slug: 'stmicroelectronics', id: '11111' },
       { locale: 'zh-CN', slug: 'stmicroelectronics', id: 'firmware-update' },
+      { locale: 'zh-CN', slug: 'stmicroelectronics', id: 'datasheet' },
+
+      { locale: 'zh-CN', slug: 'mediatek', id: '11111' },
+      { locale: 'zh-CN', slug: 'mediatek', id: '22222' },
       { locale: 'zh-CN', slug: 'mediatek', id: 'driver-download' },
+
+      { locale: 'zh-CN', slug: 'qualcomm', id: '11111' },
       { locale: 'zh-CN', slug: 'qualcomm', id: 'technical-faq' },
+
+      { locale: 'zh-CN', slug: 'espressif', id: '11111' },
       { locale: 'zh-CN', slug: 'espressif', id: 'compatibility-guide' },
+
+      { locale: 'zh-CN', slug: 'microchip', id: '11111' },
       { locale: 'zh-CN', slug: 'microchip', id: 'warranty-info' },
 
-      // English versions
-      { locale: 'en', slug: 'cree', id: 'datasheet' },
-      { locale: 'en', slug: 'ti', id: 'application-note' },
-      { locale: 'en', slug: 'infineon', id: 'user-manual' },
-      { locale: 'zh-CN', slug: 'mediatek', id: '11111' },
+      { locale: 'zh-CN', slug: 'analog', id: '11111' },
+      { locale: 'zh-CN', slug: 'analog', id: 'datasheet' },
+
+      { locale: 'zh-CN', slug: 'nxp', id: '11111' },
+      { locale: 'zh-CN', slug: 'nxp', id: 'user-manual' },
+
+      { locale: 'zh-CN', slug: 'xilinx', id: '11111' },
+      { locale: 'zh-CN', slug: 'xilinx', id: 'design-guide' },
+
+      { locale: 'zh-CN', slug: 'altera', id: '11111' },
+      { locale: 'zh-CN', slug: 'altera', id: 'installation-guide' },
+
+      // English versions - 扩展英文支持
       { locale: 'en', slug: 'cree', id: '11111' },
+      { locale: 'en', slug: 'cree', id: 'datasheet' },
+      { locale: 'en', slug: 'cree', id: 'user-manual' },
+
+      { locale: 'en', slug: 'ti', id: '11111' },
+      { locale: 'en', slug: 'ti', id: 'application-note' },
+
+      { locale: 'en', slug: 'infineon', id: '11111' },
+      { locale: 'en', slug: 'infineon', id: 'user-manual' },
+
+      { locale: 'en', slug: 'mediatek', id: '11111' },
+      { locale: 'en', slug: 'qualcomm', id: '11111' },
+      { locale: 'en', slug: 'espressif', id: '11111' },
+      { locale: 'en', slug: 'microchip', id: '11111' },
+      { locale: 'en', slug: 'analog', id: '11111' },
+      { locale: 'en', slug: 'nxp', id: '11111' },
+      { locale: 'en', slug: 'xilinx', id: '11111' },
+      { locale: 'en', slug: 'altera', id: '11111' },
+
+      // 中文品牌支持
+      { locale: 'zh-CN', slug: '海思', id: '11111' },
+      { locale: 'zh-CN', slug: '联发科', id: '11111' },
+      { locale: 'zh-CN', slug: '瑞昱', id: '11111' },
     ];
   }
 }

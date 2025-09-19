@@ -39,8 +39,8 @@ export async function generateStaticParams() {
   try {
     const locales = ['zh-CN', 'en'];
 
-    // Get comprehensive brand-solution combinations from Sanity
-    const combinations = await getBrandSolutionCombinations(75);
+    // Get comprehensive brand-solution combinations from Sanity - 增加覆盖范围
+    const combinations = await getBrandSolutionCombinations(150);
     console.log('🔍 Found brand-solution combinations:', combinations.length);
 
     const params = [];
@@ -68,14 +68,49 @@ export async function generateStaticParams() {
     return params;
   } catch (error) {
     console.error('❌ Error generating static params for brand solutions:', error);
-    // Emergency fallback with real brand-solution combinations
+    // Emergency fallback with real brand-solution combinations - 大幅扩展
     const fallbackParams = [];
     const locales = ['zh-CN', 'en'];
     const fallbackCombinations = [
+      // 核心品牌解决方案组合
       { brandSlug: 'cree', solutionSlug: '11111' },
+      { brandSlug: 'cree', solutionSlug: '22222' },
+      { brandSlug: 'cree', solutionSlug: '33333' },
+      { brandSlug: 'cree', solutionSlug: 'power-efficiency' },
+      { brandSlug: 'infineon', solutionSlug: '11111' },
       { brandSlug: 'infineon', solutionSlug: '22222' },
+      { brandSlug: 'infineon', solutionSlug: '33333' },
+      { brandSlug: 'infineon', solutionSlug: 'automotive-solution' },
+      { brandSlug: 'ti', solutionSlug: '11111' },
+      { brandSlug: 'ti', solutionSlug: '22222' },
       { brandSlug: 'ti', solutionSlug: '33333' },
+      { brandSlug: 'ti', solutionSlug: 'analog-solution' },
       { brandSlug: 'mediatek', solutionSlug: '11111' },
+      { brandSlug: 'mediatek', solutionSlug: '22222' },
+      { brandSlug: 'mediatek', solutionSlug: 'mobile-platform' },
+
+      // 更多主流品牌
+      { brandSlug: 'qualcomm', solutionSlug: '11111' },
+      { brandSlug: 'qualcomm', solutionSlug: 'wireless-solution' },
+      { brandSlug: 'espressif', solutionSlug: '11111' },
+      { brandSlug: 'espressif', solutionSlug: 'iot-solution' },
+      { brandSlug: 'microchip', solutionSlug: '11111' },
+      { brandSlug: 'microchip', solutionSlug: 'mcu-solution' },
+      { brandSlug: 'stmicroelectronics', solutionSlug: '11111' },
+      { brandSlug: 'stmicroelectronics', solutionSlug: 'embedded-solution' },
+      { brandSlug: 'analog', solutionSlug: '11111' },
+      { brandSlug: 'analog', solutionSlug: 'precision-solution' },
+      { brandSlug: 'nxp', solutionSlug: '11111' },
+      { brandSlug: 'nxp', solutionSlug: 'secure-solution' },
+      { brandSlug: 'xilinx', solutionSlug: '11111' },
+      { brandSlug: 'xilinx', solutionSlug: 'fpga-solution' },
+      { brandSlug: 'altera', solutionSlug: '11111' },
+      { brandSlug: 'altera', solutionSlug: 'programmable-solution' },
+
+      // 中文品牌
+      { brandSlug: '海思', solutionSlug: '11111' },
+      { brandSlug: '联发科', solutionSlug: '11111' },
+      { brandSlug: '瑞昱', solutionSlug: '11111' },
     ];
 
     for (const locale of locales) {

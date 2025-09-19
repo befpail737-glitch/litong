@@ -34,8 +34,8 @@ export async function generateStaticParams() {
   try {
     console.log('🔧 [generateStaticParams] Starting brand product static parameter generation...');
 
-    // 尝试从Sanity获取真实数据 - 减少批次大小防止Cloudflare超时
-    const brandProductCombinations = await getBrandProductCombinations(50);
+    // 尝试从Sanity获取真实数据 - 增加批次大小提高覆盖率
+    const brandProductCombinations = await getBrandProductCombinations(200);
     const locales = ['zh-CN', 'en']; // 支持中英文
 
     const params = [];
@@ -59,12 +59,44 @@ export async function generateStaticParams() {
       { brandSlug: 'Electronicon', productSlug: 'aaaaa' },
       { brandSlug: 'electronicon', productSlug: 'aaaaa' }, // 小写版本
 
-      // 常见的测试品牌和产品
+      // 常见的测试品牌和产品 - 大幅扩展
       { brandSlug: 'cree', productSlug: 'sic mosfet' },
       { brandSlug: 'cree', productSlug: '11111' },
+      { brandSlug: 'cree', productSlug: '22222' },
+      { brandSlug: 'cree', productSlug: '33333' },
       { brandSlug: 'ti', productSlug: 'lm358' },
+      { brandSlug: 'ti', productSlug: '11111' },
+      { brandSlug: 'ti', productSlug: '22222' },
+      { brandSlug: 'ti', productSlug: 'tms320' },
       { brandSlug: 'infineon', productSlug: 'bss123' },
+      { brandSlug: 'infineon', productSlug: '11111' },
+      { brandSlug: 'infineon', productSlug: 'igbt' },
       { brandSlug: 'stmicroelectronics', productSlug: 'stm32f103c8t6' },
+      { brandSlug: 'stmicroelectronics', productSlug: '11111' },
+      { brandSlug: 'stmicroelectronics', productSlug: 'stm32' },
+
+      // 更多常见品牌
+      { brandSlug: 'mediatek', productSlug: '11111' },
+      { brandSlug: 'mediatek', productSlug: 'mt6737' },
+      { brandSlug: 'qualcomm', productSlug: '11111' },
+      { brandSlug: 'qualcomm', productSlug: 'snapdragon' },
+      { brandSlug: 'espressif', productSlug: 'esp32' },
+      { brandSlug: 'espressif', productSlug: '11111' },
+      { brandSlug: 'microchip', productSlug: 'pic16f84a' },
+      { brandSlug: 'microchip', productSlug: '11111' },
+      { brandSlug: 'analog', productSlug: 'ad7124' },
+      { brandSlug: 'analog', productSlug: '11111' },
+      { brandSlug: 'nxp', productSlug: 'lpc2148' },
+      { brandSlug: 'nxp', productSlug: '11111' },
+      { brandSlug: 'xilinx', productSlug: 'spartan6' },
+      { brandSlug: 'xilinx', productSlug: '11111' },
+      { brandSlug: 'altera', productSlug: 'cyclone' },
+      { brandSlug: 'altera', productSlug: '11111' },
+
+      // 中文品牌示例
+      { brandSlug: '海思', productSlug: '11111' },
+      { brandSlug: '联发科', productSlug: '11111' },
+      { brandSlug: '瑞昱', productSlug: '11111' },
     ];
 
     // 添加关键组合（如果尚未包含）
@@ -105,11 +137,32 @@ export async function generateStaticParams() {
       { locale: 'zh-CN', slug: 'electronicon', id: 'aaaaa' },
       { locale: 'en', slug: 'electronicon', id: 'aaaaa' },
 
-      // 基础测试页面
+      // 扩展基础测试页面 - 覆盖更多品牌和产品组合
       { locale: 'zh-CN', slug: 'cree', id: 'sic mosfet' },
       { locale: 'zh-CN', slug: 'cree', id: '11111' },
+      { locale: 'zh-CN', slug: 'cree', id: '22222' },
       { locale: 'en', slug: 'cree', id: 'sic mosfet' },
       { locale: 'en', slug: 'cree', id: '11111' },
+      { locale: 'en', slug: 'cree', id: '22222' },
+
+      { locale: 'zh-CN', slug: 'ti', id: '11111' },
+      { locale: 'zh-CN', slug: 'ti', id: 'lm358' },
+      { locale: 'en', slug: 'ti', id: '11111' },
+      { locale: 'en', slug: 'ti', id: 'lm358' },
+
+      { locale: 'zh-CN', slug: 'infineon', id: '11111' },
+      { locale: 'zh-CN', slug: 'infineon', id: 'bss123' },
+      { locale: 'en', slug: 'infineon', id: '11111' },
+      { locale: 'en', slug: 'infineon', id: 'bss123' },
+
+      { locale: 'zh-CN', slug: 'mediatek', id: '11111' },
+      { locale: 'zh-CN', slug: 'qualcomm', id: '11111' },
+      { locale: 'zh-CN', slug: 'espressif', id: '11111' },
+      { locale: 'zh-CN', slug: 'microchip', id: '11111' },
+      { locale: 'en', slug: 'mediatek', id: '11111' },
+      { locale: 'en', slug: 'qualcomm', id: '11111' },
+      { locale: 'en', slug: 'espressif', id: '11111' },
+      { locale: 'en', slug: 'microchip', id: '11111' },
     ];
 
     console.log(`🆘 [generateStaticParams] Using emergency fallback: ${emergencyParams.length} params`);
