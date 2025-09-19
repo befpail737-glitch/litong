@@ -79,6 +79,12 @@ export async function getBrandProductCombinations(limit = 200): Promise<Array<{b
     console.log(`✅ [getBrandProductCombinations] Query completed in ${duration}ms, returned ${validCombinations.length} combinations`);
     console.log('🔍 [getBrandProductCombinations] Sample combinations:', validCombinations.slice(0, 5));
 
+    // 调试信息：如果没有数据，提供详细诊断
+    if (validCombinations.length === 0) {
+      console.warn('⚠️ [getBrandProductCombinations] 没有找到品牌-产品组合！这将导致generateStaticParams返回空数组');
+      console.warn('⚠️ [getBrandProductCombinations] 检查Sanity数据库中是否有正确的品牌和产品数据');
+    }
+
     return validCombinations;
   } catch (error) {
     const duration = Date.now() - startTime;

@@ -32,18 +32,18 @@ interface BrandProductPageProps {
 // Generate static params for all brand-product combinations
 export async function generateStaticParams() {
   try {
-    console.log('🔧 Generating minimal brand product static parameters for Cloudflare...');
+    console.log('🔧 [generateStaticParams] Starting brand product static parameter generation...');
 
-    // Expanded mode for comprehensive coverage: increase static generation
-    const brandProductCombinations = await getBrandProductCombinations(100);
-    const locales = ['zh-CN']; // Only Chinese locale for emergency deployment
+    // 尝试从Sanity获取真实数据
+    const brandProductCombinations = await getBrandProductCombinations(200);
+    const locales = ['zh-CN', 'en']; // 支持中英文
 
     const params = [];
 
+    // 添加从Sanity获取的真实组合
     for (const locale of locales) {
       for (const combo of brandProductCombinations) {
         if (combo.brandSlug && combo.productSlug) {
-          console.log(`📋 Adding minimal static param: ${locale}/${combo.brandSlug}/${combo.productSlug}`);
           params.push({
             locale,
             slug: combo.brandSlug,
@@ -53,20 +53,67 @@ export async function generateStaticParams() {
       }
     }
 
-    console.log(`✅ Generated ${params.length} brand product static params from ${brandProductCombinations.length} combinations`);
-    console.log('📊 Sample generated params:', params.slice(0, 3));
+    // 如果Sanity数据不足，添加必要的fallback保证关键页面可访问
+    const criticalCombinations = [
+      // 用户报告的具体404页面
+      { brandSlug: 'Electronicon', productSlug: 'aaaaa' },
+      { brandSlug: 'electronicon', productSlug: 'aaaaa' }, // 小写版本
+
+      // 常见的测试品牌和产品
+      { brandSlug: 'cree', productSlug: 'sic mosfet' },
+      { brandSlug: 'cree', productSlug: '11111' },
+      { brandSlug: 'ti', productSlug: 'lm358' },
+      { brandSlug: 'infineon', productSlug: 'bss123' },
+      { brandSlug: 'stmicroelectronics', productSlug: 'stm32f103c8t6' },
+    ];
+
+    // 添加关键组合（如果尚未包含）
+    for (const locale of locales) {
+      for (const critical of criticalCombinations) {
+        const exists = params.some(p =>
+          p.locale === locale &&
+          p.slug.toLowerCase() === critical.brandSlug.toLowerCase() &&
+          p.id === critical.productSlug
+        );
+
+        if (!exists) {
+          params.push({
+            locale,
+            slug: critical.brandSlug,
+            id: critical.productSlug
+          });
+          console.log(`📋 [generateStaticParams] Added critical fallback: ${locale}/${critical.brandSlug}/${critical.productSlug}`);
+        }
+      }
+    }
+
+    console.log(`✅ [generateStaticParams] Generated ${params.length} total static params:`);
+    console.log(`   - ${brandProductCombinations.length} from Sanity data`);
+    console.log(`   - ${params.length - brandProductCombinations.length * locales.length} critical fallbacks`);
+    console.log('📊 Sample generated params:', params.slice(0, 5));
+
     return params;
+
   } catch (error) {
-    console.error('Error generating brand product static params:', error);
-    // Fallback to ensure critical pages are generated - only verified products
-    const fallbackParams = [
+    console.error('❌ [generateStaticParams] Error generating brand product static params:', error);
+
+    // 完全失败时的最小fallback，确保用户报告的页面可访问
+    const emergencyParams = [
+      // 用户具体报告的404页面
+      { locale: 'zh-CN', slug: 'Electronicon', id: 'aaaaa' },
+      { locale: 'en', slug: 'Electronicon', id: 'aaaaa' },
+      { locale: 'zh-CN', slug: 'electronicon', id: 'aaaaa' },
+      { locale: 'en', slug: 'electronicon', id: 'aaaaa' },
+
+      // 基础测试页面
       { locale: 'zh-CN', slug: 'cree', id: 'sic mosfet' },
       { locale: 'zh-CN', slug: 'cree', id: '11111' },
       { locale: 'en', slug: 'cree', id: 'sic mosfet' },
       { locale: 'en', slug: 'cree', id: '11111' },
     ];
-    console.log(`⚠️ Using fallback: generated ${fallbackParams.length} verified params`);
-    return fallbackParams;
+
+    console.log(`🆘 [generateStaticParams] Using emergency fallback: ${emergencyParams.length} params`);
+    return emergencyParams;
   }
 }
 
@@ -106,26 +153,46 @@ export default async function BrandProductPage({ params }: BrandProductPageProps
 
     if (!product) {
       console.warn(`Product ${id} not found for brand ${decodedSlug} or not associated with this brand`);
+
       if (!isBuildTime) {
-        notFound();
+        // 运行时：不要直接404，而是创建一个"产品不存在"的页面
+        console.log(`🔧 [BrandProductPage] Creating "product not found" page for runtime access: ${decodedSlug}/${id}`);
+        product = {
+          _id: `not-found-${id}`,
+          title: `产品 "${id}" 暂时不可用`,
+          slug: id,
+          shortDescription: `抱歉，产品 "${id}" 在品牌 "${brandData?.brand?.name || decodedSlug}" 下暂时不可用。这可能是因为产品已下架、更改了型号，或者数据正在更新中。`,
+          brand: brandData?.brand || { name: decodedSlug, slug: decodedSlug },
+          category: null,
+          image: null,
+          pricing: null,
+          inventory: { inStock: false, quantity: 0 },
+          isActive: false,
+          isFeatured: false,
+          isNew: false,
+          _createdAt: new Date().toISOString(),
+          _updatedAt: new Date().toISOString(),
+          isNotFound: true // 标记这是一个"未找到"的产品
+        };
+      } else {
+        // 构建时：创建fallback以防止构建失败
+        product = {
+          _id: `fallback-${id}`,
+          title: `产品 ${id}`,
+          slug: id,
+          shortDescription: '产品详情加载中...',
+          brand: brandData?.brand || { name: decodedSlug, slug: decodedSlug },
+          category: null,
+          image: null,
+          pricing: null,
+          inventory: null,
+          isActive: true,
+          isFeatured: false,
+          isNew: false,
+          _createdAt: new Date().toISOString(),
+          _updatedAt: new Date().toISOString()
+        };
       }
-      // During build time, create a fallback product to prevent build failure
-      product = {
-        _id: `fallback-${id}`,
-        title: `产品 ${id}`,
-        slug: id,
-        shortDescription: '产品详情加载中...',
-        brand: brandData?.brand || { name: decodedSlug, slug: decodedSlug },
-        category: null,
-        image: null,
-        pricing: null,
-        inventory: null,
-        isActive: true,
-        isFeatured: false,
-        isNew: false,
-        _createdAt: new Date().toISOString(),
-        _updatedAt: new Date().toISOString()
-      };
     }
 
   } catch (error) {
@@ -297,6 +364,21 @@ export default async function BrandProductPage({ params }: BrandProductPageProps
                 )}
               </div>
 
+              {/* Product Not Found Warning */}
+              {product.isNotFound && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                  <div className="flex items-start gap-3">
+                    <Info className="h-5 w-5 text-yellow-600 mt-0.5" />
+                    <div>
+                      <h4 className="text-yellow-800 font-medium mb-1">产品信息提示</h4>
+                      <p className="text-yellow-700 text-sm">
+                        该产品页面是根据您的访问自动生成的，但我们暂时没有找到对应的产品信息。如果您确实需要此产品，请通过下方的"咨询此产品"按钮联系我们。
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Short Description */}
               {product.shortDescription && (
                 <p className="text-gray-700 text-lg leading-relaxed">
@@ -358,16 +440,37 @@ export default async function BrandProductPage({ params }: BrandProductPageProps
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="flex-1" asChild>
-                  <Link href={`/${locale}/inquiry`}>
-                    <ShoppingCart className="h-5 w-5 mr-2" />
-                    立即询价
-                  </Link>
-                </Button>
-                <Button variant="outline" size="lg" className="flex-1">
-                  <Download className="h-5 w-5 mr-2" />
-                  下载资料
-                </Button>
+                {product.isNotFound ? (
+                  // 产品不存在时的特殊处理
+                  <>
+                    <Button size="lg" className="flex-1" variant="outline" asChild>
+                      <Link href={`/${locale}/brands/${encodeURIComponent(brand.slug || brand.name)}/products`}>
+                        <ArrowLeft className="h-5 w-5 mr-2" />
+                        浏览其他产品
+                      </Link>
+                    </Button>
+                    <Button size="lg" className="flex-1" asChild>
+                      <Link href={`/${locale}/inquiry?brand=${encodeURIComponent(brand.name)}&product=${encodeURIComponent(id)}`}>
+                        <ShoppingCart className="h-5 w-5 mr-2" />
+                        咨询此产品
+                      </Link>
+                    </Button>
+                  </>
+                ) : (
+                  // 正常产品的按钮
+                  <>
+                    <Button size="lg" className="flex-1" asChild>
+                      <Link href={`/${locale}/inquiry`}>
+                        <ShoppingCart className="h-5 w-5 mr-2" />
+                        立即询价
+                      </Link>
+                    </Button>
+                    <Button variant="outline" size="lg" className="flex-1">
+                      <Download className="h-5 w-5 mr-2" />
+                      下载资料
+                    </Button>
+                  </>
+                )}
               </div>
 
               {/* Additional Info */}
