@@ -1,12 +1,12 @@
+'use client';
+
 import { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { EnhancedSearchBox } from '@/components/search/EnhancedSearchBox';
 import { Search, Filter, Grid, List, ChevronDown, Package, Building2, FileText } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-
-// Force dynamic rendering for search functionality
-export const dynamic = 'force-dynamic';
 
 // Generate static params for supported locales
 export async function generateStaticParams() {
@@ -18,7 +18,6 @@ export async function generateStaticParams() {
 
 interface SearchPageProps {
   params: { locale: string };
-  searchParams: { q?: string; type?: string; category?: string; brand?: string };
 }
 
 // Mock search results - 在实际应用中应该从API获取
@@ -99,8 +98,10 @@ const mockSearchResults = {
   ]
 };
 
-function SearchResults({ searchParams }: { searchParams: SearchPageProps['searchParams'] }) {
-  const { q, type = 'all' } = searchParams;
+function SearchResults() {
+  const searchParams = useSearchParams();
+  const q = searchParams.get('q') || '';
+  const type = searchParams.get('type') || 'all';
 
   if (!q) {
     return (
@@ -327,7 +328,7 @@ function SearchResults({ searchParams }: { searchParams: SearchPageProps['search
   );
 }
 
-export default function SearchPage({ params, searchParams }: SearchPageProps) {
+export default function SearchPage({ params }: SearchPageProps) {
   return (
     <MainLayout>
       <div className="min-h-screen bg-gray-50">
@@ -350,7 +351,7 @@ export default function SearchPage({ params, searchParams }: SearchPageProps) {
               <p className="text-gray-600">搜索中...</p>
             </div>
           }>
-            <SearchResults searchParams={searchParams} />
+            <SearchResults />
           </Suspense>
         </div>
       </div>
