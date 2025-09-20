@@ -20,3 +20,12 @@ export async function getAllProducts() {
 }
 
 export { getProduct, getProducts } from './queries';
+
+export async function getProductData(slug: string) {
+  try {
+    return await getProduct(slug);
+  } catch (error) {
+    console.error(`Error fetching product data "${slug}":`, error);
+    return null;
+  }
+}

@@ -45,7 +45,7 @@ export async function generateStaticParams() {
         defined(slug.current) &&
         count(relatedBrands) > 0 &&
         category->slug.current != "technical-support"
-      ] {
+      ][0...10] {
         "articleSlug": slug.current,
         "brandSlugs": relatedBrands[]->slug.current
       }
