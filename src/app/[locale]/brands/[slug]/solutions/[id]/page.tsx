@@ -40,8 +40,8 @@ export async function generateStaticParams() {
   try {
     const locales = ['zh-CN', 'en'];
 
-    // Get actual brand-solution combinations from Sanity
-    const realCombinations = await getBrandSolutionCombinations(100);
+    // 使用最小限制来避免Cloudflare构建超时
+    const realCombinations = await getBrandSolutionCombinations(20);
     console.log(`🔍 [Brand Solutions] Found ${realCombinations.length} real brand-solution combinations`);
 
     const params = [];

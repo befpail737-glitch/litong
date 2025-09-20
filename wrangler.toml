@@ -23,7 +23,7 @@ NEXT_TELEMETRY_DISABLED = "1"
 NEXT_BUILD_LINT = "false"
 NEXT_DISABLE_STATIC_IMAGES = "false"
 NEXT_IMAGES_FALLBACK = "true"
-BUILD_STAGE = "partial"
+BUILD_STAGE = "minimal"
 # Sanity CMS 配置
 SANITY_PROJECT_ID = "oquvb2bs"
 SANITY_DATASET = "production"

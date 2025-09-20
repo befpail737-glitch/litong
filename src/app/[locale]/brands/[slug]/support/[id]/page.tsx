@@ -42,8 +42,8 @@ export async function generateStaticParams() {
   try {
     const locales = ['zh-CN', 'en'];
 
-    // 使用更小的限制来避免构建超时
-    const realCombinations = await getBrandSupportCombinations(50);
+    // 使用最小限制来避免Cloudflare构建超时
+    const realCombinations = await getBrandSupportCombinations(20);
     console.log(`🔍 [Brand Support] Found ${realCombinations.length} brand-support combinations`);
 
     const params = [];
