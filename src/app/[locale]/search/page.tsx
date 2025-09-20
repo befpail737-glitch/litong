@@ -8,14 +8,6 @@ import { Search, Filter, Grid, List, ChevronDown, Package, Building2, FileText }
 import Link from 'next/link';
 import Image from 'next/image';
 
-// Generate static params for supported locales
-export async function generateStaticParams() {
-  return [
-    { locale: 'zh-CN' },
-    { locale: 'en' }
-  ];
-}
-
 interface SearchPageProps {
   params: { locale: string };
 }
