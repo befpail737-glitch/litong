@@ -130,7 +130,7 @@ export async function getFeaturedBrands(): Promise<Brand[]> {
 // 根据名称获取品牌
 export async function getBrandByName(name: string): Promise<Brand | null> {
   try {
-    const query = `*[_type == "brandBasic" && name == $name && isActive == true && !(_id in path("drafts.**"))][0] {
+    const query = `*[_type == "brandBasic" && name == $name && (isActive == true || !defined(isActive)) && !(_id in path("drafts.**"))][0] {
       _id,
       _type,
       name,
@@ -188,7 +188,7 @@ export async function getBrandData(slug: string): Promise<Brand | null> {
 
     for (const searchTerm of uniqueSearchTerms) {
       // 精确匹配
-      let query = `*[_type == "brandBasic" && slug.current == $slug && isActive == true && !(_id in path("drafts.**"))][0] {
+      let query = `*[_type == "brandBasic" && slug.current == $slug && (isActive == true || !defined(isActive)) && !(_id in path("drafts.**"))][0] {
         _id,
         _type,
         name,
@@ -268,7 +268,7 @@ export async function getBrandsByCategories() {
         "slug": slug.current,
         description,
         icon,
-        "brands": array::unique(*[_type == "product" && isActive == true && category._ref == ^._id].brand->)[defined(@) && isActive == true] | order(name asc) {
+        "brands": array::unique(*[_type == "product" && category._ref == ^._id].brand->)[defined(@) && (isActive == true || !defined(isActive))] | order(name asc) {
           _id,
           name,
           "slug": slug.current,
@@ -282,7 +282,7 @@ export async function getBrandsByCategories() {
           isFeatured
         }
       },
-      "allBrands": *[_type == "brandBasic" && isActive == true && !(_id in path("drafts.**"))] | order(name asc) {
+      "allBrands": *[_type == "brandBasic" && (isActive == true || !defined(isActive)) && !(_id in path("drafts.**"))] | order(name asc) {
         _id,
         name,
         "slug": slug.current,
@@ -380,21 +380,18 @@ export async function getBrandArticles(brandSlug: string, limit = 6) {
 // 获取品牌相关技术支持文章
 export async function getBrandSupportArticles(brandSlug: string, limit = 6) {
   try {
-    // 首先尝试通过category获取
-    let result = await getArticles({
-      brand: brandSlug,
-      limit,
-      category: 'technical-support'
-    });
+    console.log(`🔍 [getBrandSupportArticles] Fetching support articles for brand: ${brandSlug}`);
 
-    // 如果没有找到，尝试通过articleType获取
-    if (!result.articles || result.articles.length === 0) {
-      console.log(`No support articles found by category for ${brandSlug}, trying articleType...`);
-
-      const query = `*[_type == "article" &&
+    // 多种策略并行查询技术支持文章
+    const queries = [
+      // 策略1: 通过分类和品牌关联查询
+      `*[_type == "article" &&
         isPublished == true &&
-        articleType == "support" &&
-        "${brandSlug}" in relatedBrands[]->slug.current
+        category->slug.current == "technical-support" &&
+        (
+          "${brandSlug}" in relatedBrands[]->slug.current ||
+          relatedBrands[]->name match "${brandSlug}*"
+        )
       ] | order(publishedAt desc) [0...${limit}] {
         _id,
         title,
@@ -406,25 +403,122 @@ export async function getBrandSupportArticles(brandSlug: string, limit = 6) {
         difficulty,
         readTime,
         "author": author-> { name, email },
+        "category": category-> { name, "slug": slug.current },
+        "brands": relatedBrands[]-> { name, "slug": slug.current }
+      }`,
+
+      // 策略2: 通过文章类型查询
+      `*[_type == "article" &&
+        isPublished == true &&
+        articleType == "support" &&
+        (
+          "${brandSlug}" in relatedBrands[]->slug.current ||
+          relatedBrands[]->name match "${brandSlug}*"
+        )
+      ] | order(publishedAt desc) [0...${limit}] {
+        _id,
+        title,
+        "slug": slug.current,
+        excerpt,
+        content,
+        publishedAt,
+        articleType,
+        difficulty,
+        readTime,
+        "author": author-> { name, email },
+        "category": category-> { name, "slug": slug.current },
+        "brands": relatedBrands[]-> { name, "slug": slug.current }
+      }`,
+
+      // 策略3: 通用技术支持文章（没有特定品牌关联）
+      `*[_type == "article" &&
+        isPublished == true &&
+        articleType == "support" &&
+        (!defined(relatedBrands) || count(relatedBrands) == 0)
+      ] | order(publishedAt desc) [0...${Math.min(limit, 3)}] {
+        _id,
+        title,
+        "slug": slug.current,
+        excerpt,
+        content,
+        publishedAt,
+        articleType,
+        difficulty,
+        readTime,
+        "author": author-> { name, email },
+        "category": category-> { name, "slug": slug.current },
+        "brands": relatedBrands[]-> { name, "slug": slug.current }
+      }`
+    ];
+
+    const { client } = await import('./client');
+
+    // 执行所有查询策略
+    const results = await Promise.allSettled(
+      queries.map(query => client.fetch(query))
+    );
+
+    // 合并结果并去重
+    const allArticles = [];
+    const seenIds = new Set();
+
+    results.forEach((result, index) => {
+      if (result.status === 'fulfilled' && Array.isArray(result.value)) {
+        console.log(`✅ [getBrandSupportArticles] Strategy ${index + 1} found ${result.value.length} articles`);
+        result.value.forEach(article => {
+          if (!seenIds.has(article._id)) {
+            seenIds.add(article._id);
+            allArticles.push(article);
+          }
+        });
+      } else {
+        console.warn(`⚠️ [getBrandSupportArticles] Strategy ${index + 1} failed:`, result.reason);
+      }
+    });
+
+    // 按发布日期排序并限制数量
+    const sortedArticles = allArticles
+      .sort((a, b) => new Date(b.publishedAt || 0).getTime() - new Date(a.publishedAt || 0).getTime())
+      .slice(0, limit);
+
+    console.log(`✅ [getBrandSupportArticles] Total found: ${sortedArticles.length} support articles for ${brandSlug}`);
+
+    return sortedArticles;
+  } catch (error) {
+    console.error('❌ [getBrandSupportArticles] Error fetching brand support articles:', error);
+
+    // 兜底：返回通用技术支持文章
+    try {
+      console.log('🔄 [getBrandSupportArticles] Attempting fallback query...');
+      const { client } = await import('./client');
+      const fallbackQuery = `*[_type == "article" &&
+        isPublished == true &&
+        (articleType == "support" || category->slug.current == "technical-support")
+      ] | order(publishedAt desc) [0...3] {
+        _id,
+        title,
+        "slug": slug.current,
+        excerpt,
+        publishedAt,
+        articleType,
+        difficulty,
         "category": category-> { name, "slug": slug.current }
       }`;
 
-      const { client } = await import('./client');
-      const articles = await client.fetch(query);
-      result = { articles: articles || [], total: articles?.length || 0 };
+      const fallbackArticles = await client.fetch(fallbackQuery);
+      console.log(`🔄 [getBrandSupportArticles] Fallback found: ${fallbackArticles?.length || 0} articles`);
+      return fallbackArticles || [];
+    } catch (fallbackError) {
+      console.error('❌ [getBrandSupportArticles] Fallback query also failed:', fallbackError);
+      return [];
     }
-
-    return result.articles || [];
-  } catch (error) {
-    console.error('Error fetching brand support articles:', error);
-    return [];
   }
 }
 
 // 获取品牌产品分类统计
 export async function getBrandProductCategories(brandSlug: string) {
   try {
-    const query = `*[_type == "product" && brand->slug.current == "${brandSlug}" && isActive == true] {
+    const query = `*[_type == "product" && brand->slug.current == "${brandSlug}"] {
       "category": category-> {
         name,
         "slug": slug.current,

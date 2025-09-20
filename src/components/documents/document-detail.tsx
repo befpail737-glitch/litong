@@ -31,6 +31,7 @@ import { useFormatters } from '@/hooks/use-formatters';
 import type { Locale } from '@/i18n';
 import { getLocalizedValue } from '@/lib/sanity-i18n';
 import { cn } from '@/lib/utils';
+import { safeFileUrl, getFileInfo } from '@/lib/sanity/client';
 
 // 文档详情类型定义
 interface DocumentDetail {
@@ -149,7 +150,7 @@ export function DocumentDetail({
 
   const handleDownload = () => {
     onDownload?.();
-    window.open(document.file.asset.url, '_blank');
+    window.open(safeFileUrl(document.file), '_blank');
   };
 
   return (

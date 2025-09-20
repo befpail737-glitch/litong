@@ -250,64 +250,107 @@ export default async function BrandSupportPage({ params }: BrandSupportPageProps
           </div>
 
           {/* Technical Support Articles */}
-          {supportArticles && supportArticles.length > 0 ? (
-            <div className="mb-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-6">技术支持文章</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {supportArticles.slice(0, 4).map((article) => (
-                  <div key={article._id} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
-                        技术支持
-                      </span>
-                      <div className="flex items-center gap-1">
-                        <Star className="h-3 w-3 text-yellow-400 fill-current" />
-                        <span className="text-xs text-gray-500">4.8</span>
-                      </div>
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                      {article.title}
-                    </h3>
-                    {article.excerpt && (
-                      <p className="text-gray-600 mb-4 line-clamp-3">
-                        {article.excerpt}
-                      </p>
-                    )}
-                    <div className="flex items-center justify-between">
-                      <div className="text-sm text-gray-500">
-                        {article.publishedAt && (
-                          <span>
-                            {new Date(article.publishedAt).toLocaleDateString('zh-CN')}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-gray-900">技术支持文章</h2>
+              {supportArticles && supportArticles.length > 0 && (
+                <span className="text-sm text-gray-500">
+                  共 {supportArticles.length} 篇文章
+                </span>
+              )}
+            </div>
+
+            {supportArticles && supportArticles.length > 0 ? (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {supportArticles.slice(0, 4).map((article) => (
+                    <div key={article._id} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
+                          {article.category?.name || '技术支持'}
+                        </span>
+                        {article.difficulty && (
+                          <span className={`px-2 py-1 text-xs rounded ${
+                            article.difficulty === 'beginner' ? 'bg-green-100 text-green-800' :
+                            article.difficulty === 'intermediate' ? 'bg-yellow-100 text-yellow-800' :
+                            article.difficulty === 'advanced' ? 'bg-red-100 text-red-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}>
+                            {article.difficulty === 'beginner' ? '初级' :
+                             article.difficulty === 'intermediate' ? '中级' :
+                             article.difficulty === 'advanced' ? '高级' :
+                             article.difficulty === 'expert' ? '专家' : article.difficulty}
+                          </span>
+                        )}
+                        {article.readTime && (
+                          <span className="text-xs text-gray-500">
+                            {article.readTime} 分钟阅读
                           </span>
                         )}
                       </div>
-                      <Button variant="outline" size="sm" asChild>
-                        <Link href={`/${locale}/brands/${slug}/support/${article.slug}`}>
-                          阅读全文
-                        </Link>
-                      </Button>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                        {article.title}
+                      </h3>
+                      {article.excerpt && (
+                        <p className="text-gray-600 mb-4 line-clamp-3">
+                          {article.excerpt}
+                        </p>
+                      )}
+                      <div className="flex items-center justify-between">
+                        <div className="text-sm text-gray-500">
+                          {article.publishedAt && (
+                            <span>
+                              {new Date(article.publishedAt).toLocaleDateString('zh-CN')}
+                            </span>
+                          )}
+                          {article.author?.name && (
+                            <span className="ml-2">• {article.author.name}</span>
+                          )}
+                        </div>
+                        <Button variant="outline" size="sm" asChild>
+                          <Link href={`/${locale}/brands/${slug}/support/${article.slug}`}>
+                            阅读全文
+                          </Link>
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {supportArticles.length > 4 && (
+                  <div className="text-center mt-6">
+                    <Button variant="outline">
+                      查看更多支持文章 ({supportArticles.length - 4} 篇)
+                    </Button>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-8 text-center">
+                <div className="max-w-md mx-auto">
+                  <FileText className="h-16 w-16 text-blue-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    技术支持文章正在准备中
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    我们正在为 {brand.name} 准备专业的技术支持文档和解决方案。
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                    <div className="flex items-center justify-center gap-2 p-3 bg-white rounded-lg border">
+                      <Mail className="h-4 w-4 text-blue-600" />
+                      <span>邮件支持</span>
+                    </div>
+                    <div className="flex items-center justify-center gap-2 p-3 bg-white rounded-lg border">
+                      <Phone className="h-4 w-4 text-green-600" />
+                      <span>电话咨询</span>
                     </div>
                   </div>
-                ))}
-              </div>
-              {supportArticles.length > 4 && (
-                <div className="text-center mt-6">
-                  <Button variant="outline">
-                    查看更多支持文章
-                  </Button>
+                  <p className="text-xs text-gray-500 mt-4">
+                    如需即时帮助，请使用上方的联系方式
+                  </p>
                 </div>
-              )}
-            </div>
-          ) : (
-            <div className="mb-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-6">技术支持文章</h2>
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
-                <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 mb-4">暂无技术支持文章</p>
-                <p className="text-sm text-gray-500">我们正在准备相关的技术支持内容，请稍后再访问</p>
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Contact Support */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -32,6 +32,190 @@ export function urlFor(source: SanityImageSource) {
   return builder.image(source);
 }
 
+// 文件类型检测和处理工具
+export function getFileInfo(source: any | null | undefined): {
+  type: string;
+  extension: string;
+  icon: string;
+  size?: string;
+  name?: string;
+} {
+  const defaultInfo = {
+    type: 'unknown',
+    extension: '',
+    icon: 'file-text',
+    size: undefined,
+    name: 'Unknown File'
+  };
+
+  if (!source) return defaultInfo;
+
+  // 从_ref中提取文件信息
+  let ref = '';
+  if (source.asset?._ref) {
+    ref = source.asset._ref;
+  } else if (source._ref) {
+    ref = source._ref;
+  }
+
+  if (ref && ref.startsWith('file-')) {
+    // 格式: file-{hash}-{extension}
+    const parts = ref.split('-');
+    if (parts.length >= 3) {
+      const extension = parts[parts.length - 1].toLowerCase();
+
+      let type = 'document';
+      let icon = 'file-text';
+
+      // 根据扩展名确定类型
+      if (['pdf'].includes(extension)) {
+        type = 'pdf';
+        icon = 'file-text';
+      } else if (['doc', 'docx'].includes(extension)) {
+        type = 'word';
+        icon = 'file-text';
+      } else if (['xls', 'xlsx'].includes(extension)) {
+        type = 'excel';
+        icon = 'file-spreadsheet';
+      } else if (['ppt', 'pptx'].includes(extension)) {
+        type = 'powerpoint';
+        icon = 'presentation';
+      } else if (['zip', 'rar', '7z'].includes(extension)) {
+        type = 'archive';
+        icon = 'archive';
+      } else if (['txt', 'rtf'].includes(extension)) {
+        type = 'text';
+        icon = 'file-text';
+      } else if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(extension)) {
+        type = 'image';
+        icon = 'image';
+      } else if (['mp4', 'avi', 'mov', 'wmv'].includes(extension)) {
+        type = 'video';
+        icon = 'video';
+      } else if (['mp3', 'wav', 'flac', 'aac'].includes(extension)) {
+        type = 'audio';
+        icon = 'music';
+      }
+
+      // 获取文件大小（字节转换为可读格式）
+      let sizeFormatted = source.size;
+      if (typeof source.size === 'number') {
+        const bytes = source.size;
+        if (bytes === 0) {
+          sizeFormatted = '0 B';
+        } else {
+          const k = 1024;
+          const sizes = ['B', 'KB', 'MB', 'GB'];
+          const i = Math.floor(Math.log(bytes) / Math.log(k));
+          sizeFormatted = parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+      }
+
+      return {
+        type,
+        extension,
+        icon,
+        size: sizeFormatted || undefined,
+        name: source.title || source.originalFilename || source.name || `${type.toUpperCase()} 文档`
+      };
+    }
+  }
+
+  return defaultInfo;
+}
+
+// 统一的文件URL构建函数
+export function safeFileUrl(
+  source: any | null | undefined,
+  options: {
+    fallback?: string;
+    projectId?: string;
+    dataset?: string;
+  } = {}
+): string {
+  const {
+    fallback = '#',
+    projectId = 'oquvb2bs',
+    dataset = 'production'
+  } = options;
+
+  // 早期返回无效输入
+  if (!source) {
+    console.log('🗄️ [safeFileUrl] No source provided, using fallback');
+    return fallback;
+  }
+
+  // 检查是否为静态路径字符串
+  if (typeof source === 'string') {
+    if (source.startsWith('/') || source.startsWith('http')) {
+      console.log('🗄️ [safeFileUrl] Static path detected, returning as-is:', source);
+      return source;
+    }
+  }
+
+  try {
+    // 处理完整的文件对象
+    if (typeof source === 'object' && source !== null) {
+      // 如果直接有url字段，优先使用
+      if (source.url && typeof source.url === 'string') {
+        console.log('🗄️ [safeFileUrl] Found direct URL:', source.url);
+        return source.url;
+      }
+
+      // 处理asset对象
+      if (source.asset) {
+        // 检查asset.url
+        if (source.asset.url && typeof source.asset.url === 'string') {
+          console.log('🗄️ [safeFileUrl] Found asset URL:', source.asset.url);
+          return source.asset.url;
+        }
+
+        // 检查asset._ref并构建CDN URL
+        if (source.asset._ref && typeof source.asset._ref === 'string') {
+          console.log('🗄️ [safeFileUrl] Building URL from _ref:', source.asset._ref);
+
+          // 验证_ref格式
+          if (source.asset._ref.startsWith('file-')) {
+            // 从_ref构建文件URL
+            // 格式: file-{hash}-{extension}
+            const ref = source.asset._ref.replace('file-', '');
+            const fileUrl = `https://cdn.sanity.io/files/${projectId}/${dataset}/${ref}`;
+
+            console.log('🗄️ [safeFileUrl] Constructed file URL:', fileUrl);
+            return fileUrl;
+          } else if (source.asset._ref.startsWith('image-')) {
+            // 处理错误归类的图片文件
+            console.warn('⚠️ [safeFileUrl] Image asset found in file context, redirecting to image URL');
+            const imageUrl = urlFor(source).url();
+            console.log('🗄️ [safeFileUrl] Redirected to image URL:', imageUrl);
+            return imageUrl;
+          } else {
+            console.warn('⚠️ [safeFileUrl] Invalid file _ref format:', source.asset._ref);
+          }
+        }
+      }
+
+      // 检查直接的_ref字段
+      if (source._ref && typeof source._ref === 'string') {
+        if (source._ref.startsWith('file-')) {
+          const ref = source._ref.replace('file-', '');
+          const fileUrl = `https://cdn.sanity.io/files/${projectId}/${dataset}/${ref}`;
+          console.log('🗄️ [safeFileUrl] Constructed URL from direct _ref:', fileUrl);
+          return fileUrl;
+        }
+      }
+    }
+
+    console.warn('⚠️ [safeFileUrl] Could not extract file URL, using fallback');
+    return fallback;
+
+  } catch (error) {
+    console.error('❌ [safeFileUrl] Error building file URL:', error);
+    console.error('❌ [safeFileUrl] Source:', source);
+    return fallback;
+  }
+}
+
 // 安全的图片URL构建器，带有错误处理
 export function safeUrlFor(source: SanityImageSource | null | undefined): string | null {
   try {
@@ -79,7 +263,7 @@ export function safeImageUrl(
     fallback?: string;
   } = {}
 ): string {
-  const { width, height, quality = 80, format = 'auto', fallback = '/images/placeholder.svg' } = options;
+  const { width, height, quality = 80, format = 'auto', fallback = '/images/placeholder-image.svg' } = options;
 
   // 早期返回无效输入
   if (!source) {

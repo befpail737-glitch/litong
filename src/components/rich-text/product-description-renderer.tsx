@@ -21,6 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { safeFileUrl, getFileInfo } from '@/lib/sanity/client';
 import { cn } from '@/lib/utils';
 
 // 产品描述专用 Portable Text 组件类型
@@ -218,7 +219,7 @@ const ProductDocument: React.FC<ProductDocumentProps> = ({ value }) => {
             )}
           </div>
           <Button asChild>
-            <a href={file.asset.url} download target="_blank" rel="noopener noreferrer">
+            <a href={safeFileUrl(file)} download target="_blank" rel="noopener noreferrer">
               <Download className="w-4 h-4 mr-2" />
               下载
             </a>

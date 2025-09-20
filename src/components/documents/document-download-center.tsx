@@ -38,6 +38,7 @@ import { useFormatters } from '@/hooks/use-formatters';
 import type { Locale } from '@/i18n';
 import { getLocalizedValue } from '@/lib/sanity-i18n';
 import { cn } from '@/lib/utils';
+import { safeFileUrl, getFileInfo } from '@/lib/sanity/client';
 
 // 文档类型定义（复用前面的定义）
 interface DocumentItem {
@@ -219,7 +220,7 @@ export function DocumentDownloadCenter({
       }));
 
       // 实际下载文件
-      window.open(doc.file.asset.url, '_blank');
+      window.open(safeFileUrl(doc.file), '_blank');
     }
 
     onDownload?.(selectedDocs);
@@ -363,7 +364,7 @@ export function DocumentDownloadCenter({
             {isAccessible ? (
               <Button
                 size="sm"
-                onClick={() => window.open(document.file.asset.url, '_blank')}
+                onClick={() => window.open(safeFileUrl(document.file), '_blank')}
                 disabled={progress?.status === 'downloading'}
               >
                 <Download className="w-3 h-3 mr-1" />

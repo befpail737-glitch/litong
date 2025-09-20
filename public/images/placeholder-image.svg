@@ -1,0 +1,12 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#f8f9fa"/>
+  <rect x="1" y="1" width="798" height="598" stroke="#e9ecef" stroke-width="2" stroke-dasharray="8,8"/>
+  <g transform="translate(400, 300)">
+    <circle cx="0" cy="-40" r="30" fill="#6c757d" opacity="0.3"/>
+    <rect x="-60" y="-10" width="120" height="80" rx="8" fill="#6c757d" opacity="0.3"/>
+    <path d="M-30 10 L-10 30 L10 10 L30 30 L50 10" stroke="#6c757d" stroke-width="4" fill="none" opacity="0.5"/>
+  </g>
+  <text x="400" y="420" text-anchor="middle" fill="#6c757d" font-family="system-ui, sans-serif" font-size="16">
+    图片暂不可用
+  </text>
+</svg>

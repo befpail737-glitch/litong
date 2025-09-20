@@ -37,6 +37,7 @@ import { useFormatters } from '@/hooks/use-formatters';
 import type { Locale } from '@/i18n';
 import { getLocalizedValue, getLocalizedRichText } from '@/lib/sanity-i18n';
 import { cn } from '@/lib/utils';
+import { safeFileUrl, getFileInfo } from '@/lib/sanity/client';
 
 // 解决方案详情类型定义
 interface SolutionDetail {
@@ -582,7 +583,7 @@ export function SolutionDetail({
                             </Badge>
                           </div>
                           <Button asChild>
-                            <a href={download.file.asset.url} download target="_blank" rel="noopener noreferrer">
+                            <a href={safeFileUrl(download.file)} download target="_blank" rel="noopener noreferrer">
                               <Download className="w-4 h-4 mr-2" />
                               {t('download')}
                             </a>

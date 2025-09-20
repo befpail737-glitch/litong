@@ -11,7 +11,7 @@ export async function getProductSlugsOnly(limit = 5): Promise<string[]> {
   try {
     // 简化查询 - 移除草稿检查，提高性能
     const query = groq`
-      *[_type == "product" && isActive == true && defined(slug.current)] | order(_updatedAt desc) [0...${limit}] {
+      *[_type == "product" && defined(slug.current)] | order(_updatedAt desc) [0...${limit}] {
         "slug": slug.current
       }
     `;
@@ -72,7 +72,7 @@ export async function getBrandProductCombinations(limit?: number): Promise<Array
 
     // 简化查询 - 仅获取必要字段，减少处理时间
     const query = groq`
-      *[_type == "product" && isActive == true && defined(slug.current) && defined(brand->slug.current)] | order(_updatedAt desc) [0...${actualLimit}] {
+      *[_type == "product" && defined(slug.current) && defined(brand->slug.current)] | order(_updatedAt desc) [0...${actualLimit}] {
         "productSlug": slug.current,
         "brandSlug": brand->slug.current
       }
@@ -287,7 +287,7 @@ export async function getProducts(params: {
     preview = false
   } = params;
 
-  let filter = '_type == "product" && isActive == true && !(_id in path("drafts.**"))';
+  let filter = '_type == "product" && !(_id in path("drafts.**"))';
 
   if (category) {
     filter += ` && category->slug.current == "${category}"`;
@@ -329,7 +329,7 @@ export async function getProducts(params: {
 // 获取单个产品
 export async function getProduct(slug: string, preview = false) {
   const query = groq`
-    *[_type == "product" && slug.current == $slug && isActive == true && !(_id in path("drafts.**"))][0] {
+    *[_type == "product" && slug.current == $slug && !(_id in path("drafts.**"))][0] {
       ${GROQ_FRAGMENTS.productDetail}
     }
   `;
@@ -349,7 +349,6 @@ export async function getBrandProduct(brandSlug: string, productSlug: string, pr
     *[_type == "product" &&
       slug.current == $productSlug &&
       brand->slug.current == $brandSlug &&
-      isActive == true &&
       !(_id in path("drafts.**"))][0] {
       ${GROQ_FRAGMENTS.productDetail}
     }
@@ -397,7 +396,7 @@ export async function getProductCategories(parentId?: string) {
 
 // 获取品牌列表
 export async function getBrands(featured = false) {
-  let filter = '_type == "brandBasic" && isActive == true && !(_id in path("drafts.**"))';
+  let filter = '_type == "brandBasic" && (isActive == true || !defined(isActive)) && !(_id in path("drafts.**"))';
 
   if (featured) {
     filter += ' && isFeatured == true';
@@ -441,7 +440,6 @@ export async function searchProducts(searchTerm: string, limit = 10) {
   const query = groq`
     *[
       _type == "product" && 
-      isActive == true && 
       (
         title match $searchTerm + "*" ||
         partNumber match $searchTerm + "*" ||
@@ -479,7 +477,7 @@ export async function getRelatedProducts(productId: string, categoryId: string, 
   }
 }
 
-// 获取文章列表
+// 获取文章列表 - 增强调试版本
 export async function getArticles(params: {
   limit?: number
   offset?: number
@@ -488,6 +486,7 @@ export async function getArticles(params: {
   featured?: boolean
   excludeCategory?: string
 } = {}) {
+  const startTime = Date.now();
   const {
     limit = 10,
     offset = 0,
@@ -497,36 +496,92 @@ export async function getArticles(params: {
     excludeCategory
   } = params;
 
-  let filter = '_type == "article" && isPublished == true';
+  // 首先检查是否有任何文章数据
+  const debugQuery = groq`*[_type == "article"] | order(_updatedAt desc) [0...5] {
+    _id,
+    title,
+    isPublished,
+    content,
+    _updatedAt,
+    "hasContent": defined(content) && length(content) > 0,
+    "contentBlocks": length(content),
+    "publishStatus": coalesce(isPublished, false)
+  }`;
 
-  if (category) {
-    filter += ` && category->slug.current == "${category}"`;
-  }
-
-  if (excludeCategory) {
-    filter += ` && category->slug.current != "${excludeCategory}"`;
-  }
-
-  if (brand) {
-    filter += ` && "${brand}" in relatedBrands[]->slug.current`;
-  }
-
-  if (featured) {
-    filter += ' && isFeatured == true';
-  }
-
-  const query = groq`
-    {
-      "articles": *[${filter}] | order(publishedAt desc) [${offset}...${offset + limit}] {
-        ${GROQ_FRAGMENTS.article}
-      },
-      "total": count(*[${filter}])
-    }
-  `;
+  console.log('🔍 [getArticles] 开始文章查询调试...');
 
   try {
-    return await withRetry(() => client.fetch(query), 2, 500, 8000); // 15秒超时
+    // 执行调试查询
+    const debugResult = await client.fetch(debugQuery);
+    console.log('🔍 [getArticles] 调试结果:', {
+      找到文章数量: debugResult?.length || 0,
+      文章样本: debugResult
+    });
+
+    // 如果没有已发布的文章，使用更宽松的条件
+    const publishedCount = debugResult?.filter(article => article.publishStatus === true)?.length || 0;
+    console.log('📊 [getArticles] 发布状态统计:', {
+      总文章数: debugResult?.length || 0,
+      已发布数: publishedCount,
+      未发布数: (debugResult?.length || 0) - publishedCount
+    });
+
+    // 构建查询条件 - 如果没有已发布的文章，使用更宽松的条件
+    let filter = '_type == "article"';
+    if (publishedCount > 0) {
+      filter += ' && isPublished == true';
+      console.log('✅ [getArticles] 使用严格过滤条件 (仅已发布)');
+    } else {
+      console.log('⚠️ [getArticles] 没有已发布文章，使用宽松过滤条件 (包含未发布)');
+    }
+
+    if (category) {
+      filter += ` && category->slug.current == "${category}"`;
+    }
+    if (excludeCategory) {
+      filter += ` && category->slug.current != "${excludeCategory}"`;
+    }
+    if (brand) {
+      filter += ` && "${brand}" in relatedBrands[]->slug.current`;
+    }
+    if (featured) {
+      filter += ' && isFeatured == true';
+    }
+
+    const query = groq`
+      {
+        "articles": *[${filter}] | order(coalesce(publishedAt, _updatedAt) desc) [${offset}...${offset + limit}] {
+          ${GROQ_FRAGMENTS.article},
+          "contentDebug": {
+            "hasContent": defined(content) && length(content) > 0,
+            "contentLength": length(content),
+            "contentTypes": content[]{_type}
+          }
+        },
+        "total": count(*[${filter}])
+      }
+    `;
+
+    console.log('🚀 [getArticles] 执行查询:', { filter, limit, offset });
+    const result = await withRetry(() => client.fetch(query), 2, 500, 8000);
+
+    const duration = Date.now() - startTime;
+    console.log('✅ [getArticles] 查询完成:', {
+      耗时: `${duration}ms`,
+      返回文章数: result?.articles?.length || 0,
+      总数量: result?.total || 0,
+      文章样本: result?.articles?.slice(0, 2).map(article => ({
+        标题: article.title,
+        有内容: article.contentDebug?.hasContent,
+        内容长度: article.contentDebug?.contentLength,
+        内容类型: article.contentDebug?.contentTypes
+      }))
+    });
+
+    return result;
   } catch (error) {
+    const duration = Date.now() - startTime;
+    console.error(`❌ [getArticles] 查询失败 (${duration}ms):`, error);
     throw new SanityError('Failed to fetch articles', 'FETCH_ARTICLES_ERROR');
   }
 }
@@ -557,6 +612,7 @@ export async function getSolutions(params: {
   featured?: boolean
   preview?: boolean
 } = {}) {
+  const startTime = Date.now();
   const {
     limit = 10,
     offset = 0,
@@ -566,38 +622,85 @@ export async function getSolutions(params: {
     preview = false
   } = params;
 
-  let filter = '_type == "solution" && (isPublished == true || !defined(isPublished))';
+  // 首先检查解决方案数据
+  const debugQuery = groq`*[_type == "solution"] | order(_updatedAt desc) [0...5] {
+    _id,
+    title,
+    isPublished,
+    description,
+    _updatedAt,
+    "hasDescription": defined(description) && length(description) > 0,
+    "descriptionBlocks": length(description),
+    "publishStatus": coalesce(isPublished, false)
+  }`;
 
-  if (targetMarket) {
-    filter += ` && targetMarket == "${targetMarket}"`;
-  }
-
-  if (brand) {
-    filter += ` && ("${brand}" in relatedBrands[]->slug.current || primaryBrand->slug.current == "${brand}")`;
-  }
-
-  if (featured) {
-    filter += ' && isFeatured == true';
-  }
-
-  const query = groq`
-    {
-      "solutions": *[${filter}] | order(publishedAt desc) [${offset}...${offset + limit}] {
-        ${GROQ_FRAGMENTS.solution}
-      },
-      "total": count(*[${filter}])
-    }
-  `;
+  console.log('🔍 [getSolutions] 开始解决方案查询调试...');
 
   try {
-    console.log('Fetching solutions with query:', query);
-    console.log('Query parameters:', { limit, offset, targetMarket, brand, featured });
-    const result = await withRetry(() => client.fetch(query), 2, 500, 8000); // 15秒超时
-    console.log('Solutions fetch result:', {
-      totalSolutions: result.total,
-      fetchedSolutions: result.solutions?.length || 0,
-      firstSolution: result.solutions?.[0] || null
+    // 执行调试查询
+    const debugResult = await client.fetch(debugQuery);
+    console.log('🔍 [getSolutions] 调试结果:', {
+      找到解决方案数量: debugResult?.length || 0,
+      解决方案样本: debugResult
     });
+
+    // 检查发布状态
+    const publishedCount = debugResult?.filter(solution => solution.publishStatus === true)?.length || 0;
+    console.log('📊 [getSolutions] 发布状态统计:', {
+      总解决方案数: debugResult?.length || 0,
+      已发布数: publishedCount,
+      未发布数: (debugResult?.length || 0) - publishedCount
+    });
+
+    // 构建查询条件
+    let filter = '_type == "solution"';
+    if (publishedCount > 0) {
+      filter += ' && isPublished == true';
+      console.log('✅ [getSolutions] 使用严格过滤条件 (仅已发布)');
+    } else {
+      console.log('⚠️ [getSolutions] 没有已发布解决方案，使用宽松过滤条件 (包含未发布)');
+    }
+
+    if (targetMarket) {
+      filter += ` && targetMarket == "${targetMarket}"`;
+    }
+    if (brand) {
+      filter += ` && ("${brand}" in relatedBrands[]->slug.current || primaryBrand->slug.current == "${brand}")`;
+    }
+    if (featured) {
+      filter += ' && isFeatured == true';
+    }
+
+    const query = groq`
+      {
+        "solutions": *[${filter}] | order(coalesce(publishedAt, _updatedAt) desc) [${offset}...${offset + limit}] {
+          ${GROQ_FRAGMENTS.solution},
+          "descriptionDebug": {
+            "hasDescription": defined(description) && length(description) > 0,
+            "descriptionLength": length(description),
+            "descriptionTypes": description[]{_type}
+          }
+        },
+        "total": count(*[${filter}])
+      }
+    `;
+
+    console.log('🚀 [getSolutions] 执行查询:', { filter, limit, offset });
+    const result = await withRetry(() => client.fetch(query), 2, 500, 8000);
+
+    const duration = Date.now() - startTime;
+    console.log('✅ [getSolutions] 查询完成:', {
+      耗时: `${duration}ms`,
+      返回解决方案数: result?.solutions?.length || 0,
+      总数量: result?.total || 0,
+      解决方案样本: result?.solutions?.slice(0, 2).map(solution => ({
+        标题: solution.title,
+        有描述: solution.descriptionDebug?.hasDescription,
+        描述长度: solution.descriptionDebug?.descriptionLength,
+        描述类型: solution.descriptionDebug?.descriptionTypes
+      }))
+    });
+
     return result;
   } catch (error) {
     console.error('Error fetching solutions:', error);
@@ -608,7 +711,7 @@ export async function getSolutions(params: {
 // 获取单个解决方案
 export async function getSolution(slug: string, preview = false) {
   const query = groq`
-    *[_type == "solution" && slug.current == $slug && (isPublished == true || !defined(isPublished))][0] {
+    *[_type == "solution" && slug.current == $slug && isPublished == true][0] {
       ${GROQ_FRAGMENTS.solution}
     }
   `;
@@ -783,21 +886,21 @@ export async function getSupportDocument(supportId: string, brandSlug?: string) 
   console.log(`🔍 [getSupportDocument] Getting support document: ${supportId} for brand: ${brandSlug}`);
 
   try {
-    // First try to find a specific article with matching slug and brand
+    // 修复查询条件 - 更宽松的查询，支持多种文章类型
     const query = groq`
       *[_type == "article" &&
         slug.current == $supportId &&
-        category->slug.current == "technical-support" &&
         isPublished == true &&
         ($brandSlug == null || $brandSlug in relatedBrands[]->slug.current)
       ][0] {
         _id,
         title,
         "slug": slug.current,
-        "excerpt": excerpt,
+        excerpt,
         content,
         isPublished,
         publishedAt,
+        articleType,
         "category": category->{
           name,
           "slug": slug.current
@@ -810,7 +913,8 @@ export async function getSupportDocument(supportId: string, brandSlug?: string) 
           name,
           bio
         },
-        seo,
+        seoTitle,
+        seoDescription,
         _createdAt,
         _updatedAt
       }
@@ -850,21 +954,22 @@ export async function getSupportDocument(supportId: string, brandSlug?: string) 
       return supportDocument;
     }
 
-    // If no specific article found, try to find any technical support article for the brand
+    // 如果没找到精确匹配，尝试查找品牌相关的任何文章（技术支持类型优先）
     if (brandSlug) {
       const brandSupportQuery = groq`
         *[_type == "article" &&
-          category->slug.current == "technical-support" &&
           isPublished == true &&
-          $brandSlug in relatedBrands[]->slug.current
+          $brandSlug in relatedBrands[]->slug.current &&
+          (articleType == "support" || articleType == "technical" || category->slug.current match "*support*" || category->slug.current match "*technical*")
         ] | order(_updatedAt desc) [0] {
           _id,
           title,
           "slug": slug.current,
-          "excerpt": excerpt,
+          excerpt,
           content,
           isPublished,
           publishedAt,
+          articleType,
           "category": category->{
             name,
             "slug": slug.current

@@ -32,6 +32,7 @@ import { useFormatters } from '@/hooks/use-formatters';
 import type { Locale } from '@/i18n';
 import { getLocalizedValue } from '@/lib/sanity-i18n';
 import { cn } from '@/lib/utils';
+import { safeFileUrl, getFileInfo } from '@/lib/sanity/client';
 
 // 文档类型定义
 interface DocumentItem {
@@ -182,7 +183,7 @@ export function DocumentList({
     const handleDownload = () => {
       onDownload?.(document);
       // 在实际应用中，这里会调用API更新下载次数
-      window.open(document.file.asset.url, '_blank');
+      window.open(safeFileUrl(document.file), '_blank');
     };
 
     return (

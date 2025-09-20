@@ -42,8 +42,8 @@ export async function generateStaticParams() {
   try {
     const locales = ['zh-CN', 'en'];
 
-    // Get real brand-support combinations from new Sanity integration
-    const realCombinations = await getBrandSupportCombinations(200);
+    // 使用更小的限制来避免构建超时
+    const realCombinations = await getBrandSupportCombinations(50);
     console.log(`🔍 [Brand Support] Found ${realCombinations.length} brand-support combinations`);
 
     const params = [];
@@ -116,18 +116,14 @@ export async function generateStaticParams() {
   } catch (error) {
     console.error('❌ [Brand Support] Error generating static params:', error);
 
-    // Minimal emergency fallback based on most important combinations
+    // 最小化紧急回退方案，只保留最重要的几个组合以避免构建失败
     const emergencyParams = [];
     const locales = ['zh-CN', 'en'];
     const emergencyCombinations = [
-      { brandSlug: 'cree', supportId: '11111' },
       { brandSlug: 'cree', supportId: 'datasheet' },
-      { brandSlug: 'ixys', supportId: '11111' },
-      { brandSlug: 'Electronicon', supportId: '11111' },
-      { brandSlug: 'epcos', supportId: 'user-manual' },
-      { brandSlug: 'lem', supportId: 'application-note' },
-      { brandSlug: 'mediatek', supportId: 'driver-download' },
-      { brandSlug: 'semikron', supportId: 'datasheet' },
+      { brandSlug: 'ixys', supportId: 'datasheet' },
+      { brandSlug: 'Electronicon', supportId: 'datasheet' },
+      { brandSlug: 'lem', supportId: 'user-manual' },
     ];
 
     for (const locale of locales) {
@@ -140,7 +136,7 @@ export async function generateStaticParams() {
       }
     }
 
-    console.log(`🆘 [Brand Support] Using emergency fallback: ${emergencyParams.length} params`);
+    console.log(`🆘 [Brand Support] Using minimal emergency fallback: ${emergencyParams.length} params`);
     return emergencyParams;
   }
 }

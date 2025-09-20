@@ -2,7 +2,7 @@ import Image from 'next/image';
 
 import { PortableText as BasePortableText } from '@portabletext/react';
 
-import { safeImageUrl } from '@/lib/sanity/client';
+import { safeImageUrl, safeFileUrl, getFileInfo } from '@/lib/sanity/client';
 
 // 富文本内容类型定义
 type PortableTextProps = {
@@ -88,7 +88,12 @@ const components = {
     // 图片处理
     image: ({ value }: any) => {
       const { alt, caption } = value;
-      const imageUrl = safeImageUrl(value, { width: 800, height: 600 });
+      const imageUrl = safeImageUrl(value, { width: 800, height: 600, fallback: '/images/placeholder.jpg' });
+
+      // 调试图片信息
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🖼️ [PortableText] Processing image:', { value, imageUrl });
+      }
 
       return (
         <figure className="my-6">
@@ -99,6 +104,12 @@ const components = {
               fill
               className="object-contain rounded-lg"
               sizes="(max-width: 768px) 100vw, 800px"
+              onError={(e) => {
+                console.warn('⚠️ [PortableText] Image failed to load:', imageUrl);
+                // 可以设置默认图片
+                const target = e.target as HTMLImageElement;
+                target.src = '/images/placeholder.jpg';
+              }}
             />
           </div>
           {caption && (
@@ -110,34 +121,194 @@ const components = {
       );
     },
 
-    // PDF文件处理
+    // PDF文件处理 - 增强版本支持多种数据结构
     pdf: ({ value }: any) => {
-      const { title, description, asset } = value;
-      const fileUrl = asset?.url;
+      console.log('🗄️ [PortableText] PDF 原始数据:', value);
 
-      if (!fileUrl) return null;
+      // 检测多种可能的数据结构
+      let asset = null;
+      let title = '';
+      let description = '';
+
+      // 情况1: 直接的文件资产引用
+      if (value?.asset || value?._ref) {
+        asset = value.asset || value;
+        title = value.title || value.name || '';
+        description = value.description || value.caption || '';
+      }
+      // 情况2: 嵌套在其他结构中
+      else if (value?.file?.asset) {
+        asset = value.file.asset;
+        title = value.title || value.file.title || '';
+        description = value.description || value.file.description || '';
+      }
+      // 情况3: 直接包含_ref的情况
+      else if (typeof value === 'object' && value._ref) {
+        asset = value;
+        title = value.originalFilename || '';
+      }
+
+      console.log('🔍 [PortableText] 解析后的文件资产:', { asset, title, description });
+
+      // 使用新的safeFileUrl函数获取文件URL
+      const fileUrl = safeFileUrl(asset, { fallback: null });
+      const fileInfo = getFileInfo(asset);
+
+      console.log('🔗 [PortableText] 生成的文件URL:', fileUrl);
+      console.log('📄 [PortableText] 文件信息:', fileInfo);
+
+      // 根据文件类型显示不同的图标和颜色
+      const fileTypeConfig = {
+        pdf: { color: 'red', bgColor: 'red-50', borderColor: 'red-200', textColor: 'red-900', iconColor: 'red-600' },
+        doc: { color: 'blue', bgColor: 'blue-50', borderColor: 'blue-200', textColor: 'blue-900', iconColor: 'blue-600' },
+        docx: { color: 'blue', bgColor: 'blue-50', borderColor: 'blue-200', textColor: 'blue-900', iconColor: 'blue-600' },
+        xls: { color: 'green', bgColor: 'green-50', borderColor: 'green-200', textColor: 'green-900', iconColor: 'green-600' },
+        xlsx: { color: 'green', bgColor: 'green-50', borderColor: 'green-200', textColor: 'green-900', iconColor: 'green-600' },
+        ppt: { color: 'orange', bgColor: 'orange-50', borderColor: 'orange-200', textColor: 'orange-900', iconColor: 'orange-600' },
+        pptx: { color: 'orange', bgColor: 'orange-50', borderColor: 'orange-200', textColor: 'orange-900', iconColor: 'orange-600' },
+        default: { color: 'gray', bgColor: 'gray-50', borderColor: 'gray-200', textColor: 'gray-900', iconColor: 'gray-600' }
+      };
+
+      const extension = fileInfo.extension?.toLowerCase() || 'pdf';
+      const config = fileTypeConfig[extension] || fileTypeConfig.default;
+
+      if (!fileUrl || fileUrl === '#' || fileUrl.includes('undefined')) {
+        console.warn('⚠️ [PortableText] 文件URL不可用:', { value, asset, fileUrl });
+        return (
+          <div className="border rounded-lg p-4 my-6 bg-yellow-50 border-yellow-200">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <span className="text-yellow-600 font-semibold text-sm">
+                  {extension.toUpperCase()}
+                </span>
+              </div>
+              <div className="flex-1">
+                <h4 className="font-semibold text-yellow-800">
+                  {title || '文档文件'}
+                </h4>
+                <p className="text-sm text-yellow-600">
+                  文件暂时不可用 - 请检查文件是否已正确上传到Sanity
+                </p>
+                {description && (
+                  <p className="text-sm text-yellow-600 mt-1">{description}</p>
+                )}
+                <div className="text-xs text-yellow-500 mt-2 font-mono">
+                  调试: {JSON.stringify({ asset: asset?._ref || 'null', url: fileUrl })}
+                </div>
+              </div>
+              <div className="px-3 py-1 bg-yellow-200 text-yellow-800 rounded text-xs">
+                文件缺失
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // 使用固定的样式类避免动态类名问题
+      const getFileTypeStyles = (ext: string) => {
+        switch (ext.toLowerCase()) {
+          case 'pdf':
+            return {
+              container: 'border rounded-lg p-4 my-6 bg-red-50 border-red-200',
+              icon: 'w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center',
+              iconText: 'text-red-600 font-bold text-sm',
+              title: 'font-semibold text-red-900',
+              description: 'text-sm text-red-700 mt-1',
+              info: 'flex items-center gap-4 mt-2 text-xs text-red-600',
+              button: 'bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors flex items-center gap-2'
+            };
+          case 'doc':
+          case 'docx':
+            return {
+              container: 'border rounded-lg p-4 my-6 bg-blue-50 border-blue-200',
+              icon: 'w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center',
+              iconText: 'text-blue-600 font-bold text-sm',
+              title: 'font-semibold text-blue-900',
+              description: 'text-sm text-blue-700 mt-1',
+              info: 'flex items-center gap-4 mt-2 text-xs text-blue-600',
+              button: 'bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors flex items-center gap-2'
+            };
+          case 'xls':
+          case 'xlsx':
+            return {
+              container: 'border rounded-lg p-4 my-6 bg-green-50 border-green-200',
+              icon: 'w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center',
+              iconText: 'text-green-600 font-bold text-sm',
+              title: 'font-semibold text-green-900',
+              description: 'text-sm text-green-700 mt-1',
+              info: 'flex items-center gap-4 mt-2 text-xs text-green-600',
+              button: 'bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors flex items-center gap-2'
+            };
+          case 'ppt':
+          case 'pptx':
+            return {
+              container: 'border rounded-lg p-4 my-6 bg-orange-50 border-orange-200',
+              icon: 'w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center',
+              iconText: 'text-orange-600 font-bold text-sm',
+              title: 'font-semibold text-orange-900',
+              description: 'text-sm text-orange-700 mt-1',
+              info: 'flex items-center gap-4 mt-2 text-xs text-orange-600',
+              button: 'bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 transition-colors flex items-center gap-2'
+            };
+          default:
+            return {
+              container: 'border rounded-lg p-4 my-6 bg-gray-50 border-gray-200',
+              icon: 'w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center',
+              iconText: 'text-gray-600 font-bold text-sm',
+              title: 'font-semibold text-gray-900',
+              description: 'text-sm text-gray-700 mt-1',
+              info: 'flex items-center gap-4 mt-2 text-xs text-gray-600',
+              button: 'bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors flex items-center gap-2'
+            };
+        }
+      };
+
+      const styles = getFileTypeStyles(extension);
 
       return (
-        <div className="border rounded-lg p-4 my-6 bg-red-50">
+        <div className={styles.container}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-              <span className="text-red-600 font-semibold text-sm">PDF</span>
+            <div className={styles.icon}>
+              <span className={styles.iconText}>
+                {extension.toUpperCase()}
+              </span>
             </div>
             <div className="flex-1">
-              <h4 className="font-semibold">{title}</h4>
-              {description && <p className="text-sm text-gray-600">{description}</p>}
+              <h4 className={styles.title}>
+                {title || fileInfo.name || `${extension.toUpperCase()} 文档`}
+              </h4>
+              {description && (
+                <p className={styles.description}>{description}</p>
+              )}
+              <div className={styles.info}>
+                <span>类型: {extension.toUpperCase()}</span>
+                {fileInfo.size && <span>大小: {fileInfo.size}</span>}
+                <span className="font-mono text-xs">✓ URL正常</span>
+              </div>
             </div>
             <a
               href={fileUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+              className={styles.button}
+              onClick={() => {
+                console.log('🗄️ [PortableText] 文件下载点击:', { title, fileUrl, extension });
+              }}
             >
-              下载PDF
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              下载 {extension.toUpperCase()}
             </a>
           </div>
         </div>
       );
+    },
+
+    // 文件处理 (通用)
+    file: ({ value }: any) => {
+      // 使用PDF处理逻辑处理所有文件类型
+      return components.types.pdf({ value });
     },
 
     // 表格处理

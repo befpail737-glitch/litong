@@ -22,6 +22,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
+import { safeFileUrl, getFileInfo, safeImageUrl } from '@/lib/sanity/client';
 
 // Portable Text 组件类型
 interface PortableTextRendererProps {
@@ -113,6 +114,19 @@ interface ImageBlockProps {
 const ImageBlock: React.FC<ImageBlockProps> = ({ value }) => {
   const { asset, alt, caption, alignment = 'center', size = 'full' } = value;
 
+  // 安全地获取图片 URL
+  const imageUrl = safeImageUrl(value, {
+    width: size === 'small' ? 300 : size === 'medium' ? 600 : size === 'large' ? 1200 : undefined,
+    quality: 85,
+    fallback: '/images/placeholder-image.svg'
+  });
+
+  // 如果没有有效的图片 URL，不渲染图片块
+  if (!imageUrl || imageUrl === '/images/placeholder-image.svg') {
+    console.warn('ImageBlock: No valid image URL, skipping render');
+    return null;
+  }
+
   const sizeClasses = {
     small: 'max-w-xs',
     medium: 'max-w-md',
@@ -130,11 +144,15 @@ const ImageBlock: React.FC<ImageBlockProps> = ({ value }) => {
     <figure className={cn('my-8', alignmentClasses[alignment])}>
       <div className={cn('relative rounded-lg overflow-hidden', sizeClasses[size])}>
         <Image
-          src={asset.url}
-          alt={alt || ''}
-          width={asset.metadata?.dimensions?.width || 800}
-          height={asset.metadata?.dimensions?.height || 600}
+          src={imageUrl}
+          alt={alt || '图片'}
+          width={asset?.metadata?.dimensions?.width || 800}
+          height={asset?.metadata?.dimensions?.height || 600}
           className="w-full h-auto"
+          onError={(e) => {
+            console.error('Image failed to load:', imageUrl);
+            // 可以在这里设置一个错误状态或显示占位符
+          }}
         />
       </div>
       {caption && (
@@ -330,23 +348,57 @@ interface DownloadBlockProps {
 const DownloadBlock: React.FC<DownloadBlockProps> = ({ value }) => {
   const { file, title, description, fileSize } = value;
 
+  // 安全地获取文件 URL
+  const fileUrl = safeFileUrl(file, {
+    fallback: '#'
+  });
+
+  // 获取文件信息
+  const fileInfo = getFileInfo(file);
+
+  // 如果没有有效的文件 URL，显示错误状态
+  if (!fileUrl || fileUrl === '#') {
+    return (
+      <Card className="my-6 border-destructive/50">
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 text-destructive" />
+            <div>
+              <h4 className="font-medium text-destructive">
+                {title || '文件不可用'}
+              </h4>
+              <p className="text-sm text-muted-foreground">
+                文件链接已失效或文件不存在
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="my-6">
       <CardContent className="p-4">
         <div className="flex items-center justify-between">
           <div className="flex-1">
             <h4 className="font-medium">
-              {title || file.asset.originalFilename || '下载文件'}
+              {title || file?.asset?.originalFilename || fileInfo.name || '下载文件'}
             </h4>
             {description && (
               <p className="text-sm text-muted-foreground mt-1">{description}</p>
             )}
-            {fileSize && (
-              <p className="text-xs text-muted-foreground mt-1">{fileSize}</p>
-            )}
+            <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+              {fileSize && <span>{fileSize}</span>}
+              {fileInfo.extension && (
+                <span className="bg-muted px-1.5 py-0.5 rounded uppercase">
+                  {fileInfo.extension}
+                </span>
+              )}
+            </div>
           </div>
           <Button asChild>
-            <a href={file.asset.url} download target="_blank" rel="noopener noreferrer">
+            <a href={fileUrl} download target="_blank" rel="noopener noreferrer">
               <Download className="w-4 h-4 mr-2" />
               下载
             </a>
@@ -365,7 +417,9 @@ const portableTextComponents = {
     video: VideoBlock,
     callout: CalloutBlock,
     table: TableBlock,
-    download: DownloadBlock
+    download: DownloadBlock,
+    pdf: DownloadBlock, // PDF 文件使用下载组件
+    file: DownloadBlock  // 通用文件使用下载组件
   },
 
   marks: {
