@@ -73,7 +73,7 @@ export default async function BrandSupportPage({ params }: BrandSupportPageProps
   // Decode slug to handle Chinese brand names
   const decodedSlug = decodeURIComponent(slug);
 
-  const { brand, articles } = await getBrandWithContent(decodedSlug);
+  const { brand, supportArticles } = await getBrandWithContent(decodedSlug);
 
   if (!brand) {
     console.warn(`Brand not found for slug: ${decodedSlug}`);
@@ -249,16 +249,16 @@ export default async function BrandSupportPage({ params }: BrandSupportPageProps
             </div>
           </div>
 
-          {/* Technical Articles */}
-          {articles && articles.length > 0 && (
+          {/* Technical Support Articles */}
+          {supportArticles && supportArticles.length > 0 ? (
             <div className="mb-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-6">技术文章</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-6">技术支持文章</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {articles.slice(0, 4).map((article) => (
+                {supportArticles.slice(0, 4).map((article) => (
                   <div key={article._id} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-2 mb-3">
-                      <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">
-                        技术文章
+                      <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
+                        技术支持
                       </span>
                       <div className="flex items-center gap-1">
                         <Star className="h-3 w-3 text-yellow-400 fill-current" />
@@ -282,13 +282,29 @@ export default async function BrandSupportPage({ params }: BrandSupportPageProps
                         )}
                       </div>
                       <Button variant="outline" size="sm" asChild>
-                        <Link href={`/${locale}/articles/${article.slug}`}>
+                        <Link href={`/${locale}/brands/${slug}/support/${article.slug}`}>
                           阅读全文
                         </Link>
                       </Button>
                     </div>
                   </div>
                 ))}
+              </div>
+              {supportArticles.length > 4 && (
+                <div className="text-center mt-6">
+                  <Button variant="outline">
+                    查看更多支持文章
+                  </Button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="mb-8">
+              <h2 className="text-xl font-bold text-gray-900 mb-6">技术支持文章</h2>
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
+                <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600 mb-4">暂无技术支持文章</p>
+                <p className="text-sm text-gray-500">我们正在准备相关的技术支持内容，请稍后再访问</p>
               </div>
             </div>
           )}

@@ -380,11 +380,40 @@ export async function getBrandArticles(brandSlug: string, limit = 6) {
 // 获取品牌相关技术支持文章
 export async function getBrandSupportArticles(brandSlug: string, limit = 6) {
   try {
-    const result = await getArticles({
+    // 首先尝试通过category获取
+    let result = await getArticles({
       brand: brandSlug,
       limit,
       category: 'technical-support'
     });
+
+    // 如果没有找到，尝试通过articleType获取
+    if (!result.articles || result.articles.length === 0) {
+      console.log(`No support articles found by category for ${brandSlug}, trying articleType...`);
+
+      const query = `*[_type == "article" &&
+        isPublished == true &&
+        articleType == "support" &&
+        "${brandSlug}" in relatedBrands[]->slug.current
+      ] | order(publishedAt desc) [0...${limit}] {
+        _id,
+        title,
+        "slug": slug.current,
+        excerpt,
+        content,
+        publishedAt,
+        articleType,
+        difficulty,
+        readTime,
+        "author": author-> { name, email },
+        "category": category-> { name, "slug": slug.current }
+      }`;
+
+      const { client } = await import('./client');
+      const articles = await client.fetch(query);
+      result = { articles: articles || [], total: articles?.length || 0 };
+    }
+
     return result.articles || [];
   } catch (error) {
     console.error('Error fetching brand support articles:', error);

@@ -309,6 +309,25 @@ export const article = defineType({
       description: '预估阅读时长'
     }),
     
+    // 文章类型
+    defineField({
+      name: 'articleType',
+      title: '文章类型',
+      type: 'string',
+      options: {
+        list: [
+          { title: '技术文章', value: 'technical' },
+          { title: '技术支持', value: 'support' },
+          { title: '教程指南', value: 'tutorial' },
+          { title: '案例研究', value: 'case-study' },
+          { title: '产品发布', value: 'product-release' }
+        ],
+        layout: 'radio'
+      },
+      initialValue: 'technical',
+      description: '选择文章类型，技术支持文章会显示在品牌技术支持页面'
+    }),
+
     // 技术难度级别
     defineField({
       name: 'difficulty',
