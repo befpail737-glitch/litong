@@ -104,12 +104,6 @@ const components = {
               fill
               className="object-contain rounded-lg"
               sizes="(max-width: 768px) 100vw, 800px"
-              onError={(e) => {
-                console.warn('⚠️ [PortableText] Image failed to load:', imageUrl);
-                // 可以设置默认图片
-                const target = e.target as HTMLImageElement;
-                target.src = '/images/placeholder.jpg';
-              }}
             />
           </div>
           {caption && (

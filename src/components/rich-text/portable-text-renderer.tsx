@@ -149,10 +149,6 @@ const ImageBlock: React.FC<ImageBlockProps> = ({ value }) => {
           width={asset?.metadata?.dimensions?.width || 800}
           height={asset?.metadata?.dimensions?.height || 600}
           className="w-full h-auto"
-          onError={(e) => {
-            console.error('Image failed to load:', imageUrl);
-            // 可以在这里设置一个错误状态或显示占位符
-          }}
         />
       </div>
       {caption && (

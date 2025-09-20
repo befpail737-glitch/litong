@@ -236,9 +236,6 @@ export default async function ContentDebugPage({ params }: ContentDebugPageProps
                                 fill
                                 className="object-cover rounded-lg"
                                 sizes="200px"
-                                onError={(e) => {
-                                  console.warn('❌ 文章封面图片加载失败:', article.title);
-                                }}
                               />
                             </div>
                             <p className="text-xs text-gray-500 mt-1 text-center">封面图片</p>
@@ -353,9 +350,6 @@ export default async function ContentDebugPage({ params }: ContentDebugPageProps
                                 fill
                                 className="object-cover rounded-lg"
                                 sizes="200px"
-                                onError={(e) => {
-                                  console.warn('❌ 解决方案封面图片加载失败:', solution.title);
-                                }}
                               />
                             </div>
                             <p className="text-xs text-gray-500 mt-1 text-center">封面图片</p>
