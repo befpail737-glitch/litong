@@ -11,6 +11,22 @@ interface ContentDebugPageProps {
   };
 }
 
+// Generate static params for all supported locales
+export async function generateStaticParams() {
+  return [
+    { locale: 'zh-CN' },
+    { locale: 'en' },
+    { locale: 'zh-TW' },
+    { locale: 'ja' },
+    { locale: 'ko' },
+    { locale: 'de' },
+    { locale: 'fr' },
+    { locale: 'es' },
+    { locale: 'ru' },
+    { locale: 'ar' }
+  ];
+}
+
 export default async function ContentDebugPage({ params }: ContentDebugPageProps) {
   const { locale } = params;
 
