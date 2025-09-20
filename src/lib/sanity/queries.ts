@@ -486,19 +486,25 @@ export async function getArticles(params: {
   category?: string
   brand?: string
   featured?: boolean
+  excludeCategory?: string
 } = {}) {
   const {
     limit = 10,
     offset = 0,
     category,
     brand,
-    featured
+    featured,
+    excludeCategory
   } = params;
 
   let filter = '_type == "article" && isPublished == true';
 
   if (category) {
     filter += ` && category->slug.current == "${category}"`;
+  }
+
+  if (excludeCategory) {
+    filter += ` && category->slug.current != "${excludeCategory}"`;
   }
 
   if (brand) {

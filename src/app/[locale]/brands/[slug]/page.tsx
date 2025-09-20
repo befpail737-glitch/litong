@@ -61,7 +61,7 @@ export default async function BrandPage({ params }: BrandPageProps) {
   console.log(`🔍 [BrandPage] Loading brand page for: ${decodedSlug} (locale: ${locale})`);
 
   try {
-    const { brand, products, solutions, articles, categories } = await getBrandWithContent(decodedSlug);
+    const { brand, products, solutions, articles, supportArticles, categories } = await getBrandWithContent(decodedSlug);
 
     if (!brand) {
       console.warn(`❌ [BrandPage] Brand not found for slug: ${decodedSlug}`);
@@ -274,10 +274,50 @@ export default async function BrandPage({ params }: BrandPageProps) {
                     )}
                     <div className="flex justify-between items-center">
                       <Link
-                        href={`/${locale}/brands/${encodeURIComponent(brand.slug || brand.name)}/articles/${article.slug}`}
+                        href={article.category?.slug === 'technical-support'
+                          ? `/${locale}/brands/${encodeURIComponent(brand.slug || brand.name)}/support/${article.slug}`
+                          : `/${locale}/brands/${encodeURIComponent(brand.slug || brand.name)}/articles/${article.slug}`}
                         className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                       >
                         阅读全文 →
+                      </Link>
+                      {article.publishedAt && (
+                        <span className="text-xs text-gray-500">
+                          {new Date(article.publishedAt).toLocaleDateString('zh-CN')}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Technical Support Articles */}
+          {supportArticles && supportArticles.length > 0 && (
+            <div className="mb-8">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">技术支持</h2>
+                <Link
+                  href={`/${locale}/brands/${encodeURIComponent(brand.slug || brand.name)}/support`}
+                  className="text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  查看更多 →
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {supportArticles.slice(0, 4).map((article) => (
+                  <div key={article._id} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
+                    <h3 className="font-medium text-gray-900 mb-3">{article.title}</h3>
+                    {article.excerpt && (
+                      <p className="text-gray-600 text-sm mb-4 line-clamp-2">{article.excerpt}</p>
+                    )}
+                    <div className="flex justify-between items-center">
+                      <Link
+                        href={`/${locale}/brands/${encodeURIComponent(brand.slug || brand.name)}/support/${article.slug}`}
+                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                      >
+                        查看详情 →
                       </Link>
                       {article.publishedAt && (
                         <span className="text-xs text-gray-500">

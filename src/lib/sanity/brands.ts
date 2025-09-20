@@ -362,13 +362,32 @@ export async function getBrandSolutions(brandSlug: string, limit = 6) {
   }
 }
 
-// 获取品牌相关技术文章
+// 获取品牌相关技术文章（排除技术支持文章）
 export async function getBrandArticles(brandSlug: string, limit = 6) {
   try {
-    const result = await getArticles({ brand: brandSlug, limit });
+    const result = await getArticles({
+      brand: brandSlug,
+      limit,
+      excludeCategory: 'technical-support'
+    });
     return result.articles || [];
   } catch (error) {
     console.error('Error fetching brand articles:', error);
+    return [];
+  }
+}
+
+// 获取品牌相关技术支持文章
+export async function getBrandSupportArticles(brandSlug: string, limit = 6) {
+  try {
+    const result = await getArticles({
+      brand: brandSlug,
+      limit,
+      category: 'technical-support'
+    });
+    return result.articles || [];
+  } catch (error) {
+    console.error('Error fetching brand support articles:', error);
     return [];
   }
 }
@@ -431,6 +450,7 @@ export async function getBrandWithContent(brandSlug: string) {
         products: [],
         solutions: [],
         articles: [],
+        supportArticles: [],
         categories: []
       };
     }
@@ -445,6 +465,7 @@ export async function getBrandWithContent(brandSlug: string) {
         products: [],
         solutions: [],
         articles: [],
+        supportArticles: [],
         categories: []
       };
     }
@@ -456,11 +477,13 @@ export async function getBrandWithContent(brandSlug: string) {
       products,
       solutions,
       articles,
+      supportArticles,
       categories
     ] = await Promise.allSettled([
       getBrandProducts(brandSlug, 8),
       getBrandSolutions(brandSlug, 4),
       getBrandArticles(brandSlug, 4),
+      getBrandSupportArticles(brandSlug, 4),
       getBrandProductCategories(brandSlug)
     ]);
 
@@ -468,15 +491,17 @@ export async function getBrandWithContent(brandSlug: string) {
     const safeProducts = products.status === 'fulfilled' ? products.value : [];
     const safeSolutions = solutions.status === 'fulfilled' ? solutions.value : [];
     const safeArticles = articles.status === 'fulfilled' ? articles.value : [];
+    const safeSupportArticles = supportArticles.status === 'fulfilled' ? supportArticles.value : [];
     const safeCategories = categories.status === 'fulfilled' ? categories.value : [];
 
-    console.log(`✅ [getBrandWithContent] Content fetched - Products: ${safeProducts.length}, Solutions: ${safeSolutions.length}, Articles: ${safeArticles.length}, Categories: ${safeCategories.length}`);
+    console.log(`✅ [getBrandWithContent] Content fetched - Products: ${safeProducts.length}, Solutions: ${safeSolutions.length}, Articles: ${safeArticles.length}, Support Articles: ${safeSupportArticles.length}, Categories: ${safeCategories.length}`);
 
     return {
       brand,
       products: safeProducts,
       solutions: safeSolutions,
       articles: safeArticles,
+      supportArticles: safeSupportArticles,
       categories: safeCategories
     };
   } catch (error) {
@@ -490,6 +515,7 @@ export async function getBrandWithContent(brandSlug: string) {
       products: [],
       solutions: [],
       articles: [],
+      supportArticles: [],
       categories: []
     };
   }
