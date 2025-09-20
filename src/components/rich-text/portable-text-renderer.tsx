@@ -43,15 +43,6 @@ interface CodeBlockProps {
 const CodeBlock: React.FC<CodeBlockProps> = ({ value }) => {
   const { language = 'javascript', code, filename, caption } = value;
 
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(code);
-      // 这里可以添加复制成功的提示
-    } catch (err) {
-      console.error('Failed to copy code:', err);
-    }
-  };
-
   return (
     <Card className="my-6">
       {(filename || caption) && (
@@ -66,14 +57,6 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ value }) => {
       )}
       <CardContent className="p-0">
         <div className="relative">
-          <Button
-            size="sm"
-            variant="outline"
-            className="absolute top-2 right-2 z-10"
-            onClick={handleCopy}
-          >
-            复制
-          </Button>
           <SyntaxHighlighter
             language={language}
             style={vscDarkPlus}
