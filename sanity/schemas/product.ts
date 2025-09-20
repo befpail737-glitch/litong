@@ -37,8 +37,203 @@ export const product = defineType({
     defineField({
       name: 'description',
       title: '产品描述',
-      type: 'text',
-      rows: 4,
+      type: 'array',
+      description: '产品详细描述，支持富文本编辑、图片、表格、链接等',
+      of: [
+        {
+          type: 'block',
+          styles: [
+            { title: '正文', value: 'normal' },
+            { title: '标题1', value: 'h1' },
+            { title: '标题2', value: 'h2' },
+            { title: '标题3', value: 'h3' },
+            { title: '标题4', value: 'h4' },
+            { title: '引用', value: 'blockquote' },
+          ],
+          lists: [
+            { title: '无序列表', value: 'bullet' },
+            { title: '有序列表', value: 'number' },
+          ],
+          marks: {
+            decorators: [
+              { title: '粗体', value: 'strong' },
+              { title: '斜体', value: 'em' },
+              { title: '下划线', value: 'underline' },
+              { title: '删除线', value: 'strike-through' },
+              { title: '代码', value: 'code' },
+            ],
+            annotations: [
+              // 超链接功能
+              {
+                name: 'link',
+                type: 'object',
+                title: '超链接',
+                fields: [
+                  {
+                    name: 'href',
+                    type: 'url',
+                    title: '链接地址',
+                    validation: Rule => Rule.required().uri({
+                      scheme: ['http', 'https', 'mailto', 'tel']
+                    }),
+                  },
+                  {
+                    name: 'target',
+                    type: 'string',
+                    title: '打开方式',
+                    options: {
+                      list: [
+                        { title: '当前窗口', value: '_self' },
+                        { title: '新窗口', value: '_blank' },
+                      ]
+                    },
+                    initialValue: '_blank',
+                  },
+                ],
+              },
+              // 字体颜色
+              {
+                name: 'color',
+                type: 'object',
+                title: '字体颜色',
+                fields: [
+                  {
+                    name: 'hex',
+                    type: 'string',
+                    title: '颜色',
+                    options: {
+                      list: [
+                        { title: '黑色', value: '#000000' },
+                        { title: '红色', value: '#DC2626' },
+                        { title: '蓝色', value: '#2563EB' },
+                        { title: '绿色', value: '#059669' },
+                        { title: '橙色', value: '#EA580C' },
+                        { title: '紫色', value: '#7C3AED' },
+                        { title: '灰色', value: '#6B7280' },
+                      ]
+                    },
+                    initialValue: '#000000',
+                  },
+                ],
+              },
+              // 字体大小
+              {
+                name: 'fontSize',
+                type: 'object',
+                title: '字体大小',
+                fields: [
+                  {
+                    name: 'size',
+                    type: 'string',
+                    title: '大小',
+                    options: {
+                      list: [
+                        { title: '小号 (12px)', value: 'text-xs' },
+                        { title: '正常 (14px)', value: 'text-sm' },
+                        { title: '中号 (16px)', value: 'text-base' },
+                        { title: '大号 (18px)', value: 'text-lg' },
+                        { title: '特大 (20px)', value: 'text-xl' },
+                        { title: '超大 (24px)', value: 'text-2xl' },
+                      ]
+                    },
+                    initialValue: 'text-base',
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        // 图片支持
+        {
+          type: 'image',
+          options: {
+            hotspot: true,
+          },
+          fields: [
+            {
+              name: 'alt',
+              type: 'string',
+              title: '图片描述',
+              validation: Rule => Rule.required(),
+            },
+            {
+              name: 'caption',
+              type: 'string',
+              title: '图片标题',
+            },
+          ],
+        },
+        // PDF文件支持
+        {
+          type: 'file',
+          name: 'pdf',
+          title: 'PDF文档',
+          options: {
+            accept: '.pdf',
+          },
+          fields: [
+            {
+              name: 'title',
+              type: 'string',
+              title: '文档标题',
+              validation: Rule => Rule.required(),
+            },
+            {
+              name: 'description',
+              type: 'text',
+              title: '文档描述',
+            },
+          ],
+        },
+        // 表格支持
+        {
+          type: 'object',
+          name: 'table',
+          title: '表格',
+          fields: [
+            {
+              name: 'title',
+              type: 'string',
+              title: '表格标题',
+            },
+            {
+              name: 'rows',
+              type: 'array',
+              title: '表格行',
+              of: [
+                {
+                  type: 'object',
+                  fields: [
+                    {
+                      name: 'cells',
+                      type: 'array',
+                      title: '单元格',
+                      of: [{ type: 'string' }],
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              name: 'hasHeader',
+              type: 'boolean',
+              title: '包含表头',
+              initialValue: true,
+            },
+          ],
+          preview: {
+            select: {
+              title: 'title',
+            },
+            prepare({ title }) {
+              return {
+                title: title || '数据表格',
+                subtitle: '产品规格表格',
+              };
+            },
+          },
+        },
+      ],
     }),
     
     defineField({

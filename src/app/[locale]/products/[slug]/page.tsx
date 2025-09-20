@@ -18,6 +18,7 @@ import {
   Tag
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ProductDescriptionRenderer } from '@/components/rich-text/product-description-renderer';
 
 interface ProductPageProps {
   params: {
@@ -297,8 +298,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <div className="prose max-w-none text-gray-700">
                 {typeof product.description === 'string' ? (
                   <div dangerouslySetInnerHTML={{ __html: product.description }} />
+                ) : Array.isArray(product.description) ? (
+                  <ProductDescriptionRenderer value={product.description} />
                 ) : (
-                  <p>产品详情将在此处显示。请联系开发团队完成 Portable Text 渲染组件的集成。</p>
+                  <p>产品详情将在此处显示。</p>
                 )}
               </div>
             </div>
