@@ -1,4 +1,5 @@
 import { MainLayout } from '@/components/layout/MainLayout';
+import { EnhancedSearchBox } from '@/components/search/EnhancedSearchBox';
 
 // Generate static params for all supported locales
 export async function generateStaticParams() {
@@ -30,6 +31,14 @@ export default function HomePage() {
               专业的电子元器件供应链服务商，为全球客户提供高品质产品和专业技术支持，
               助力您的项目成功
             </p>
+
+            {/* Enhanced Search Box */}
+            <div className="max-w-2xl mx-auto mb-8 sm:mb-12 px-4">
+              <EnhancedSearchBox
+                placeholder="搜索产品型号、品牌或关键词..."
+                className="mb-6"
+              />
+            </div>
 
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-8 sm:mb-12 px-4">
               <button className="w-full sm:w-auto inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm sm:text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-600 text-white hover:bg-blue-700 h-12 sm:h-10 px-6 sm:px-8 py-3 sm:py-2 touch-target-44">
