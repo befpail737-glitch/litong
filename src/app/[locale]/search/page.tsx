@@ -5,6 +5,9 @@ import { Search, Filter, Grid, List, ChevronDown, Package, Building2, FileText }
 import Link from 'next/link';
 import Image from 'next/image';
 
+// Force dynamic rendering for search functionality
+export const dynamic = 'force-dynamic';
+
 // Generate static params for supported locales
 export async function generateStaticParams() {
   return [
